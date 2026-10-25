@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probe Studio</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;
+    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;
+    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;
+      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }
+  header .meta { color: var(--muted); font-size: 12px; }
+  header .spacer { flex: 1; }
+  nav { display: flex; gap: 4px; }
+  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }
+  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }
+  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }
+  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.secondary { background: var(--track); color: var(--text); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }
+  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }
+  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }
+  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .card .k { color: var(--muted); font-size: 12px; }
+  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: var(--track); }
+  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }
+  .bar span { display: block; height: 100%; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
+  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }
+  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
+  .pill.h-unknown { color: var(--muted); background: var(--track); }
+  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }
+  .tile:hover { background: var(--track); }
+  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }
+  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }
+  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+  .box h3 { font-size: 13px; margin: 0 0 8px; }
+  .box ul { margin: 4px 0; padding-left: 18px; }
+  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }
+  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }
+  textarea { width: 100%; min-height: 90px; resize: vertical; }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); font-size: 12px; }
+  td.mono { word-break: break-all; }
+  h2 { font-size: 15px; margin: 22px 0 10px; }
+  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }
+  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }
+  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }
+  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }
+  details.fc > summary::-webkit-details-marker { display: none; }
+  details.fc[open] > summary { border-bottom: 1px solid var(--line); }
+  .fc-body { padding: 4px 16px 14px; }
+  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }
+  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }
+  .fc-body ul.expect { list-style: none; padding-left: 0; }
+  .fc-body ul.expect li { margin: 3px 0; }
+  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+  .reach b { color: var(--muted); font-weight: 400; }
+  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .pill.lvl-capability { color: var(--text); background: var(--track); }
+  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }
+  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
+  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }
+  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }
+  ul.setup { list-style: none; padding: 0; margin: 0; }
+  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  ul.setup li:last-child { border-bottom: 0; }
+  ul.setup .what { flex: 1; min-width: 200px; }
+  .src { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }
+  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+  .side .head input { width: 100%; min-width: 0; }
+  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }
+  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }
+  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+  .side li:hover { background: var(--track); }
+  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }
+  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }
+  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }
+  .issues { margin: 12px 0; }
+  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .issue:last-child { border-bottom: 0; }
+  .issue .what { flex: 1; min-width: 220px; }
+  .issue .k { font-size: 11px; }
+  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }
+  @media (max-width: 720px) {
+    header { flex-wrap: wrap; padding: 12px 16px; }
+    main { padding: 16px; }
+    .hide-sm { display: none; }
+    table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Probe</h1>
+  <div class="meta" id="meta">loading…</div>
+  <span class="branch" id="branch" title="Branch this project is on">…</span>
+  <div class="spacer"></div>
+  <nav>
+    <button data-tab="atlas" class="active">Atlas</button>
+    <button data-tab="cards">Cards</button>
+    <button data-tab="verify">Verify</button>
+    <button data-tab="runs">Runs</button>
+    <button data-tab="settings">Settings</button>
+    <button data-tab="setup">Setup</button>
+  </nav>
+</header>
+<div id="banner"></div>
+<main id="view"></main>
+
+<script>
+const $view = document.getElementById("view");
+const $meta = document.getElementById("meta");
+const state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null };
+
+const api = (path, opts) => fetch(path, opts).then((r) => r.json());
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const ago = (iso) => {
+  if (!iso) return "never";
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.round(s / 60) + "m ago";
+  if (s < 86400) return Math.round(s / 3600) + "h ago";
+  return Math.round(s / 86400) + "d ago";
+};
+
+document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {
+  state.tab = b.dataset.tab; state.feature = null; render();
+}));
+
+function closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }
+
+async function render() {
+  closeStream();
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
+  if (state.tab === "setup") return renderSetup();
+  if (state.tab === "atlas") return state.feature ? renderFeature(state.feature) : renderAtlas();
+  if (state.tab === "cards") return renderCards();
+  if (state.tab === "verify") return renderVerify();
+  if (state.tab === "runs") return renderRuns();
+  if (state.tab === "settings") return renderSettings();
+}
+
+function coverageBar(s) {
+  const t = Math.max(1, s.testable);
+  const w = (n) => (100 * n / t).toFixed(1) + "%";
+  return `<div class="bar" title="${s.direct} direct · ${s.referenced} referenced · ${s.untested} untested">
+    <span style="width:${w(s.direct)};background:var(--ok)"></span>
+    <span style="width:${w(s.referenced)};background:var(--warn)"></span>
+  </div>`;
+}
+
+function runPill(r) {
+  if (!r) return `<span class="pill none">not run</span>`;
+  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;
+  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;
+}
+
+const HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };
+function healthPill(f) {
+  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\n"))}">${HEALTH_LABEL[f.health]}</span>`;
+}
+
+function devicePill(d) {
+  const ran = d.passed + d.failed + d.blocked + d.error;
+  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">⟳ ${d.stale} outdated</span>`;
+  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">—</span>`;
+  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";
+  return `<span class="pill ${cls}" title="${d.passed} passed · ${d.failed} failed · ${d.blocked} blocked · ${d.error} error · ${d.stale} outdated · ${d.maybe} maybe outdated · ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">⟳ ${d.stale}</span>` : ""}`;
+}
+
+/** Marks a result that no longer holds for the code checked out here. */
+function freshPill(r) {
+  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";
+  const why = (r.freshReasons || []).join("\n");
+  return r.fresh === "stale"
+    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">⟳ outdated</span>`
+    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;
+}
+
+function whoRan(r) {
+  return r.remote ? ` · recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";
+}
+
+function lastRunPill(r) {
+  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;
+  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;
+}
+
+function cardsPill(c) {
+  if (!c) return `<span class="pill none">none</span>`;
+  const title = `${c.approved} approved · ${c.draft} draft · ${c.rejected} rejected`;
+  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` · ${c.draft} to review` : ""}</span>`;
+}
+
+/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */
+function outdatedCount(features) {
+  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;
+}
+
+async function loadScan(refresh) {
+  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });
+  const p = state.scan.project;
+  $meta.textContent = `${p.name} · ${p.adapter} · scanned ${ago(state.scan.scannedAt)}`;
+}
+
+async function renderAtlas() {
+  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project…</div>`; await loadScan(false); }
+  const all = state.scan.features;
+  const list = all
+    .filter((f) => state.group === "all" || f.group === state.group)
+    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));
+  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);
+  const testable = sum("testable");
+  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "–";
+
+  $view.innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="k">${state.group === "platform" ? "Platform groups" : "Features"}</div><div class="v">${list.length}</div></div>
+      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>
+      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>
+      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>
+      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>
+      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>
+      <input type="search" id="filter" placeholder="Filter…" value="${esc(state.filter)}">
+      <div class="seg" id="group">
+        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>
+      </div>
+      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>
+      <div style="flex:1"></div>
+      ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">⟳ Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}
+      <button class="btn secondary" id="rescan">Rescan</button>
+    </div>
+    <div id="runpanel"></div>
+    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}
+    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\n"))}">
+        <strong>${esc(f.id)}</strong>
+        <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `✗${f.unit.failed}` : "✓") : "—"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>
+        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>
+      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `
+    <table>
+      <thead><tr>
+        <th>Feature</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>
+        <th class="num hide-sm">Untested</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>
+      </tr></thead>
+      <tbody>
+        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">
+          <td><strong>${esc(f.id)}</strong></td>
+          <td class="num hide-sm">${f.stats.modules}</td>
+          <td class="num">${f.stats.testable}</td>
+          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>
+          <td class="num hide-sm">${f.stats.untested}</td>
+          <td>${cardsPill(f.cards)}</td>
+          <td>${runPill(f.lastUnitRun)}</td>
+          <td>${devicePill(f.device)}</td>
+          <td>${healthPill(f)}</td>
+        </tr>`).join("") || `<tr><td colspan="9" class="empty">Nothing matches.</td></tr>`}
+      </tbody>
+    </table>`}`;
+
+  const filter = document.getElementById("filter");
+  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });
+  document.querySelectorAll("#group button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.g === state.group);
+    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });
+  });
+  document.getElementById("uptodate")?.addEventListener("click", async (e) => {
+    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;
+    e.target.disabled = true;
+    const res = await post("/api/verify", { outdated: true });
+    if (res.error) { alert(res.error); e.target.disabled = false; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
+  });
+  document.getElementById("rescan").addEventListener("click", async (e) => {
+    e.target.disabled = true; e.target.textContent = "Scanning…";
+    await loadScan(true); renderAtlas();
+  });
+  document.querySelectorAll("#view button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.v === state.view);
+    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });
+  });
+  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));
+}
+
+async function renderFeature(id) {
+  $view.innerHTML = `<div class="empty">Loading ${esc(id)}…</div>`;
+  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);
+  if (!state.scan) await loadScan(false);
+  const h = state.scan.features.find((x) => x.id === f.id);
+  const nav = navmap[f.id];
+  const s = f.stats;
+  const withTests = f.modules.filter((m) => m.unitTestTask).length;
+  $view.innerHTML = `
+    <button class="back" id="back">← Atlas</button>
+    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>
+      <button class="btn secondary" id="backfill" title="A background agent reads code, docs and git history and drafts cards">✦ Draft cards</button>
+      <button class="btn secondary" id="explore" title="An agent walks this feature's screens on an emulator and maps how each is reached">⌖ Map screens</button>
+      <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">✎ Write missing tests</button>
+      <button class="btn secondary" id="verifyf" title="Unit tests, then this feature's approved cards on a device">✓ Verify</button>
+      <button class="btn" id="run" ${withTests ? "" : "disabled"}>▶ Run unit tests</button></div>
+    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}
+    <div class="cards">
+      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>
+      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>
+      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>
+      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>
+      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>
+    </div>
+    <div id="runpanel"></div>
+    <h2>Cards</h2>
+    <div id="featurecards"></div>
+    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">· mapped ${ago(nav.at)}</span>` : ""}</h2>
+    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}
+      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>
+      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>→</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}
+      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>⌖ Map screens</strong> lets an agent walk this feature on an emulator.</div>`}
+    <h2>Riskiest untested classes</h2>
+    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model…) and size. Static analysis: a class counts as tested when a test class is named after it.</p>
+    <table>
+      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>
+      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing 🎉</td></tr>`}</tbody>
+    </table>
+    <h2>Modules</h2>
+    <table>
+      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>
+      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "—")}</td></tr>`).join("")}</tbody>
+    </table>`;
+  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });
+  const showCards = async () => {
+    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);
+    const el = document.getElementById("featurecards");
+    if (!el) return;
+    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>✦ Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;
+    bindCardActions(el, showCards);
+  };
+  showCards();
+  document.getElementById("backfill").addEventListener("click", async (e) => {
+    e.target.disabled = true; e.target.textContent = "Agent drafting…";
+    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });
+    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "✦ Draft cards"; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "✦ Draft cards"; state.scan = null; showCards(); });
+  });
+  document.getElementById("run").addEventListener("click", async (e) => {
+    e.target.disabled = true; e.target.textContent = "Running…";
+    const { runId } = await api("/api/unit/" + encodeURIComponent(f.id), { method: "POST" });
+    followRun(runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "▶ Run unit tests"; state.scan = null; });
+  });
+  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {
+    const label = e.target.textContent;
+    e.target.disabled = true; e.target.textContent = busy;
+    const res = await post(path, body);
+    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });
+  });
+  start("explore", "Agent mapping…", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));
+  start("unitwrite", "Agent writing tests…", "/api/unitwrite/" + encodeURIComponent(f.id), {});
+  start("verifyf", "Verifying…", "/api/verify", { features: [f.id] }, showCards);
+}
+
+// Every action carries the branch the person is looking at; the server refuses it if the
+// project has moved to another branch since (a checkout in a terminal or the IDE).
+const post = async (path, body) => {
+  const headers = { "content-type": "application/json" };
+  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);
+  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });
+  if (res.branchChanged) checkBranch();
+  return res;
+};
+
+async function checkBranch() {
+  const b = await api("/api/branch").catch(() => null);
+  if (!b) return;
+  state.branchInfo = b;
+  if (b.id && !state.branchSeen) state.branchSeen = b.id;
+  const chip = document.getElementById("branch");
+  chip.textContent = b.git ? `⎇ ${b.id}${b.git.dirty ? ` · ${b.git.dirty} uncommitted` : ""}` : "no git";
+  chip.className = "branch" + (b.warnings.length ? " warn" : "");
+  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\n");
+  const banner = document.getElementById("banner");
+  if (b.id && state.branchSeen && b.id !== state.branchSeen) {
+    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} → ${esc(b.id)}.</strong>
+      <span>Actions are paused so nothing runs on code you did not mean to test.</span>
+      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;
+    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });
+  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {
+    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" · ")}</div>`;
+  } else banner.innerHTML = "";
+}
+setInterval(checkBranch, 5000);
+
+function followRun(runId, el, onDone) {
+  closeStream();
+  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">■ Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;
+  const log = el.querySelector("#log");
+  const stopBtn = el.querySelector("#rstop");
+  stopBtn.addEventListener("click", async () => {
+    if (!confirm(`Stop run ${runId}?`)) return;
+    stopBtn.disabled = true; stopBtn.textContent = "Stopping…";
+    const res = await stopRunReq(runId);
+    if (res.error) { alert(res.error); stopBtn.remove(); }
+  });
+  const es = new EventSource(`/api/runs/${runId}/stream`);
+  state.eventSource = es;
+  es.onmessage = (msg) => {
+    const e = JSON.parse(msg.data);
+    if (e.type === "log") {
+      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;
+      log.textContent += e.line + "\n";
+      if (atBottom) log.scrollTop = log.scrollHeight;
+    } else if (e.type === "done") {
+      es.close(); state.eventSource = null;
+      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;
+      el.querySelector("#rstop")?.remove();
+      const rr = el.querySelector("#rr");
+      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;
+      bindTicket(rr);
+      renderIssues(e.run, rr.querySelector("#ri"), el);
+      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));
+      onDone && onDone(e.run);
+    }
+  };
+  es.onerror = () => { es.close(); state.eventSource = null; };
+}
+
+const ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };
+
+/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */
+async function renderIssues(run, el, panel) {
+  if (run.status === "running" || run.kind === "fix") return;
+  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);
+  if (!Array.isArray(issues) || !issues.length) return;
+  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>
+    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">
+      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` · run ${esc(i.runId)}` : ""}</div></div>
+      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">⧉ Fix prompt</button>
+      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">✦ Fix</button>
+      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;
+  el.querySelectorAll(".issue").forEach((row) => {
+    const id = row.dataset.issue;
+    const out = row.querySelector(".ip");
+    row.querySelector("[data-prompt]").addEventListener("click", async () => {
+      if (out.innerHTML) { out.innerHTML = ""; return; }
+      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);
+      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;
+      out.querySelector("[data-copy]").addEventListener("click", async () => {
+        const ta = out.querySelector("textarea");
+        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }
+        out.querySelector("[data-copied]").textContent = "Copied.";
+      });
+    });
+    row.querySelector("[data-fix]").addEventListener("click", async () => {
+      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";
+      if (!confirm(`An agent will change the code${branch} to fix:\n\n${row.querySelector("strong").textContent}\n\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;
+      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);
+      if (res.error) return alert(res.error);
+      followRun(res.runId, panel);
+    });
+  });
+}
+
+const stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);
+
+function perfBlock(p) {
+  if (!p) return "";
+  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;
+  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +
+    p.issues.map((i) => `<p style="color:var(--warn)">⚠ ${esc(i)}</p>`).join("");
+}
+
+function evidence(run) {
+  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;
+  const shots = run.timeline.filter((t) => t.screenshot);
+  return `<p>${esc(run.device)} · ${run.timeline.length} steps · $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +
+    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +
+    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +
+    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} · ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +
+    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} — ${esc(t.detail)}</li>`).join("")}</ol></details>`;
+}
+
+function ticketButton(run) {
+  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login") return "";
+  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">⧉ Ticket draft</button></div><div class="ticketpanel"></div>`;
+}
+
+async function bindTicket(el) {
+  const b = el.querySelector("button[data-ticket]");
+  if (!b) return;
+  b.addEventListener("click", async () => {
+    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);
+    const panel = el.querySelector(".ticketpanel");
+    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>
+      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;
+    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\n\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));
+    const file = panel.querySelector("[data-file]");
+    if (file) file.addEventListener("click", async () => {
+      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;
+      file.disabled = true;
+      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);
+      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;
+    });
+  });
+}
+
+function resultsTable(run) {
+  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";
+  if (run.kind === "verify") {
+    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);
+    return err + `<p>vs <strong>${esc(run.base)}</strong> · ${run.changed.length} changed files · ${run.features.length} features · ${run.device ? "unit + device" : "unit only"} · $${run.costUsd.toFixed(2)}</p>
+      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>
+      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>
+        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "—"}</td>
+        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">— ${esc(c.note)}</span>` : ""}</div>`).join("") || "—"}</td></tr>`).join("")}
+      </tbody></table>
+      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);
+  }
+  if (run.kind === "login") {
+    const l = run.login;
+    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` · shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);
+  }
+  if (run.kind === "explore") {
+    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}
+      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" → ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);
+  }
+  if (run.kind === "unitwrite") {
+    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} · $${run.costUsd.toFixed(2)}${run.unitRun ? ` · <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>
+      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "⚠ " : "+ "}${esc(f)}</li>`).join("")}</ul>
+      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;
+  }
+  if (run.kind === "card") {
+    const v = run.verdict;
+    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "✅" : e.met === false ? "❌" : "❔"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";
+    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` · part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);
+  }
+  if (run.kind === "fix") {
+    const link = (id, label) => id ? ` · <a href="#" data-open="${esc(id)}">${label}</a>` : "";
+    return err + `<p><strong>${esc(run.issue.title)}</strong></p>
+      <p class="muted">${esc(run.feature)} · $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>
+      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}
+      ${run.summary ? `<details open><summary class="muted">Agent's account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;
+  }
+  if (run.kind === "backfill") {
+    return err + `<p>${run.written.length} cards written · $${run.costUsd.toFixed(2)}</p>` +
+      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" · ")}</p>` : "");
+  }
+  if (!run.results.length) return err;
+  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>
+    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>
+      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">✗ ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}
+  </tbody></table>`;
+}
+
+const LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };
+
+function cardHtml(c) {
+  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");
+  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">
+    <summary>
+      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>
+      <strong>${esc(c.title)}</strong>
+      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}
+      <span style="flex:1"></span>
+      ${lastRunPill(c.lastRun)}
+      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>
+      <span class="pill st-${c.status}">${c.status}</span>
+    </summary>
+    <div class="fc-body">
+      <p>${esc(c.summary)}</p>
+      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>→</b>")}</div>
+      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}
+      <div class="k">Steps</div><ol>${list(c.steps)}</ol>
+      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>
+      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` — ${esc(s.note)}` : ""}</li>`).join("")}</ul>
+      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} · ${esc(c.modules.join(", "))} · ${c.createdBy}, ${ago(c.updatedAt)}</div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" data-run title="An agent performs this card on an emulator and checks every expectation">▶ Run on device</button>
+        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}
+        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}
+        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}
+      </div>
+    </div>
+  </details>`;
+}
+
+function bindCardActions(el, refresh) {
+  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {
+    b.disabled = true; b.textContent = "Agent testing…";
+    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });
+    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "▶ Run on device"; return; }
+    let panel = d.querySelector(".runpanel");
+    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }
+    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "▶ Run on device"; });
+  })));
+  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {
+    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),
+    });
+    state.scan = null;
+    refresh();
+  })));
+}
+
+const LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];
+const SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];
+
+/** One entry per feature: its counts, and the dot that says what needs attention first. */
+function cardFeatures(all) {
+  const by = new Map();
+  for (const c of all) {
+    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };
+    f.cards.push(c);
+    if (c.status === "draft") f.draft++;
+    if (c.status === "approved") f.approved++;
+    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;
+    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;
+    if (!c.lastRun && c.status !== "rejected") f.notrun++;
+    by.set(c.feature, f);
+  }
+  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
+async function renderCards() {
+  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };
+  const fl = state.cardFilter;
+  const all = await api("/api/cards");
+  if (!all.length) {
+    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose ✦ Draft cards, or <button class="btn secondary" id="bfall">✦ Draft cards for every feature</button></div><div id="runpanel"></div>`;
+    return bindBackfillAll();
+  }
+  const features = cardFeatures(all);
+  const listed = features
+    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))
+    .filter((f) => fl.side === "all" || f[fl.side] > 0);
+  // Open on what needs a person: a failing feature, else one with drafts.
+  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;
+  const f = features.find((x) => x.id === fl.feature);
+  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));
+  const total = (k) => features.reduce((n, x) => n + x[k], 0);
+  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");
+
+  $view.innerHTML = `
+    <div class="toolbar">
+      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>
+      <span class="pill st-draft">${total("draft")} to review</span>
+      <span class="pill st-approved">${total("approved")} approved</span>
+      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}
+      <div style="flex:1"></div>
+      <button class="btn secondary" id="bfall" title="Runs a background agent per feature that has no cards yet">✦ Draft cards for features without any</button>
+    </div>
+    <div id="runpanel"></div>
+    <div class="split">
+      <aside class="side">
+        <div class="head">
+          <input type="search" id="cq" placeholder="Find a feature, card or ticket…" value="${esc(fl.q)}">
+          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>
+        </div>
+        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review · ${x.approved} approved · ${x.failing} failing · ${x.notrun} never run">
+          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>
+      </aside>
+      <section>
+        <div class="toolbar">
+          <h2 style="margin:0">${esc(f.id)}</h2>
+          <span class="muted">${f.cards.length} cards · ${f.approved} approved · ${f.draft} to review${f.failing ? ` · <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` · <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>
+          <div style="flex:1"></div>
+          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" title="Runs this feature's approved cards whose result is outdated or missing">⟳ Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}
+          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}
+        </div>
+        <div class="toolbar">
+          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>
+          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>
+        </div>
+        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>
+      </section>
+    </div>`;
+
+  bindCardActions(document.getElementById("cardlist"), renderCards);
+  const q = document.getElementById("cq");
+  q.addEventListener("input", () => {
+    const v = q.value.toLowerCase();
+    // Filter the sidebar in place, so typing never loses focus.
+    $view.querySelectorAll(".side li[data-f]").forEach((li) => {
+      const x = features.find((y) => y.id === li.dataset.f);
+      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";
+    });
+  });
+  q.addEventListener("change", () => { fl.q = q.value; });
+  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; renderCards(); }));
+  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));
+  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));
+  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));
+  document.getElementById("rerunold")?.addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const res = await post("/api/verify", { outdated: true, features: [f.id] });
+    if (res.error) { alert(res.error); e.target.disabled = false; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());
+  });
+  const approveAll = document.getElementById("approveall");
+  if (approveAll) approveAll.addEventListener("click", async () => {
+    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;
+    approveAll.disabled = true;
+    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });
+    renderCards();
+  });
+  bindBackfillAll();
+}
+
+function bindBackfillAll() {
+  document.getElementById("bfall")?.addEventListener("click", async (e) => {
+    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;
+    e.target.disabled = true;
+    const res = await post("/api/cards/*/backfill");
+    if (res.error) { alert(res.error); e.target.disabled = false; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });
+  });
+}
+
+async function renderRuns() {
+  $view.innerHTML = `<div class="empty">Loading runs…</div>`;
+  const runs = await api("/api/runs");
+  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }
+  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>
+    ${runs.map((r) => {
+      let result;
+      if (r.kind === "backfill") result = `${r.written.length} cards · $${r.costUsd.toFixed(2)}`;
+      else if (r.kind === "card") result = `${esc(r.cardId)} · ${r.timeline.length} steps · $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` · <span style="color:var(--warn)">perf ⚠</span>` : ""}`;
+      else if (r.kind === "verify") result = `vs ${esc(r.base)} · ${r.features.length} features · ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;
+      else if (r.kind === "explore") result = `${r.screens.length} screens · ${r.issues.length} issues`;
+      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "—";
+      else if (r.kind === "unitwrite") result = `${r.files.length} files · $${r.costUsd.toFixed(2)}`;
+      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files · $${r.costUsd.toFixed(2)}`;
+      else {
+        const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);
+        result = `${t} tests${f ? ` · <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;
+      }
+      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">■ Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;
+    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;
+  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));
+  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;
+    b.disabled = true;
+    const res = await stopRunReq(b.dataset.stop);
+    if (res.error) alert(res.error);
+    setTimeout(renderRuns, 1500);
+  }));
+}
+
+async function renderVerify() {
+  if (!state.verify) state.verify = { base: "" };
+  $view.innerHTML = `<div class="empty">Reading the change…</div>`;
+  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);
+  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";
+  $view.innerHTML = `
+    <div class="box"><h3>Verify this change</h3>
+      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>
+      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}
+      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>
+      <form class="inline" id="vf">
+        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>
+        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>
+        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>
+        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>
+        <button class="btn" type="submit" ${ch.features.length ? "" : "disabled"}>✓ Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>
+        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>
+      </form>
+      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>
+      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>… ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}
+      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}
+    </div>
+    <div class="box"><h3>From a ticket</h3>
+      <form class="inline" id="tf">
+        <label>Ticket<input name="ticket" placeholder="VAN-1234" required></label>
+        <button class="btn secondary" type="button" id="tlook">Look up</button>
+        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket's commits touched, its own cards first">✓ Verify ticket</button>
+      </form>
+      <div id="tinfo"></div>
+      <form class="inline" id="tc" style="margin-top:10px">
+        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can…"></textarea></label>
+        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>
+        <button class="btn" type="submit">✦ Draft cards from ticket</button>
+      </form>
+    </div>
+    <div id="runpanel"></div>`;
+  const vf = document.getElementById("vf");
+  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });
+  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });
+  vf.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });
+    if (res.error) return alert(res.error);
+    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
+  });
+  const tf = document.getElementById("tf");
+  const ticket = () => tf.ticket.value.trim();
+  document.getElementById("tlook").addEventListener("click", async () => {
+    if (!ticket()) return;
+    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));
+    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} · features: ${t.features.map(esc).join(", ") || "none"} · cards: ${t.cards.map(esc).join(", ") || "none"}
+      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;
+  });
+  document.getElementById("tverify").addEventListener("click", async () => {
+    if (!ticket()) return;
+    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });
+    if (res.error) return alert(res.error);
+    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
+  });
+  document.getElementById("tc").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!ticket()) return alert("Enter the ticket id above.");
+    const tc = e.target;
+    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });
+    if (res.error) return alert(res.error);
+    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
+  });
+}
+
+async function renderAccounts(el) {
+  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);
+  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">—</span>`;
+  const l = login && login.run.login;
+  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} — agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";
+  el.innerHTML = `
+    <div class="box"><h3>Who the app on the device is logged in as</h3>
+      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">· ${esc(login.run.device)} · ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>
+        <button class="btn secondary" id="logincheck" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>
+      <div id="runpanel"></div></div>`;
+  el.innerHTML += `
+    <div class="box"><h3>Test accounts</h3>
+    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them — Probe types them on the device.</p>
+    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>
+      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>
+        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}
+    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}
+    <form class="acct" autocomplete="off">
+      <label>Role<input name="role" placeholder="user_a" required pattern="[\\w-]{1,40}"></label>
+      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>
+      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>
+      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>
+      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>
+      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>
+      <button class="btn" type="submit">Save account</button>
+    </form></div>`;
+  const startLogin = async (role, b) => {
+    b.disabled = true;
+    const res = await post("/api/login", { role });
+    if (res.error) { alert(res.error); b.disabled = false; return; }
+    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));
+  };
+  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));
+  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));
+  const form = el.querySelector("form.acct");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(form));
+    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    if (res.error) return alert(res.error);
+    renderAccounts(el);
+  });
+  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {
+    const a = accounts.find((x) => x.role === b.dataset.edit);
+    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";
+    form.password.focus();
+  }));
+  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {
+    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;
+    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });
+    renderAccounts(el);
+  }));
+}
+
+const MODELS = [
+  ["sonnet", "Sonnet — balanced, included in most plans (recommended)"],
+  ["haiku", "Haiku — fastest and cheapest, fine for simple cards"],
+  ["opus", "Opus — strongest, uses your plan faster"],
+  ["fable", "Fable — may bill usage credits on your plan"],
+];
+const SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe's default" };
+
+const APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };
+
+function projectBox(p) {
+  const a = p.app;
+  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];
+  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;
+  const branches = p.branches || [];
+  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;
+  return `<div class="box"><h3>Project</h3>
+    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>
+    <form class="inline" id="pf">
+      <label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>
+      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>
+      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>
+      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine · a phone usually carries someone's own accounts</span></div>
+        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}
+      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>
+      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>
+      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>
+      <label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>
+      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>
+      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>
+      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>
+      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>
+      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>
+      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>
+      <button class="btn" type="submit">Save project settings</button>
+    </form>
+    <p id="pout" style="margin-bottom:0"></p>
+  </div>`;
+}
+
+function bindProject() {
+  const f = document.getElementById("pf");
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const num = (v) => (v === "" ? null : Number(v));
+    const body = {
+      app: { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null },
+      devices: { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) },
+      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },
+      perf: { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) },
+      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },
+    };
+    for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];
+    const res = await post("/api/project", body);
+    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;
+    if (!res.error) setTimeout(renderSettings, 700);
+  });
+}
+
+async function renderSettings() {
+  $view.innerHTML = `<div class="empty">Reading settings…</div>`;
+  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);
+  p.branches = br.branches;
+  const current = s.agents.model;
+  const known = MODELS.some(([m]) => m === current);
+  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `
+    <div class="box"><h3>Agent model</h3>
+      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs on your own Claude Code login and plan, with this model. It is saved for this machine only, since each developer's plan differs; a run started from the CLI can still pass <span class="mono">--model</span>.</p>
+      <form class="inline" id="sf">
+        <label>Model<select name="pick">${MODELS.map(([m, label]) => `<option value="${m}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other…</option></select></label>
+        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="claude-sonnet-5-5"></label>
+        <button class="btn" type="submit">Save</button>
+        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>
+        ${s.agents.source === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}
+      </form>
+      <p style="margin-bottom:0">In use: <strong class="mono">${esc(current)}</strong> <span class="muted">· ${SOURCE_LABEL[s.agents.source]}</span></p>
+      <p id="sout" style="margin-bottom:0"></p>
+    </div>`;
+  bindProject();
+  renderAccounts(document.getElementById("acctwrap"));
+  const form = document.getElementById("sf");
+  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);
+  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });
+  const out = document.getElementById("sout");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const res = await post("/api/settings", { model: chosen() });
+    if (res.error) return alert(res.error);
+    renderSettings();
+  });
+  document.getElementById("stest").addEventListener("click", async (e) => {
+    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen())}…</span>`;
+    const r = await post("/api/settings/test", { model: chosen() });
+    e.target.disabled = false;
+    out.innerHTML = r.ok
+      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`
+      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;
+  });
+  const reset = document.getElementById("sreset");
+  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { model: "" }); renderSettings(); });
+}
+
+async function renderDoctor(el) {
+  el.innerHTML = `<div class="empty">Checking the machine…</div>`;
+  const checks = await api("/api/doctor");
+  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>
+    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">→ ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+const STATUS_ICON = { ok: "✓", warn: "!", fail: "✕" };
+async function renderSetup() {
+  $view.innerHTML = `<div class="empty">Checking this project…</div>`;
+  const items = await api("/api/setup");
+  const left = items.filter((i) => i.status !== "ok").length;
+  $view.innerHTML = `<div class="box"><h3>${left ? `${left} thing${left === 1 ? "" : "s"} left to set up` : "Ready: agents can test this project"}</h3>
+    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>
+    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>
+      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>
+      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;
+  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);
+  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));
+  renderDoctor(document.getElementById("docwrap"));
+}
+
+(async () => {
+  await checkBranch();
+  // A project that cannot be tested yet opens on what is missing.
+  const items = await api("/api/setup").catch(() => []);
+  if (items.some((i) => i.status === "fail")) state.tab = "setup";
+  render();
+})();
+</script>
+</body>
+</html>

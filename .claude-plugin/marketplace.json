@@ -1,0 +1,11 @@
+{
+  "name": "probe-tools",
+  "owner": { "name": "Jalil" },
+  "plugins": [
+    {
+      "name": "probe",
+      "source": "./",
+      "description": "Agent-driven test platform for Android apps: feature health map, unit tests, feature cards tested on an emulator, verify and fix, with a local GUI (Probe Studio)."
+    }
+  ]
+}
