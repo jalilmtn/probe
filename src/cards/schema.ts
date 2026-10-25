@@ -30,7 +30,7 @@ export const CardInput = z.object({
     .min(1),
   accounts: z.number().int().min(0).max(4).default(1).describe("Test accounts needed (2 for chat/calls between users)."),
   modules: z.array(z.string()).default([]).describe("Build modules this behaviour lives in."),
-  tickets: z.array(z.string()).default([]).describe("Ticket ids, e.g. VAN-4016."),
+  tickets: z.array(z.string()).default([]).describe("Ticket ids, e.g. PROJ-123."),
   sources: z
     .array(
       z.object({

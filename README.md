@@ -30,7 +30,7 @@ place that fixes it. A project that cannot be tested yet opens on that tab.
 /probe write-tests chat   write missing unit tests
 /probe run comment comment-add
 /probe explore comment    map a feature's screens
-/probe ticket VAN-1234
+/probe ticket PROJ-1234
 ```
 
 Other agents (Cursor, Codex, Copilot, Gemini CLI): register the MCP server
@@ -58,10 +58,10 @@ node dist/probe.cjs doctor | scan | studio                   --project <app>
 node dist/probe.cjs feature <id> | unit <feature>
 node dist/probe.cjs write-tests <feature> [--limit 5]
 node dist/probe.cjs cards [feature] [--detail] | context <feature>
-node dist/probe.cjs backfill <feature|*> [--ticket VAN-1 [--ticket-text file.md]]
+node dist/probe.cjs backfill <feature|*> [--ticket PROJ-1 [--ticket-text file.md]]
 node dist/probe.cjs run <feature> <card> [--device <serial>]
 node dist/probe.cjs explore <feature> | login [role]
-node dist/probe.cjs verify [--base origin/develop] [--features a,b] [--ticket VAN-1] [--no-device] [--all-cards] [--max-cards 10]
+node dist/probe.cjs verify [--base origin/develop] [--features a,b] [--ticket PROJ-1] [--no-device] [--all-cards] [--max-cards 10]
 node dist/probe.cjs ticket <id> | ticket draft <run> | ticket file <run>
 node dist/probe.cjs issues <run> | fix-prompt <issue> | fix <issue>
 node dist/probe.cjs results [feature] | verify --outdated [--rerun-fresh]

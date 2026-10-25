@@ -181,7 +181,7 @@ perf:
   # maxMemoryMb: 400
 
 tickets:
-  # pattern: 'VAN-\\d+'
+  # pattern: 'PROJ-\\d+'
   # url: https://jira.example.com/browse/{id}
   # fileCommand: gh issue create --title {title} --body-file {file}
 `;
