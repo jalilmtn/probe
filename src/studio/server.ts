@@ -23,9 +23,17 @@ import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { findFeature, latestScan, riskyGaps, scan } from "../engine/scan.js";
 import { startUnitRun } from "../engine/unit.js";
 import page from "./page.html";
+import { startWatcher } from "../engine/watcher.js";
+import { loadWatch, recordStudio, runningCheck, startCheck, type ChangeSource } from "../engine/watch.js";
+import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "../knowledge/draft.js";
+import { briefGlance, checkManifest, loadManifest, manifestFile } from "../knowledge/manifest.js";
+import { describeCardProof, ruleProofs } from "../knowledge/proof.js";
+import { chooseFeatures, chosenFeatures, initPendingDrafts, initStatus, isInitStep, proposedFeatures, runningInit, startInit, type InitStepId } from "../engine/init.js";
 import { branchInfo, branchMismatch, projectSettings, saveProjectSettings, setupChecklist, type ProjectSettingsBody } from "./project.js";
 
 let running: { server: Server; url: string } | null = null;
+/** What the file watcher did lately, for Studio (Studio may run inside the MCP server, so never stdout). */
+const watchLog: string[] = [];
 
 /** Starts Studio once per process and returns its URL; later calls reuse it. */
 export async function startStudio(project: Project, preferredPort = 7777): Promise<string> {
@@ -38,6 +46,8 @@ export async function startStudio(project: Project, preferredPort = 7777): Promi
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
+      recordStudio(project, running.url);
+      if (project.config.watch.enabled) startWatcher(project, (line) => watchLog.push(`${new Date().toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
       return running.url;
     }
   }
@@ -66,6 +76,34 @@ async function handle(project: Project, req: IncomingMessage, res: ServerRespons
 
   if (method === "GET" && path === "/api/branch") return send(res, 200, branchInfo(project, url.searchParams.has("branches")));
   if (method === "GET" && path === "/api/setup") return send(res, 200, setupChecklist(project));
+  if (method === "GET" && path === "/api/init") {
+    const scanned = project.store.read("scan.json") !== null;
+    return send(res, 200, {
+      steps: initStatus(project),
+      proposed: scanned ? proposedFeatures(project) : [],
+      chosen: chosenFeatures(project),
+      drafts: initPendingDrafts(project).map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
+      running: runningInit(),
+    });
+  }
+  if (method === "POST" && path === "/api/init/run") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { step?: string; features?: string[]; accept?: boolean };
+    if (body.step && !isInitStep(body.step)) return send(res, 400, { error: `Unknown step ${body.step}.` });
+    try {
+      const { run } = startInit(project, { step: body.step as InitStepId | undefined, features: body.features, accept: body.accept });
+      return send(res, 200, { runId: run.id });
+    } catch (e) {
+      return send(res, 409, { error: (e as Error).message });
+    }
+  }
+  if (method === "POST" && path === "/api/init/features") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { features?: string[] };
+    try {
+      return send(res, 200, { chosen: chooseFeatures(project, body.features ?? []) });
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
   if (method === "GET" && path === "/api/project") return send(res, 200, projectSettings(project));
   if (method === "POST" && path === "/api/project") {
     const error = saveProjectSettings(project, JSON.parse(await readBody(req)) as ProjectSettingsBody);
@@ -93,6 +131,62 @@ async function handle(project: Project, req: IncomingMessage, res: ServerRespons
     return send(res, 200, listCards(project.root).map((c) => ({ ...c, lastRun: last.get(`${c.feature}/${c.id}`) ?? null })));
   }
   if (method === "GET" && path === "/api/navmap") return send(res, 200, navMap(project));
+
+  // Keeping features current while people code: what is stale, the check, drafted corrections.
+  if (method === "GET" && path === "/api/watch") {
+    const state = loadWatch(project);
+    return send(res, 200, {
+      enabled: project.config.watch.enabled,
+      stale: state.stale,
+      running: runningCheck(project),
+      checks: state.checks.slice(-30).reverse(),
+      drafts: listDrafts(project).filter((d) => d.status === "pending").map(({ id, feature, createdAt, files }) => ({ id, feature, createdAt, files: files.map((f) => f.path) })),
+      log: watchLog.slice(-20),
+    });
+  }
+  if (method === "POST" && path === "/api/watch/check") {
+    const body = JSON.parse(await readBody(req)) as { trigger?: ChangeSource; features?: string[]; drafts?: boolean };
+    const started = startCheck(project, { trigger: body.trigger ?? "manual", features: body.features, drafts: body.drafts });
+    return started ? send(res, 200, { runId: started.run.id }) : send(res, 409, { error: `A check is already running (${runningCheck(project)?.runId}).` });
+  }
+  m = /^\/api\/knowledge\/([^/]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const id = decodeURIComponent(m[1]!);
+    let manifest = null;
+    try {
+      manifest = loadManifest(project.root, id);
+    } catch {
+      // checkManifest below reports why it does not parse.
+    }
+    const exists = existsSync(join(project.root, manifestFile(id)));
+    return send(res, 200, {
+      file: manifestFile(id),
+      manifest,
+      check: exists ? checkManifest(project.root, id) : null,
+      glance: manifest ? briefGlance(project.root, manifest) : null,
+      // Each rule's cards with their last result, keyed by rule id.
+      cards: manifest
+        ? Object.fromEntries(
+            ruleProofs(project, manifest).map((p) => [
+              p.invariant.id,
+              p.cards.map((c) => ({ ref: c.ref, feature: c.feature, id: c.id, title: c.card?.title, status: c.card?.status, result: c.result, freshness: c.freshness, text: describeCardProof(c) })),
+            ]),
+          )
+        : {},
+      stale: loadWatch(project).stale[id] ?? null,
+      drafts: listDrafts(project, id).filter((d) => d.status === "pending").map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
+    });
+  }
+  m = /^\/api\/drafts\/([\w-]+)\/(approve|reject)$/.exec(path);
+  if (method === "POST" && m) {
+    const result = m[2] === "approve" ? approveDraft(project, m[1]!) : rejectDraft(project, m[1]!);
+    return send(res, result.ok ? 200 : 409, result);
+  }
+  m = /^\/api\/drafts\/([\w-]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const draft = findDraft(project, m[1]!);
+    return draft ? send(res, 200, { ...draft, diffs: draftDiffs(project, draft) }) : send(res, 404, { error: "unknown draft" });
+  }
 
   // What a verify would check right now, before anything runs.
   if (method === "GET" && path === "/api/changes") {

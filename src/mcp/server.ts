@@ -25,6 +25,11 @@ import { startFix, summarizeFix } from "../engine/fix.js";
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { startVerify, summarizeVerify } from "../engine/verify.js";
 import { ticketDraft, ticketInfo } from "../tickets/tickets.js";
+import { loadWatch, runningCheck, startCheck, summarizeCheckRun } from "../engine/watch.js";
+import { listDrafts } from "../knowledge/draft.js";
+import { checkManifest, loadManifest, summarizeCheck } from "../knowledge/manifest.js";
+import { formatInitStatus, INIT_STEPS, initStatus, startInit, summarizeInit } from "../engine/init.js";
+import { findRule, ruleProofs, runRuleCards, summarizeRule, summarizeRuleRun, summarizeRules } from "../knowledge/proof.js";
 
 const projectDir = z
   .string()
@@ -39,6 +44,101 @@ const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
  */
 export async function runMcpServer(version: string): Promise<void> {
   const server = new McpServer({ name: "probe", version });
+
+  server.registerTool(
+    "probe_init",
+    {
+      title: "Set the project up",
+      description:
+        "Sets a project up for Probe, step by step: tools, settings file, the manifest format and the probe-lead/probe-feature agents, a scan, the features to cover, a manifest per feature (agent-drafted: paths, flows, rules and the exact tests proving them), device cards for rules no unit test can prove, and the Features section in AGENTS.md/CLAUDE.md. Resumes where it stopped and never redoes finished work. Manifests, card links and the agent file arrive as drafts to review in Studio → Setup. status: true only reports. The manifests and cards steps run agents: minutes per feature.",
+      inputSchema: {
+        projectDir,
+        status: z.boolean().optional().describe("Only report each step, run nothing"),
+        step: z.enum(INIT_STEPS.map((s) => s.id) as [string, ...string[]]).optional().describe("Run one step only"),
+        accept: z.boolean().optional().describe("Take the proposed features (the scan's feature group) as chosen"),
+        features: z.array(z.string()).optional().describe("With step features: the features to choose. Otherwise: limit the agent steps to these"),
+        limit: z.number().int().positive().optional().describe("At most this many agents per step"),
+      },
+    },
+    async ({ projectDir: dir, status, step, accept, features, limit }) => {
+      const project = openProject(dir);
+      if (status) return text(formatInitStatus(initStatus(project)));
+      const { done } = startInit(project, { step: step as (typeof INIT_STEPS)[number]["id"] | undefined, accept, features, limit });
+      return text(summarizeInit(await done));
+    },
+  );
+
+  // Keeping features current while people code.
+  server.registerTool(
+    "probe_check",
+    {
+      title: "Check edited features",
+      description:
+        "Checks the features edited since their last check (or the ones named): their unit tests, their manifest's test links, and an agent-drafted correction to the manifest and brief for review. The edit hooks start this on their own at the end of a turn. Can take minutes.",
+      inputSchema: { projectDir, features: z.array(z.string()).optional(), drafts: z.boolean().optional().describe("false: no drafting agent") },
+    },
+    async ({ projectDir: dir, features, drafts }) => {
+      const project = openProject(dir);
+      const started = startCheck(project, { features, drafts, trigger: "manual" });
+      if (!started) return text(`A check is already running (run ${runningCheck(project)?.runId}).`);
+      return text(summarizeCheckRun(await started.done));
+    },
+  );
+
+  server.registerTool(
+    "probe_stale",
+    {
+      title: "Edited features",
+      description: "Features edited since their last check, with the files and who edited them (claude, editor). Also lists drafted manifest/brief corrections waiting for review.",
+      inputSchema: { projectDir },
+    },
+    async ({ projectDir: dir }) => {
+      const project = openProject(dir);
+      const { stale } = loadWatch(project);
+      const lines = Object.entries(stale).map(([id, e]) => `${id}${e.owned ? "" : " (related)"} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}\n${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
+      const drafts = listDrafts(project).filter((d) => d.status === "pending");
+      if (drafts.length) lines.push(`Drafts to review: ${drafts.map((d) => `${d.id} (${d.feature})`).join(", ")}`);
+      const running = runningCheck(project);
+      if (running) lines.push(`A check is running: ${running.runId}`);
+      return text(lines.length ? lines.join("\n") : "Nothing stale: every feature was checked after its last edit.");
+    },
+  );
+
+  server.registerTool(
+    "probe_manifest",
+    {
+      title: "Check a feature manifest",
+      description:
+        "Checks probe/features/<feature>.yaml against the code: every covered_by names a test that exists under that exact name, every card link names a card in probe/cards, paths exist, unproven rules say why.",
+      inputSchema: { projectDir, feature: z.string() },
+    },
+    async ({ projectDir: dir, feature }) => text(summarizeCheck(checkManifest(openProject(dir).root, feature))),
+  );
+
+  server.registerTool(
+    "probe_rule",
+    {
+      title: "Rules and what proves them",
+      description:
+        "A feature's rules (from its manifest) or one rule, each with the unit tests and device cards that prove it, and for each card its last result and whether that still holds for this code. Use to answer 'is X still true?' and to pick the cards to run with probe_card_run { rule }.",
+      inputSchema: {
+        projectDir,
+        rule: z.string().optional().describe("One rule: feature/rule-id, or a rule id unique across manifests."),
+        feature: z.string().optional().describe("Every rule of this feature."),
+      },
+    },
+    async ({ projectDir: dir, rule, feature }) => {
+      const project = openProject(dir);
+      if (rule) {
+        const found = findRule(project, rule);
+        if ("error" in found) return text(found.error);
+        return text(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)!));
+      }
+      if (!feature) return text("Give a rule (feature/rule-id) or a feature.");
+      const manifest = loadManifest(project.root, feature);
+      return text(manifest ? summarizeRules(project, manifest) : `No manifest probe/features/${feature}.yaml.`);
+    },
+  );
 
   server.registerTool(
     "probe_doctor",
@@ -341,11 +441,20 @@ export async function runMcpServer(version: string): Promise<void> {
     {
       title: "Run a card on a device",
       description:
-        "Runs one feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Takes minutes.",
-      inputSchema: { projectDir, feature: z.string(), card: z.string().describe("Card id"), device: z.string().optional().describe("Device serial") },
+        "Runs a feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. Takes minutes per card.",
+      inputSchema: {
+        projectDir,
+        feature: z.string().optional(),
+        card: z.string().optional().describe("Card id"),
+        rule: z.string().optional().describe("Run the cards behind this rule instead: feature/rule-id."),
+        device: z.string().optional().describe("Device serial"),
+      },
     },
-    async ({ projectDir: dir, feature, card, device }) => {
-      const { done } = startCardRun(openProject(dir), feature, card, { device });
+    async ({ projectDir: dir, feature, card, rule, device }) => {
+      const project = openProject(dir);
+      if (rule) return text(summarizeRuleRun(await runRuleCards(project, rule, { device })));
+      if (!feature || !card) return text("Give feature and card, or a rule.");
+      const { done } = startCardRun(project, feature, card, { device });
       return text(summarizeCardRun(await done));
     },
   );

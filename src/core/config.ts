@@ -60,6 +60,18 @@ export interface ProbeConfig {
      */
     model: string;
   };
+  /**
+   * Keeping features current while people code: an edit marks the features it touches stale,
+   * and a check runs their unit tests, their manifest's test links and (with a manifest) an
+   * agent that drafts corrections for review.
+   */
+  watch: {
+    enabled: boolean;
+    /** Let an agent draft manifest and brief corrections after a change. Costs one agent run per feature. */
+    drafts: boolean;
+    /** At most this many features per check; a wider change leaves the rest stale for a manual check. */
+    maxFeatures: number;
+  };
   /** Per machine, from the local settings file — never from the shared probe.yaml. */
   devices: {
     /** Emulator to boot when none is running. */
@@ -83,6 +95,7 @@ const DEFAULTS: ProbeConfig = {
   perf: { maxStartupMs: 4000, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
   agents: { model: "sonnet" },
+  watch: { enabled: true, drafts: true, maxFeatures: 3 },
   devices: { allowReal: [] },
 };
 
@@ -106,6 +119,7 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
     // This machine's choice wins over the team's: each developer's plan decides which models they can use.
     agents: { ...DEFAULTS.agents, ...raw.agents, ...local.agents },
+    watch: { ...DEFAULTS.watch, ...raw.watch },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] },
   };
 }
@@ -179,6 +193,12 @@ perf:
   maxJankyPct: 15
   maxP90Ms: 32
   # maxMemoryMb: 400
+
+# Keeping features current while you code (edit hooks, Studio's file watcher).
+watch:
+  enabled: true
+  drafts: true         # an agent drafts manifest and brief corrections for review
+  maxFeatures: 3
 
 tickets:
   # pattern: 'PROJ-\\d+'

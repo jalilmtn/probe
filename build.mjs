@@ -10,6 +10,6 @@ await build({
   target: "node20",
   format: "cjs",
   banner: { js: "#!/usr/bin/env node" },
-  loader: { ".html": "text" },
+  loader: { ".html": "text", ".md": "text" },
   logLevel: "info",
 });

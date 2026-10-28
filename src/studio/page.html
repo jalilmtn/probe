@@ -138,6 +138,11 @@
   .issue .what { flex: 1; min-width: 220px; }
   .issue .k { font-size: 11px; }
   textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }
+  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }
+  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }
+  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }
+  .box.stale { border-color: var(--warn); }
+  .box a { color: var(--accent); font-weight: 600; }
   @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }
   @media (max-width: 720px) {
     header { flex-wrap: wrap; padding: 12px 16px; }
@@ -263,6 +268,7 @@ async function loadScan(refresh) {
 
 async function renderAtlas() {
   if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project…</div>`; await loadScan(false); }
+  const watch = await api("/api/watch");
   const all = state.scan.features;
   const list = all
     .filter((f) => state.group === "all" || f.group === state.group)
@@ -291,10 +297,11 @@ async function renderAtlas() {
       ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">⟳ Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}
       <button class="btn secondary" id="rescan">Rescan</button>
     </div>
+    ${watchBanner(watch)}
     <div id="runpanel"></div>
     ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}
     ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\n"))}">
-        <strong>${esc(f.id)}</strong>
+        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>
         <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `✗${f.unit.failed}` : "✓") : "—"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>
         <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>
       </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `
@@ -305,7 +312,7 @@ async function renderAtlas() {
       </tr></thead>
       <tbody>
         ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">
-          <td><strong>${esc(f.id)}</strong></td>
+          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}</td>
           <td class="num hide-sm">${f.stats.modules}</td>
           <td class="num">${f.stats.testable}</td>
           <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>
@@ -340,6 +347,127 @@ async function renderAtlas() {
     b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });
   });
   document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));
+  bindWatchBanner(() => renderAtlas());
+}
+
+// ── Keeping features current: stale marks, the check, drafted corrections ──
+
+function stalePill(watch, id) {
+  const e = watch.stale[id];
+  if (!e) return "";
+  return ` <span class="pill warn" title="Edited since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\n${esc(e.files.slice(0, 12).join("\n"))}">edited</span>`;
+}
+
+function watchBanner(watch) {
+  if (!watch.enabled) return "";
+  const stale = Object.keys(watch.stale);
+  const parts = [];
+  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);
+  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);
+  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);
+  if (!parts.length) return "";
+  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join('<span class="muted">·</span>')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">✓ Check now</button>` : ""}</div></div>`;
+}
+
+function bindWatchBanner(refresh) {
+  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));
+  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));
+  document.getElementById("checknow")?.addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const res = await post("/api/watch/check", {});
+    if (res.error) { alert(res.error); e.target.disabled = false; return; }
+    followRun(res.runId, document.getElementById("runpanel"), refresh);
+  });
+}
+
+/** Just enough markdown for a brief's At a glance: bullets, bold, code, links as text. */
+function miniMd(text) {
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  const items = [];
+  for (const line of text.split("\n")) {
+    if (/^\s*[-*] /.test(line)) items.push(line.replace(/^\s*[-*] /, ""));
+    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();
+  }
+  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;
+}
+
+function diffHtml(diff) {
+  return `<pre class="diff">${diff.split("\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\n")}</pre>`;
+}
+
+async function renderKnowledge(id) {
+  const k = await api("/api/knowledge/" + encodeURIComponent(id));
+  // Looked up after the fetch: the page may have re-rendered while it loaded.
+  const el = document.getElementById("knowledge");
+  if (!el) return;
+  if (!k.manifest && !k.check && k.drafts.length) {
+    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span></div>`;
+    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });
+    return;
+  }
+  if (!k.manifest && !k.check) {
+    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup → Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives this feature a summary, its rules and the tests that prove them; Probe then keeps them in step with the code.</span></div>`;
+    return;
+  }
+  const m = k.manifest || {};
+  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };
+  const brokenBy = {};
+  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);
+  const brokenCardsBy = {};
+  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);
+  // A card proves its rule only while its last pass still holds for this code.
+  const cardPill = (x) => {
+    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";
+    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" title="Run this card on a device">▶</button>`;
+    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} · ${esc(x.text)}</span>${run}</div>`;
+  };
+  const proof = (inv) => {
+    const broken = brokenBy[inv.id] || [];
+    const pills = [];
+    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);
+    const cards = (k.cards || {})[inv.id] || [];
+    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);
+    return pills.join(" ") + cards.map(cardPill).join("") +
+      broken.map((b) => `<div class="muted" style="font-size:12px">✗ ${esc(b.entry)} — ${esc(b.problem)}${b.closest ? `; closest: “${esc(b.closest)}”` : ""}</div>`).join("") +
+      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">✗ card ${esc(b.card)} — no such card${b.closest ? `; closest: “${esc(b.closest)}”` : ""}</div>`).join("");
+  };
+  el.innerHTML = `
+    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">edited</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature">✓ Check now</button></div></div>` : ""}
+    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">· ${ago(d.createdAt)}${d.runId ? ` · check ${esc(d.runId)}` : ""}</span></h3>
+      <p style="margin:4px 0 8px">${esc(d.summary)}</p>
+      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}
+      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}
+    <div class="box"><h3>${esc(m.name || id)} ${m.owner ? `<span class="muted" style="font-weight:400">· owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature's manifest and brief yet">no owner</span>`}</h3>
+      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}
+      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}
+      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> · ` : ""}manifest <span class="mono">${esc(k.file)}</span> · ${c.links} test links · ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` · <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>
+      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">✗ ${esc(e)}</div>`).join("")}
+    </div>
+    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules · ${c.gaps.length} unproven${c.broken.length ? ` · ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">
+      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}
+    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;
+  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {
+    const at = b.dataset.runcard.lastIndexOf("/");
+    b.disabled = true; b.textContent = "…";
+    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });
+    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "▶"; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));
+  }));
+  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {
+    e.target.disabled = true; e.target.textContent = "Checking…";
+    const res = await post("/api/watch/check", { features: [id] });
+    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "✓ Check now"; return; }
+    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));
+  });
+  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {
+    const approve = !!b.dataset.approve;
+    const draftId = b.dataset.approve || b.dataset.reject;
+    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;
+    b.disabled = true;
+    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});
+    if (!res.ok) alert(res.error);
+    renderKnowledge(id);
+  }));
 }
 
 async function renderFeature(id) {
@@ -358,6 +486,7 @@ async function renderFeature(id) {
       <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">✎ Write missing tests</button>
       <button class="btn secondary" id="verifyf" title="Unit tests, then this feature's approved cards on a device">✓ Verify</button>
       <button class="btn" id="run" ${withTests ? "" : "disabled"}>▶ Run unit tests</button></div>
+    <div id="knowledge"></div>
     ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}
     <div class="cards">
       <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>
@@ -386,6 +515,7 @@ async function renderFeature(id) {
       <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "—")}</td></tr>`).join("")}</tbody>
     </table>`;
   document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });
+  renderKnowledge(f.id);
   const showCards = async () => {
     const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);
     const el = document.getElementById("featurecards");
@@ -538,7 +668,7 @@ function evidence(run) {
 }
 
 function ticketButton(run) {
-  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login") return "";
+  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";
   return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">⧉ Ticket draft</button></div><div class="ticketpanel"></div>`;
 }
 
@@ -572,6 +702,9 @@ function resultsTable(run) {
         <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">— ${esc(c.note)}</span>` : ""}</div>`).join("") || "—"}</td></tr>`).join("")}
       </tbody></table>
       ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);
+  }
+  if (run.kind === "init") {
+    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` · ${run.costUsd.toFixed(2)}` : ""}</p>`;
   }
   if (run.kind === "login") {
     const l = run.login;
@@ -786,6 +919,7 @@ async function renderRuns() {
       else if (r.kind === "explore") result = `${r.screens.length} screens · ${r.issues.length} issues`;
       else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "—";
       else if (r.kind === "unitwrite") result = `${r.files.length} files · $${r.costUsd.toFixed(2)}`;
+      else if (r.kind === "check") result = `${esc(r.trigger)} · ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "—"}${f.draftId ? " ✎" : ""}`).join(", ") || "nothing stale"}`;
       else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files · $${r.costUsd.toFixed(2)}`;
       else {
         const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);
@@ -1038,11 +1172,63 @@ async function renderDoctor(el) {
 }
 
 const STATUS_ICON = { ok: "✓", warn: "!", fail: "✕" };
+const INIT_PILL = { done: ["ok", "✓"], todo: ["none", "·"], waiting: ["warn", "…"], warn: ["warn", "!"] };
+const INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);
+
+/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */
+async function renderInit(el) {
+  const k = await api("/api/init");
+  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");
+  const features = k.steps.find((s) => s.id === "features");
+  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>
+      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running…" : "▶ Run the next steps"}</button>` : ""}</div>
+    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>
+    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>
+      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>
+      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>
+    ${features.status === "waiting" && k.proposed.length ? `<div class="k" style="margin-top:10px">Features to give a manifest (${k.proposed.length} proposed by the scan)</div>
+      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${k.proposed.map((f) => `<label style="font-size:13px"><input type="checkbox" data-feat="${esc(f)}" checked> ${esc(f)}</label>`).join("")}</div>
+      <div class="row"><button class="btn" id="initchoose">Use these features</button><button class="btn secondary" id="initnone">Untick all</button></div>` : ""}
+  </div>
+  <div id="initpanel"></div>
+  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">· drafted ${ago(d.createdAt)}</span></h3>
+      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>
+      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}
+      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;
+
+  const start = async (body) => {
+    const res = await post("/api/init/run", body);
+    if (res.error) return alert(res.error);
+    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));
+    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));
+  };
+  el.querySelector("#initrun")?.addEventListener("click", () => start({}));
+  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));
+  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]").forEach((c) => (c.checked = false)));
+  el.querySelector("#initchoose")?.addEventListener("click", async () => {
+    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);
+    if (!chosen.length) return alert("Tick at least one feature.");
+    const res = await post("/api/init/features", { features: chosen });
+    if (res.error) return alert(res.error);
+    renderInit(el);
+  });
+  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {
+    const approve = !!b.dataset.iapprove;
+    const id = b.dataset.iapprove || b.dataset.ireject;
+    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;
+    b.disabled = true;
+    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});
+    if (!res.ok) alert(res.error);
+    renderInit(el);
+  }));
+  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));
+}
+
 async function renderSetup() {
   $view.innerHTML = `<div class="empty">Checking this project…</div>`;
   const items = await api("/api/setup");
   const left = items.filter((i) => i.status !== "ok").length;
-  $view.innerHTML = `<div class="box"><h3>${left ? `${left} thing${left === 1 ? "" : "s"} left to set up` : "Ready: agents can test this project"}</h3>
+  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>
     <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>
     <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>
       <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>
@@ -1050,13 +1236,15 @@ async function renderSetup() {
   $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);
   $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));
   renderDoctor(document.getElementById("docwrap"));
+  renderInit(document.getElementById("initwrap"));
 }
 
 (async () => {
   await checkBranch();
   // A project that cannot be tested yet opens on what is missing.
-  const items = await api("/api/setup").catch(() => []);
-  if (items.some((i) => i.status === "fail")) state.tab = "setup";
+  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);
+  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");
+  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";
   render();
 })();
 </script>

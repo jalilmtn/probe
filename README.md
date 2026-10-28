@@ -15,15 +15,22 @@ edits YAML by hand.
 ## Install (Claude Code)
 
 ```
-/plugin marketplace add JalilTn/probe
+/plugin marketplace add jalilmtn/probe
 /plugin install probe@probe-tools
 ```
 
-Then, inside a project, `/probe` opens Studio. Its **Setup** tab lists what is found and what is
+Then, inside a project, `/probe init` sets it up: settings, the manifest format and the
+`probe-lead` / `probe-feature` agents, a scan, the features to cover, an agent-drafted manifest per
+feature (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
+test can prove, and the Features section in `AGENTS.md` / `CLAUDE.md`. It resumes where it stopped;
+everything it writes into the project's knowledge arrives as a draft to review.
+
+`/probe` opens Studio. Its **Setup** tab lists what is found and what is
 still missing (app, emulator, test account, agent model, cards, branch), each with a button to the
 place that fixes it. A project that cannot be tested yet opens on that tab.
 
 ```
+/probe init               set the project up, step by step (resumes)
 /probe                    open Probe Studio (local GUI)
 /probe verify             check the current change: unit tests + cards on an emulator
 /probe scan               feature map with health
@@ -40,6 +47,7 @@ Other agents (Cursor, Codex, Copilot, Gemini CLI): register the MCP server
 
 | Area | What | Where |
 |---|---|---|
+| Init | Sets a project up step by step and resumes where it stopped; manifests, rule cards and the agent file arrive as drafts | `init [--status] [--step id] [--yes] [--features a,b]`, `probe_init`, Studio → Setup |
 | Atlas | Features, static unit coverage, health per feature (table or map) | Studio → Atlas, `probe scan`, `probe_scan` |
 | Unit | Run a feature's unit tests; an agent writes the missing ones | `unit`, `write-tests` |
 | Cards | What each feature does, how to reach it, what must be true | `backfill`, `cards`; review in Studio |
@@ -49,12 +57,15 @@ Other agents (Cursor, Codex, Copilot, Gemini CLI): register the MCP server
 | Verify | Diff → features → unit tests → reinstall → cards on device | `verify`, Studio → Verify |
 | Tickets | In: commits/features/cards of a ticket, cards from ticket text. Out: ticket draft of a failed run | `ticket`, Studio → Verify, ⧉ Ticket draft |
 | Fix | Every problem a run found gets **⧉ Fix prompt** (context to paste into any coding agent) and **✦ Fix** (an agent edits the code, then Probe re-runs the unit tests and the card) | `issues`, `fix-prompt`, `fix`; under every run |
+| Watch | While you code: an edit marks its features as edited; at the end of a Claude turn (or 45s after edits in an IDE, while Studio runs) a check runs their unit tests and manifest test links, and drafts manifest/brief corrections for review. Rules only a device card proves are named, with an offer to run their cards. Results go back to the Claude session | `hooks/hooks.json`, `check`, `stale`, Studio → feature |
+| Rules | Each manifest rule lists the unit tests and device cards that prove it; ask whether a rule holds, or run its cards on an emulator by rule | `rules`, `rule --run`, `probe_rule`, `probe_card_run { rule }`, Studio → feature |
 | Stop | Any running run stops: its build or agent is killed, it is saved as `stopped` and never counts toward health | ■ Stop, Ctrl+C in the CLI |
 
 ## CLI
 
 ```
 node dist/probe.cjs doctor | scan | studio                   --project <app>
+node dist/probe.cjs init [--status] [--step <id>] [--yes] [--features a,b] [--limit n]
 node dist/probe.cjs feature <id> | unit <feature>
 node dist/probe.cjs write-tests <feature> [--limit 5]
 node dist/probe.cjs cards [feature] [--detail] | context <feature>
@@ -67,6 +78,9 @@ node dist/probe.cjs issues <run> | fix-prompt <issue> | fix <issue>
 node dist/probe.cjs results [feature] | verify --outdated [--rerun-fresh]
 node dist/probe.cjs accounts | account set <role> [--code]
 node dist/probe.cjs devices [allow <serial> | avd <name>]
+node dist/probe.cjs check [features] [--no-drafts] | stale | manifest <feature>
+node dist/probe.cjs rules <feature> | rule <feature/rule> [--run] [--device <serial>]
+node dist/probe.cjs drafts [feature] | draft show|approve|reject <id>
 ```
 
 Agents run on your own Claude Code login and plan. They use `agents.model` from `probe.yaml`

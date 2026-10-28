@@ -41,6 +41,16 @@ export class Store {
   }
 }
 
+const issued = new Set<string>();
+
+/**
+ * A run id from the time, to the second. Runs that start in the same second (a check and the
+ * unit run it starts) get a suffix, or the second one's record would overwrite the first.
+ */
 export function newRunId(): string {
-  return new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
+  const base = new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
+  let id = base;
+  for (let n = 2; issued.has(id); n++) id = `${base}-${n}`;
+  issued.add(id);
+  return id;
 }

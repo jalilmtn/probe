@@ -8,7 +8,8 @@ import { listAccounts, Secrets, type SecretKind } from "./accounts/accounts.js";
 import { Adb } from "./devices/adb.js";
 import { listDevices } from "./devices/android.js";
 import { formatAtlas, formatCards } from "./cli/format.js";
-import { CONFIG_TEMPLATE, configPath, saveLocalDevices } from "./core/config.js";
+import { saveLocalDevices } from "./core/config.js";
+import { formatInitStatus, initStatus, isInitStep, startInit, summarizeInit } from "./engine/init.js";
 import { openInBrowser } from "./core/proc.js";
 import { doctor, formatDoctor } from "./engine/doctor.js";
 import { openProject } from "./engine/project.js";
@@ -27,6 +28,11 @@ import { startUnitWrite, summarizeUnitWrite } from "./engine/unitwrite.js";
 import { startVerify, summarizeVerify } from "./engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "./tickets/tickets.js";
 import { startStudio } from "./studio/server.js";
+import { runHook } from "./cli/hook.js";
+import { type ChangeSource, loadWatch, runningCheck, startCheck, summarizeCheckRun } from "./engine/watch.js";
+import { checkManifest, loadManifest, summarizeCheck } from "./knowledge/manifest.js";
+import { findRule, ruleProofs, runRuleCards, summarizeRule, summarizeRuleRun, summarizeRules } from "./knowledge/proof.js";
+import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./knowledge/draft.js";
 
 const VERSION = "0.1.0";
 
@@ -35,6 +41,10 @@ const HELP = `probe ${VERSION} — agent-driven test platform
 Usage: probe <command> [options]
 
   doctor                 Check setup (Node, project, SDK, devices)
+  init                   Set the project up step by step: settings, agents, feature manifests, rule
+                         cards, the agent file. Resumes where it stopped; manifests arrive as drafts
+                         --status: only show the steps; --step <id>: one step; --yes: take the
+                         proposed features; --features a,b: choose (or limit agents to) these
   scan                   Map features: unit coverage and health
   feature <id>           One feature: modules + riskiest untested classes
   unit <feature>         Run a feature's unit tests
@@ -61,6 +71,15 @@ Usage: probe <command> [options]
   devices                List devices and which ones agents may use
   devices allow <serial> Let agents use a real phone (this machine only)
   devices avd <name>     Emulator to boot when none is running
+  check [features]       Check stale features now: unit tests, manifest links, drafted corrections
+                         --no-drafts: no agent; --trigger claude|editor|manual
+  stale                  Features edited since their last check
+  manifest <feature>     Check a feature manifest's test and card links, paths and unproven rules
+  rules <feature>        A feature's rules, the tests and cards proving each, the cards' last results
+  rule <feature/rule>    One rule and what proves it; --run runs its cards on a device
+  drafts [feature]       Drafted corrections to manifests and briefs
+  draft show|approve|reject <id>
+  hook <event>           Claude Code hook entry (edit, stop, prompt); see hooks/hooks.json
   studio                 Open the local GUI
   mcp                    Run as an MCP server (stdio) for AI agents
 
@@ -86,7 +105,11 @@ async function main(argv: string[]): Promise<number> {
   const ticketTextArg = opt("--ticket-text");
   const limitArg = opt("--limit");
   const maxCardsArg = opt("--max-cards");
-  const flags = new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh"]);
+  const triggerArg = opt("--trigger");
+  const stepArg = opt("--step");
+  const flags = new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
+  const runFlag = argv.includes("--run");
+  const noDrafts = argv.includes("--no-drafts");
   const outdated = argv.includes("--outdated");
   const rerunFresh = argv.includes("--rerun-fresh");
   const noDevice = argv.includes("--no-device");
@@ -112,15 +135,22 @@ async function main(argv: string[]): Promise<number> {
     }
     case "init": {
       const project = openProject(projectArg);
-      const file = configPath(project.root);
-      if (existsSync(file)) {
-        console.log(`Already exists: ${file}`);
+      if (argv.includes("--status")) {
+        console.log(formatInitStatus(initStatus(project)));
         return 0;
       }
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, CONFIG_TEMPLATE);
-      console.log(`Created ${file}`);
-      return 0;
+      if (stepArg && !isInitStep(stepArg)) return usage("probe init [--step doctor|config|kit|scan|features|manifests|cards|agentfile|check]");
+      const { run, done } = startInit(project, {
+        step: stepArg && isInitStep(stepArg) ? stepArg : undefined,
+        accept: argv.includes("--yes"),
+        features: featuresArg?.split(",").map((f) => f.trim()).filter(Boolean),
+        limit: limitArg ? Number(limitArg) : undefined,
+        model,
+      });
+      follow(run.id);
+      const finished = await done;
+      console.log(`\n${summarizeInit(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
     }
     case "scan": {
       const project = openProject(projectArg);
@@ -337,6 +367,92 @@ async function main(argv: string[]): Promise<number> {
       }
       console.log(`\nEmulator to boot when none runs: ${local.avd ?? "not set (probe devices avd <name>)"}`);
       return 0;
+    }
+    case "hook":
+      // Called by Claude Code (hooks/hooks.json), never by a person.
+      return runHook(arg ?? "");
+    case "check": {
+      // What the edit hooks start in the background; by hand: `probe check call`.
+      const project = openProject(projectArg);
+      const started = startCheck(project, {
+        features: arg ? arg.split(",").map((f) => f.trim()).filter(Boolean) : undefined,
+        trigger: (triggerArg as ChangeSource | undefined) ?? "manual",
+        drafts: noDrafts ? false : undefined,
+        model,
+      });
+      if (!started) {
+        console.log(`A check is already running (${runningCheck(project)?.runId}).`);
+        return 0;
+      }
+      follow(started.run.id);
+      const finished = await started.done;
+      console.log(`\n${summarizeCheckRun(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
+    }
+    case "stale": {
+      const project = openProject(projectArg);
+      const { stale } = loadWatch(project);
+      const ids = Object.keys(stale);
+      if (!ids.length) {
+        console.log("Nothing stale: every feature was checked after its last edit.");
+        return 0;
+      }
+      for (const id of ids) {
+        const e = stale[id]!;
+        console.log(`${id}${e.owned ? "" : " (related)"} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}`);
+        for (const f of e.files.slice(0, 10)) console.log(`    ${f}`);
+      }
+      return 0;
+    }
+    case "manifest": {
+      if (!arg) return usage("probe manifest <feature>");
+      const check = checkManifest(openProject(projectArg).root, arg);
+      console.log(summarizeCheck(check));
+      return check.errors.length || check.broken.length || check.brokenCards.length || check.unexplained.length ? 1 : 0;
+    }
+    case "rules": {
+      if (!arg) return usage("probe rules <feature>");
+      const project = openProject(projectArg);
+      const manifest = loadManifest(project.root, arg);
+      if (!manifest) return usage(`probe rules <feature>  (no manifest probe/features/${arg}.yaml)`);
+      console.log(summarizeRules(project, manifest));
+      return 0;
+    }
+    case "rule": {
+      if (!arg) return usage("probe rule <feature/rule> [--run] [--device <serial>]");
+      const project = openProject(projectArg);
+      const found = findRule(project, arg);
+      if ("error" in found) {
+        console.log(found.error);
+        return 1;
+      }
+      if (!runFlag) {
+        console.log(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)!));
+        return 0;
+      }
+      const result = await runRuleCards(project, arg, { device: deviceArg, model, log: (l) => console.log(l) });
+      console.log(`\n${summarizeRuleRun(result)}`);
+      return !result.error && result.runs.length && result.runs.every((r) => r.status === "passed") ? 0 : 1;
+    }
+    case "drafts": {
+      const project = openProject(projectArg);
+      const list = listDrafts(project, arg);
+      console.log(list.length ? list.map((d) => `${d.id}  ${d.status.padEnd(8)} ${d.feature}: ${d.files.map((f) => f.path).join(", ")}`).join("\n") : "No drafts.");
+      return 0;
+    }
+    case "draft": {
+      if (!arg || !arg2) return usage("probe draft show|approve|reject <id>");
+      const project = openProject(projectArg);
+      if (arg === "show") {
+        const draft = findDraft(project, arg2);
+        if (!draft) return usage(`probe draft show <id>  (no draft ${arg2})`);
+        console.log(`${draft.id} · ${draft.feature} · ${draft.status}\n\n${draft.summary}\n`);
+        for (const d of draftDiffs(project, draft)) console.log(`${d.conflict ? "⚠ changed since the draft was made\n" : ""}${d.diff}\n`);
+        return 0;
+      }
+      const res = arg === "approve" ? approveDraft(project, arg2) : arg === "reject" ? rejectDraft(project, arg2) : { ok: false, error: `Unknown action ${arg}.` };
+      console.log(res.ok ? `${arg === "approve" ? "Applied" : "Rejected"} ${arg2}.` : res.error);
+      return res.ok ? 0 : 1;
     }
     case "studio": {
       const url = await startStudio(openProject(projectArg), port);

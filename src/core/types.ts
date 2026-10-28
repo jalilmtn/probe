@@ -276,7 +276,56 @@ export interface FixRun extends BaseRun {
   costUsd: number;
 }
 
-export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun;
+/** One feature inside a check: what an edit touched and what the check found. */
+export interface CheckFeature {
+  feature: string;
+  files: string[];
+  /** False when the feature only depends on the changed code (its manifest's `related`). */
+  owned: boolean;
+  unitRun?: string;
+  unitStatus?: RunStatus | "skipped";
+  /** "Class.test: message" for the first failing tests. */
+  failures: string[];
+  manifest?: { links: number; broken: number; gaps: number; errors: number };
+  /** A drafted correction to the manifest or brief, waiting for review. */
+  draftId?: string;
+  /** Rules only a device card proves, whose cards have no up-to-date pass: "feature/rule (why)". */
+  deviceRules?: string[];
+  note?: string;
+}
+
+/** Runs after code changes: unit tests, manifest links and drafted corrections for the features touched. */
+export interface CheckRun extends BaseRun {
+  kind: "check";
+  /** What changed the code: Claude's edits, an editor outside Claude, or a person pressing Check. */
+  trigger: "claude" | "editor" | "manual";
+  features: CheckFeature[];
+  /** Stale features left for later: over watch.maxFeatures. */
+  skipped: string[];
+  costUsd: number;
+}
+
+/** One step of `probe init` as a run saw it. */
+export interface InitStepState {
+  id: string;
+  label: string;
+  /** done: nothing left; todo: Probe can do it; waiting: a person has to (choose, review); warn: worth a look, blocks nothing. */
+  status: "done" | "todo" | "waiting" | "warn";
+  detail: string;
+}
+
+/** Sets a project up for Probe: config, the agents, the feature manifests and their cards, the agent file. */
+export interface InitRun extends BaseRun {
+  kind: "init";
+  /** The step asked for, or every step in order. */
+  only?: string;
+  steps: InitStepState[];
+  /** Drafts this run made, waiting for review. */
+  drafts: string[];
+  costUsd: number;
+}
+
+export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun | CheckRun | InitRun;
 export type DeviceRun = CardRun | LoginRun | ExploreRun;
 
 // ── Feature cards ─────────────────────────────────────────────────────────────

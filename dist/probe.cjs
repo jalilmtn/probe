@@ -7264,7 +7264,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse7(src, reviver, options) {
+    function parse8(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -7305,7 +7305,7 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse7;
+    exports2.parse = parse8;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument2;
     exports2.stringify = stringify7;
@@ -8392,10 +8392,10 @@ var require_util = __commonJS({
     var codegen_1 = require_codegen();
     var code_1 = require_code();
     function toHash(arr) {
-      const hash = {};
+      const hash2 = {};
       for (const item of arr)
-        hash[item] = true;
-      return hash;
+        hash2[item] = true;
+      return hash2;
     }
     exports2.toHash = toHash;
     function alwaysValidSchema(it, schema) {
@@ -9566,8 +9566,8 @@ var require_resolve = __commonJS({
       }
       return count;
     }
-    function getFullPath(resolver, id = "", normalize2) {
-      if (normalize2 !== false)
+    function getFullPath(resolver, id = "", normalize3) {
+      if (normalize3 !== false)
         id = normalizeId(id);
       const p = resolver.parse(id);
       return _getFullPath(resolver, p);
@@ -10315,7 +10315,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve4.call(this, root, ref);
+      let _sch = resolve5.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref];
         const { schemaId } = this.opts;
@@ -10342,7 +10342,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve4(root, ref) {
+    function resolve5(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -11196,17 +11196,17 @@ var require_fast_uri = __commonJS({
       }
       return stringScheme;
     }
-    function normalize2(uri, options) {
+    function normalize3(uri, options) {
       if (typeof uri === "string") {
         uri = /** @type {T} */
         normalizeString(uri, options);
       } else if (typeof uri === "object") {
         uri = /** @type {T} */
-        parse7(serialize(uri, options), options);
+        parse8(serialize(uri, options), options);
       }
       return uri;
     }
-    function resolve4(baseURI, relativeURI, options) {
+    function resolve5(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const {
         parsed: baseParsed,
@@ -11242,50 +11242,50 @@ var require_fast_uri = __commonJS({
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
-    function resolveComponent(base, relative8, options, skipNormalization) {
+    function resolveComponent(base, relative10, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base = parse7(serialize(base, options), options);
-        relative8 = parse7(serialize(relative8, options), options);
+        base = parse8(serialize(base, options), options);
+        relative10 = parse8(serialize(relative10, options), options);
       }
       options = options || {};
-      if (!options.tolerant && relative8.scheme) {
-        target.scheme = relative8.scheme;
-        target.userinfo = relative8.userinfo;
-        target.host = relative8.host;
-        target.port = relative8.port;
-        target.path = removeDotSegments(relative8.path || "");
-        target.query = relative8.query;
+      if (!options.tolerant && relative10.scheme) {
+        target.scheme = relative10.scheme;
+        target.userinfo = relative10.userinfo;
+        target.host = relative10.host;
+        target.port = relative10.port;
+        target.path = removeDotSegments(relative10.path || "");
+        target.query = relative10.query;
       } else {
-        if (relative8.userinfo !== void 0 || relative8.host !== void 0 || relative8.port !== void 0) {
-          target.userinfo = relative8.userinfo;
-          target.host = relative8.host;
-          target.port = relative8.port;
-          target.path = removeDotSegments(relative8.path || "");
-          target.query = relative8.query;
+        if (relative10.userinfo !== void 0 || relative10.host !== void 0 || relative10.port !== void 0) {
+          target.userinfo = relative10.userinfo;
+          target.host = relative10.host;
+          target.port = relative10.port;
+          target.path = removeDotSegments(relative10.path || "");
+          target.query = relative10.query;
         } else {
-          if (!relative8.path) {
+          if (!relative10.path) {
             target.path = base.path;
-            if (relative8.query !== void 0) {
-              target.query = relative8.query;
+            if (relative10.query !== void 0) {
+              target.query = relative10.query;
             } else {
               target.query = base.query;
             }
           } else {
-            if (relative8.path[0] === "/") {
-              target.path = removeDotSegments(relative8.path);
+            if (relative10.path[0] === "/") {
+              target.path = removeDotSegments(relative10.path);
             } else {
               const baseHasAuthority = base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0;
               if (baseHasAuthority && !base.path) {
-                target.path = "/" + relative8.path;
+                target.path = "/" + relative10.path;
               } else if (!base.path) {
-                target.path = relative8.path;
+                target.path = relative10.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative8.path;
+                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative10.path;
               }
               target.path = base.scheme === void 0 && !baseHasAuthority && target.path[0] !== "/" ? removeDotSegmentsRelative(target.path) : removeDotSegments(target.path);
             }
-            target.query = relative8.query;
+            target.query = relative10.query;
           }
           target.userinfo = base.userinfo;
           target.host = base.host;
@@ -11293,7 +11293,7 @@ var require_fast_uri = __commonJS({
         }
         target.scheme = base.scheme;
       }
-      target.fragment = relative8.fragment;
+      target.fragment = relative10.fragment;
       return target;
     }
     function equal(uriA, uriB, options) {
@@ -11564,7 +11564,7 @@ var require_fast_uri = __commonJS({
       }
       return { parsed, malformedAuthorityOrPort, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme };
     }
-    function parse7(uri, opts) {
+    function parse8(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
     }
     function normalizeString(uri, opts) {
@@ -11596,12 +11596,12 @@ var require_fast_uri = __commonJS({
     }
     var fastUri = {
       SCHEMES,
-      normalize: normalize2,
-      resolve: resolve4,
+      normalize: normalize3,
+      resolve: resolve5,
       resolveComponent,
       equal,
       serialize,
-      parse: parse7
+      parse: parse8
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -14587,8 +14587,7 @@ var require_dist2 = __commonJS({
 });
 
 // src/cli.ts
-var import_node_fs20 = require("node:fs");
-var import_node_path24 = require("node:path");
+var import_node_fs26 = require("node:fs");
 
 // src/agent/headless.ts
 var import_node_fs = require("node:fs");
@@ -14666,8 +14665,9 @@ async function runAgent(project, task, log) {
     })
   );
   const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
-  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...task.allowEdits ? ["Edit", "Write"] : []];
-  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...task.allowEdits ? [] : ["Edit", "Write"]];
+  const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
+  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...task.allowEdits ? ["Edit", "Write"] : [], ...scoped];
+  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...task.allowEdits || scoped.length ? [] : ["Edit", "Write"]];
   const args = [
     "-p",
     "--output-format",
@@ -14679,7 +14679,8 @@ async function runAgent(project, task, log) {
     "--allowedTools",
     allowed.join(","),
     "--disallowedTools",
-    denied.join(",")
+    denied.join(","),
+    ...(task.addDirs ?? []).flatMap((d) => ["--add-dir", d])
   ];
   args.push("--model", task.model ?? project.config.agents.model);
   const env = { ...process.env };
@@ -14691,7 +14692,7 @@ async function runAgent(project, task, log) {
     exitCode = await stream(
       "claude",
       args,
-      project.root,
+      task.cwd ?? project.root,
       (line) => {
         const event = parseEvent(line);
         if (!event) {
@@ -14777,8 +14778,8 @@ var Store = class {
   dir;
   constructor(projectRoot) {
     const abs = (0, import_node_path2.resolve)(projectRoot);
-    const hash = (0, import_node_crypto.createHash)("sha1").update(abs.toLowerCase()).digest("hex").slice(0, 10);
-    this.dir = (0, import_node_path2.join)((0, import_node_os.homedir)(), ".probe", "projects", `${(0, import_node_path2.basename)(abs)}-${hash}`);
+    const hash2 = (0, import_node_crypto.createHash)("sha1").update(abs.toLowerCase()).digest("hex").slice(0, 10);
+    this.dir = (0, import_node_path2.join)((0, import_node_os.homedir)(), ".probe", "projects", `${(0, import_node_path2.basename)(abs)}-${hash2}`);
     (0, import_node_fs2.mkdirSync)((0, import_node_path2.join)(this.dir, "runs"), { recursive: true });
   }
   read(name) {
@@ -14796,8 +14797,13 @@ var Store = class {
     return (0, import_node_fs2.readdirSync)((0, import_node_path2.join)(this.dir, "runs")).filter((f) => f.endsWith(".json")).sort().reverse().map((f) => this.read((0, import_node_path2.join)("runs", f))).filter((r) => r !== null);
   }
 };
+var issued = /* @__PURE__ */ new Set();
 function newRunId() {
-  return (/* @__PURE__ */ new Date()).toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
+  const base = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
+  let id = base;
+  for (let n = 2; issued.has(id); n++) id = `${base}-${n}`;
+  issued.add(id);
+  return id;
 }
 
 // src/engine/runs.ts
@@ -14810,9 +14816,9 @@ function commitsTouching(root, paths, limit = 80) {
   if (paths.length === 0) return [];
   const out = capture("git", ["log", "--no-merges", `-n${limit}`, "--date=short", "--format=%h%x09%ad%x09%s", "--", ...paths], root);
   if (!out) return [];
-  return out.split("\n").map((line) => line.split("	")).filter((p) => p.length >= 3).map(([hash, date3, ...rest]) => {
+  return out.split("\n").map((line) => line.split("	")).filter((p) => p.length >= 3).map(([hash2, date3, ...rest]) => {
     const subject = rest.join("	");
-    return { hash, date: date3, subject, tickets: [...new Set(subject.match(TICKET) ?? [])], fix: FIX.test(subject) };
+    return { hash: hash2, date: date3, subject, tickets: [...new Set(subject.match(TICKET) ?? [])], fix: FIX.test(subject) };
   });
 }
 function defaultBase(root, configured) {
@@ -14841,13 +14847,13 @@ function dirtyFiles(root) {
 function commitsForTicket(root, ticket, limit = 50) {
   const out = capture("git", ["log", "--no-merges", `-n${limit}`, "--date=short", "--format=%h%x09%ad%x09%s", "-i", `--grep=${ticket}`], root);
   if (!out) return [];
-  return out.split("\n").map((line) => line.split("	")).filter((p) => p.length >= 3).map(([hash, date3, ...rest]) => {
+  return out.split("\n").map((line) => line.split("	")).filter((p) => p.length >= 3).map(([hash2, date3, ...rest]) => {
     const subject = rest.join("	");
-    return { hash, date: date3, subject, tickets: [...new Set(subject.match(TICKET) ?? [])], fix: FIX.test(subject) };
+    return { hash: hash2, date: date3, subject, tickets: [...new Set(subject.match(TICKET) ?? [])], fix: FIX.test(subject) };
   });
 }
-function filesOfCommit(root, hash) {
-  return (capture("git", ["show", "--name-only", "--format=", hash], root) ?? "").split("\n").filter(Boolean);
+function filesOfCommit(root, hash2) {
+  return (capture("git", ["show", "--name-only", "--format=", hash2], root) ?? "").split("\n").filter(Boolean);
 }
 function trackedFiles(root, pathspec) {
   return (capture("git", ["ls-files", "--", pathspec], root) ?? "").split("\n").filter(Boolean);
@@ -14932,6 +14938,7 @@ var DEFAULTS = {
   perf: { maxStartupMs: 4e3, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
   agents: { model: "sonnet" },
+  watch: { enabled: true, drafts: true, maxFeatures: 3 },
   devices: { allowReal: [] }
 };
 function configPath(root) {
@@ -14953,6 +14960,7 @@ function loadConfig(root, localDir) {
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
     // This machine's choice wins over the team's: each developer's plan decides which models they can use.
     agents: { ...DEFAULTS.agents, ...raw.agents, ...local.agents },
+    watch: { ...DEFAULTS.watch, ...raw.watch },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] }
   };
 }
@@ -15016,6 +15024,12 @@ perf:
   maxJankyPct: 15
   maxP90Ms: 32
   # maxMemoryMb: 400
+
+# Keeping features current while you code (edit hooks, Studio's file watcher).
+watch:
+  enabled: true
+  drafts: true         # an agent drafts manifest and brief corrections for review
+  maxFeatures: 3
 
 tickets:
   # pattern: 'PROJ-\\d+'
@@ -19380,17 +19394,17 @@ ${section.body}`);
 }
 function sections(md) {
   const out = [];
-  let current = { heading: "(top)", body: "" };
+  let current3 = { heading: "(top)", body: "" };
   for (const line of md.split(/\r?\n/)) {
     if (/^#{1,3} /.test(line)) {
-      if (current.body.trim()) out.push(current);
-      current = { heading: line.replace(/^#+ /, ""), body: "" };
+      if (current3.body.trim()) out.push(current3);
+      current3 = { heading: line.replace(/^#+ /, ""), body: "" };
     } else {
-      current.body += `${line}
+      current3.body += `${line}
 `;
     }
   }
-  if (current.body.trim()) out.push(current);
+  if (current3.body.trim()) out.push(current3);
   return out;
 }
 
@@ -20081,13 +20095,13 @@ var ContentIndex = class {
   /** Hash of one module's files; with `tests`, its test sources too (unit results depend on them, device results do not). */
   module(id, tests) {
     const key = `${tests ? "t" : "m"}${id}`;
-    let hash = this.hashes.get(key);
-    if (hash === void 0) {
+    let hash2 = this.hashes.get(key);
+    if (hash2 === void 0) {
       const lines = [...this.files.get(id) ?? [], ...tests ? this.testFiles.get(id) ?? [] : []];
-      hash = short(lines.join("\n"));
-      this.hashes.set(key, hash);
+      hash2 = short(lines.join("\n"));
+      this.hashes.set(key, hash2);
     }
-    return hash;
+    return hash2;
   }
   hashes = /* @__PURE__ */ new Map();
   /** Modules these modules depend on, directly or not, themselves excluded. */
@@ -20217,9 +20231,9 @@ var ResultFreshness = class {
     const was = entry.fingerprint;
     const reasons = [];
     if (was.card !== void 0 && was.card !== now.card) reasons.push("the card changed");
-    for (const [id, hash] of Object.entries(now.own)) {
+    for (const [id, hash2] of Object.entries(now.own)) {
       if (was.own?.[id] === void 0) reasons.push(`${id} was not part of it`);
-      else if (was.own[id] !== hash) reasons.push(`${id} changed`);
+      else if (was.own[id] !== hash2) reasons.push(`${id} changed`);
     }
     if (reasons.length) return { state: "stale", reasons, entry };
     if (was.deps !== now.deps) return { state: "maybe", reasons: [this.depsChanged(entry, Object.keys(now.own))], entry };
@@ -20367,8 +20381,386 @@ function formatAtlas(result, health) {
   return [...header, "", "  (features first, then \xB7 platform groups)", ...rows].join("\n");
 }
 
-// src/engine/doctor.ts
+// src/engine/init.ts
+var import_node_fs13 = require("node:fs");
+var import_node_path15 = require("node:path");
+
+// templates/agent-probe-feature.md
+var agent_probe_feature_default = "---\nname: probe-feature\ndescription: The expert on one feature, loaded from its manifest. Give it a feature id and a mode. `explain <id>` briefs a person or agent who is about to work on the feature. `maintain <id>` (optionally with the changed files) checks the feature after a code change - runs its unit tests, checks its rules and test links, and drafts corrections to its manifest and brief for review. Never edits files itself.\ntools: Read, Grep, Glob, Bash\nmodel: sonnet\n---\n\nYou are the expert on one feature. Everything you know about it comes from files, loaded fresh\neach time, never from memory. You are given a feature id, a mode, and in `maintain` mode\nusually the changed files.\n\n## Load first, every time\n\n1. `probe/features/README.md` \u2014 the formats.\n2. `probe/features/<id>.yaml` \u2014 the manifest. If it does not exist, stop: say there is no\n   manifest for `<id>` and point to the README's format.\n3. The `brief:` doc, starting with its \"At a glance\" section, and every `also_read:` entry\n   (an anchor such as `CLAUDE.md#calling` means only that section).\n\nRead code only when the mode needs it, and only under the manifest's `paths`.\n\n## Mode: explain\n\nFor someone about to work on the feature. Return, in this order:\n\n1. **What it is**: the summary, in two or three sentences.\n2. **Where to start**: the class to open first and why, then the module layout.\n3. **How it works**: the main data flow in a few lines (from the brief, checked against the code).\n4. **Rules you must not break**: each invariant as one line. Mark the ones with a `gap` as\n   unproven by any test.\n5. **How to test**: the unit command, and what needs a device: the rules whose `cards` prove them,\n   each with its card ids, run with `probe_card_run { rule: \"<id>/<rule>\" }`.\n6. **Before you change X**: the brief's gotchas that apply most often.\n\nKeep it to what someone needs in the first hour. Point to the brief for the rest.\n\n## Mode: maintain\n\nAfter a code change. Do all of these, then report.\n\n1. **Test links.** For every `covered_by` entry `\"TestClass :: test name\"`, confirm a test\n   ``fun `test name`(`` exists in a file named `TestClass.kt` under the repo. List every one that\n   is missing or renamed, with the closest existing name if there is one.\n2. **Unit tests.** Run the manifest's `unit.command` (in the background if it may take over two\n   minutes). Report pass/fail per module. For each failure, quote the test and message and say\n   which invariant, if any, it belongs to.\n3. **Rules against the change.** Read the diff (`git diff` for the changed files, plus untracked\n   ones). For each change, decide whether it contradicts an invariant, a flow, or the brief's\n   At a glance. Quote the line of the diff and the rule.\n4. **Missing knowledge.** New behaviour (a new signal, state, endpoint, push type, screen or rule)\n   with no invariant or flow describing it. New tests that prove something no invariant claims.\n5. **Cards.** For every rule's `cards`, confirm `probe/cards/<feature>/<id>.yaml` exists (a ref\n   with a slash names another feature). Run `node <probe>/dist/probe.cjs rules <id>` if Probe is\n   installed: it shows each card's last result and whether it still holds. Name the rules the change\n   touches that only a card proves; never run a card yourself (it needs an emulator and minutes),\n   say which to run with `probe_card_run { rule }`.\n6. **Gaps.** List invariants with a `gap`; say if the change made any of them easier to cover.\n\n### Report format\n\n```\nfeature: <id>   unit: PASS | FAIL (<n> failing)\nbroken links:   <list or none>\ndevice rules:   <rules only a card proves that the change touches, each with its card and last result, or none>\ncontradictions: <list or none>\nproposed changes:\n  probe/features/<id>.yaml\n    <a unified diff, ready to apply>\n  <brief path>\n    <a unified diff, ready to apply>\nopen questions: <anything you could not decide from the code>\n```\n\n## Rules\n\n- You never write files. Corrections are proposed as diffs; a person approves them.\n- `covered_by` entries must match a real test exactly. Never add one you have not found.\n- Behaviour goes in `invariants`; architecture stays in the brief. Do not move one into the other.\n- An invariant you cannot prove from the code is an open question, not a guess.\n- Never commit, stage, push or create branches.\n";
+
+// templates/agent-probe-lead.md
+var agent_probe_lead_default = '---\nname: probe-lead\ndescription: Knows every feature in the app and routes work to them. Use to answer "what features are there / what is X / where do I start on X", or to turn a list of changed files into the features they affect and what each needs checked. Reads probe/features/*.yaml; does not edit anything.\ntools: Read, Grep, Glob, Bash\nmodel: sonnet\n---\n\nYou are the lead for this app\'s features. You know what each feature is and which code belongs\nto it, and you send work to the right feature. You do not change files.\n\n## Where the knowledge is\n\n- `probe/features/README.md` \u2014 the manifest and brief formats. Read it first.\n- `probe/features/<id>.yaml` \u2014 one per feature: `summary`, `brief`, `paths`, `related`, `unit`,\n  `flows`, `invariants`. The folder is the index; list it rather than relying on memory.\n- `CLAUDE.md` / `AGENTS.md` \u2014 global rules for the whole repo.\n- Features Probe knows about but that have no manifest yet: the folders under `probe/cards/`.\n  Name them as "no manifest yet" rather than guessing what they do.\n\n## What you are asked, and what you return\n\n**"What features are there?"** List each manifest\'s `id`, `name` and `summary`, then the\nfeatures with no manifest yet.\n\n**"I want to work on X" / "What is X?"** Find the manifest (match `id`, `name` or `summary`).\nReturn its summary, the brief path, the class to open first (from the brief\'s At a glance), and\ntell the caller to run the `probe-feature` agent in `explain` mode with that id for the full\nbriefing. If nothing matches, say so and list the closest features.\n\n**"These files changed: \u2026"** Map each file to features:\n\n1. A file under a feature\'s `paths` is **owned** by it. Under several, it is owned by each.\n2. A file under a feature\'s `related` marks it **stale** without owning it.\n3. A file nobody claims is **unmapped**. List it; do not guess.\n\nThen return one entry per affected feature:\n\n```\n<id>  owned|related  files: <list>\n  unit: <the manifest\'s unit.command>\n  next: probe-feature maintain <id>\n```\n\n**Wide changes.** If more than 3 features are owned by the change (typically an edit under\n`core/` or `common/`), return the unit commands for all of them but recommend `maintain` for at\nmost the 3 with the most owned files, and say which ones were left at unit tests only. One edit\nmust not start ten agents.\n\n## Rules\n\n- You cannot start other agents. Return the plan; the caller runs `probe-feature`.\n- Never invent a feature, a path or a test. Everything you say comes from a manifest, the brief,\n  or the code.\n- Never commit, stage, push or create branches.\n';
+
+// templates/features-README.md
+var features_README_default = '# Feature manifests\n\nOne file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id Probe\'s scan\nuses (`call`, `universe`, `chat`, ...). Together they are the feature index: the lead agent lists\nthis folder and reads each `summary`, so there is no separate index file to fall out of date.\n\nEach feature has three layers:\n\n| Layer | Where | Answers | Read by |\n|---|---|---|---|\n| Summary | `summary:` in the manifest | What is this, in one line? | lead agent, Studio, people browsing |\n| Brief | the doc `brief:` points to (`docs/features/<name>.md`) | What it does, how it works, what must never break | people and agents starting work |\n| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and the feature agent |\n\nThe manifest never repeats the brief. It points into it.\n\n## Manifest format\n\n```yaml\nid: call                      # Probe feature id; must match the scan\nname: Calling                 # display name\nsummary: >-                   # one or two lines, from the user\'s point of view\n  ...\nowner: "@someone"             # who approves changes to the authored parts; null until agreed\nbrief: docs/features/calling.md\nalso_read:                    # other docs an agent should load, with anchors where useful\n  - CLAUDE.md#calling\n\npaths:                        # code that belongs to this feature (prefix match, repo relative)\n  - feature/call/\nrelated:                      # code owned elsewhere that this feature depends on; an edit here\n  - path: core/push/impl/     # marks the feature stale but does not make it the owner\n    why: push types and categories that wake a call\n\nunit:                         # how to run this feature\'s unit tests\n  command: ./gradlew :feature:call:impl:testDebugUnitTest\n\nflows:                        # what a user can do, one line each; each becomes a card candidate\n  - id: dial\n    text: Start a call from a chat or a profile\n\ninvariants:                   # rules that must hold, each tied to what proves it\n  - id: own-call-never-rings\n    rule: Reconcile never rings for a call this device placed.\n    covered_by:               # "TestClass :: test name", exactly as written in the test\n      - "CallSignalSourceImplTest :: a reconcile never rings for a call this device placed"\n    cards: []                 # device cards that prove it: "card-id" in probe/cards/<this feature>/,\n                              # or "other-feature/card-id"\n    gap: null                 # why no unit test proves it (needed when covered_by is empty)\n\ndevice_only:                  # checks no unit test can make; candidates for cards\n  - text: Lock screen, incoming call\n```\n\n### Rules for the authored fields\n\n- **`invariants`** are behaviour, not architecture. "The reducer is pure" belongs in the brief;\n  "a declined outgoing call sends no DELETE" belongs here, because a test or a card can fail on it.\n- An invariant with empty `covered_by`, no `cards` and a `gap` is a known hole. One with all three\n  empty is invalid: say why it is not covered.\n- **`cards`** tie a rule to the device cards in `probe/cards/` that show it on a phone. Use them for\n  what a unit test cannot reach (a locked screen, the system ringer, a payment sheet, two devices).\n  A rule may have tests and cards both. A card link that names no card is a broken link, like a\n  renamed test. A card proves its rule only while its last pass still holds for the code; Probe\n  reads that from `probe/results/`. Keep `gap` on a card-only rule to say why no unit test can.\n- To check a rule on a device, ask Claude ("does the locked-phone ring rule still hold?"): it runs\n  `probe_card_run { rule: "call/full-screen-intent-rings" }`. From a shell: `probe rule\n  call/full-screen-intent-rings --run`. `probe rules <feature>` lists every rule with its proof.\n  The older single `card: <id>` still reads as a one-item `cards`.\n- `covered_by` names must match a real test exactly, so a renamed or deleted test shows up as a\n  broken link instead of silently passing.\n- `paths` decide ownership when the edit hook asks "which feature did this file touch?". A file\n  matched by two features\' `paths` belongs to both; `related` only marks a feature stale.\n\n### Derived fields\n\nModules, classes, test files and coverage are not written here. Probe\'s scan derives them from the\ncode on every run, so they cannot go stale. Do not add them by hand.\n\n## Brief format\n\nThe brief is the feature\'s doc in whatever form the team keeps docs (often `docs/features/<name>.md`).\nIt starts with an **At a glance** section, the part a newcomer reads first:\n\n```\n## 0) At a glance\n- What it is      \u2014 2\u20134 lines, user\'s point of view\n- Where it lives  \u2014 modules, and the one class to open first\n- User flows      \u2014 the main paths\n- Rules           \u2014 pointer to the manifest\'s invariants, plus the gaps that are still open\n- How to test     \u2014 unit command, and what needs a device\n```\n\nThe rest of the doc stays as the team writes it. A feature with no doc yet has no `brief:`.\n\n## Keeping it current\n\nWhen code under a feature\'s `paths` changes, the feature is stale. The feature agent then checks:\n\n1. Every `covered_by` test still exists under that exact name.\n2. The change does not contradict an invariant, a flow or the brief\'s At a glance.\n3. New behaviour (a new signal, endpoint, screen or rule) has an invariant or flow to go with it.\n\nIt drafts the corrections; a person approves them. Nothing here is rewritten without review.\n';
+
+// src/knowledge/draft.ts
+var import_node_crypto3 = require("node:crypto");
+var import_node_fs11 = require("node:fs");
+var import_node_path14 = require("node:path");
+
+// src/core/diff.ts
+function unifiedDiff(before, after, path, context = 3) {
+  const a = before.split("\n");
+  const b = after.split("\n");
+  const ops = lineOps(a, b);
+  if (!ops.some((o) => o.op !== " ")) return "";
+  const changed = ops.flatMap((o, k) => o.op === " " ? [] : [k]);
+  const groups = [];
+  for (const k of changed) {
+    const last = groups[groups.length - 1];
+    if (last && k - last[1] <= context * 2) last[1] = k;
+    else groups.push([k, k]);
+  }
+  const out = [`--- a/${path}`, `+++ b/${path}`];
+  for (const [first, last] of groups) {
+    const hunk = ops.slice(Math.max(0, first - context), Math.min(ops.length, last + context + 1));
+    const aLen = hunk.filter((o) => o.op !== "+").length;
+    const bLen = hunk.filter((o) => o.op !== "-").length;
+    out.push(`@@ -${hunk[0].a + 1},${aLen} +${hunk[0].b + 1},${bLen} @@`);
+    for (const o of hunk) out.push(`${o.op}${o.text}`);
+  }
+  return out.join("\n");
+}
+function lineOps(a, b) {
+  let head = 0;
+  while (head < a.length && head < b.length && a[head] === b[head]) head++;
+  let tail = 0;
+  while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+  const midA = a.slice(head, a.length - tail);
+  const midB = b.slice(head, b.length - tail);
+  const n = midA.length;
+  const m = midB.length;
+  if (n * m > 4e6) {
+    return [
+      ...a.slice(0, head).map((text2, k) => ({ op: " ", text: text2, a: k, b: k })),
+      ...midA.map((text2, k) => ({ op: "-", text: text2, a: head + k, b: head })),
+      ...midB.map((text2, k) => ({ op: "+", text: text2, a: head + n, b: head + k })),
+      ...a.slice(a.length - tail).map((text2, k) => ({ op: " ", text: text2, a: head + n + k, b: head + m + k }))
+    ];
+  }
+  const lcs = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
+  for (let i2 = n - 1; i2 >= 0; i2--) for (let j2 = m - 1; j2 >= 0; j2--) lcs[i2][j2] = midA[i2] === midB[j2] ? lcs[i2 + 1][j2 + 1] + 1 : Math.max(lcs[i2 + 1][j2], lcs[i2][j2 + 1]);
+  const ops = [];
+  for (let k = 0; k < head; k++) ops.push({ op: " ", text: a[k], a: k, b: k });
+  let i = 0;
+  let j = 0;
+  while (i < n || j < m) {
+    if (i < n && j < m && midA[i] === midB[j]) ops.push({ op: " ", text: midA[i], a: head + i++, b: head + j++ });
+    else if (j < m && (i >= n || lcs[i][j + 1] > lcs[i + 1][j])) ops.push({ op: "+", text: midB[j], a: head + i, b: head + j++ });
+    else ops.push({ op: "-", text: midA[i], a: head + i++, b: head + j });
+  }
+  for (let k = 0; k < tail; k++) ops.push({ op: " ", text: a[a.length - tail + k], a: a.length - tail + k, b: b.length - tail + k });
+  return ops;
+}
+
+// src/knowledge/manifest.ts
 var import_node_fs10 = require("node:fs");
+var import_node_path13 = require("node:path");
+var import_yaml6 = __toESM(require_dist(), 1);
+var FEATURES_DIR = "probe/features";
+function manifestFile(id) {
+  return `${FEATURES_DIR}/${id}.yaml`;
+}
+function loadManifest(root, id) {
+  const file = manifestFile(id);
+  const abs = (0, import_node_path13.join)(root, file);
+  if (!(0, import_node_fs10.existsSync)(abs)) return null;
+  return normalize((0, import_yaml6.parse)((0, import_node_fs10.readFileSync)(abs, "utf8")) ?? {}, file);
+}
+function loadManifests(root) {
+  const dir = (0, import_node_path13.join)(root, FEATURES_DIR);
+  if (!(0, import_node_fs10.existsSync)(dir)) return [];
+  const out = [];
+  for (const name of (0, import_node_fs10.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
+    try {
+      const m = loadManifest(root, name.slice(0, -".yaml".length));
+      if (m) out.push(m);
+    } catch {
+    }
+  }
+  return out;
+}
+function normalize(raw, file) {
+  const list = (v) => Array.isArray(v) ? v : [];
+  const slash = (p) => String(p).replace(/\\/g, "/");
+  return {
+    id: String(raw.id ?? (0, import_node_path13.basename)(file, ".yaml")),
+    name: raw.name,
+    summary: raw.summary,
+    owner: raw.owner ?? null,
+    brief: raw.brief,
+    alsoRead: list(raw.also_read),
+    paths: list(raw.paths).map(slash),
+    related: list(raw.related).map((r) => typeof r === "string" ? { path: slash(r) } : { path: slash(String(r.path)), why: r.why }),
+    unitCommand: raw.unit?.command,
+    flows: list(raw.flows).map((f) => ({ id: String(f.id), text: String(f.text ?? "") })),
+    invariants: list(raw.invariants).map((i) => ({
+      id: String(i.id),
+      rule: String(i.rule ?? ""),
+      coveredBy: list(i.covered_by),
+      cards: [...list(i.cards), ...typeof i.card === "string" && i.card ? [i.card] : []].map(String),
+      gap: i.gap ?? null
+    })),
+    deviceOnly: list(raw.device_only).map((d) => typeof d === "string" ? d : String(d.text ?? "")),
+    file
+  };
+}
+function cardRef(feature, ref) {
+  const at = ref.lastIndexOf("/");
+  return at < 0 ? { feature, id: ref } : { feature: ref.slice(0, at), id: ref.slice(at + 1) };
+}
+function checkManifest(root, id, text2) {
+  const file = manifestFile(id);
+  const result = { feature: id, file, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
+  let m;
+  try {
+    m = text2 === void 0 ? loadManifest(root, id) : normalize((0, import_yaml6.parse)(text2) ?? {}, file);
+  } catch (e) {
+    result.errors.push(`Does not parse: ${e.message.split("\n")[0]}`);
+    return result;
+  }
+  if (!m) {
+    result.errors.push("No manifest.");
+    return result;
+  }
+  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${id}.yaml`);
+  if (!m.summary) result.errors.push("No summary.");
+  if (m.brief && !(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
+  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, p))) result.missingPaths.push(p);
+  const tests = testIndex(root);
+  for (const inv of m.invariants) {
+    if (!inv.coveredBy.length && !inv.cards.length) {
+      if (inv.gap) result.gaps.push({ invariant: inv.id, rule: inv.rule, gap: inv.gap });
+      else result.unexplained.push(inv.id);
+    }
+    for (const ref of inv.cards) {
+      result.cardLinks++;
+      const target = cardRef(m.id, ref);
+      const ids = listCards(root, target.feature).map((c) => c.id);
+      if (ids.includes(target.id)) continue;
+      const near = closest(target.id.replace(/-/g, " "), ids.map((i) => i.replace(/-/g, " ")));
+      result.brokenCards.push({ invariant: inv.id, card: ref, closest: near?.replace(/ /g, "-") });
+    }
+    for (const entry of inv.coveredBy) {
+      result.links++;
+      const [cls, name] = entry.split(" :: ").map((s) => s.trim());
+      const files = tests.get(cls ?? "") ?? [];
+      if (!files.length) {
+        result.broken.push({ invariant: inv.id, entry, problem: "no test class" });
+        continue;
+      }
+      const names = files.flatMap((f) => testNames((0, import_node_path13.join)(root, f)));
+      if (!names.includes(name ?? "")) result.broken.push({ invariant: inv.id, entry, problem: "no such test", closest: closest(name ?? "", names) });
+    }
+  }
+  return result;
+}
+var indexed = null;
+function testIndex(root) {
+  if (indexed && indexed.root === root && Date.now() - indexed.at < 2e3) return indexed.tests;
+  const out = /* @__PURE__ */ new Map();
+  const listed = capture("git", ["ls-files", "-co", "--exclude-standard"], root) ?? "";
+  for (const f of listed.split("\n")) {
+    if (!/\/src\/(test|androidTest)[^/]*\//.test(f) || !/\.(kt|java)$/.test(f)) continue;
+    const cls = (0, import_node_path13.basename)(f).replace(/\.(kt|java)$/, "");
+    out.set(cls, [...out.get(cls) ?? [], f]);
+  }
+  indexed = { root, at: Date.now(), tests: out };
+  return out;
+}
+function testNames(file) {
+  const text2 = (0, import_node_fs10.readFileSync)(file, "utf8");
+  return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
+}
+function closest(name, names) {
+  const words = new Set(name.toLowerCase().split(/\W+/).filter(Boolean));
+  let best;
+  for (const n of names) {
+    const other = n.toLowerCase().split(/\W+/).filter(Boolean);
+    const score = other.filter((w) => words.has(w)).length / Math.max(words.size, other.length, 1);
+    if (!best || score > best.score) best = { n, score };
+  }
+  return best && best.score >= 0.5 ? best.n : void 0;
+}
+function briefGlance(root, m) {
+  if (!m.brief || !(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, m.brief))) return null;
+  const text2 = (0, import_node_fs10.readFileSync)((0, import_node_path13.join)(root, m.brief), "utf8");
+  const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text2);
+  return match ? match[1].trim() : null;
+}
+function summarizeCheck(c) {
+  const lines = [
+    `Manifest ${c.file} \xB7 ${c.links} test links \xB7 ${c.cardLinks} card links \xB7 ${c.broken.length + c.brokenCards.length} broken \xB7 ${c.gaps.length} unproven rules`
+  ];
+  for (const e of c.errors) lines.push(`  error: ${e}`);
+  for (const p of c.missingPaths) lines.push(`  missing path: ${p}`);
+  for (const b of c.broken) lines.push(`  broken (${b.invariant}): ${b.entry} \u2014 ${b.problem}${b.closest ? `; closest: "${b.closest}"` : ""}`);
+  for (const b of c.brokenCards) lines.push(`  broken (${b.invariant}): card ${b.card} \u2014 no such card${b.closest ? `; closest: "${b.closest}"` : ""}`);
+  for (const u of c.unexplained) lines.push(`  ${u}: no test, no card and no gap given`);
+  for (const g of c.gaps) lines.push(`  unproven (${g.invariant}): ${g.gap}`);
+  return lines.join("\n");
+}
+
+// src/knowledge/draft.ts
+var DRAFTS = "drafts";
+function draftDir(project, id) {
+  return (0, import_node_path14.join)(project.store.dir, DRAFTS, id);
+}
+var hash = (text2) => (0, import_node_crypto3.createHash)("sha1").update(text2).digest("hex");
+var current = (project, path) => {
+  const abs = (0, import_node_path14.join)(project.root, path);
+  return (0, import_node_fs11.existsSync)(abs) ? (0, import_node_fs11.readFileSync)(abs, "utf8") : "";
+};
+function openDraft(project, feature, files) {
+  const id = `${newRunId()}-${feature.replace(/[^\w-]/g, "_")}`;
+  const dir = draftDir(project, id);
+  (0, import_node_fs11.mkdirSync)(dir, { recursive: true });
+  const staged = files.map((f) => {
+    const text2 = current(project, f.path);
+    (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(dir, f.staged), (0, import_node_fs11.existsSync)((0, import_node_path14.join)(project.root, f.path)) ? text2 : f.initial ?? "");
+    return { path: f.path, base: hash(text2), staged: f.staged };
+  });
+  const format = (0, import_node_path14.join)(project.root, FEATURES_DIR, "README.md");
+  if ((0, import_node_fs11.existsSync)(format)) (0, import_node_fs11.copyFileSync)(format, (0, import_node_path14.join)(dir, "FORMAT.md"));
+  return { id, dir, feature, files: staged };
+}
+function closeDraft(project, work, details) {
+  const changed = work.files.filter((f) => {
+    const staged = (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(work.dir, f.staged), "utf8");
+    return staged.trim() !== "" && staged !== current(project, f.path);
+  });
+  if (!changed.length) {
+    (0, import_node_fs11.rmSync)(work.dir, { recursive: true, force: true });
+    return null;
+  }
+  const draft = { id: work.id, feature: work.feature, createdAt: (/* @__PURE__ */ new Date()).toISOString(), status: "pending", ...details, summary: details.summary.slice(0, 4e3), files: changed };
+  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
+  return draft;
+}
+async function draftCorrections(project, input, log) {
+  const { manifest } = input;
+  const work = openDraft(project, manifest.id, [
+    { path: manifest.file, staged: "manifest.yaml" },
+    ...manifest.brief && (0, import_node_fs11.existsSync)((0, import_node_path14.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
+  ]);
+  const { dir, files } = work;
+  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(dir, "CHANGE.md"), changeContext(project, input));
+  const result = await runAgent(
+    project,
+    {
+      prompt: draftPrompt(project, input, files),
+      probeTools: [],
+      cwd: dir,
+      addDirs: [project.root],
+      editOnly: ["./manifest.yaml", "./brief.md"],
+      model: input.model
+    },
+    log
+  );
+  const draft = closeDraft(project, work, { summary: result.summary, runId: input.runId, origin: "check" });
+  if (!draft) {
+    log(`${manifest.id}: nothing to correct${result.ok ? "" : ` (agent: ${result.summary.slice(0, 200)})`}`);
+    return { draft: null, costUsd: result.costUsd };
+  }
+  log(`${manifest.id}: drafted a correction to ${draft.files.map((f) => f.path).join(", ")} \u2014 review it in Studio`);
+  return { draft, costUsd: result.costUsd };
+}
+function changeContext(project, input) {
+  const files = input.files.slice(0, 40);
+  const tracked = capture("git", ["diff", "HEAD", "--", ...files], project.root) ?? "";
+  const untracked = (capture("git", ["ls-files", "--others", "--exclude-standard", "--", ...files], project.root) ?? "").split("\n").filter(Boolean);
+  const added = untracked.map((f) => `### new file ${f}
+\`\`\`
+${(0, import_node_fs11.readFileSync)((0, import_node_path14.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
+\`\`\``).join("\n\n");
+  const diff = `${tracked}
+${added}`.slice(0, 6e4);
+  return `# Change to feature ${input.manifest.id}
+
+Changed files (${input.files.length}${input.files.length > files.length ? `, first ${files.length} shown` : ""}):
+${files.map((f) => `- ${f}`).join("\n")}
+
+## Unit tests after the change
+${input.unit}
+
+## Manifest check
+${summarizeCheck(input.check)}
+
+## Diff (against the last commit; uncommitted work included)
+${diff.trim() ? `\`\`\`diff
+${diff}
+\`\`\`` : "(no diff: the change is already committed, read the files instead)"}
+`;
+}
+function draftPrompt(project, input, files) {
+  const m = input.manifest;
+  const glance = briefGlance(project.root, m);
+  return `You keep the written knowledge of the feature "${m.name ?? m.id}" in step with its code.
+
+Your working folder holds copies you may edit:
+- manifest.yaml \u2014 a copy of ${m.file}
+${files.some((f) => f.staged === "brief.md") ? `- brief.md \u2014 a copy of ${m.brief}
+` : ""}and read-only context:
+- FORMAT.md \u2014 the manifest and brief formats. Read it first.
+- CHANGE.md \u2014 what just changed: files, diff, unit test result, broken test links.
+
+The project itself is at ${project.root}. Read its code there (${m.paths.join(", ")}), and ${m.alsoRead.length ? m.alsoRead.join(", ") : "its CLAUDE.md"} for the rules. You cannot change anything in the project.
+${glance ? `
+The brief's At a glance, as it stands:
+${glance}
+` : ""}
+Do this:
+1. Fix every broken \`covered_by\` link in manifest.yaml: point it at the renamed test if you can find it in the code, otherwise remove the entry. If that leaves an invariant with nothing proving it, add a \`gap:\` saying why.
+2. If the change adds behaviour a user or a caller can see (a new flow, a new rule that must hold, a new endpoint, signal or push type), add it: a \`flows\` entry or an \`invariants\` entry. Only link tests you have read in the code, by their exact name.
+3. If the change makes a line of the brief's At a glance or an invariant wrong, correct it.
+4. Change nothing else. Do not reformat, reorder or reword what is still true. Keep comments.
+
+If nothing needs correcting, change no file. Finish with two or three sentences: what you changed and why, or that nothing needed changing.`;
+}
+function listDrafts(project, feature) {
+  const root = (0, import_node_path14.join)(project.store.dir, DRAFTS);
+  if (!(0, import_node_fs11.existsSync)(root)) return [];
+  return (0, import_node_fs11.readdirSync)(root).map((id) => (0, import_node_path14.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs11.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs11.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+function findDraft(project, id) {
+  const file = (0, import_node_path14.join)(draftDir(project, id), "draft.json");
+  return (0, import_node_fs11.existsSync)(file) ? JSON.parse((0, import_node_fs11.readFileSync)(file, "utf8")) : null;
+}
+function draftDiffs(project, draft) {
+  return draft.files.map((f) => {
+    const now = current(project, f.path);
+    const staged = (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(draftDir(project, draft.id), f.staged), "utf8");
+    return { path: f.path, diff: unifiedDiff(now, staged, f.path), conflict: hash(now) !== f.base };
+  });
+}
+function approveDraft(project, id) {
+  const draft = findDraft(project, id);
+  if (!draft) return { ok: false, error: `No draft ${id}.` };
+  if (draft.status !== "pending") return { ok: false, error: `Draft ${id} is already ${draft.status}.` };
+  const conflicts = draftDiffs(project, draft).filter((d) => d.conflict);
+  if (conflicts.length) return { ok: false, error: `${conflicts.map((c) => c.path).join(", ")} changed after this draft was made. Reject it and check the feature again.` };
+  for (const f of draft.files) {
+    const abs = (0, import_node_path14.join)(project.root, f.path);
+    (0, import_node_fs11.mkdirSync)((0, import_node_path14.dirname)(abs), { recursive: true });
+    (0, import_node_fs11.writeFileSync)(abs, (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(draftDir(project, id), f.staged), "utf8"));
+  }
+  setStatus(project, draft, "approved");
+  return { ok: true, files: draft.files.map((f) => f.path) };
+}
+function rejectDraft(project, id) {
+  const draft = findDraft(project, id);
+  if (!draft) return { ok: false, error: `No draft ${id}.` };
+  if (draft.status !== "pending") return { ok: false, error: `Draft ${id} is already ${draft.status}.` };
+  setStatus(project, draft, "rejected");
+  return { ok: true };
+}
+function setStatus(project, draft, status) {
+  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
+}
+
+// src/engine/doctor.ts
+var import_node_fs12 = require("node:fs");
 function doctor(project, error2) {
   const major = Number(process.versions.node.split(".")[0]);
   const checks = [
@@ -20393,7 +20785,7 @@ function doctor(project, error2) {
     return checks;
   }
   checks.push({ id: "project", label: "Project", status: "ok", detail: `${project.name} (${project.adapter.id}) at ${project.root}` });
-  const hasConfig = (0, import_node_fs10.existsSync)(configPath(project.root));
+  const hasConfig = (0, import_node_fs12.existsSync)(configPath(project.root));
   checks.push({
     id: "config",
     label: "probe/probe.yaml",
@@ -20425,29 +20817,458 @@ function formatDoctor(checks) {
      \u2192 ${c.fix}` : ""}`).join("\n");
 }
 
+// src/engine/init.ts
+var INIT_STEPS = [
+  { id: "doctor", label: "Tools", what: "Node, the build, devices: what this machine can run" },
+  { id: "config", label: "Settings file", what: "probe/probe.yaml, every setting optional" },
+  { id: "kit", label: "Format and agents", what: "probe/features/README.md and the probe-lead / probe-feature agents" },
+  { id: "scan", label: "Scan", what: "modules, test classes and coverage" },
+  { id: "features", label: "Features", what: "which features get a manifest" },
+  { id: "manifests", label: "Manifests", what: "an agent drafts each feature's manifest: paths, flows, rules and the tests proving them" },
+  { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the rules no unit test can prove" },
+  { id: "agentfile", label: "Agent file", what: "the Features section in AGENTS.md or CLAUDE.md, so every Claude session knows the manifests" },
+  { id: "check", label: "Link check", what: "every test and card link in the manifests resolves" }
+];
+var STATE = "init.json";
+var readState = (project) => project.store.read(STATE) ?? {};
+var writeState = (project, patch) => project.store.write(STATE, { ...readState(project), ...patch });
+var KIT = [
+  { path: `${FEATURES_DIR}/README.md`, text: features_README_default },
+  { path: ".claude/agents/probe-lead.md", text: agent_probe_lead_default },
+  { path: ".claude/agents/probe-feature.md", text: agent_probe_feature_default }
+];
+function initDrafts(project, step, feature) {
+  return listDrafts(project, feature).filter((d) => d.origin === "init" && d.step === step);
+}
+function proposedFeatures(project) {
+  return latestScan(project).features.filter((f) => f.group === "feature").map((f) => f.id);
+}
+function chosenFeatures(project) {
+  const state = readState(project);
+  if (state.features) return state.features;
+  const written = loadManifests(project.root).map((m) => m.id);
+  return written.length ? written : null;
+}
+function chooseFeatures(project, features) {
+  const known = new Set(latestScan(project).features.map((f) => f.id));
+  const unknown2 = features.filter((f) => !known.has(f));
+  if (unknown2.length) throw new Error(`Not features of this project: ${unknown2.join(", ")}. Run \`probe scan\` to list them.`);
+  writeState(project, { features: [...new Set(features)] });
+  return features;
+}
+var hasManifest = (project, id) => (0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, manifestFile(id)));
+function agentFileTarget(project) {
+  return (0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, "AGENTS.md")) ? "AGENTS.md" : "CLAUDE.md";
+}
+function initStatus(project) {
+  const steps = [];
+  const add = (id, status, detail) => steps.push({ id, label: INIT_STEPS.find((s) => s.id === id).label, status, detail });
+  const failing = doctor(project).filter((c) => c.status === "fail");
+  add("doctor", failing.length ? "warn" : "done", failing.length ? `${failing.map((c) => c.label).join(", ")}: see \`probe doctor\`. Only device runs need these.` : "ready");
+  add("config", (0, import_node_fs13.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path15.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
+  const missingKit = KIT.filter((k) => !(0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, k.path))).map((k) => k.path);
+  add("kit", missingKit.length ? "todo" : "done", missingKit.length ? `to write: ${missingKit.join(", ")}` : KIT.map((k) => k.path).join(", "));
+  const scanned = project.store.read("scan.json");
+  add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform modules` : "not scanned yet");
+  const chosen = chosenFeatures(project);
+  add("features", chosen ? "done" : scanned ? "waiting" : "todo", chosen ? `${chosen.length}: ${chosen.join(", ")}` : scanned ? `choose from ${proposedFeatures(project).length} proposed: \`probe init --yes\` takes them all, \`--features a,b\` some` : "after the scan");
+  const features = chosen ?? [];
+  const manifests = manifestProgress(project, features);
+  add(
+    "manifests",
+    !chosen ? "todo" : manifests.todo.length ? "todo" : manifests.pending.length ? "waiting" : "done",
+    !chosen ? "after the features are chosen" : [
+      `${manifests.written.length}/${features.length} written`,
+      manifests.pending.length ? `${manifests.pending.length} drafted, to review: ${manifests.pending.join(", ")}` : "",
+      manifests.todo.length ? `${manifests.todo.length} to draft: ${manifests.todo.slice(0, 12).join(", ")}${manifests.todo.length > 12 ? " \u2026" : ""}` : "",
+      manifests.rejected.length ? `rejected, left out: ${manifests.rejected.join(", ")}` : ""
+    ].filter(Boolean).join(" \xB7 ")
+  );
+  const cards = cardProgress(project, features);
+  add(
+    "cards",
+    !chosen || cards.todo.length ? "todo" : cards.pending.length || cards.waiting.length ? "waiting" : "done",
+    !chosen ? "after the manifests" : [
+      cards.todo.length ? `${cards.todo.length} to draft: ${cards.todo.join(", ")}` : "",
+      cards.pending.length ? `to review: ${cards.pending.join(", ")}` : "",
+      cards.waiting.length ? `${cards.waiting.length} after their manifest is applied` : "",
+      cards.done.length ? `${cards.done.length} done` : "",
+      cards.optional ? `${cards.optional} older manifests have unproven rules: \`probe init --step cards --features a,b\` drafts their cards` : ""
+    ].filter(Boolean).join(" \xB7 ") || "nothing to do"
+  );
+  const target = agentFileTarget(project);
+  const pendingAgentFile = initDrafts(project, "agentfile").filter((d) => d.status === "pending");
+  add(
+    "agentfile",
+    agentFileDone(project) ? "done" : pendingAgentFile.length ? "waiting" : "todo",
+    agentFileDone(project) ? `${target} has the Features section${target === "AGENTS.md" ? " and CLAUDE.md imports it" : ""}` : pendingAgentFile.length ? "drafted, to review" : `a Features section for ${target}`
+  );
+  const problems = loadManifests(project.root).map((m) => checkManifest(project.root, m.id)).filter((c) => c.errors.length || c.broken.length || c.brokenCards.length);
+  add("check", problems.length ? "warn" : "done", problems.length ? `${problems.length} manifests with broken links or errors: ${problems.map((c) => c.feature).join(", ")} (\`probe manifest <feature>\`)` : "every link resolves");
+  return steps;
+}
+function manifestProgress(project, features) {
+  const out = { written: [], pending: [], rejected: [], todo: [] };
+  for (const f of features) {
+    if (hasManifest(project, f)) out.written.push(f);
+    else {
+      const drafts = initDrafts(project, "manifests", f);
+      if (drafts.some((d) => d.status === "pending")) out.pending.push(f);
+      else if (drafts[0]?.status === "rejected") out.rejected.push(f);
+      else out.todo.push(f);
+    }
+  }
+  return out;
+}
+function cardProgress(project, features, named) {
+  const none = new Set(readState(project).cardsNone ?? []);
+  const out = { todo: [], pending: [], done: [], waiting: [], optional: 0 };
+  for (const f of named ?? features) {
+    const drafts = initDrafts(project, "cards", f);
+    if (none.has(f) || drafts.some((d) => d.status !== "pending")) out.done.push(f);
+    else if (drafts.length) out.pending.push(f);
+    else if (!hasManifest(project, f)) {
+      if (named || initDrafts(project, "manifests", f).length) out.waiting.push(f);
+    } else if (named || initDrafts(project, "manifests", f).some((d) => d.status === "approved")) out.todo.push(f);
+    else if (needsCards(project, f)) out.optional++;
+  }
+  return out;
+}
+function needsCards(project, feature) {
+  try {
+    const m = loadManifest(project.root, feature);
+    return !!m && (m.deviceOnly.length > 0 || m.invariants.some((i) => !i.coveredBy.length && !i.cards.length));
+  } catch {
+    return false;
+  }
+}
+function agentFileDone(project) {
+  const read = (p) => (0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, p)) ? (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(project.root, p), "utf8") : "";
+  const target = agentFileTarget(project);
+  if (!read(target).includes(`${FEATURES_DIR}/`)) return false;
+  return target !== "AGENTS.md" || /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
+}
+function isInitStep(id) {
+  return INIT_STEPS.some((s) => s.id === id);
+}
+var PARALLEL = 3;
+var current2 = null;
+function runningInit() {
+  return current2 && liveRun(current2)?.run.status === "running" ? current2 : null;
+}
+function startInit(project, options = {}) {
+  const busy = runningInit();
+  if (busy) throw new Error(`Init is already running (run ${busy}).`);
+  const run = {
+    id: newRunId(),
+    kind: "init",
+    feature: "*",
+    only: options.step,
+    startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    status: "running",
+    steps: [],
+    drafts: [],
+    costUsd: 0
+  };
+  const wants = (id) => !options.step || options.step === id;
+  current2 = run.id;
+  return launchRun(project, run, async (log) => {
+    await new Promise((r) => setImmediate(r));
+    if (wants("doctor")) {
+      const failing = doctor(project).filter((c) => c.status === "fail");
+      log(failing.length ? `tools: ${failing.map((c) => `${c.label} (${c.fix ?? c.detail})`).join("; ")} \u2014 device runs need these, the rest of init does not` : "tools: ready");
+    }
+    if (wants("config") && !(0, import_node_fs13.existsSync)(configPath(project.root))) {
+      (0, import_node_fs13.mkdirSync)((0, import_node_path15.dirname)(configPath(project.root)), { recursive: true });
+      (0, import_node_fs13.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
+      log(`wrote ${(0, import_node_path15.relative)(project.root, configPath(project.root))}`);
+    }
+    if (wants("kit")) {
+      for (const k of KIT) {
+        const abs = (0, import_node_path15.join)(project.root, k.path);
+        if ((0, import_node_fs13.existsSync)(abs)) continue;
+        (0, import_node_fs13.mkdirSync)((0, import_node_path15.dirname)(abs), { recursive: true });
+        (0, import_node_fs13.writeFileSync)(abs, k.text);
+        log(`wrote ${k.path}`);
+      }
+    }
+    if (wants("scan") && (options.step === "scan" || !project.store.read("scan.json"))) {
+      const result = scan(project);
+      log(`scanned: ${result.features.length} features and platform modules`);
+    }
+    if (wants("features") && (options.accept || options.step === "features" && options.features)) {
+      const chosen2 = chooseFeatures(project, options.features ?? proposedFeatures(project));
+      log(`features chosen: ${chosen2.length}`);
+    }
+    const chosen = chosenFeatures(project);
+    if (!chosen) {
+      if (!options.step || options.step === "features")
+        log(`waiting: choose the features \u2014 \`probe init --yes\` takes all ${proposedFeatures(project).length} proposed, \`probe init --step features --features a,b\` some, or tick them in Studio \u2192 Setup`);
+    } else {
+      const only = (list) => options.features && options.step !== "features" ? list.filter((f) => options.features.includes(f)) : list;
+      if (wants("manifests")) await draftManifests(project, run, only(manifestProgress(project, chosen).todo).slice(0, options.limit), options.model, log);
+      if (wants("cards")) {
+        const named = options.step === "cards" && options.features ? options.features : void 0;
+        await draftCards(project, run, only(cardProgress(project, chosen, named).todo).slice(0, options.limit), options.model, log);
+      }
+      if (wants("agentfile")) draftAgentFile(project, run, log);
+    }
+    run.steps = initStatus(project);
+    const open = run.steps.filter((s) => s.status === "todo" || s.status === "waiting");
+    log(open.length ? `left: ${open.map((s) => `${s.label} (${s.status === "waiting" ? "yours" : "Probe"})`).join(", ")}` : "set up: nothing left");
+  });
+}
+async function pool(items, work) {
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(PARALLEL, items.length) }, async () => {
+      while (next < items.length) {
+        const i = next++;
+        await work(items[i], i);
+      }
+    })
+  );
+}
+async function draftManifests(project, run, features, model, log) {
+  if (!features.length) return;
+  log(`manifests: drafting ${features.length} (${PARALLEL} at a time)`);
+  const tests = testIndex(project.root);
+  const scanned = latestScan(project);
+  await pool(features, async (id, i) => {
+    const feature = scanned.features.find((f) => f.id === id);
+    if (!feature) return log(`${id}: not in the scan, skipped`);
+    const say = (line) => log(`[${id}] ${line}`);
+    say(`drafting the manifest (${i + 1}/${features.length})`);
+    const file = manifestFile(id);
+    const work = openDraft(project, id, [{ path: file, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md
+id: ${id}
+` }]);
+    (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
+    if (!(0, import_node_fs13.existsSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"))) (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"), features_README_default);
+    const agent = (prompt6) => runAgent(project, { prompt: prompt6, probeTools: [], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model }, say);
+    let result = await agent(manifestPrompt(project, feature));
+    run.costUsd += result.costUsd;
+    let check2 = checkManifest(project.root, id, (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "manifest.yaml"), "utf8"));
+    if (check2.errors.length || check2.broken.length || check2.unexplained.length) {
+      say(`mending ${check2.errors.length + check2.broken.length + check2.unexplained.length} problems the link check found`);
+      const fix = await agent(`The manifest.yaml you wrote for the feature "${id}" fails Probe's check:
+
+${summarizeCheck(check2)}
+
+Fix every problem in manifest.yaml: point a broken covered_by entry at the test's exact name (FEATURE.md lists them), or remove it and give the rule a gap. Change nothing else. Finish with one sentence.`);
+      run.costUsd += fix.costUsd;
+      check2 = checkManifest(project.root, id, (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "manifest.yaml"), "utf8"));
+      result = { ...result, summary: `${result.summary}
+
+${fix.summary}` };
+    }
+    const draft = closeDraft(project, work, { summary: `${result.summary}
+
+${summarizeCheck(check2)}`, runId: run.id, origin: "init", step: "manifests" });
+    if (!draft) return say(`no manifest written${result.ok ? "" : ` (agent: ${result.summary.slice(0, 200)})`}`);
+    run.drafts.push(draft.id);
+    say(`drafted ${file} \xB7 ${check2.links} test links, ${check2.broken.length} broken, ${check2.gaps.length} unproven \u2014 review it in Studio \u2192 Setup`);
+  });
+}
+function featureContext(project, feature, tests) {
+  const rel = (dir) => (0, import_node_path15.relative)(project.root, dir).replace(/\\/g, "/");
+  const dirs = feature.modules.map((m) => `${rel(m.dir)}/`);
+  const tasks = feature.modules.map((m) => m.unitTestTask).filter((t) => !!t);
+  const command = tasks.length ? project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : tasks.join(" ") : null;
+  const testFiles = [...tests.values()].flat().filter((f) => dirs.some((d) => f.startsWith(d)));
+  const testList = testFiles.slice(0, 60).map((f) => {
+    const names = testNames((0, import_node_path15.join)(project.root, f));
+    return `### ${f.split("/").pop().replace(/\.(kt|java)$/, "")} (${f})
+${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `
+- \u2026 ${names.length - 80} more` : ""}`;
+  });
+  const docs = docsAbout(project.root, feature.id, 12e3);
+  const examples = loadManifests(project.root).slice(0, 2).map((m) => m.file);
+  return `# Feature ${feature.id}
+
+## Modules
+${feature.modules.map((m) => `- ${m.id} \u2014 ${rel(m.dir)}/ (${m.mainFiles} source files, ${m.testFiles} test files${m.unitTestTask ? `, unit task ${m.unitTestTask}` : ""})`).join("\n")}
+
+Unit command: ${command ?? "none (no module has unit tests)"}
+
+## Unit tests in these modules (class, then each test's exact name)
+${testList.join("\n\n") || "(none)"}${testFiles.length > 60 ? `
+
+\u2026 ${testFiles.length - 60} more test files under the same folders` : ""}
+
+## Docs that mention it
+${docs.map((d) => `### ${d.ref}
+${d.text}`).join("\n\n") || "(none found)"}
+${examples.length ? `
+## Manifests already written in this project, as examples
+${examples.map((e) => `- ${e}`).join("\n")}
+` : ""}`;
+}
+function manifestPrompt(project, feature) {
+  return `You write the Probe manifest for the feature "${feature.id}" of the project at ${project.root}.
+
+Your working folder holds:
+- manifest.yaml \u2014 the file you write. It starts with only its id.
+- FORMAT.md \u2014 the manifest format and its rules. Read it first.
+- FEATURE.md \u2014 the feature's modules, its unit command, every unit test in its modules with its exact name, and docs that mention it.
+
+The project is read-only to you. Read its code: the screens, view models, use cases, repositories and the tests FEATURE.md lists.
+
+Write manifest.yaml:
+1. id "${feature.id}", a name, a summary of one or two lines from the user's point of view, owner: null.
+2. paths: the folders of its modules. related: code owned elsewhere it depends on (core modules, other features' api), each with a why; only paths that exist.
+3. unit.command: the one FEATURE.md gives.
+4. flows: what a user can do with it, one line each.
+5. invariants: the rules that must hold \u2014 behaviour a test or a device run can fail on, not architecture. For each, covered_by with the tests that prove it, written "TestClass :: exact test name" exactly as FEATURE.md lists them. Never invent a test name. A rule no test proves gets covered_by: [] and a gap saying why (and whether only a device can show it).
+6. device_only: checks no unit test can make (system UI, permissions, real devices, other apps).
+7. brief: the feature's doc if one exists (FEATURE.md lists docs that mention it); otherwise leave it out.
+
+Prefer fewer, sharper rules that the tests really prove over many vague ones. Finish with two sentences: what the feature is, and what you could not work out.`;
+}
+async function draftCards(project, run, features, model, log) {
+  if (!features.length) return;
+  log(`cards: drafting for ${features.length} features (${PARALLEL} at a time)`);
+  await pool(features, async (id, i) => {
+    const say = (line) => log(`[${id}] ${line}`);
+    say(`looking for rules only a device can prove (${i + 1}/${features.length})`);
+    const before = new Map(listCards(project.root, id).map((c) => [c.id, c.updatedAt]));
+    const work = openDraft(project, id, [{ path: manifestFile(id), staged: "manifest.yaml" }]);
+    if (!(0, import_node_fs13.existsSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"))) (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"), features_README_default);
+    const result = await runAgent(
+      project,
+      { prompt: cardsPrompt(project, id), probeTools: ["probe_cards_context", "probe_cards_save"], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model },
+      say
+    );
+    run.costUsd += result.costUsd;
+    const written = listCards(project.root, id).filter((c) => before.get(c.id) !== c.updatedAt).map((c) => c.id);
+    const draft = closeDraft(project, work, { summary: `${result.summary}
+
+Cards written (as drafts): ${written.join(", ") || "none"}`, runId: run.id, origin: "init", step: "cards" });
+    if (draft) {
+      run.drafts.push(draft.id);
+      say(`${written.length} cards drafted, linked to their rules in a manifest draft \u2014 review both in Studio`);
+    } else if (result.ok) {
+      writeState(project, { cardsNone: [.../* @__PURE__ */ new Set([...readState(project).cardsNone ?? [], id])] });
+      say(written.length ? `${written.length} cards drafted but linked to no rule` : "no rule needs a device card");
+    } else say(`agent did not finish: ${result.summary.slice(0, 200)}`);
+  });
+}
+function cardsPrompt(project, feature) {
+  return `You give the feature "${feature}" of the project at ${project.root} device cards for the rules no unit test can prove.
+
+Your working folder holds manifest.yaml (a copy of ${manifestFile(feature)}, which you may edit) and FORMAT.md (its format; read the part about cards).
+
+1. Read manifest.yaml. Pick the invariants with empty covered_by whose gap says a device, the system or another app is needed, and the device_only checks that state a rule. Leave rules a unit test could prove: they need a test, not a card.
+2. If none qualify, change nothing and say so.
+3. Call probe_cards_context with feature "${feature}" for the card rules, read the code the rule is about (screens, the labels a user sees), and draft one capability card per such rule. Save them all with one probe_cards_save call for feature "${feature}"; fix and save again if it reports errors.
+4. In manifest.yaml add each card's id to its rule's \`cards:\` list. Keep the gap. Change nothing else.
+
+Finish with two sentences: which rules got cards, and which you left and why.`;
+}
+function draftAgentFile(project, run, log) {
+  if (agentFileDone(project) || initDrafts(project, "agentfile").some((d) => d.status === "pending")) return;
+  const manifests = loadManifests(project.root).map((m) => m.id);
+  const features = manifests.length ? manifests : chosenFeatures(project) ?? [];
+  if (!features.length) return;
+  const target = agentFileTarget(project);
+  const files = [{ path: target, staged: "target.md" }, ...target === "AGENTS.md" ? [{ path: "CLAUDE.md", staged: "claude.md" }] : []];
+  const work = openDraft(project, "_project", files);
+  const edit = (staged, change) => {
+    const abs = (0, import_node_path15.join)(work.dir, staged);
+    const before = (0, import_node_fs13.readFileSync)(abs, "utf8");
+    const crlf = before.includes("\r\n");
+    const after = change(before.replace(/\r\n/g, "\n"));
+    (0, import_node_fs13.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
+  };
+  if (!(0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "target.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("target.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(features)}
+`);
+  if (target === "AGENTS.md")
+    edit("claude.md", (t) => {
+      if (/^@AGENTS\.md\s*$/m.test(t)) return t;
+      const title = /^# .*\n+/.exec(t);
+      return title ? `${t.slice(0, title[0].length)}@AGENTS.md
+
+${t.slice(title[0].length)}` : `@AGENTS.md
+${t ? `
+${t}` : ""}`;
+    });
+  const draft = closeDraft(project, work, {
+    summary: `Adds the Features section to ${target}${target === "AGENTS.md" ? " and imports AGENTS.md from CLAUDE.md (Claude Code reads CLAUDE.md, not AGENTS.md)" : ""}, so every session knows the manifests and the probe agents.`,
+    runId: run.id,
+    origin: "init",
+    step: "agentfile"
+  });
+  if (draft) {
+    run.drafts.push(draft.id);
+    log(`agent file: drafted the Features section for ${target} \u2014 review it in Studio \u2192 Setup`);
+  }
+}
+function featuresSection(features) {
+  return `## Features
+
+Every feature has a manifest, \`${FEATURES_DIR}/<id>.yaml\` (format: \`${FEATURES_DIR}/README.md\`):
+what it is, where it lives, its user flows, the rules it must keep, and the exact test that proves
+each rule (\`covered_by\`) or why none does yet (\`gap\`). Read it before changing a feature. When it
+names a \`brief\`, that doc's "At a glance" section is the short version; \`also_read\` lists the rest.
+
+- \`probe-lead\` maps a question or a set of changed files to features; \`probe-feature explain <id>\`
+  briefs you on one, \`probe-feature maintain <id>\` checks it after a change.
+- Changing a rule's behaviour means changing its invariant in the manifest in the same change. A
+  test that proves a rule goes in its \`covered_by\` as \`TestClass :: exact test name\`; a renamed
+  test breaks the link, and Probe's turn-end check reports it.
+- A rule only a device can prove lists its cards (\`probe/cards/<feature>/<id>.yaml\`) under \`cards:\`.
+  \`probe rules <feature>\` shows each rule's tests and cards; \`probe rule <feature/rule> --run\`
+  (or \`probe_card_run\` with \`rule\`) runs its cards on an emulator. Never start a card run unasked.
+- With the Probe plugin installed, edits mark their features stale and the turn ends with their
+  unit tests and a link check; corrections to manifests and briefs arrive as drafts to approve in
+  Probe Studio.
+
+Features: ${features.join(" \xB7 ")}.`;
+}
+function initPendingDrafts(project) {
+  return listDrafts(project).filter((d) => d.origin === "init" && d.status === "pending");
+}
+function summarizeInit(run, steps = run.steps) {
+  const lines = [
+    `Init ${run.id}${run.only ? ` \xB7 step ${run.only}` : ""} \xB7 ${run.status.toUpperCase()}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}${run.drafts.length ? ` \xB7 ${run.drafts.length} drafts to review` : ""}`
+  ];
+  if (run.error) lines.push(run.error);
+  lines.push(formatInitStatus(steps));
+  return lines.join("\n");
+}
+function formatInitStatus(steps) {
+  const icon = { done: "\u2713", todo: "\xB7", waiting: "\u2026", warn: "!" };
+  const open = steps.filter((s) => s.status === "todo" || s.status === "waiting");
+  return [
+    ...steps.map((s) => `  ${icon[s.status]} ${s.label.padEnd(18)} ${s.detail}`),
+    "",
+    open.length ? `Next: ${open[0].status === "waiting" ? "yours" : "`probe init`"} \u2014 ${open[0].label}. \u2713 done \xB7 \xB7 Probe does it \xB7 \u2026 waiting for you \xB7 ! worth a look` : "Set up: nothing left."
+  ].join("\n");
+}
+
 // src/engine/project.ts
-var import_node_path19 = require("node:path");
+var import_node_path22 = require("node:path");
 
 // src/adapters/android-gradle/index.ts
-var import_node_fs16 = require("node:fs");
-var import_node_path18 = require("node:path");
+var import_node_fs19 = require("node:fs");
+var import_node_path21 = require("node:path");
 
 // src/adapters/android-gradle/app.ts
-var import_node_fs12 = require("node:fs");
-var import_node_path14 = require("node:path");
+var import_node_fs15 = require("node:fs");
+var import_node_path17 = require("node:path");
 
 // src/adapters/android-gradle/settings.ts
-var import_node_fs11 = require("node:fs");
-var import_node_path13 = require("node:path");
+var import_node_fs14 = require("node:fs");
+var import_node_path16 = require("node:path");
 var SETTINGS_FILES = ["settings.gradle.kts", "settings.gradle"];
 function settingsFile(root) {
-  const name = SETTINGS_FILES.find((f) => (0, import_node_fs11.existsSync)((0, import_node_path13.join)(root, f)));
-  return name ? (0, import_node_path13.join)(root, name) : null;
+  const name = SETTINGS_FILES.find((f) => (0, import_node_fs14.existsSync)((0, import_node_path16.join)(root, f)));
+  return name ? (0, import_node_path16.join)(root, name) : null;
 }
 function includedModules(root) {
   const file = settingsFile(root);
   if (!file) return [];
-  const text2 = stripComments((0, import_node_fs11.readFileSync)(file, "utf8"));
+  const text2 = stripComments((0, import_node_fs14.readFileSync)(file, "utf8"));
   const overrides = /* @__PURE__ */ new Map();
   for (const m of text2.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
     overrides.set(m[1], m[2]);
@@ -20459,7 +21280,7 @@ function includedModules(root) {
       ids.add(raw.startsWith(":") ? raw : `:${raw}`);
     }
   }
-  return [...ids].map((id) => ({ id, dir: (0, import_node_path13.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs11.existsSync)((0, import_node_path13.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs11.existsSync)((0, import_node_path13.join)(m.dir, "build.gradle")));
+  return [...ids].map((id) => ({ id, dir: (0, import_node_path16.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs14.existsSync)((0, import_node_path16.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs14.existsSync)((0, import_node_path16.join)(m.dir, "build.gradle")));
 }
 function stripComments(text2) {
   return text2.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -20468,20 +21289,20 @@ function stripComments(text2) {
 // src/adapters/android-gradle/app.ts
 var APPLICATION_PLUGIN = /com\.android\.application|android[.-]application|androidApplication/;
 function buildFileOf(dir) {
-  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs12.existsSync)((0, import_node_path14.join)(dir, name))) return (0, import_node_fs12.readFileSync)((0, import_node_path14.join)(dir, name), "utf8");
+  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs15.existsSync)((0, import_node_path17.join)(dir, name))) return (0, import_node_fs15.readFileSync)((0, import_node_path17.join)(dir, name), "utf8");
   return null;
 }
 function detectAndroidApp(root) {
   const apps = includedModules(root).map((m) => ({ ...m, build: buildFileOf(m.dir) })).filter((m) => m.build && APPLICATION_PLUGIN.test(m.build));
   if (apps.length === 0) return null;
   const app = apps.find((m) => m.id === ":app") ?? apps[0];
-  const apkDir = (0, import_node_path14.join)(app.dir, "build", "outputs", "apk");
+  const apkDir = (0, import_node_path17.join)(app.dir, "build", "outputs", "apk");
   let flavor = "";
-  let metadata = (0, import_node_fs12.existsSync)((0, import_node_path14.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path14.join)(apkDir, "debug", "output-metadata.json") : null;
-  if (!metadata && (0, import_node_fs12.existsSync)(apkDir)) {
-    for (const d of (0, import_node_fs12.readdirSync)(apkDir)) {
-      const file = (0, import_node_path14.join)(apkDir, d, "debug", "output-metadata.json");
-      if ((0, import_node_fs12.existsSync)(file)) {
+  let metadata = (0, import_node_fs15.existsSync)((0, import_node_path17.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path17.join)(apkDir, "debug", "output-metadata.json") : null;
+  if (!metadata && (0, import_node_fs15.existsSync)(apkDir)) {
+    for (const d of (0, import_node_fs15.readdirSync)(apkDir)) {
+      const file = (0, import_node_path17.join)(apkDir, d, "debug", "output-metadata.json");
+      if ((0, import_node_fs15.existsSync)(file)) {
         flavor = d;
         metadata = file;
         break;
@@ -20490,7 +21311,7 @@ function detectAndroidApp(root) {
   }
   const installTask = `${app.id}:install${flavor ? flavor[0].toUpperCase() + flavor.slice(1) : ""}Debug`;
   if (metadata) {
-    const id2 = JSON.parse((0, import_node_fs12.readFileSync)(metadata, "utf8")).applicationId;
+    const id2 = JSON.parse((0, import_node_fs15.readFileSync)(metadata, "utf8")).applicationId;
     if (id2) return { module: app.id, package: id2, installTask, source: "last build" };
   }
   const build = app.build;
@@ -20501,8 +21322,8 @@ function detectAndroidApp(root) {
 }
 
 // src/adapters/android-gradle/deps.ts
-var import_node_fs13 = require("node:fs");
-var import_node_path15 = require("node:path");
+var import_node_fs16 = require("node:fs");
+var import_node_path18 = require("node:path");
 function accessorSegment(segment) {
   return segment.replace(/[-_]+([a-zA-Z0-9])/g, (_, c) => c.toUpperCase());
 }
@@ -20511,9 +21332,9 @@ function moduleDependencies(modules) {
   const ids = new Set(modules.map((m) => m.id));
   const out = /* @__PURE__ */ new Map();
   for (const m of modules) {
-    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path15.join)(m.dir, f)).find(import_node_fs13.existsSync);
+    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path18.join)(m.dir, f)).find(import_node_fs16.existsSync);
     if (!file) continue;
-    const text2 = (0, import_node_fs13.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const text2 = (0, import_node_fs16.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     const deps = /* @__PURE__ */ new Set();
     for (const x of text2.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
     for (const x of text2.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
@@ -20529,15 +21350,15 @@ function moduleDependencies(modules) {
 }
 
 // src/adapters/android-gradle/inventory.ts
-var import_node_fs14 = require("node:fs");
-var import_node_path16 = require("node:path");
+var import_node_fs17 = require("node:fs");
+var import_node_path19 = require("node:path");
 var SOURCE_EXT = /\.(kt|java)$/;
 function sourceFiles(dir) {
-  if (!(0, import_node_fs14.existsSync)(dir)) return [];
+  if (!(0, import_node_fs17.existsSync)(dir)) return [];
   const out = [];
   const walk = (d) => {
-    for (const entry of (0, import_node_fs14.readdirSync)(d, { withFileTypes: true })) {
-      const p = (0, import_node_path16.join)(d, entry.name);
+    for (const entry of (0, import_node_fs17.readdirSync)(d, { withFileTypes: true })) {
+      const p = (0, import_node_path19.join)(d, entry.name);
       if (entry.isDirectory()) walk(p);
       else if (SOURCE_EXT.test(entry.name)) out.push(p);
     }
@@ -20546,7 +21367,7 @@ function sourceFiles(dir) {
   return out;
 }
 function sourceSetFiles(moduleDir, set) {
-  return sourceFiles((0, import_node_path16.join)(moduleDir, "src", set));
+  return sourceFiles((0, import_node_path19.join)(moduleDir, "src", set));
 }
 var DECLARATION = /^(?:@\w+(?:\([^)]*\))?\s+)*((?:(?:public|internal|private|protected|abstract|open|final|data|sealed|enum|value|inline|annotation|fun|static)\s+)*)(class|object|interface)\s+([A-Z]\w*)/;
 function declaredClasses(text2) {
@@ -20579,21 +21400,21 @@ function classify(c, fileText) {
 }
 var TEST_SUFFIX = /(Test|Tests|Spec)$/;
 var TEST_QUALIFIER = /(Exhaustive|Integration|Unit|Robolectric|Compose|Ui|Property|Contract|Fake|Impl)$/;
-function normalize(name) {
+function normalize2(name) {
   return name.replace(/^(Default|Real|Base)(?=[A-Z])/, "").replace(/Impl$/, "");
 }
 function indexTests(testFiles) {
   const bases = /* @__PURE__ */ new Set();
   const identifiers = /* @__PURE__ */ new Set();
   for (const file of testFiles) {
-    const text2 = (0, import_node_fs14.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8");
     for (const c of declaredClasses(text2)) {
       if (!TEST_SUFFIX.test(c.name)) continue;
       let base = c.name.replace(TEST_SUFFIX, "");
-      bases.add(normalize(base));
+      bases.add(normalize2(base));
       while (TEST_QUALIFIER.test(base)) {
         base = base.replace(TEST_QUALIFIER, "");
-        bases.add(normalize(base));
+        bases.add(normalize2(base));
       }
     }
     for (const id of text2.matchAll(/\b[A-Z]\w+\b/g)) identifiers.add(id[0]);
@@ -20601,14 +21422,14 @@ function indexTests(testFiles) {
   return { bases, identifiers };
 }
 function testLink(name, index) {
-  if (index.bases.has(normalize(name))) return "direct";
+  if (index.bases.has(normalize2(name))) return "direct";
   if (index.identifiers.has(name)) return "referenced";
   return "none";
 }
 function inventory(projectRoot, mainFiles, tests) {
   const out = [];
   for (const file of mainFiles) {
-    const text2 = (0, import_node_fs14.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8");
     const declared = declaredClasses(text2).filter((c) => !c.modifiers.includes("private"));
     if (declared.length === 0) continue;
     const lines = Math.max(1, Math.round(text2.split("\n").length / declared.length));
@@ -20618,7 +21439,7 @@ function inventory(projectRoot, mainFiles, tests) {
       const weight = KIND_WEIGHT[kind];
       out.push({
         name: c.name,
-        file: (0, import_node_path16.relative)(projectRoot, file).replace(/\\/g, "/"),
+        file: (0, import_node_path19.relative)(projectRoot, file).replace(/\\/g, "/"),
         kind,
         lines,
         test,
@@ -20630,15 +21451,15 @@ function inventory(projectRoot, mainFiles, tests) {
 }
 
 // src/adapters/android-gradle/junit.ts
-var import_node_fs15 = require("node:fs");
-var import_node_path17 = require("node:path");
+var import_node_fs18 = require("node:fs");
+var import_node_path20 = require("node:path");
 function readJUnitResults(moduleId, resultsDir, sinceMs) {
-  if (!(0, import_node_fs15.existsSync)(resultsDir)) return null;
-  const files = (0, import_node_fs15.readdirSync)(resultsDir).filter((f) => f.startsWith("TEST-") && f.endsWith(".xml")).map((f) => (0, import_node_path17.join)(resultsDir, f)).filter((f) => (0, import_node_fs15.statSync)(f).mtimeMs >= sinceMs - 2e3);
+  if (!(0, import_node_fs18.existsSync)(resultsDir)) return null;
+  const files = (0, import_node_fs18.readdirSync)(resultsDir).filter((f) => f.startsWith("TEST-") && f.endsWith(".xml")).map((f) => (0, import_node_path20.join)(resultsDir, f)).filter((f) => (0, import_node_fs18.statSync)(f).mtimeMs >= sinceMs - 2e3);
   if (files.length === 0) return null;
   const result = { module: moduleId, tests: 0, failed: 0, skipped: 0, durationMs: 0, failures: [] };
   for (const file of files) {
-    const xml = (0, import_node_fs15.readFileSync)(file, "utf8");
+    const xml = (0, import_node_fs18.readFileSync)(file, "utf8");
     for (const tc of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
       const attrs = tc[1];
       const body = tc[3] ?? "";
@@ -20679,12 +21500,12 @@ var androidGradleAdapter = {
   },
   projectName(root) {
     const file = settingsFile(root);
-    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs16.readFileSync)(file, "utf8"))?.[1];
-    return named || (0, import_node_path18.basename)(root);
+    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs19.readFileSync)(file, "utf8"))?.[1];
+    return named || (0, import_node_path21.basename)(root);
   },
   scanModules(root, config2) {
     return includedModules(root).map(({ id, dir }) => {
-      const buildFile = (0, import_node_fs16.readFileSync)((0, import_node_fs16.existsSync)((0, import_node_path18.join)(dir, "build.gradle.kts")) ? (0, import_node_path18.join)(dir, "build.gradle.kts") : (0, import_node_path18.join)(dir, "build.gradle"), "utf8");
+      const buildFile = (0, import_node_fs19.readFileSync)((0, import_node_fs19.existsSync)((0, import_node_path21.join)(dir, "build.gradle.kts")) ? (0, import_node_path21.join)(dir, "build.gradle.kts") : (0, import_node_path21.join)(dir, "build.gradle"), "utf8");
       const platform = /android/i.test(buildFile) ? "android" : /jvm|java-library|kotlin\("jvm"\)/.test(buildFile) ? "jvm" : "unknown";
       const main2 = sourceSetFiles(dir, "main");
       const test = sourceSetFiles(dir, "test");
@@ -20719,7 +21540,7 @@ var androidGradleAdapter = {
     return modules.filter((m) => m.unitTestTask).map((m) => {
       const taskName = m.unitTestTask.split(":").pop();
       const cached2 = invocation.reused.includes(m.id);
-      const result = readJUnitResults(m.id, (0, import_node_path18.join)(m.dir, "build", "test-results", taskName), cached2 ? 0 : sinceMs);
+      const result = readJUnitResults(m.id, (0, import_node_path21.join)(m.dir, "build", "test-results", taskName), cached2 ? 0 : sinceMs);
       return result && { ...result, cached: cached2 };
     }).filter((r) => r !== null);
   },
@@ -20743,10 +21564,10 @@ var androidGradleAdapter = {
     const out = [];
     for (const m of modules) {
       for (const file of sourceSetFiles(m.dir, "main")) {
-        const lines = (0, import_node_fs16.readFileSync)(file, "utf8").split(/\r?\n/);
+        const lines = (0, import_node_fs19.readFileSync)(file, "utf8").split(/\r?\n/);
         lines.forEach((text2, i) => {
           if (out.length < limit && NAV_HINT.test(text2)) {
-            out.push(`${(0, import_node_path18.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+            out.push(`${(0, import_node_path21.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
           }
         });
       }
@@ -20755,7 +21576,7 @@ var androidGradleAdapter = {
   },
   doctor(root) {
     const checks = [];
-    const wrapper = (0, import_node_fs16.existsSync)((0, import_node_path18.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
+    const wrapper = (0, import_node_fs19.existsSync)((0, import_node_path21.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
     checks.push({
       id: "gradle-wrapper",
       label: "Gradle wrapper",
@@ -20787,8 +21608,8 @@ var androidGradleAdapter = {
       detail: devices.length > 0 ? devices.map((d) => `${d.serial} (${d.model}, ${d.emulator ? "emulator" : "real phone \u2014 agents need permission"})`).join(", ") : "none (only needed for agent tests)",
       fix: devices.length > 0 ? void 0 : "Start an emulator or connect a phone with USB debugging"
     });
-    const emulator = sdk ? (0, import_node_path18.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
-    const avds = emulator && (0, import_node_fs16.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
+    const emulator = sdk ? (0, import_node_path21.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
+    const avds = emulator && (0, import_node_fs19.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
     checks.push({
       id: "avds",
       label: "Emulator images",
@@ -20800,7 +21621,7 @@ var androidGradleAdapter = {
   }
 };
 function gradlew(root) {
-  const wrapper = (0, import_node_path18.join)(root, isWindows ? "gradlew.bat" : "gradlew");
+  const wrapper = (0, import_node_path21.join)(root, isWindows ? "gradlew.bat" : "gradlew");
   return isWindows ? `"${wrapper}"` : wrapper;
 }
 var NAV_HINT = /\bcomposable<|\bnavigation<|\bNavHost\(|startDestination|deepLinks?\s*[=(]|navDeepLink|uriPattern|@Serializable\s+(data\s+)?(object|class)\s+\w*(Route|Destination|Screen|Graph)\b|\bnavigateTo\w*\(|Intent\(\s*\w+,\s*\w+Activity::class/;
@@ -20813,7 +21634,7 @@ function detectAdapter(root) {
 
 // src/engine/project.ts
 function openProject(explicit) {
-  const start = (0, import_node_path19.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
+  const start = (0, import_node_path22.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
   let dir = start;
   for (; ; ) {
     const adapter = detectAdapter(dir);
@@ -20822,14 +21643,14 @@ function openProject(explicit) {
       const config2 = loadConfig(dir, store.dir);
       return { root: dir, name: config2.name ?? adapter.projectName(dir), adapter, config: config2, store };
     }
-    const parent = (0, import_node_path19.dirname)(dir);
+    const parent = (0, import_node_path22.dirname)(dir);
     if (parent === dir) throw new Error(`No supported project found at or above ${start}. Supported: Android/Gradle.`);
     dir = parent;
   }
 }
 
 // src/engine/issues.ts
-var import_node_path20 = require("node:path");
+var import_node_path23 = require("node:path");
 function issuesOf(project, run) {
   const read = (id) => id ? project.store.read(`runs/${id}.json`) : null;
   if (run.kind === "verify") {
@@ -20881,7 +21702,7 @@ function findIssue(project, issueId) {
 }
 function fixPrompt(project, issue2, run, forProbe) {
   const feature = findFeature(latestScan(project), issue2.feature);
-  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path20.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
+  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path23.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
   const parts = [`Fix one problem that Probe found in the "${issue2.feature}" feature of the project in the current directory.`, `## The problem
 ${issue2.title}
 
@@ -21704,7 +22525,7 @@ var _parse = (_Err) => (schema, value, _ctx, _params) => {
   }
   return result.value;
 };
-var parse5 = /* @__PURE__ */ _parse($ZodRealError);
+var parse6 = /* @__PURE__ */ _parse($ZodRealError);
 var _parseAsync = (_Err) => async (schema, value, _ctx, params) => {
   const ctx = _ctx ? Object.assign(_ctx, { async: true }) : { async: true };
   let result = schema._zod.run({ value, issues: [] }, ctx);
@@ -24844,7 +25665,7 @@ var ZodMiniType = /* @__PURE__ */ $constructor("ZodMiniType", (inst, def) => {
     throw new Error("Uninitialized schema in ZodMiniType.");
   $ZodType.init(inst, def);
   inst.def = def;
-  inst.parse = (data, params) => parse5(inst, data, params, { callee: inst.parse });
+  inst.parse = (data, params) => parse6(inst, data, params, { callee: inst.parse });
   inst.safeParse = (data, params) => safeParse(inst, data, params);
   inst.parseAsync = async (data, params) => parseAsync(inst, data, params, { callee: inst.parseAsync });
   inst.safeParseAsync = async (data, params) => safeParseAsync(inst, data, params);
@@ -25120,7 +25941,7 @@ var ZodRealError = $constructor("ZodError", initializer2, {
 });
 
 // node_modules/zod/v4/classic/parse.js
-var parse6 = /* @__PURE__ */ _parse(ZodRealError);
+var parse7 = /* @__PURE__ */ _parse(ZodRealError);
 var parseAsync2 = /* @__PURE__ */ _parseAsync(ZodRealError);
 var safeParse3 = /* @__PURE__ */ _safeParse(ZodRealError);
 var safeParseAsync3 = /* @__PURE__ */ _safeParseAsync(ZodRealError);
@@ -25148,7 +25969,7 @@ var ZodType2 = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
     reg.add(inst, meta);
     return inst;
   });
-  inst.parse = (data, params) => parse6(inst, data, params, { callee: inst.parse });
+  inst.parse = (data, params) => parse7(inst, data, params, { callee: inst.parse });
   inst.safeParse = (data, params) => safeParse3(inst, data, params);
   inst.parseAsync = async (data, params) => parseAsync2(inst, data, params, { callee: inst.parseAsync });
   inst.safeParseAsync = async (data, params) => safeParseAsync3(inst, data, params);
@@ -29123,7 +29944,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve4) => setTimeout(resolve4, pollInterval));
+        await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error2) {
@@ -29140,7 +29961,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve4, reject) => {
+    return new Promise((resolve5, reject) => {
       const earlyReject = (error2) => {
         reject(error2);
       };
@@ -29218,7 +30039,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve4(parseResult.data);
+            resolve5(parseResult.data);
           }
         } catch (error2) {
           reject(error2);
@@ -29480,12 +30301,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve4, reject) => {
+    return new Promise((resolve5, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve4, interval);
+      const timeoutId = setTimeout(resolve5, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -30625,7 +31446,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve4) => setTimeout(resolve4, pollInterval));
+      await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -31289,21 +32110,21 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve4) => {
+    return new Promise((resolve5) => {
       const json = serializeMessage(message);
       if (this._stdout.write(json)) {
-        resolve4();
+        resolve5();
       } else {
-        this._stdout.once("drain", resolve4);
+        this._stdout.once("drain", resolve5);
       }
     });
   }
 };
 
 // src/studio/server.ts
-var import_node_fs19 = require("node:fs");
+var import_node_fs24 = require("node:fs");
 var import_node_http = require("node:http");
-var import_node_path23 = require("node:path");
+var import_node_path28 = require("node:path");
 
 // src/accounts/login.ts
 function prompt3(project, wanted, device, pkg) {
@@ -31364,7 +32185,7 @@ function lastLogin(project) {
 }
 
 // src/cards/explore.ts
-var import_yaml6 = __toESM(require_dist(), 1);
+var import_yaml7 = __toESM(require_dist(), 1);
 var NAVMAP_FILE = "navmap.json";
 function prompt4(project, feature, device, pkg) {
   const cards = listCards(project.root, feature).map((c) => ({ title: c.title, reach: c.reach }));
@@ -31377,7 +32198,7 @@ Only look and navigate: do not post, send, delete or change anything.
 
 ## What Probe already knows about reaching it (feature cards)
 \`\`\`yaml
-${cards.length ? (0, import_yaml6.stringify)(cards) : "none yet\n"}\`\`\`
+${cards.length ? (0, import_yaml7.stringify)(cards) : "none yet\n"}\`\`\`
 
 ## Test accounts
 ${accountsForPrompt(project)}
@@ -31599,9 +32420,9 @@ function summarizeUnitWrite(run) {
 }
 
 // src/engine/verify.ts
-var import_node_path21 = require("node:path");
+var import_node_path24 = require("node:path");
 function featuresOfFiles(project, result, files) {
-  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path21.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
+  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path24.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
   const byFeature = /* @__PURE__ */ new Map();
   const unowned = [];
   for (const file of files) {
@@ -31742,8 +32563,8 @@ function summarizeVerify(run) {
 
 // src/tickets/tickets.ts
 var import_node_child_process6 = require("node:child_process");
-var import_node_fs17 = require("node:fs");
-var import_node_path22 = require("node:path");
+var import_node_fs20 = require("node:fs");
+var import_node_path25 = require("node:path");
 function ticketUrl(project, id) {
   return project.config.tickets.url?.replace("{id}", encodeURIComponent(id));
 }
@@ -31755,7 +32576,7 @@ function ticketInfo(project, id) {
   return { id, url: ticketUrl(project, id), commits, features: [...byFeature.keys()], cards: cards.map((c) => `${c.feature}/${c.id}`) };
 }
 function ticketDraft(project, run) {
-  const evidence = (0, import_node_path22.join)(project.store.dir, "runs", run.id);
+  const evidence = (0, import_node_path25.join)(project.store.dir, "runs", run.id);
   const lines = [];
   let title = `[Probe] ${run.feature}: ${run.kind} ${run.status}`;
   switch (run.kind) {
@@ -31801,10 +32622,10 @@ function ticketDraft(project, run) {
 function fileTicket(project, run, draft = ticketDraft(project, run)) {
   const template = project.config.tickets.fileCommand;
   if (!template) throw new Error("No tickets.fileCommand in probe/probe.yaml; copy the draft instead.");
-  const dir = (0, import_node_path22.join)(project.store.dir, "tickets");
-  (0, import_node_fs17.mkdirSync)(dir, { recursive: true });
-  const file = (0, import_node_path22.join)(dir, `${run.id}.md`);
-  (0, import_node_fs17.writeFileSync)(file, draft.body);
+  const dir = (0, import_node_path25.join)(project.store.dir, "tickets");
+  (0, import_node_fs20.mkdirSync)(dir, { recursive: true });
+  const file = (0, import_node_path25.join)(dir, `${run.id}.md`);
+  (0, import_node_fs20.writeFileSync)(file, draft.body);
   const quote = (s) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file));
   const r = (0, import_node_child_process6.spawnSync)(command, { cwd: project.root, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
@@ -31813,15 +32634,452 @@ function fileTicket(project, run, draft = ticketDraft(project, run)) {
 }
 
 // src/studio/page.html
-var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <div class="meta" id="meta">loading\u2026</div>\n  <span class="branch" id="branch" title="Branch this project is on">\u2026</span>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  if (state.tab === "setup") return renderSetup();\n  if (state.tab === "atlas") return state.feature ? renderFeature(state.feature) : renderAtlas();\n  if (state.tab === "cards") return renderCards();\n  if (state.tab === "verify") return renderVerify();\n  if (state.tab === "runs") return renderRuns();\n  if (state.tab === "settings") return renderSettings();\n}\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.name} \xB7 ${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${state.group === "platform" ? "Platform groups" : "Features"}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}</strong>\n        <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>Feature</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong></td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="9" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" title="An agent walks this feature\'s screens on an emulator and maps how each is reached">\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const { runId } = await api("/api/unit/" + encodeURIComponent(f.id), { method: "POST" });\n    followRun(runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""}` : "no git";\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));\n      onDone && onDone(e.run);\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div></div>\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  if (!run.results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run title="An agent performs this card on an emulator and checks every expectation">\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; renderCards(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\nasync function renderRuns() {\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  const runs = await api("/api/runs");\n  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>\n    ${runs.map((r) => {\n      let result;\n      if (r.kind === "backfill") result = `${r.written.length} cards \xB7 $${r.costUsd.toFixed(2)}`;\n      else if (r.kind === "card") result = `${esc(r.cardId)} \xB7 ${r.timeline.length} steps \xB7 $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n      else if (r.kind === "verify") result = `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n      else if (r.kind === "explore") result = `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n      else if (r.kind === "unitwrite") result = `${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\n      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\n      else {\n        const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);\n        result = `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n      }\n      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;\n    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;\n  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));\n  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        <button class="btn" type="submit" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst MODELS = [\n  ["sonnet", "Sonnet \u2014 balanced, included in most plans (recommended)"],\n  ["haiku", "Haiku \u2014 fastest and cheapest, fine for simple cards"],\n  ["opus", "Opus \u2014 strongest, uses your plan faster"],\n  ["fable", "Fable \u2014 may bill usage credits on your plan"],\n];\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      <label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      <label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      app: { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null },\n      devices: { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) },\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      perf: { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const known = MODELS.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agent model</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs on your own Claude Code login and plan, with this model. It is saved for this machine only, since each developer\'s plan differs; a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Model<select name="pick">${MODELS.map(([m, label]) => `<option value="${m}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="claude-sonnet-5-5"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong class="mono">${esc(current)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen())}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div class="box"><h3>${left ? `${left} thing${left === 1 ? "" : "s"} left to set up` : "Ready: agents can test this project"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n}\n\n(async () => {\n  await checkBranch();\n  // A project that cannot be tested yet opens on what is missing.\n  const items = await api("/api/setup").catch(() => []);\n  if (items.some((i) => i.status === "fail")) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
+var page_default = '<!doctype html>\r\n<html lang="en">\r\n<head>\r\n<meta charset="utf-8">\r\n<meta name="viewport" content="width=device-width, initial-scale=1">\r\n<title>Probe Studio</title>\r\n<style>\r\n  :root {\r\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\r\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\r\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\r\n  }\r\n  @media (prefers-color-scheme: dark) {\r\n    :root {\r\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\r\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\r\n    }\r\n  }\r\n  * { box-sizing: border-box; }\r\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\r\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\r\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\r\n  header .meta { color: var(--muted); font-size: 12px; }\r\n  header .spacer { flex: 1; }\r\n  nav { display: flex; gap: 4px; }\r\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\r\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\r\n  .btn.secondary { background: var(--track); color: var(--text); }\r\n  .btn:disabled { opacity: .5; cursor: default; }\r\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\r\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\r\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\r\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\r\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\r\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\r\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\r\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\r\n  .card .k { color: var(--muted); font-size: 12px; }\r\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\r\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\r\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\r\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\r\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\r\n  tbody tr:last-child td { border-bottom: 0; }\r\n  tr.click { cursor: pointer; }\r\n  tr.click:hover td { background: var(--track); }\r\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\r\n  .bar span { display: block; height: 100%; }\r\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\r\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\r\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\r\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\r\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\r\n  .tile:hover { background: var(--track); }\r\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\r\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\r\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\r\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\r\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\r\n  .box ul { margin: 4px 0; padding-left: 18px; }\r\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\r\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\r\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\r\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\r\n  .muted { color: var(--muted); }\r\n  .mono { font-family: var(--mono); font-size: 12px; }\r\n  td.mono { word-break: break-all; }\r\n  h2 { font-size: 15px; margin: 22px 0 10px; }\r\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\r\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\r\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\r\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\r\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\r\n  .row { display: flex; gap: 12px; align-items: center; }\r\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\r\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\r\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\r\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\r\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\r\n  details.fc > summary::-webkit-details-marker { display: none; }\r\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\r\n  .fc-body { padding: 4px 16px 14px; }\r\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\r\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\r\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\r\n  .fc-body ul.expect li { margin: 3px 0; }\r\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\r\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\r\n  .reach b { color: var(--muted); font-weight: 400; }\r\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\r\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\r\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\r\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }\r\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\r\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\r\n  ul.setup { list-style: none; padding: 0; margin: 0; }\r\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\r\n  ul.setup li:last-child { border-bottom: 0; }\r\n  ul.setup .what { flex: 1; min-width: 200px; }\r\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\r\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\r\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\r\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\r\n  .side .head input { width: 100%; min-width: 0; }\r\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\r\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\r\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\r\n  .side li:hover { background: var(--track); }\r\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\r\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\r\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\r\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\r\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\r\n  .issues { margin: 12px 0; }\r\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\r\n  .issue:last-child { border-bottom: 0; }\r\n  .issue .what { flex: 1; min-width: 220px; }\r\n  .issue .k { font-size: 11px; }\r\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\r\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\r\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\r\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\r\n  .box.stale { border-color: var(--warn); }\r\n  .box a { color: var(--accent); font-weight: 600; }\r\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\r\n  @media (max-width: 720px) {\r\n    header { flex-wrap: wrap; padding: 12px 16px; }\r\n    main { padding: 16px; }\r\n    .hide-sm { display: none; }\r\n    table { font-size: 13px; }\r\n  }\r\n</style>\r\n</head>\r\n<body>\r\n<header>\r\n  <h1>Probe</h1>\r\n  <div class="meta" id="meta">loading\u2026</div>\r\n  <span class="branch" id="branch" title="Branch this project is on">\u2026</span>\r\n  <div class="spacer"></div>\r\n  <nav>\r\n    <button data-tab="atlas" class="active">Atlas</button>\r\n    <button data-tab="cards">Cards</button>\r\n    <button data-tab="verify">Verify</button>\r\n    <button data-tab="runs">Runs</button>\r\n    <button data-tab="settings">Settings</button>\r\n    <button data-tab="setup">Setup</button>\r\n  </nav>\r\n</header>\r\n<div id="banner"></div>\r\n<main id="view"></main>\r\n\r\n<script>\r\nconst $view = document.getElementById("view");\r\nconst $meta = document.getElementById("meta");\r\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null };\r\n\r\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\r\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\r\nconst ago = (iso) => {\r\n  if (!iso) return "never";\r\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\r\n  if (s < 60) return "just now";\r\n  if (s < 3600) return Math.round(s / 60) + "m ago";\r\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\r\n  return Math.round(s / 86400) + "d ago";\r\n};\r\n\r\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\r\n  state.tab = b.dataset.tab; state.feature = null; render();\r\n}));\r\n\r\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\r\n\r\nasync function render() {\r\n  closeStream();\r\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\r\n  if (state.tab === "setup") return renderSetup();\r\n  if (state.tab === "atlas") return state.feature ? renderFeature(state.feature) : renderAtlas();\r\n  if (state.tab === "cards") return renderCards();\r\n  if (state.tab === "verify") return renderVerify();\r\n  if (state.tab === "runs") return renderRuns();\r\n  if (state.tab === "settings") return renderSettings();\r\n}\r\n\r\nfunction coverageBar(s) {\r\n  const t = Math.max(1, s.testable);\r\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\r\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\r\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\r\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\r\n  </div>`;\r\n}\r\n\r\nfunction runPill(r) {\r\n  if (!r) return `<span class="pill none">not run</span>`;\r\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\r\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\r\n}\r\n\r\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\r\nfunction healthPill(f) {\r\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\r\n}\r\n\r\nfunction devicePill(d) {\r\n  const ran = d.passed + d.failed + d.blocked + d.error;\r\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\r\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\r\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\r\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\r\n}\r\n\r\n/** Marks a result that no longer holds for the code checked out here. */\r\nfunction freshPill(r) {\r\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\r\n  const why = (r.freshReasons || []).join("\\n");\r\n  return r.fresh === "stale"\r\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\r\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\r\n}\r\n\r\nfunction whoRan(r) {\r\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\r\n}\r\n\r\nfunction lastRunPill(r) {\r\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\r\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\r\n}\r\n\r\nfunction cardsPill(c) {\r\n  if (!c) return `<span class="pill none">none</span>`;\r\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\r\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\r\n}\r\n\r\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\r\nfunction outdatedCount(features) {\r\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\r\n}\r\n\r\nasync function loadScan(refresh) {\r\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\r\n  const p = state.scan.project;\r\n  $meta.textContent = `${p.name} \xB7 ${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\r\n}\r\n\r\nasync function renderAtlas() {\r\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\r\n  const watch = await api("/api/watch");\r\n  const all = state.scan.features;\r\n  const list = all\r\n    .filter((f) => state.group === "all" || f.group === state.group)\r\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\r\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\r\n  const testable = sum("testable");\r\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\r\n\r\n  $view.innerHTML = `\r\n    <div class="cards">\r\n      <div class="card"><div class="k">${state.group === "platform" ? "Platform groups" : "Features"}</div><div class="v">${list.length}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\r\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\r\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\r\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\r\n    </div>\r\n    <div class="toolbar">\r\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\r\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\r\n      <div class="seg" id="group">\r\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\r\n      </div>\r\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\r\n      <div style="flex:1"></div>\r\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\r\n      <button class="btn secondary" id="rescan">Rescan</button>\r\n    </div>\r\n    ${watchBanner(watch)}\r\n    <div id="runpanel"></div>\r\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\r\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\r\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\r\n        <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\r\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\r\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\r\n    <table>\r\n      <thead><tr>\r\n        <th>Feature</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\r\n        <th class="num hide-sm">Untested</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\r\n      </tr></thead>\r\n      <tbody>\r\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\r\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}</td>\r\n          <td class="num hide-sm">${f.stats.modules}</td>\r\n          <td class="num">${f.stats.testable}</td>\r\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\r\n          <td class="num hide-sm">${f.stats.untested}</td>\r\n          <td>${cardsPill(f.cards)}</td>\r\n          <td>${runPill(f.lastUnitRun)}</td>\r\n          <td>${devicePill(f.device)}</td>\r\n          <td>${healthPill(f)}</td>\r\n        </tr>`).join("") || `<tr><td colspan="9" class="empty">Nothing matches.</td></tr>`}\r\n      </tbody>\r\n    </table>`}`;\r\n\r\n  const filter = document.getElementById("filter");\r\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\r\n  document.querySelectorAll("#group button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.g === state.group);\r\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\r\n  });\r\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("rescan").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\r\n    await loadScan(true); renderAtlas();\r\n  });\r\n  document.querySelectorAll("#view button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.v === state.view);\r\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\r\n  });\r\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\r\n  bindWatchBanner(() => renderAtlas());\r\n}\r\n\r\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\r\n\r\nfunction stalePill(watch, id) {\r\n  const e = watch.stale[id];\r\n  if (!e) return "";\r\n  return ` <span class="pill warn" title="Edited since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">edited</span>`;\r\n}\r\n\r\nfunction watchBanner(watch) {\r\n  if (!watch.enabled) return "";\r\n  const stale = Object.keys(watch.stale);\r\n  const parts = [];\r\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\r\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\r\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\r\n  if (!parts.length) return "";\r\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\r\n}\r\n\r\nfunction bindWatchBanner(refresh) {\r\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\r\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\r\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/watch/check", {});\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\r\n  });\r\n}\r\n\r\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\r\nfunction miniMd(text) {\r\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\r\n  const items = [];\r\n  for (const line of text.split("\\n")) {\r\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\r\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\r\n  }\r\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\r\n}\r\n\r\nfunction diffHtml(diff) {\r\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\r\n}\r\n\r\nasync function renderKnowledge(id) {\r\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\r\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\r\n  const el = document.getElementById("knowledge");\r\n  if (!el) return;\r\n  if (!k.manifest && !k.check && k.drafts.length) {\r\n    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span></div>`;\r\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\r\n    return;\r\n  }\r\n  if (!k.manifest && !k.check) {\r\n    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives this feature a summary, its rules and the tests that prove them; Probe then keeps them in step with the code.</span></div>`;\r\n    return;\r\n  }\r\n  const m = k.manifest || {};\r\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\r\n  const brokenBy = {};\r\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\r\n  const brokenCardsBy = {};\r\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\r\n  // A card proves its rule only while its last pass still holds for this code.\r\n  const cardPill = (x) => {\r\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\r\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" title="Run this card on a device">\u25B6</button>`;\r\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\r\n  };\r\n  const proof = (inv) => {\r\n    const broken = brokenBy[inv.id] || [];\r\n    const pills = [];\r\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\r\n    const cards = (k.cards || {})[inv.id] || [];\r\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\r\n    return pills.join(" ") + cards.map(cardPill).join("") +\r\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\r\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\r\n  };\r\n  el.innerHTML = `\r\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">edited</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature">\u2713 Check now</button></div></div>` : ""}\r\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\r\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\r\n    <div class="box"><h3>${esc(m.name || id)} ${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\r\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\r\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\r\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\r\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\r\n    </div>\r\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\r\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\r\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\r\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\r\n    const at = b.dataset.runcard.lastIndexOf("/");\r\n    b.disabled = true; b.textContent = "\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  }));\r\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\r\n    const res = await post("/api/watch/check", { features: [id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  });\r\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.approve;\r\n    const draftId = b.dataset.approve || b.dataset.reject;\r\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderKnowledge(id);\r\n  }));\r\n}\r\n\r\nasync function renderFeature(id) {\r\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\r\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\r\n  if (!state.scan) await loadScan(false);\r\n  const h = state.scan.features.find((x) => x.id === f.id);\r\n  const nav = navmap[f.id];\r\n  const s = f.stats;\r\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\r\n  $view.innerHTML = `\r\n    <button class="back" id="back">\u2190 Atlas</button>\r\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\r\n      <button class="btn secondary" id="backfill" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\r\n      <button class="btn secondary" id="explore" title="An agent walks this feature\'s screens on an emulator and maps how each is reached">\u2316 Map screens</button>\r\n      <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\r\n      <button class="btn secondary" id="verifyf" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\r\n      <button class="btn" id="run" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\r\n    <div id="knowledge"></div>\r\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\r\n    <div class="cards">\r\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\r\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\r\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <h2>Cards</h2>\r\n    <div id="featurecards"></div>\r\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\r\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\r\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\r\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\r\n    <h2>Riskiest untested classes</h2>\r\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\r\n    <table>\r\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\r\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\r\n    </table>\r\n    <h2>Modules</h2>\r\n    <table>\r\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\r\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\r\n    </table>`;\r\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\r\n  renderKnowledge(f.id);\r\n  const showCards = async () => {\r\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\r\n    const el = document.getElementById("featurecards");\r\n    if (!el) return;\r\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\r\n    bindCardActions(el, showCards);\r\n  };\r\n  showCards();\r\n  document.getElementById("backfill").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\r\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\r\n  });\r\n  document.getElementById("run").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\r\n    const { runId } = await api("/api/unit/" + encodeURIComponent(f.id), { method: "POST" });\r\n    followRun(runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\r\n  });\r\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\r\n    const label = e.target.textContent;\r\n    e.target.disabled = true; e.target.textContent = busy;\r\n    const res = await post(path, body);\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\r\n  });\r\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\r\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\r\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\r\n}\r\n\r\n// Every action carries the branch the person is looking at; the server refuses it if the\r\n// project has moved to another branch since (a checkout in a terminal or the IDE).\r\nconst post = async (path, body) => {\r\n  const headers = { "content-type": "application/json" };\r\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\r\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\r\n  if (res.branchChanged) checkBranch();\r\n  return res;\r\n};\r\n\r\nasync function checkBranch() {\r\n  const b = await api("/api/branch").catch(() => null);\r\n  if (!b) return;\r\n  state.branchInfo = b;\r\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\r\n  const chip = document.getElementById("branch");\r\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""}` : "no git";\r\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\r\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\r\n  const banner = document.getElementById("banner");\r\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\r\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\r\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\r\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\r\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\r\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\r\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\r\n  } else banner.innerHTML = "";\r\n}\r\nsetInterval(checkBranch, 5000);\r\n\r\nfunction followRun(runId, el, onDone) {\r\n  closeStream();\r\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\r\n  const log = el.querySelector("#log");\r\n  const stopBtn = el.querySelector("#rstop");\r\n  stopBtn.addEventListener("click", async () => {\r\n    if (!confirm(`Stop run ${runId}?`)) return;\r\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\r\n    const res = await stopRunReq(runId);\r\n    if (res.error) { alert(res.error); stopBtn.remove(); }\r\n  });\r\n  const es = new EventSource(`/api/runs/${runId}/stream`);\r\n  state.eventSource = es;\r\n  es.onmessage = (msg) => {\r\n    const e = JSON.parse(msg.data);\r\n    if (e.type === "log") {\r\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\r\n      log.textContent += e.line + "\\n";\r\n      if (atBottom) log.scrollTop = log.scrollHeight;\r\n    } else if (e.type === "done") {\r\n      es.close(); state.eventSource = null;\r\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\r\n      el.querySelector("#rstop")?.remove();\r\n      const rr = el.querySelector("#rr");\r\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\r\n      bindTicket(rr);\r\n      renderIssues(e.run, rr.querySelector("#ri"), el);\r\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));\r\n      onDone && onDone(e.run);\r\n    }\r\n  };\r\n  es.onerror = () => { es.close(); state.eventSource = null; };\r\n}\r\n\r\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };\r\n\r\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\r\nasync function renderIssues(run, el, panel) {\r\n  if (run.status === "running" || run.kind === "fix") return;\r\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\r\n  if (!Array.isArray(issues) || !issues.length) return;\r\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\r\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\r\n      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div></div>\r\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\r\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\r\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\r\n  el.querySelectorAll(".issue").forEach((row) => {\r\n    const id = row.dataset.issue;\r\n    const out = row.querySelector(".ip");\r\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\r\n      if (out.innerHTML) { out.innerHTML = ""; return; }\r\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\r\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\r\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\r\n        const ta = out.querySelector("textarea");\r\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\r\n        out.querySelector("[data-copied]").textContent = "Copied.";\r\n      });\r\n    });\r\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\r\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\r\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\r\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\r\n      if (res.error) return alert(res.error);\r\n      followRun(res.runId, panel);\r\n    });\r\n  });\r\n}\r\n\r\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\r\n\r\nfunction perfBlock(p) {\r\n  if (!p) return "";\r\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\r\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\r\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\r\n}\r\n\r\nfunction evidence(run) {\r\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\r\n  const shots = run.timeline.filter((t) => t.screenshot);\r\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\r\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\r\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\r\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\r\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\r\n}\r\n\r\nfunction ticketButton(run) {\r\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\r\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\r\n}\r\n\r\nasync function bindTicket(el) {\r\n  const b = el.querySelector("button[data-ticket]");\r\n  if (!b) return;\r\n  b.addEventListener("click", async () => {\r\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\r\n    const panel = el.querySelector(".ticketpanel");\r\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\r\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\r\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\r\n    const file = panel.querySelector("[data-file]");\r\n    if (file) file.addEventListener("click", async () => {\r\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\r\n      file.disabled = true;\r\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\r\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\r\n    });\r\n  });\r\n}\r\n\r\nfunction resultsTable(run) {\r\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\r\n  if (run.kind === "verify") {\r\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\r\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\r\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\r\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\r\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\r\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\r\n      </tbody></table>\r\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\r\n  }\r\n  if (run.kind === "init") {\r\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\r\n  }\r\n  if (run.kind === "login") {\r\n    const l = run.login;\r\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\r\n  }\r\n  if (run.kind === "explore") {\r\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "unitwrite") {\r\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\r\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\r\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\r\n  }\r\n  if (run.kind === "card") {\r\n    const v = run.verdict;\r\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\r\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "fix") {\r\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\r\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\r\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\r\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\r\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\r\n  }\r\n  if (run.kind === "backfill") {\r\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\r\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\r\n  }\r\n  if (!run.results.length) return err;\r\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\r\n    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\r\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\r\n\r\nfunction cardHtml(c) {\r\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\r\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\r\n    <summary>\r\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\r\n      <strong>${esc(c.title)}</strong>\r\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\r\n      <span style="flex:1"></span>\r\n      ${lastRunPill(c.lastRun)}\r\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\r\n      <span class="pill st-${c.status}">${c.status}</span>\r\n    </summary>\r\n    <div class="fc-body">\r\n      <p>${esc(c.summary)}</p>\r\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\r\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\r\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\r\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\r\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\r\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\r\n      <div class="row" style="margin-top:10px">\r\n        <button class="btn" data-run title="An agent performs this card on an emulator and checks every expectation">\u25B6 Run on device</button>\r\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\r\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\r\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\r\n      </div>\r\n    </div>\r\n  </details>`;\r\n}\r\n\r\nfunction bindCardActions(el, refresh) {\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\r\n    b.disabled = true; b.textContent = "Agent testing\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\r\n    let panel = d.querySelector(".runpanel");\r\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\r\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\r\n  })));\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\r\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\r\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\r\n    });\r\n    state.scan = null;\r\n    refresh();\r\n  })));\r\n}\r\n\r\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\r\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\r\n\r\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\r\nfunction cardFeatures(all) {\r\n  const by = new Map();\r\n  for (const c of all) {\r\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\r\n    f.cards.push(c);\r\n    if (c.status === "draft") f.draft++;\r\n    if (c.status === "approved") f.approved++;\r\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\r\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\r\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\r\n    by.set(c.feature, f);\r\n  }\r\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\r\n}\r\n\r\nasync function renderCards() {\r\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\r\n  const fl = state.cardFilter;\r\n  const all = await api("/api/cards");\r\n  if (!all.length) {\r\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\r\n    return bindBackfillAll();\r\n  }\r\n  const features = cardFeatures(all);\r\n  const listed = features\r\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\r\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\r\n  // Open on what needs a person: a failing feature, else one with drafts.\r\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\r\n  const f = features.find((x) => x.id === fl.feature);\r\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\r\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\r\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\r\n\r\n  $view.innerHTML = `\r\n    <div class="toolbar">\r\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\r\n      <span class="pill st-draft">${total("draft")} to review</span>\r\n      <span class="pill st-approved">${total("approved")} approved</span>\r\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\r\n      <div style="flex:1"></div>\r\n      <button class="btn secondary" id="bfall" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <div class="split">\r\n      <aside class="side">\r\n        <div class="head">\r\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\r\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\r\n        </div>\r\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\r\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\r\n      </aside>\r\n      <section>\r\n        <div class="toolbar">\r\n          <h2 style="margin:0">${esc(f.id)}</h2>\r\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\r\n          <div style="flex:1"></div>\r\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\r\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\r\n        </div>\r\n        <div class="toolbar">\r\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\r\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\r\n        </div>\r\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\r\n      </section>\r\n    </div>`;\r\n\r\n  bindCardActions(document.getElementById("cardlist"), renderCards);\r\n  const q = document.getElementById("cq");\r\n  q.addEventListener("input", () => {\r\n    const v = q.value.toLowerCase();\r\n    // Filter the sidebar in place, so typing never loses focus.\r\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\r\n      const x = features.find((y) => y.id === li.dataset.f);\r\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\r\n    });\r\n  });\r\n  q.addEventListener("change", () => { fl.q = q.value; });\r\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; renderCards(); }));\r\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\r\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\r\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\r\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\r\n  });\r\n  const approveAll = document.getElementById("approveall");\r\n  if (approveAll) approveAll.addEventListener("click", async () => {\r\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\r\n    approveAll.disabled = true;\r\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\r\n    renderCards();\r\n  });\r\n  bindBackfillAll();\r\n}\r\n\r\nfunction bindBackfillAll() {\r\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/cards/*/backfill");\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\r\n  });\r\n}\r\n\r\nasync function renderRuns() {\r\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\r\n  const runs = await api("/api/runs");\r\n  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\r\n  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>\r\n    ${runs.map((r) => {\r\n      let result;\r\n      if (r.kind === "backfill") result = `${r.written.length} cards \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else if (r.kind === "card") result = `${esc(r.cardId)} \xB7 ${r.timeline.length} steps \xB7 $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\r\n      else if (r.kind === "verify") result = `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\r\n      else if (r.kind === "explore") result = `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\r\n      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\r\n      else if (r.kind === "unitwrite") result = `${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else if (r.kind === "check") result = `${esc(r.trigger)} \xB7 ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "\u2014"}${f.draftId ? " \u270E" : ""}`).join(", ") || "nothing stale"}`;\r\n      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else {\r\n        const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);\r\n        result = `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\r\n      }\r\n      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;\r\n    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;\r\n  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));\r\n  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\r\n    e.stopPropagation();\r\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\r\n    b.disabled = true;\r\n    const res = await stopRunReq(b.dataset.stop);\r\n    if (res.error) alert(res.error);\r\n    setTimeout(renderRuns, 1500);\r\n  }));\r\n}\r\n\r\nasync function renderVerify() {\r\n  if (!state.verify) state.verify = { base: "" };\r\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\r\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\r\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\r\n  $view.innerHTML = `\r\n    <div class="box"><h3>Verify this change</h3>\r\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\r\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\r\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\r\n      <form class="inline" id="vf">\r\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\r\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\r\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\r\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\r\n        <button class="btn" type="submit" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\r\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\r\n      </form>\r\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\r\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\r\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\r\n    </div>\r\n    <div class="box"><h3>From a ticket</h3>\r\n      <form class="inline" id="tf">\r\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\r\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\r\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\r\n      </form>\r\n      <div id="tinfo"></div>\r\n      <form class="inline" id="tc" style="margin-top:10px">\r\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\r\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\r\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\r\n      </form>\r\n    </div>\r\n    <div id="runpanel"></div>`;\r\n  const vf = document.getElementById("vf");\r\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  vf.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  const tf = document.getElementById("tf");\r\n  const ticket = () => tf.ticket.value.trim();\r\n  document.getElementById("tlook").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\r\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\r\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\r\n  });\r\n  document.getElementById("tverify").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("tc").addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    if (!ticket()) return alert("Enter the ticket id above.");\r\n    const tc = e.target;\r\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n}\r\n\r\nasync function renderAccounts(el) {\r\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\r\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\r\n  const l = login && login.run.login;\r\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\r\n  el.innerHTML = `\r\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\r\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\r\n        <button class="btn secondary" id="logincheck" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\r\n      <div id="runpanel"></div></div>`;\r\n  el.innerHTML += `\r\n    <div class="box"><h3>Test accounts</h3>\r\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\r\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\r\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\r\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\r\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\r\n    <form class="acct" autocomplete="off">\r\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\r\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\r\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\r\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\r\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\r\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\r\n      <button class="btn" type="submit">Save account</button>\r\n    </form></div>`;\r\n  const startLogin = async (role, b) => {\r\n    b.disabled = true;\r\n    const res = await post("/api/login", { role });\r\n    if (res.error) { alert(res.error); b.disabled = false; return; }\r\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\r\n  };\r\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\r\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\r\n  const form = el.querySelector("form.acct");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const body = Object.fromEntries(new FormData(form));\r\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\r\n    if (res.error) return alert(res.error);\r\n    renderAccounts(el);\r\n  });\r\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\r\n    const a = accounts.find((x) => x.role === b.dataset.edit);\r\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\r\n    form.password.focus();\r\n  }));\r\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\r\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\r\n    renderAccounts(el);\r\n  }));\r\n}\r\n\r\nconst MODELS = [\r\n  ["sonnet", "Sonnet \u2014 balanced, included in most plans (recommended)"],\r\n  ["haiku", "Haiku \u2014 fastest and cheapest, fine for simple cards"],\r\n  ["opus", "Opus \u2014 strongest, uses your plan faster"],\r\n  ["fable", "Fable \u2014 may bill usage credits on your plan"],\r\n];\r\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\r\n\r\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\r\n\r\nfunction projectBox(p) {\r\n  const a = p.app;\r\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\r\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\r\n  const branches = p.branches || [];\r\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\r\n  return `<div class="box"><h3>Project</h3>\r\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\r\n    <form class="inline" id="pf">\r\n      <label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\r\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\r\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\r\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\r\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}\r\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\r\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\r\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\r\n      <label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\r\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\r\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\r\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>\r\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\r\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\r\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\r\n      <button class="btn" type="submit">Save project settings</button>\r\n    </form>\r\n    <p id="pout" style="margin-bottom:0"></p>\r\n  </div>`;\r\n}\r\n\r\nfunction bindProject() {\r\n  const f = document.getElementById("pf");\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const num = (v) => (v === "" ? null : Number(v));\r\n    const body = {\r\n      app: { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null },\r\n      devices: { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) },\r\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\r\n      perf: { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) },\r\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\r\n    };\r\n    for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\r\n    const res = await post("/api/project", body);\r\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\r\n    if (!res.error) setTimeout(renderSettings, 700);\r\n  });\r\n}\r\n\r\nasync function renderSettings() {\r\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\r\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\r\n  p.branches = br.branches;\r\n  const current = s.agents.model;\r\n  const known = MODELS.some(([m]) => m === current);\r\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\r\n    <div class="box"><h3>Agent model</h3>\r\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs on your own Claude Code login and plan, with this model. It is saved for this machine only, since each developer\'s plan differs; a run started from the CLI can still pass <span class="mono">--model</span>.</p>\r\n      <form class="inline" id="sf">\r\n        <label>Model<select name="pick">${MODELS.map(([m, label]) => `<option value="${m}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\r\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="claude-sonnet-5-5"></label>\r\n        <button class="btn" type="submit">Save</button>\r\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\r\n        ${s.agents.source === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\r\n      </form>\r\n      <p style="margin-bottom:0">In use: <strong class="mono">${esc(current)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\r\n      <p id="sout" style="margin-bottom:0"></p>\r\n    </div>`;\r\n  bindProject();\r\n  renderAccounts(document.getElementById("acctwrap"));\r\n  const form = document.getElementById("sf");\r\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\r\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\r\n  const out = document.getElementById("sout");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/settings", { model: chosen() });\r\n    if (res.error) return alert(res.error);\r\n    renderSettings();\r\n  });\r\n  document.getElementById("stest").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen())}\u2026</span>`;\r\n    const r = await post("/api/settings/test", { model: chosen() });\r\n    e.target.disabled = false;\r\n    out.innerHTML = r.ok\r\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\r\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\r\n  });\r\n  const reset = document.getElementById("sreset");\r\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { model: "" }); renderSettings(); });\r\n}\r\n\r\nasync function renderDoctor(el) {\r\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\r\n  const checks = await api("/api/doctor");\r\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\r\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\r\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\r\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\r\n\r\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\r\nasync function renderInit(el) {\r\n  const k = await api("/api/init");\r\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\r\n  const features = k.steps.find((s) => s.id === "features");\r\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\r\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\r\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\r\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\r\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\r\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\r\n    ${features.status === "waiting" && k.proposed.length ? `<div class="k" style="margin-top:10px">Features to give a manifest (${k.proposed.length} proposed by the scan)</div>\r\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${k.proposed.map((f) => `<label style="font-size:13px"><input type="checkbox" data-feat="${esc(f)}" checked> ${esc(f)}</label>`).join("")}</div>\r\n      <div class="row"><button class="btn" id="initchoose">Use these features</button><button class="btn secondary" id="initnone">Untick all</button></div>` : ""}\r\n  </div>\r\n  <div id="initpanel"></div>\r\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\r\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\r\n\r\n  const start = async (body) => {\r\n    const res = await post("/api/init/run", body);\r\n    if (res.error) return alert(res.error);\r\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\r\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\r\n  };\r\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\r\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\r\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]").forEach((c) => (c.checked = false)));\r\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\r\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\r\n    if (!chosen.length) return alert("Tick at least one feature.");\r\n    const res = await post("/api/init/features", { features: chosen });\r\n    if (res.error) return alert(res.error);\r\n    renderInit(el);\r\n  });\r\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.iapprove;\r\n    const id = b.dataset.iapprove || b.dataset.ireject;\r\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderInit(el);\r\n  }));\r\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\r\n}\r\n\r\nasync function renderSetup() {\r\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\r\n  const items = await api("/api/setup");\r\n  const left = items.filter((i) => i.status !== "ok").length;\r\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\r\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\r\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\r\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\r\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\r\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\r\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\r\n  renderDoctor(document.getElementById("docwrap"));\r\n  renderInit(document.getElementById("initwrap"));\r\n}\r\n\r\n(async () => {\r\n  await checkBranch();\r\n  // A project that cannot be tested yet opens on what is missing.\r\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\r\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\r\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\r\n  render();\r\n})();\r\n</script>\r\n</body>\r\n</html>\r\n';
+
+// src/engine/watcher.ts
+var import_node_fs22 = require("node:fs");
+var import_node_path27 = require("node:path");
+
+// src/engine/watch.ts
+var import_node_child_process7 = require("node:child_process");
+var import_node_fs21 = require("node:fs");
+var import_node_path26 = require("node:path");
+
+// src/knowledge/proof.ts
+function findRule(project, ref) {
+  const at = Math.max(ref.lastIndexOf("/"), ref.lastIndexOf("#"), ref.lastIndexOf(":"));
+  const candidates = at < 0 ? loadManifests(project.root) : [loadManifest(project.root, ref.slice(0, at))].filter((m) => !!m);
+  const id = at < 0 ? ref : ref.slice(at + 1);
+  if (at >= 0 && !candidates.length) return { error: `No manifest probe/features/${ref.slice(0, at)}.yaml.` };
+  const hits = candidates.flatMap((manifest) => manifest.invariants.filter((i) => i.id === id).map((invariant) => ({ manifest, invariant })));
+  if (hits.length === 1) return hits[0];
+  if (hits.length > 1) return { error: `Rule "${id}" is in ${hits.map((h) => h.manifest.id).join(", ")}; name it as feature/${id}.` };
+  const known = candidates.flatMap((m) => m.invariants.map((i) => `${m.id}/${i.id}`));
+  const near = known.filter((k) => k.includes(id) || id.split("-").some((w) => w.length > 3 && k.includes(w))).slice(0, 5);
+  return { error: `No rule "${ref}".${near.length ? ` Did you mean: ${near.join(", ")}?` : ""}` };
+}
+function ruleProofs(project, manifest) {
+  let freshness;
+  const ledgers = /* @__PURE__ */ new Map();
+  return manifest.invariants.map((invariant) => ({
+    feature: manifest.id,
+    invariant,
+    cards: invariant.cards.map((ref) => {
+      const { feature, id } = cardRef(manifest.id, ref);
+      const card = listCards(project.root, feature).find((c) => c.id === id);
+      if (!card) return { ref, feature, id, freshness: "missing", reasons: [] };
+      if (!ledgers.has(feature)) ledgers.set(feature, readLedger(project.root, feature));
+      const entry = ledgers.get(feature).cards?.[id];
+      if (!entry) return { ref, feature, id, card, freshness: "never", reasons: [] };
+      freshness ??= new ResultFreshness(project, latestScan(project));
+      const fresh = freshness.card(card, entry);
+      return { ref, feature, id, card, result: entry.result, at: entry.at, freshness: fresh.state, reasons: fresh.reasons };
+    })
+  }));
+}
+function describeCardProof(p) {
+  if (p.freshness === "missing") return "no such card";
+  if (!p.result) return `never run${p.card?.status === "draft" ? " (draft card)" : ""}`;
+  const holds = p.freshness === "fresh" ? "still holds" : p.freshness === "maybe" ? "may not hold: a dependency changed" : `out of date: ${p.reasons.join(", ") || "code changed"}`;
+  return `${p.result} ${(p.at ?? "").slice(0, 10)}, ${holds}`;
+}
+function summarizeRule(proof) {
+  const inv = proof.invariant;
+  const lines = [`${proof.feature}/${inv.id}: ${inv.rule}`];
+  for (const t of inv.coveredBy) lines.push(`  test  ${t}`);
+  for (const c of proof.cards) lines.push(`  card  ${c.feature}/${c.id}${c.card ? ` "${c.card.title}"` : ""} \u2014 ${describeCardProof(c)}`);
+  if (!inv.coveredBy.length && !proof.cards.length) lines.push(`  unproven${inv.gap ? `: ${inv.gap}` : ""}`);
+  else if (inv.gap) lines.push(`  note  ${inv.gap}`);
+  return lines.join("\n");
+}
+function summarizeRules(project, manifest) {
+  return ruleProofs(project, manifest).map(summarizeRule).join("\n");
+}
+async function runRuleCards(project, ref, options = {}) {
+  const found = findRule(project, ref);
+  if ("error" in found) return { rule: ref, runs: [], skipped: [], error: found.error };
+  const rule = `${found.manifest.id}/${found.invariant.id}`;
+  const proof = ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id);
+  if (!proof.cards.length) {
+    return { rule, runs: [], skipped: [], error: `${rule} has no cards. ${found.invariant.coveredBy.length ? "Its unit tests prove it." : "Write one (probe_cards_save) and list it under the rule's cards:."}` };
+  }
+  const runs = [];
+  const skipped = [];
+  for (const c of proof.cards) {
+    if (!c.card) {
+      skipped.push(`${c.ref} (no such card)`);
+      continue;
+    }
+    options.log?.(`${rule}: running ${c.feature}/${c.id}`);
+    const { done } = startCardRun(project, c.feature, c.id, { device: options.device, model: options.model });
+    runs.push(await done);
+  }
+  return { rule, runs, skipped };
+}
+function summarizeRuleRun(r) {
+  if (r.error) return r.error;
+  const verdict = r.runs.every((x) => x.status === "passed") && !r.skipped.length ? "HOLDS" : r.runs.some((x) => x.status === "failed") ? "BROKEN" : "NOT SHOWN";
+  return [`Rule ${r.rule}: ${verdict} on device (${r.runs.length} card${r.runs.length === 1 ? "" : "s"})`, ...r.skipped.map((s) => `  skipped ${s}`), ...r.runs.map(summarizeCardRun)].join("\n");
+}
+
+// src/engine/watch.ts
+var STATE2 = "watch.json";
+var LOCK = "check.lock";
+var STUDIO = "studio.json";
+var IGNORED = /(^|\/)(build|\.gradle|\.git|\.idea|node_modules|\.kotlin|\.cxx)\//;
+function loadWatch(project) {
+  return { stale: {}, checks: [], ...project.store.read(STATE2) ?? {} };
+}
+function saveWatch(project, state) {
+  const file = (0, import_node_path26.join)(project.store.dir, STATE2);
+  const tmp = `${file}.${process.pid}.tmp`;
+  (0, import_node_fs21.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
+  (0, import_node_fs21.renameSync)(tmp, file);
+}
+function update(project, change) {
+  const state = loadWatch(project);
+  change(state);
+  saveWatch(project, state);
+  return state;
+}
+function projectFiles(project, files) {
+  return files.map((f) => (0, import_node_path26.relative)(project.root, (0, import_node_path26.isAbsolute)(f) ? f : (0, import_node_path26.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !IGNORED.test(f) && !f.startsWith("probe/"));
+}
+function featuresForFiles(project, files, result = latestScan(project)) {
+  const out = /* @__PURE__ */ new Map();
+  const add = (feature, file, owned) => {
+    const entry = out.get(feature) ?? { files: [], owned: false };
+    if (!entry.files.includes(file)) entry.files.push(file);
+    entry.owned ||= owned;
+    out.set(feature, entry);
+  };
+  for (const [feature, fs] of featuresOfFiles(project, result, files).byFeature) for (const f of fs) add(feature, f, true);
+  for (const m of loadManifests(project.root)) {
+    for (const f of files) {
+      if (m.paths.some((p) => f.startsWith(p))) add(m.id, f, true);
+      else if (m.related.some((r) => f.startsWith(r.path))) add(m.id, f, false);
+    }
+  }
+  return out;
+}
+function markStale(project, files, source, session) {
+  const rel = projectFiles(project, files);
+  if (!rel.length) return [];
+  const touched = featuresForFiles(project, rel);
+  if (!touched.size) return [];
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  update(project, (state) => {
+    for (const [feature, { files: fs, owned }] of touched) {
+      const e = state.stale[feature] ?? { files: [], owned: false, since: now, last: now, sources: [], sessions: [] };
+      e.files = [.../* @__PURE__ */ new Set([...e.files, ...fs])];
+      e.owned ||= owned;
+      e.last = now;
+      if (!e.sources.includes(source)) e.sources.push(source);
+      if (session && !e.sessions.includes(session)) e.sessions.push(session);
+      state.stale[feature] = e;
+    }
+  });
+  return [...touched.keys()];
+}
+function sweepDirty(project, source, session) {
+  const state = loadWatch(project);
+  const since = state.sweptAt ? Date.parse(state.sweptAt) : null;
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  update(project, (s) => s.sweptAt = now);
+  if (since === null) return [];
+  const recent = [...dirtyFiles(project.root).keys()].filter((f) => {
+    try {
+      return (0, import_node_fs21.statSync)((0, import_node_path26.join)(project.root, f)).mtimeMs > since;
+    } catch {
+      return false;
+    }
+  });
+  return markStale(project, recent, source, session);
+}
+function alive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function runningCheck(project) {
+  const lock = project.store.read(LOCK);
+  return lock && alive(lock.pid) ? lock : null;
+}
+function startCheck(project, options = {}) {
+  if (runningCheck(project)) return null;
+  const run = {
+    id: newRunId(),
+    kind: "check",
+    feature: options.features?.length === 1 ? options.features[0] : "*",
+    startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    status: "running",
+    trigger: options.trigger ?? "manual",
+    features: [],
+    skipped: [],
+    costUsd: 0
+  };
+  project.store.write(LOCK, { pid: process.pid, runId: run.id, startedAt: run.startedAt });
+  const started = launchRun(project, run, async (log) => {
+    try {
+      for (let round = 0; round < 3; round++) {
+        const checkedAt = (/* @__PURE__ */ new Date()).toISOString();
+        const targets = pickTargets(project, options, run, round);
+        if (!targets.length) break;
+        log(`\u2500\u2500 round ${round + 1}: ${targets.map((t) => t.feature).join(", ")}${run.skipped.length ? ` (left for later: ${run.skipped.join(", ")})` : ""}`);
+        for (const t of targets) {
+          throwIfStopped();
+          await checkFeature(project, run, t, options, log);
+          clearStale(project, t.feature, checkedAt);
+        }
+        if (options.features?.length) break;
+      }
+      const failed = run.features.some((f) => f.unitStatus === "failed" || (f.manifest?.broken ?? 0) > 0);
+      const errored = run.features.some((f) => f.unitStatus === "error");
+      run.status = !run.features.length ? "passed" : failed ? "failed" : errored ? "error" : "passed";
+      if (run.status === "error") run.error = `The build failed before the tests ran: ${run.features.filter((f) => f.unitStatus === "error").map((f) => f.feature).join(", ")}.`;
+      if (!run.features.length) log("nothing stale to check");
+    } finally {
+      (0, import_node_fs21.rmSync)((0, import_node_path26.join)(project.store.dir, LOCK), { force: true });
+    }
+  });
+  return started;
+}
+function pickTargets(project, options, run, round) {
+  const state = loadWatch(project);
+  if (options.features?.length) {
+    if (round > 0) return [];
+    return options.features.map((f) => ({ feature: f, files: state.stale[f]?.files ?? [], owned: state.stale[f]?.owned ?? true, sessions: state.stale[f]?.sessions ?? [] }));
+  }
+  const entries = Object.entries(state.stale).filter(([id]) => !run.skipped.includes(id)).sort(([, a], [, b]) => Number(b.owned) - Number(a.owned) || b.files.length - a.files.length);
+  const budget = Math.max(1, project.config.watch.maxFeatures);
+  if (round === 0) run.skipped = entries.slice(budget).map(([id]) => id);
+  return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, sessions: e.sessions }));
+}
+async function checkFeature(project, run, target, options, log) {
+  const f = { feature: target.feature, files: target.files, owned: target.owned, failures: [] };
+  run.features.push(f);
+  const scanned = findFeature(latestScan(project), target.feature);
+  if (scanned?.modules.some((m) => m.unitTestTask)) {
+    const { run: unit, done } = startUnitRun(project, scanned.id);
+    f.unitRun = unit.id;
+    log(`${target.feature}: unit tests (run ${unit.id})`);
+    const finished = await done;
+    f.unitStatus = finished.status;
+    f.failures = finished.results.flatMap((r) => r.failures.map((x) => `${x.className.split(".").pop()}.${x.name}: ${(x.message ?? "").split("\n")[0].slice(0, 200)}`)).slice(0, 8);
+    if (finished.status === "error") {
+      const compile = (liveRun(unit.id)?.log ?? []).filter((l) => /^e: /.test(l)).map((l) => l.replace(/^e: file:\/\/\/?/, "compile error: ").replace(project.root.replace(/\\/g, "/") + "/", ""));
+      f.failures = compile.length ? compile.slice(0, 5) : [finished.error ?? "build failed"];
+    }
+    const total = finished.results.reduce((n, r) => n + r.tests, 0);
+    log(`${target.feature}: unit ${finished.status}, ${total} tests${f.failures.length ? `, ${f.failures.length} failing` : ""}`);
+  } else {
+    f.unitStatus = "skipped";
+    f.note = scanned ? "no unit tests" : "not a module feature; only its manifest is checked";
+  }
+  const manifest = (() => {
+    try {
+      return loadManifest(project.root, target.feature);
+    } catch {
+      return null;
+    }
+  })();
+  const check2 = (0, import_node_fs21.existsSync)((0, import_node_path26.join)(project.root, "probe", "features", `${target.feature}.yaml`)) ? checkManifest(project.root, target.feature) : null;
+  if (check2) {
+    const broken = check2.broken.length + check2.brokenCards.length;
+    f.manifest = { links: check2.links + check2.cardLinks, broken, gaps: check2.gaps.length, errors: check2.errors.length };
+    log(`${target.feature}: manifest ${check2.links} test links, ${check2.cardLinks} card links, ${broken} broken, ${check2.gaps.length} unproven`);
+  }
+  if (manifest && target.owned && target.files.length) {
+    try {
+      const rules = ruleProofs(project, manifest).filter((p) => !p.invariant.coveredBy.length && p.cards.length).filter((p) => !p.cards.every((c) => c.result === "passed" && c.freshness === "fresh")).map((p) => `${p.feature}/${p.invariant.id} (${p.cards.map(describeCardProof).join("; ")})`);
+      if (rules.length) {
+        f.deviceRules = rules;
+        log(`${target.feature}: ${rules.length} rule(s) only a device card proves`);
+      }
+    } catch (e) {
+      log(`${target.feature}: could not read card results (${e.message})`);
+    }
+  }
+  const drafts = options.drafts ?? project.config.watch.drafts;
+  const hasPending = listDrafts(project, target.feature).some((d) => d.status === "pending");
+  if (manifest && check2 && drafts && target.owned && target.files.length && !hasPending) {
+    throwIfStopped();
+    const unit = f.unitStatus === "skipped" ? `not run (${f.note})` : `${f.unitStatus}${f.failures.length ? `
+${f.failures.map((x) => `- ${x}`).join("\n")}` : ""}`;
+    const { draft, costUsd } = await draftCorrections(project, { manifest, check: check2, files: target.files, unit, runId: run.id, model: options.model }, log);
+    run.costUsd += costUsd;
+    if (draft) f.draftId = draft.id;
+  } else if (hasPending) {
+    log(`${target.feature}: a draft is already waiting for review; not drafting another`);
+  }
+  update(
+    project,
+    (state) => state.checks.push({
+      runId: run.id,
+      feature: f.feature,
+      at: (/* @__PURE__ */ new Date()).toISOString(),
+      unit: f.unitStatus,
+      failures: f.failures,
+      broken: f.manifest?.broken ?? 0,
+      gaps: f.manifest?.gaps ?? 0,
+      draftId: f.draftId,
+      deviceRules: f.deviceRules,
+      note: f.note,
+      sessions: target.sessions,
+      reportedTo: []
+    })
+  );
+}
+function clearStale(project, feature, checkedAt) {
+  update(project, (state) => {
+    const e = state.stale[feature];
+    if (e && e.last <= checkedAt) delete state.stale[feature];
+  });
+}
+function summarizeCheckRun(run) {
+  const lines = [`Check ${run.id} \xB7 ${run.trigger} \xB7 ${run.status.toUpperCase()} \xB7 ${run.features.length} features \xB7 $${run.costUsd.toFixed(2)}`];
+  if (run.error) lines.push(run.error);
+  for (const f of run.features) {
+    lines.push(`  ${f.feature}${f.owned ? "" : " (related)"}: unit ${f.unitStatus ?? "\u2014"}${f.unitRun ? ` (${f.unitRun})` : ""}${f.manifest ? ` \xB7 manifest ${f.manifest.broken} broken links, ${f.manifest.gaps} unproven` : ""}${f.draftId ? ` \xB7 draft ${f.draftId} to review` : ""}${f.note ? ` \xB7 ${f.note}` : ""}`);
+    for (const x of f.failures) lines.push(`      - ${x}`);
+    for (const r of f.deviceRules ?? []) lines.push(`      device: ${r}`);
+  }
+  if (run.skipped.length) lines.push(`  left stale (over watch.maxFeatures): ${run.skipped.join(", ")}`);
+  return lines.join("\n");
+}
+function recordStudio(project, url) {
+  project.store.write(STUDIO, { url, pid: process.pid });
+}
+async function kickCheck(project, trigger) {
+  if (runningCheck(project)) return "busy";
+  const studio = project.store.read(STUDIO);
+  if (studio && alive(studio.pid)) {
+    try {
+      const res = await fetch(`${studio.url}/api/watch/check`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ trigger }), signal: AbortSignal.timeout(1500) });
+      if (res.ok) return "studio";
+    } catch {
+    }
+  }
+  const child = (0, import_node_child_process7.spawn)(process.execPath, [(0, import_node_path26.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
+    cwd: project.root,
+    detached: true,
+    stdio: "ignore",
+    windowsHide: isWindows
+  });
+  child.unref();
+  return "background";
+}
+function takeReports(project, session, filter = () => true) {
+  let taken = [];
+  update(project, (state) => {
+    taken = state.checks.filter((r) => !r.reportedTo.includes(session) && (r.sessions.includes(session) || r.sessions.length === 0) && filter(r));
+    for (const r of taken) r.reportedTo.push(session);
+  });
+  return taken;
+}
+function isProblem(r) {
+  return r.unit === "failed" || r.unit === "error" || r.broken > 0;
+}
+function formatReports(reports, studioUrl2) {
+  const lines = ["Probe checked the features your recent edits touched:"];
+  for (const r of reports) {
+    const parts = [`unit ${r.unit ?? "not run"}`];
+    if (r.broken) parts.push(`${r.broken} manifest link${r.broken === 1 ? "" : "s"} broken (a test or card was renamed or removed)`);
+    if (r.draftId) parts.push(`a correction to its manifest/brief is drafted for review${studioUrl2 ? ` in Studio (${studioUrl2})` : ""}`);
+    lines.push(`- ${r.feature}: ${parts.join("; ")}${r.note ? ` (${r.note})` : ""}`);
+    for (const x of r.failures) lines.push(`    failing: ${x}`);
+    if (r.deviceRules?.length) {
+      lines.push(`    only a device proves ${r.deviceRules.length === 1 ? "this rule" : "these rules"}; unit tests say nothing about ${r.deviceRules.length === 1 ? "it" : "them"}:`);
+      for (const d of r.deviceRules) lines.push(`      ${d}`);
+    }
+  }
+  if (reports.some(isProblem)) lines.push("Fix the failures before going on, or say why they are expected. `probe check <feature>` re-checks.");
+  if (reports.some((r) => r.deviceRules?.length))
+    lines.push(`Offer to run those rules' cards on an emulator (probe_card_run with rule: "feature/rule"; minutes per card). Do not start one unasked.`);
+  return lines.join("\n");
+}
+function studioUrl(project) {
+  const s = project.store.read(STUDIO);
+  return s && alive(s.pid) ? s.url : void 0;
+}
+
+// src/engine/watcher.ts
+var SETTLE_MS = 3e3;
+var CHECK_AFTER_MS = 45e3;
+var CLAUDE_ACTIVE_MS = 10 * 6e4;
+function startWatcher(project, log = () => {
+}) {
+  const pending = /* @__PURE__ */ new Set();
+  let head = headOf(project);
+  let settle;
+  let check2;
+  const flush = () => {
+    const files = [...pending];
+    pending.clear();
+    const now = headOf(project);
+    if (now !== head) {
+      head = now;
+      log(`watch: branch or commit changed; ${files.length} file changes not counted as edits`);
+      return;
+    }
+    const known = new Set(Object.values(loadWatch(project).stale).flatMap((e) => e.files));
+    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path27.join)(project.root, f)));
+    const features = markStale(project, fresh, "editor");
+    if (!features.length) return;
+    log(`watch: edits outside Claude made ${features.join(", ")} stale`);
+    clearTimeout(check2);
+    check2 = setTimeout(autoCheck, CHECK_AFTER_MS);
+  };
+  const autoCheck = () => {
+    const stale = Object.values(loadWatch(project).stale);
+    const claudeActive = stale.some((e) => e.sources.includes("claude") && Date.now() - Date.parse(e.last) < CLAUDE_ACTIVE_MS);
+    if (!stale.length || claudeActive || runningCheck(project)) return;
+    const started = startCheck(project, { trigger: "editor" });
+    if (started) log(`watch: checking ${stale.length} stale feature(s) (run ${started.run.id})`);
+  };
+  let watcher;
+  try {
+    watcher = (0, import_node_fs22.watch)(project.root, { recursive: true }, (_event, name) => {
+      if (!name) return;
+      const file = name.toString().replace(/\\/g, "/");
+      if (/(^|\/)(build|\.gradle|\.git|\.idea|node_modules|\.kotlin|\.cxx)(\/|$)/.test(file)) return;
+      pending.add(file);
+      clearTimeout(settle);
+      settle = setTimeout(flush, SETTLE_MS);
+    });
+  } catch (e) {
+    log(`watch: cannot watch ${project.root} (${e.message}); only Claude's edits are tracked`);
+    return () => {
+    };
+  }
+  return () => {
+    clearTimeout(settle);
+    clearTimeout(check2);
+    watcher.close();
+  };
+}
+function isFile(path) {
+  try {
+    return (0, import_node_fs22.statSync)(path).isFile();
+  } catch {
+    return false;
+  }
+}
+function headOf(project) {
+  const git2 = gitState(project.root);
+  return git2 ? `${git2.branch}@${git2.commit}` : "";
+}
 
 // src/studio/project.ts
-var import_node_fs18 = require("node:fs");
+var import_node_fs23 = require("node:fs");
 function projectSettings(project) {
   const c = project.config;
   const devices = listDevices(Adb.forProject(project.root));
   return {
-    configFile: (0, import_node_fs18.existsSync)(configPath(project.root)),
+    configFile: (0, import_node_fs23.existsSync)(configPath(project.root)),
     app: resolveApp(project),
     appSet: c.app,
     devices: {
@@ -31861,9 +33119,9 @@ function saveProjectSettings(project, body) {
   if (shared.verify && base !== void 0) shared.verify.base = base;
   if (Object.keys(shared).length) saveProject(project.root, shared);
   if (devices) {
-    const current = project.config.devices;
-    const avd = devices.avd === void 0 ? current.avd : devices.avd || void 0;
-    saveLocal(project.store.dir, { devices: { avd, allowReal: devices.allowReal ?? current.allowReal } });
+    const current3 = project.config.devices;
+    const avd = devices.avd === void 0 ? current3.avd : devices.avd || void 0;
+    saveLocal(project.store.dir, { devices: { avd, allowReal: devices.allowReal ?? current3.allowReal } });
   }
   project.config = loadConfig(project.root, project.store.dir);
   return null;
@@ -31953,16 +33211,19 @@ function pickableBranches(root, keep) {
 
 // src/studio/server.ts
 var running = null;
+var watchLog = [];
 async function startStudio(project, preferredPort = 7777) {
   if (running) return running.url;
   for (let port = preferredPort; port < preferredPort + 20; port++) {
     const server = (0, import_node_http.createServer)((req, res) => handle(project, req, res).catch((e) => send(res, 500, { error: String(e) })));
-    const ok = await new Promise((resolve4) => {
-      server.once("error", () => resolve4(false));
-      server.listen(port, "127.0.0.1", () => resolve4(true));
+    const ok = await new Promise((resolve5) => {
+      server.once("error", () => resolve5(false));
+      server.listen(port, "127.0.0.1", () => resolve5(true));
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
+      recordStudio(project, running.url);
+      if (project.config.watch.enabled) startWatcher(project, (line) => watchLog.push(`${(/* @__PURE__ */ new Date()).toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
       return running.url;
     }
   }
@@ -31985,6 +33246,34 @@ async function handle(project, req, res) {
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
   if (method === "GET" && path === "/api/branch") return send(res, 200, branchInfo(project, url.searchParams.has("branches")));
   if (method === "GET" && path === "/api/setup") return send(res, 200, setupChecklist(project));
+  if (method === "GET" && path === "/api/init") {
+    const scanned = project.store.read("scan.json") !== null;
+    return send(res, 200, {
+      steps: initStatus(project),
+      proposed: scanned ? proposedFeatures(project) : [],
+      chosen: chosenFeatures(project),
+      drafts: initPendingDrafts(project).map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
+      running: runningInit()
+    });
+  }
+  if (method === "POST" && path === "/api/init/run") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    if (body.step && !isInitStep(body.step)) return send(res, 400, { error: `Unknown step ${body.step}.` });
+    try {
+      const { run } = startInit(project, { step: body.step, features: body.features, accept: body.accept });
+      return send(res, 200, { runId: run.id });
+    } catch (e) {
+      return send(res, 409, { error: e.message });
+    }
+  }
+  if (method === "POST" && path === "/api/init/features") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    try {
+      return send(res, 200, { chosen: chooseFeatures(project, body.features ?? []) });
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
   if (method === "GET" && path === "/api/project") return send(res, 200, projectSettings(project));
   if (method === "POST" && path === "/api/project") {
     const error2 = saveProjectSettings(project, JSON.parse(await readBody(req)));
@@ -32009,6 +33298,57 @@ async function handle(project, req, res) {
     return send(res, 200, listCards(project.root).map((c) => ({ ...c, lastRun: last.get(`${c.feature}/${c.id}`) ?? null })));
   }
   if (method === "GET" && path === "/api/navmap") return send(res, 200, navMap(project));
+  if (method === "GET" && path === "/api/watch") {
+    const state = loadWatch(project);
+    return send(res, 200, {
+      enabled: project.config.watch.enabled,
+      stale: state.stale,
+      running: runningCheck(project),
+      checks: state.checks.slice(-30).reverse(),
+      drafts: listDrafts(project).filter((d) => d.status === "pending").map(({ id, feature, createdAt, files }) => ({ id, feature, createdAt, files: files.map((f) => f.path) })),
+      log: watchLog.slice(-20)
+    });
+  }
+  if (method === "POST" && path === "/api/watch/check") {
+    const body = JSON.parse(await readBody(req));
+    const started = startCheck(project, { trigger: body.trigger ?? "manual", features: body.features, drafts: body.drafts });
+    return started ? send(res, 200, { runId: started.run.id }) : send(res, 409, { error: `A check is already running (${runningCheck(project)?.runId}).` });
+  }
+  m = /^\/api\/knowledge\/([^/]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const id = decodeURIComponent(m[1]);
+    let manifest = null;
+    try {
+      manifest = loadManifest(project.root, id);
+    } catch {
+    }
+    const exists = (0, import_node_fs24.existsSync)((0, import_node_path28.join)(project.root, manifestFile(id)));
+    return send(res, 200, {
+      file: manifestFile(id),
+      manifest,
+      check: exists ? checkManifest(project.root, id) : null,
+      glance: manifest ? briefGlance(project.root, manifest) : null,
+      // Each rule's cards with their last result, keyed by rule id.
+      cards: manifest ? Object.fromEntries(
+        ruleProofs(project, manifest).map((p) => [
+          p.invariant.id,
+          p.cards.map((c) => ({ ref: c.ref, feature: c.feature, id: c.id, title: c.card?.title, status: c.card?.status, result: c.result, freshness: c.freshness, text: describeCardProof(c) }))
+        ])
+      ) : {},
+      stale: loadWatch(project).stale[id] ?? null,
+      drafts: listDrafts(project, id).filter((d) => d.status === "pending").map((d) => ({ ...d, diffs: draftDiffs(project, d) }))
+    });
+  }
+  m = /^\/api\/drafts\/([\w-]+)\/(approve|reject)$/.exec(path);
+  if (method === "POST" && m) {
+    const result = m[2] === "approve" ? approveDraft(project, m[1]) : rejectDraft(project, m[1]);
+    return send(res, result.ok ? 200 : 409, result);
+  }
+  m = /^\/api\/drafts\/([\w-]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const draft = findDraft(project, m[1]);
+    return draft ? send(res, 200, { ...draft, diffs: draftDiffs(project, draft) }) : send(res, 404, { error: "unknown draft" });
+  }
   if (method === "GET" && path === "/api/changes") {
     const base = url.searchParams.get("base") || defaultBase(project.root, project.config.verify.base);
     if (!base) return send(res, 200, { base: null, files: [], features: [], unowned: [] });
@@ -32071,10 +33411,10 @@ async function handle(project, req, res) {
   }
   m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4))$/.exec(path);
   if (method === "GET" && m) {
-    const file = (0, import_node_path23.join)(project.store.dir, "runs", m[1], m[2]);
-    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs19.existsSync)(file)) return send(res, 404, { error: "no such file" });
+    const file = (0, import_node_path28.join)(project.store.dir, "runs", m[1], m[2]);
+    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs24.existsSync)(file)) return send(res, 404, { error: "no such file" });
     res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : "video/mp4", "cache-control": "max-age=3600" });
-    (0, import_node_fs19.createReadStream)(file).pipe(res);
+    (0, import_node_fs24.createReadStream)(file).pipe(res);
     return;
   }
   m = /^\/api\/cards\/([^/]+)\/([^/]+)\/status$/.exec(path);
@@ -32196,10 +33536,10 @@ function summary(result, project) {
   };
 }
 function readBody(req) {
-  return new Promise((resolve4, reject) => {
+  return new Promise((resolve5, reject) => {
     let body = "";
     req.on("data", (chunk) => body += chunk.toString());
-    req.on("end", () => resolve4(body || "{}"));
+    req.on("end", () => resolve5(body || "{}"));
     req.on("error", reject);
   });
 }
@@ -32213,6 +33553,92 @@ var projectDir = external_exports.string().optional().describe("Project root. De
 var text = (t) => ({ content: [{ type: "text", text: t }] });
 async function runMcpServer(version2) {
   const server = new McpServer({ name: "probe", version: version2 });
+  server.registerTool(
+    "probe_init",
+    {
+      title: "Set the project up",
+      description: "Sets a project up for Probe, step by step: tools, settings file, the manifest format and the probe-lead/probe-feature agents, a scan, the features to cover, a manifest per feature (agent-drafted: paths, flows, rules and the exact tests proving them), device cards for rules no unit test can prove, and the Features section in AGENTS.md/CLAUDE.md. Resumes where it stopped and never redoes finished work. Manifests, card links and the agent file arrive as drafts to review in Studio \u2192 Setup. status: true only reports. The manifests and cards steps run agents: minutes per feature.",
+      inputSchema: {
+        projectDir,
+        status: external_exports.boolean().optional().describe("Only report each step, run nothing"),
+        step: external_exports.enum(INIT_STEPS.map((s) => s.id)).optional().describe("Run one step only"),
+        accept: external_exports.boolean().optional().describe("Take the proposed features (the scan's feature group) as chosen"),
+        features: external_exports.array(external_exports.string()).optional().describe("With step features: the features to choose. Otherwise: limit the agent steps to these"),
+        limit: external_exports.number().int().positive().optional().describe("At most this many agents per step")
+      }
+    },
+    async ({ projectDir: dir, status, step, accept, features, limit }) => {
+      const project = openProject(dir);
+      if (status) return text(formatInitStatus(initStatus(project)));
+      const { done } = startInit(project, { step, accept, features, limit });
+      return text(summarizeInit(await done));
+    }
+  );
+  server.registerTool(
+    "probe_check",
+    {
+      title: "Check edited features",
+      description: "Checks the features edited since their last check (or the ones named): their unit tests, their manifest's test links, and an agent-drafted correction to the manifest and brief for review. The edit hooks start this on their own at the end of a turn. Can take minutes.",
+      inputSchema: { projectDir, features: external_exports.array(external_exports.string()).optional(), drafts: external_exports.boolean().optional().describe("false: no drafting agent") }
+    },
+    async ({ projectDir: dir, features, drafts }) => {
+      const project = openProject(dir);
+      const started = startCheck(project, { features, drafts, trigger: "manual" });
+      if (!started) return text(`A check is already running (run ${runningCheck(project)?.runId}).`);
+      return text(summarizeCheckRun(await started.done));
+    }
+  );
+  server.registerTool(
+    "probe_stale",
+    {
+      title: "Edited features",
+      description: "Features edited since their last check, with the files and who edited them (claude, editor). Also lists drafted manifest/brief corrections waiting for review.",
+      inputSchema: { projectDir }
+    },
+    async ({ projectDir: dir }) => {
+      const project = openProject(dir);
+      const { stale } = loadWatch(project);
+      const lines = Object.entries(stale).map(([id, e]) => `${id}${e.owned ? "" : " (related)"} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}
+${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
+      const drafts = listDrafts(project).filter((d) => d.status === "pending");
+      if (drafts.length) lines.push(`Drafts to review: ${drafts.map((d) => `${d.id} (${d.feature})`).join(", ")}`);
+      const running2 = runningCheck(project);
+      if (running2) lines.push(`A check is running: ${running2.runId}`);
+      return text(lines.length ? lines.join("\n") : "Nothing stale: every feature was checked after its last edit.");
+    }
+  );
+  server.registerTool(
+    "probe_manifest",
+    {
+      title: "Check a feature manifest",
+      description: "Checks probe/features/<feature>.yaml against the code: every covered_by names a test that exists under that exact name, every card link names a card in probe/cards, paths exist, unproven rules say why.",
+      inputSchema: { projectDir, feature: external_exports.string() }
+    },
+    async ({ projectDir: dir, feature }) => text(summarizeCheck(checkManifest(openProject(dir).root, feature)))
+  );
+  server.registerTool(
+    "probe_rule",
+    {
+      title: "Rules and what proves them",
+      description: "A feature's rules (from its manifest) or one rule, each with the unit tests and device cards that prove it, and for each card its last result and whether that still holds for this code. Use to answer 'is X still true?' and to pick the cards to run with probe_card_run { rule }.",
+      inputSchema: {
+        projectDir,
+        rule: external_exports.string().optional().describe("One rule: feature/rule-id, or a rule id unique across manifests."),
+        feature: external_exports.string().optional().describe("Every rule of this feature.")
+      }
+    },
+    async ({ projectDir: dir, rule, feature }) => {
+      const project = openProject(dir);
+      if (rule) {
+        const found = findRule(project, rule);
+        if ("error" in found) return text(found.error);
+        return text(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)));
+      }
+      if (!feature) return text("Give a rule (feature/rule-id) or a feature.");
+      const manifest = loadManifest(project.root, feature);
+      return text(manifest ? summarizeRules(project, manifest) : `No manifest probe/features/${feature}.yaml.`);
+    }
+  );
   server.registerTool(
     "probe_doctor",
     { title: "Check setup", description: "Checks Node, the project, build tooling, SDKs, devices and emulator images.", inputSchema: { projectDir } },
@@ -32489,11 +33915,20 @@ ${r.errors.join("\n")}` : ""
     "probe_card_run",
     {
       title: "Run a card on a device",
-      description: "Runs one feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Takes minutes.",
-      inputSchema: { projectDir, feature: external_exports.string(), card: external_exports.string().describe("Card id"), device: external_exports.string().optional().describe("Device serial") }
+      description: "Runs a feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. Takes minutes per card.",
+      inputSchema: {
+        projectDir,
+        feature: external_exports.string().optional(),
+        card: external_exports.string().optional().describe("Card id"),
+        rule: external_exports.string().optional().describe("Run the cards behind this rule instead: feature/rule-id."),
+        device: external_exports.string().optional().describe("Device serial")
+      }
     },
-    async ({ projectDir: dir, feature, card, device }) => {
-      const { done } = startCardRun(openProject(dir), feature, card, { device });
+    async ({ projectDir: dir, feature, card, rule, device }) => {
+      const project = openProject(dir);
+      if (rule) return text(summarizeRuleRun(await runRuleCards(project, rule, { device })));
+      if (!feature || !card) return text("Give feature and card, or a rule.");
+      const { done } = startCardRun(project, feature, card, { device });
       return text(summarizeCardRun(await done));
     }
   );
@@ -32638,6 +34073,66 @@ ${d.body}`);
   await server.connect(new StdioServerTransport());
 }
 
+// src/cli/hook.ts
+var import_node_fs25 = require("node:fs");
+var import_node_path29 = require("node:path");
+async function runHook(event) {
+  try {
+    const input = JSON.parse(await readStdin() || "{}");
+    const project = probeProject(input.cwd);
+    if (!project || !project.config.watch.enabled) return 0;
+    const session = input.session_id ?? "unknown";
+    if (event === "edit") {
+      const file = input.tool_input?.file_path ?? input.tool_input?.notebook_path;
+      if (file) markStale(project, [file], "claude", session);
+      return 0;
+    }
+    if (event === "stop") {
+      sweepDirty(project, "claude", session);
+      if (!input.stop_hook_active) {
+        const problems = takeReports(project, session, isProblem);
+        if (problems.length) {
+          process.stdout.write(JSON.stringify({ decision: "block", reason: formatReports(problems, studioUrl(project)) }));
+          return 0;
+        }
+      }
+      if (Object.keys(loadWatch(project).stale).length) await kickCheck(project, "claude");
+      return 0;
+    }
+    if (event === "prompt") {
+      const reports = takeReports(project, session);
+      const lines = [];
+      if (reports.length) lines.push(formatReports(reports, studioUrl(project)));
+      const running2 = runningCheck(project);
+      if (running2) lines.push(`Probe is still checking features after recent edits (run ${running2.runId}); results follow when it ends.`);
+      if (lines.length) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n\n") } }));
+      return 0;
+    }
+  } catch (e) {
+    if (process.env.PROBE_DEBUG) process.stderr.write(`probe hook ${event}: ${e.stack}
+`);
+  }
+  return 0;
+}
+function probeProject(cwd) {
+  try {
+    const project = openProject(cwd);
+    return (0, import_node_fs25.existsSync)((0, import_node_path29.join)(project.root, "probe")) ? project : null;
+  } catch {
+    return null;
+  }
+}
+function readStdin() {
+  return new Promise((resolve5) => {
+    if (process.stdin.isTTY) return resolve5("");
+    let data = "";
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", (c) => data += c);
+    process.stdin.on("end", () => resolve5(data));
+    process.stdin.on("error", () => resolve5(data));
+  });
+}
+
 // src/cli.ts
 var VERSION = "0.1.0";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
@@ -32645,6 +34140,10 @@ var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 Usage: probe <command> [options]
 
   doctor                 Check setup (Node, project, SDK, devices)
+  init                   Set the project up step by step: settings, agents, feature manifests, rule
+                         cards, the agent file. Resumes where it stopped; manifests arrive as drafts
+                         --status: only show the steps; --step <id>: one step; --yes: take the
+                         proposed features; --features a,b: choose (or limit agents to) these
   scan                   Map features: unit coverage and health
   feature <id>           One feature: modules + riskiest untested classes
   unit <feature>         Run a feature's unit tests
@@ -32671,6 +34170,15 @@ Usage: probe <command> [options]
   devices                List devices and which ones agents may use
   devices allow <serial> Let agents use a real phone (this machine only)
   devices avd <name>     Emulator to boot when none is running
+  check [features]       Check stale features now: unit tests, manifest links, drafted corrections
+                         --no-drafts: no agent; --trigger claude|editor|manual
+  stale                  Features edited since their last check
+  manifest <feature>     Check a feature manifest's test and card links, paths and unproven rules
+  rules <feature>        A feature's rules, the tests and cards proving each, the cards' last results
+  rule <feature/rule>    One rule and what proves it; --run runs its cards on a device
+  drafts [feature]       Drafted corrections to manifests and briefs
+  draft show|approve|reject <id>
+  hook <event>           Claude Code hook entry (edit, stop, prompt); see hooks/hooks.json
   studio                 Open the local GUI
   mcp                    Run as an MCP server (stdio) for AI agents
 
@@ -32695,7 +34203,11 @@ async function main(argv) {
   const ticketTextArg = opt("--ticket-text");
   const limitArg = opt("--limit");
   const maxCardsArg = opt("--max-cards");
-  const flags = /* @__PURE__ */ new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh"]);
+  const triggerArg = opt("--trigger");
+  const stepArg = opt("--step");
+  const flags = /* @__PURE__ */ new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
+  const runFlag = argv.includes("--run");
+  const noDrafts = argv.includes("--no-drafts");
   const outdated = argv.includes("--outdated");
   const rerunFresh = argv.includes("--rerun-fresh");
   const noDevice = argv.includes("--no-device");
@@ -32721,15 +34233,23 @@ async function main(argv) {
     }
     case "init": {
       const project = openProject(projectArg);
-      const file = configPath(project.root);
-      if ((0, import_node_fs20.existsSync)(file)) {
-        console.log(`Already exists: ${file}`);
+      if (argv.includes("--status")) {
+        console.log(formatInitStatus(initStatus(project)));
         return 0;
       }
-      (0, import_node_fs20.mkdirSync)((0, import_node_path24.dirname)(file), { recursive: true });
-      (0, import_node_fs20.writeFileSync)(file, CONFIG_TEMPLATE);
-      console.log(`Created ${file}`);
-      return 0;
+      if (stepArg && !isInitStep(stepArg)) return usage("probe init [--step doctor|config|kit|scan|features|manifests|cards|agentfile|check]");
+      const { run, done } = startInit(project, {
+        step: stepArg && isInitStep(stepArg) ? stepArg : void 0,
+        accept: argv.includes("--yes"),
+        features: featuresArg?.split(",").map((f) => f.trim()).filter(Boolean),
+        limit: limitArg ? Number(limitArg) : void 0,
+        model
+      });
+      follow(run.id);
+      const finished = await done;
+      console.log(`
+${summarizeInit(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
     }
     case "scan": {
       const project = openProject(projectArg);
@@ -32893,7 +34413,7 @@ Cards: ${info.cards.join(", ") || "none"}`);
       const project = openProject(projectArg);
       const targets = arg ?? (ticketArg ? ticketInfo(project, ticketArg).features : void 0);
       if (!targets || Array.isArray(targets) && targets.length === 0) return usage("probe backfill <feature|*> [--ticket <id> [--ticket-text <file>]]");
-      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs20.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
+      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs26.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
       const { run, done } = startBackfill(project, targets, { model, ticket });
       follow(run.id);
       const finished = await done;
@@ -32960,6 +34480,96 @@ ${summarizeCardRun(finished)}`);
 Emulator to boot when none runs: ${local.avd ?? "not set (probe devices avd <name>)"}`);
       return 0;
     }
+    case "hook":
+      return runHook(arg ?? "");
+    case "check": {
+      const project = openProject(projectArg);
+      const started = startCheck(project, {
+        features: arg ? arg.split(",").map((f) => f.trim()).filter(Boolean) : void 0,
+        trigger: triggerArg ?? "manual",
+        drafts: noDrafts ? false : void 0,
+        model
+      });
+      if (!started) {
+        console.log(`A check is already running (${runningCheck(project)?.runId}).`);
+        return 0;
+      }
+      follow(started.run.id);
+      const finished = await started.done;
+      console.log(`
+${summarizeCheckRun(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
+    }
+    case "stale": {
+      const project = openProject(projectArg);
+      const { stale } = loadWatch(project);
+      const ids = Object.keys(stale);
+      if (!ids.length) {
+        console.log("Nothing stale: every feature was checked after its last edit.");
+        return 0;
+      }
+      for (const id of ids) {
+        const e = stale[id];
+        console.log(`${id}${e.owned ? "" : " (related)"} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}`);
+        for (const f of e.files.slice(0, 10)) console.log(`    ${f}`);
+      }
+      return 0;
+    }
+    case "manifest": {
+      if (!arg) return usage("probe manifest <feature>");
+      const check2 = checkManifest(openProject(projectArg).root, arg);
+      console.log(summarizeCheck(check2));
+      return check2.errors.length || check2.broken.length || check2.brokenCards.length || check2.unexplained.length ? 1 : 0;
+    }
+    case "rules": {
+      if (!arg) return usage("probe rules <feature>");
+      const project = openProject(projectArg);
+      const manifest = loadManifest(project.root, arg);
+      if (!manifest) return usage(`probe rules <feature>  (no manifest probe/features/${arg}.yaml)`);
+      console.log(summarizeRules(project, manifest));
+      return 0;
+    }
+    case "rule": {
+      if (!arg) return usage("probe rule <feature/rule> [--run] [--device <serial>]");
+      const project = openProject(projectArg);
+      const found = findRule(project, arg);
+      if ("error" in found) {
+        console.log(found.error);
+        return 1;
+      }
+      if (!runFlag) {
+        console.log(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)));
+        return 0;
+      }
+      const result = await runRuleCards(project, arg, { device: deviceArg, model, log: (l) => console.log(l) });
+      console.log(`
+${summarizeRuleRun(result)}`);
+      return !result.error && result.runs.length && result.runs.every((r) => r.status === "passed") ? 0 : 1;
+    }
+    case "drafts": {
+      const project = openProject(projectArg);
+      const list = listDrafts(project, arg);
+      console.log(list.length ? list.map((d) => `${d.id}  ${d.status.padEnd(8)} ${d.feature}: ${d.files.map((f) => f.path).join(", ")}`).join("\n") : "No drafts.");
+      return 0;
+    }
+    case "draft": {
+      if (!arg || !arg2) return usage("probe draft show|approve|reject <id>");
+      const project = openProject(projectArg);
+      if (arg === "show") {
+        const draft = findDraft(project, arg2);
+        if (!draft) return usage(`probe draft show <id>  (no draft ${arg2})`);
+        console.log(`${draft.id} \xB7 ${draft.feature} \xB7 ${draft.status}
+
+${draft.summary}
+`);
+        for (const d of draftDiffs(project, draft)) console.log(`${d.conflict ? "\u26A0 changed since the draft was made\n" : ""}${d.diff}
+`);
+        return 0;
+      }
+      const res = arg === "approve" ? approveDraft(project, arg2) : arg === "reject" ? rejectDraft(project, arg2) : { ok: false, error: `Unknown action ${arg}.` };
+      console.log(res.ok ? `${arg === "approve" ? "Applied" : "Rejected"} ${arg2}.` : res.error);
+      return res.ok ? 0 : 1;
+    }
     case "studio": {
       const url = await startStudio(openProject(projectArg), port);
       console.log(`Probe Studio: ${url}  (Ctrl+C to stop)`);
@@ -32992,7 +34602,7 @@ async function readSecret(promptText) {
   process.stdout.write(promptText);
   stdin.setRawMode(true);
   stdin.resume();
-  return new Promise((resolve4) => {
+  return new Promise((resolve5) => {
     let value = "";
     const onData = (buf) => {
       for (const ch of buf.toString("utf8")) {
@@ -33001,7 +34611,7 @@ async function readSecret(promptText) {
           stdin.pause();
           stdin.off("data", onData);
           process.stdout.write("\n");
-          resolve4(value);
+          resolve5(value);
           return;
         }
         if (ch === "") process.exit(130);

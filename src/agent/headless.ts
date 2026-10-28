@@ -14,6 +14,15 @@ export interface AgentTask {
   mcpEnv?: Record<string, string>;
   /** Lets the agent create and edit files (writing unit tests). It still never runs commands. */
   allowEdits?: boolean;
+  /** Folder the agent works in; the project by default. */
+  cwd?: string;
+  /** More folders the agent may read, e.g. the project when it works in a scratch folder. */
+  addDirs?: string[];
+  /**
+   * Lets the agent edit only files matching these permission patterns (`./**` = its own folder).
+   * Everything else stays read-only, unlike allowEdits.
+   */
+  editOnly?: string[];
 }
 
 export interface AgentResult {
@@ -40,8 +49,10 @@ export async function runAgent(project: Project, task: AgentTask, log: (line: st
   );
 
   const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
-  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...(task.allowEdits ? ["Edit", "Write"] : [])];
-  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...(task.allowEdits ? [] : ["Edit", "Write"])];
+  const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
+  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...(task.allowEdits ? ["Edit", "Write"] : []), ...scoped];
+  // A denied tool beats any allowed pattern, so scoped edits leave Edit and Write off this list.
+  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...(task.allowEdits || scoped.length ? [] : ["Edit", "Write"])];
   const args = [
     "-p",
     "--output-format",
@@ -54,6 +65,7 @@ export async function runAgent(project: Project, task: AgentTask, log: (line: st
     allowed.join(","),
     "--disallowedTools",
     denied.join(","),
+    ...(task.addDirs ?? []).flatMap((d) => ["--add-dir", d]),
   ];
   // Always explicit: without it the agent inherits the user's Claude Code default model.
   args.push("--model", task.model ?? project.config.agents.model);
@@ -69,7 +81,7 @@ export async function runAgent(project: Project, task: AgentTask, log: (line: st
   exitCode = await stream(
     "claude",
     args,
-    project.root,
+    task.cwd ?? project.root,
     (line) => {
       const event = parseEvent(line);
       if (!event) {

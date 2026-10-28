@@ -13,6 +13,7 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 | Tool | Use it to |
 |---|---|
 | `probe_doctor` | Check setup before anything else fails mysteriously |
+| `probe_init` | Set a project up step by step (settings, agents, scan, features, a manifest per feature, rule cards, agent file); `status: true` only reports. Resumes; writes drafts for review |
 | `probe_scan` | The feature map: static unit coverage and a health verdict per feature, with reasons (`refresh: true` after code changes) |
 | `probe_feature` | One feature's modules and its riskiest untested classes |
 | `probe_unit_run` | Run a feature's unit tests and get failures |
@@ -21,11 +22,15 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 | `probe_cards_save` | Save drafted cards (YAML in `probe/cards/<feature>/`) |
 | `probe_cards_list` | Read cards: how to reach a behaviour and what must be true |
 | `probe_cards_backfill` | Hand drafting to a background agent; with `ticket` (+ `ticketText`), the cards a ticket needs |
-| `probe_card_run` | A background agent performs one card on an emulator and judges it |
+| `probe_card_run` | A background agent performs one card on an emulator and judges it; with `rule`, every card that proves that rule |
+| `probe_rule` | A feature's rules (or one rule) with the tests and cards that prove each, and whether each card's last pass still holds |
 | `probe_explore` | A background agent maps a feature's screens and navigation on an emulator |
 | `probe_login_check` | See which account the app on the emulator uses, or log it in as a test role |
 | `probe_verify` | Check a change end to end: affected features' unit tests, then their cards on a device |
 | `probe_ticket` | A ticket's commits, features and cards; or a ticket draft for a run that did not pass |
+| `probe_check` | Check edited features: unit tests, manifest test links, a drafted manifest/brief correction |
+| `probe_stale` | Features edited since their last check, and drafts waiting for review |
+| `probe_manifest` | Check `probe/features/<feature>.yaml` against the code |
 | `probe_studio_open` | Open the GUI for the user |
 
 Always pass `projectDir` as the current working directory.
@@ -52,6 +57,37 @@ to features, runs their unit tests, reinstalls the app from this code once and r
 approved cards on an emulator. Report per feature: unit result, each card's verdict, perf
 warnings, and the run ids so the user can open evidence in Studio. If a feature has no approved
 cards, say so: the change was not checked on a device.
+
+## Keeping features current
+
+The plugin's hooks run on their own: an Edit or Write marks the features the file belongs to as
+edited (instant, no build), and when you end a turn a check starts in the background. When it
+finds failing tests or broken manifest links, they come back to you once: at the end of the turn
+or with the user's next message. Fix them before going on, or say why they are expected.
+
+A feature with a manifest (`probe/features/<id>.yaml`, format in `probe/features/README.md`)
+also gets an agent-drafted correction to its manifest and brief after a change. It is never
+applied on its own; the user reviews it in Studio. Never apply a draft yourself.
+
+## Setting a project up
+
+A project with no `probe/features/` is not set up. Call `probe_init { status: true }` and show the
+steps. Then `probe_init` runs what Probe can do alone and stops where a person decides: which
+features get a manifest (`accept: true` takes the scan's proposal; ask before taking it for the
+user) and the drafts to review. The manifests and cards steps run an agent per feature, minutes
+each: say so before starting them, and offer `limit` or `features` for a first pass. Never apply
+a draft yourself; point the user to Studio → Setup or `probe draft approve <id>`.
+
+## Rules and their cards
+
+Each manifest rule (`invariants`) lists the unit tests (`covered_by`) and the device cards
+(`cards`) that prove it. When the user asks whether a behaviour still holds, find the rule with
+`probe_rule` (a feature, or `feature/rule-id`) and answer from its proof: a test link, or a card
+whose last pass still holds for this code. When only a card can prove it and that pass is missing
+or out of date, offer `probe_card_run { rule }`; it takes minutes per card and needs an emulator,
+so start it when asked. When the turn-end check names rules "only a device proves", tell the
+user and offer the same. A rule with no card that needs one: draft it with `probe_cards_context` +
+`probe_cards_save`, then add its id under the rule's `cards:`.
 
 ## Shared results
 
