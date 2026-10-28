@@ -1,6 +1,6 @@
 {
   "name": "probe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Agent-driven test platform: maps an app into features with health, runs and writes unit tests, drafts feature cards, has agents test cards on an emulator (screenshots, video, performance), verifies a change end to end, fixes what it finds, and shares results through git. Local GUI: Probe Studio.",
   "author": { "name": "Jalil" },
   "license": "MIT",
