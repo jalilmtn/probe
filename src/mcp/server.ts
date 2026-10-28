@@ -50,7 +50,7 @@ export async function runMcpServer(version: string): Promise<void> {
     {
       title: "Set the project up",
       description:
-        "Sets a project up for Probe, step by step: tools, settings file, the manifest format and the probe-lead/probe-feature agents, a scan, the features to cover, a manifest per feature (agent-drafted: paths, flows, rules and the exact tests proving them), device cards for rules no unit test can prove, and the Features section in AGENTS.md/CLAUDE.md. Resumes where it stopped and never redoes finished work. Manifests, card links and the agent file arrive as drafts to review in Studio → Setup. status: true only reports. The manifests and cards steps run agents: minutes per feature.",
+        "Sets a project up for Probe, step by step: tools, settings file, the manifest format, a scan, the features to cover, a manifest per feature (agent-drafted: paths, flows, rules and the exact tests proving them), device cards for rules no unit test can prove, and the Features section in AGENTS.md (how any coding agent finds and works on a feature; CLAUDE.md imports it). Resumes where it stopped and never redoes finished work. Manifests, card links and the agent file arrive as drafts to review in Studio → Setup. status: true only reports. The manifests and cards steps run agents: minutes per feature.",
       inputSchema: {
         projectDir,
         status: z.boolean().optional().describe("Only report each step, run nothing"),

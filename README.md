@@ -19,10 +19,10 @@ edits YAML by hand.
 /plugin install probe@probe-tools
 ```
 
-Then, inside a project, `/probe init` sets it up: settings, the manifest format and the
-`probe-lead` / `probe-feature` agents, a scan, the features to cover, an agent-drafted manifest per
+Then, inside a project, `/probe init` sets it up: settings, the manifest format, a scan, the features to cover, an agent-drafted manifest per
 feature (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
-test can prove, and the Features section in `AGENTS.md` / `CLAUDE.md`. It resumes where it stopped;
+test can prove, and the Features section in `AGENTS.md`: how any coding agent
+finds a feature, works on it and checks it after a change (`CLAUDE.md` imports it). It resumes where it stopped;
 everything it writes into the project's knowledge arrives as a draft to review.
 
 `/probe` opens Studio. Its **Setup** tab lists what is found and what is

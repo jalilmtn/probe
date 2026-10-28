@@ -1,16 +1,16 @@
 # Feature manifests
 
 One file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id Probe's scan
-uses (`call`, `universe`, `chat`, ...). Together they are the feature index: the lead agent lists
+uses (`call`, `universe`, `chat`, ...). Together they are the feature index: agents list
 this folder and reads each `summary`, so there is no separate index file to fall out of date.
 
 Each feature has three layers:
 
 | Layer | Where | Answers | Read by |
 |---|---|---|---|
-| Summary | `summary:` in the manifest | What is this, in one line? | lead agent, Studio, people browsing |
+| Summary | `summary:` in the manifest | What is this, in one line? | agents, Studio, people browsing |
 | Brief | the doc `brief:` points to (`docs/features/<name>.md`) | What it does, how it works, what must never break | people and agents starting work |
-| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and the feature agent |
+| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and agents working on the feature |
 
 The manifest never repeats the brief. It points into it.
 
@@ -63,7 +63,7 @@ device_only:                  # checks no unit test can make; candidates for car
   A rule may have tests and cards both. A card link that names no card is a broken link, like a
   renamed test. A card proves its rule only while its last pass still holds for the code; Probe
   reads that from `probe/results/`. Keep `gap` on a card-only rule to say why no unit test can.
-- To check a rule on a device, ask Claude ("does the locked-phone ring rule still hold?"): it runs
+- To check a rule on a device, ask your agent ("does the locked-phone ring rule still hold?"): it runs
   `probe_card_run { rule: "call/full-screen-intent-rings" }`. From a shell: `probe rule
   call/full-screen-intent-rings --run`. `probe rules <feature>` lists every rule with its proof.
   The older single `card: <id>` still reads as a one-item `cards`.
@@ -95,7 +95,8 @@ The rest of the doc stays as the team writes it. A feature with no doc yet has n
 
 ## Keeping it current
 
-When code under a feature's `paths` changes, the feature is stale. The feature agent then checks:
+When code under a feature's `paths` changes, the feature is stale. Whoever changed it, or Probe's
+check, then confirms:
 
 1. Every `covered_by` test still exists under that exact name.
 2. The change does not contradict an invariant, a flow or the brief's At a glance.

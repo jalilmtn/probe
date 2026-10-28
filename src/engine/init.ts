@@ -1,7 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import agentFeature from "../../templates/agent-probe-feature.md";
-import agentLead from "../../templates/agent-probe-lead.md";
+import featuresGuide from "../../templates/agents-features.md";
 import featuresReadme from "../../templates/features-README.md";
 import { runAgent } from "../agent/headless.js";
 import { listCards } from "../cards/store.js";
@@ -21,16 +20,18 @@ import { latestScan, scan } from "./scan.js";
  * Each step reads its state from the project itself (files, drafts), so running init again
  * picks up where it stopped and never redoes or overwrites finished work. Whatever lands in the
  * project's knowledge (manifests, their card links, the agent file) arrives as a draft to review.
+ * Nothing is written for one agent only: how to work with the features goes in AGENTS.md, which
+ * every coding agent reads, and CLAUDE.md just imports it.
  */
 export const INIT_STEPS = [
   { id: "doctor", label: "Tools", what: "Node, the build, devices: what this machine can run" },
   { id: "config", label: "Settings file", what: "probe/probe.yaml, every setting optional" },
-  { id: "kit", label: "Format and agents", what: "probe/features/README.md and the probe-lead / probe-feature agents" },
+  { id: "kit", label: "Manifest format", what: "probe/features/README.md: the manifest and brief formats" },
   { id: "scan", label: "Scan", what: "modules, test classes and coverage" },
   { id: "features", label: "Features", what: "which features get a manifest" },
   { id: "manifests", label: "Manifests", what: "an agent drafts each feature's manifest: paths, flows, rules and the tests proving them" },
   { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the rules no unit test can prove" },
-  { id: "agentfile", label: "Agent file", what: "the Features section in AGENTS.md or CLAUDE.md, so every Claude session knows the manifests" },
+  { id: "agentfile", label: "Agent file", what: "the Features section in AGENTS.md (CLAUDE.md imports it), so every coding agent knows the manifests and how to work with them" },
   { id: "check", label: "Link check", what: "every test and card link in the manifests resolves" },
 ] as const;
 
@@ -49,11 +50,7 @@ interface InitState {
 const readState = (project: Project): InitState => project.store.read<InitState>(STATE) ?? {};
 const writeState = (project: Project, patch: InitState) => project.store.write(STATE, { ...readState(project), ...patch });
 
-const KIT: { path: string; text: string }[] = [
-  { path: `${FEATURES_DIR}/README.md`, text: featuresReadme },
-  { path: ".claude/agents/probe-lead.md", text: agentLead },
-  { path: ".claude/agents/probe-feature.md", text: agentFeature },
-];
+const KIT: { path: string; text: string }[] = [{ path: `${FEATURES_DIR}/README.md`, text: featuresReadme }];
 
 /** Init's drafts for one step, newest first. */
 function initDrafts(project: Project, step: string, feature?: string): Draft[] {
@@ -83,10 +80,6 @@ export function chooseFeatures(project: Project, features: string[]): string[] {
 
 const hasManifest = (project: Project, id: string) => existsSync(join(project.root, manifestFile(id)));
 
-/** Where the Features section goes: AGENTS.md when the repo has one, CLAUDE.md otherwise. */
-function agentFileTarget(project: Project): string {
-  return existsSync(join(project.root, "AGENTS.md")) ? "AGENTS.md" : "CLAUDE.md";
-}
 
 /** Each step as the project stands now. Cheap: file reads only, no build, no agent. */
 export function initStatus(project: Project): InitStepState[] {
@@ -141,12 +134,11 @@ export function initStatus(project: Project): InitStepState[] {
           .join(" · ") || "nothing to do",
   );
 
-  const target = agentFileTarget(project);
   const pendingAgentFile = initDrafts(project, "agentfile").filter((d) => d.status === "pending");
   add(
     "agentfile",
     agentFileDone(project) ? "done" : pendingAgentFile.length ? "waiting" : "todo",
-    agentFileDone(project) ? `${target} has the Features section${target === "AGENTS.md" ? " and CLAUDE.md imports it" : ""}` : pendingAgentFile.length ? "drafted, to review" : `a Features section for ${target}`,
+    agentFileDone(project) ? "AGENTS.md has the Features section and CLAUDE.md imports it" : pendingAgentFile.length ? "drafted, to review" : "a Features section for AGENTS.md, imported by CLAUDE.md",
   );
 
   const problems = loadManifests(project.root)
@@ -201,9 +193,7 @@ function needsCards(project: Project, feature: string): boolean {
 
 function agentFileDone(project: Project): boolean {
   const read = (p: string) => (existsSync(join(project.root, p)) ? readFileSync(join(project.root, p), "utf8") : "");
-  const target = agentFileTarget(project);
-  if (!read(target).includes(`${FEATURES_DIR}/`)) return false;
-  return target !== "AGENTS.md" || /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
+  return read("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
 }
 
 export interface InitOptions {
@@ -436,15 +426,16 @@ Your working folder holds manifest.yaml (a copy of ${manifestFile(feature)}, whi
 Finish with two sentences: which rules got cards, and which you left and why.`;
 }
 
-/** The Features section, drafted for the agent file every Claude session reads. */
+/** The Features section, drafted into AGENTS.md for every coding agent; CLAUDE.md imports it for Claude Code. */
 function draftAgentFile(project: Project, run: InitRun, log: (line: string) => void): void {
   if (agentFileDone(project) || initDrafts(project, "agentfile").some((d) => d.status === "pending")) return;
   const manifests = loadManifests(project.root).map((m) => m.id);
   const features = manifests.length ? manifests : (chosenFeatures(project) ?? []);
   if (!features.length) return;
-  const target = agentFileTarget(project);
-  const files = [{ path: target, staged: "target.md" }, ...(target === "AGENTS.md" ? [{ path: "CLAUDE.md", staged: "claude.md" }] : [])];
-  const work = openDraft(project, "_project", files);
+  const work = openDraft(project, "_project", [
+    { path: "AGENTS.md", staged: "agents.md" },
+    { path: "CLAUDE.md", staged: "claude.md" },
+  ]);
   const edit = (staged: string, change: (text: string) => string) => {
     const abs = join(work.dir, staged);
     const before = readFileSync(abs, "utf8");
@@ -452,47 +443,27 @@ function draftAgentFile(project: Project, run: InitRun, log: (line: string) => v
     const after = change(before.replace(/\r\n/g, "\n"));
     writeFileSync(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
   };
-  if (!readFileSync(join(work.dir, "target.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("target.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(features)}\n`);
-  if (target === "AGENTS.md")
-    edit("claude.md", (t) => {
+  if (!readFileSync(join(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(features)}\n`);
+  edit("claude.md", (t) => {
       if (/^@AGENTS\.md\s*$/m.test(t)) return t;
       // After the title, when there is one, so the import reads as part of the file's header.
       const title = /^# .*\n+/.exec(t);
       return title ? `${t.slice(0, title[0].length)}@AGENTS.md\n\n${t.slice(title[0].length)}` : `@AGENTS.md\n${t ? `\n${t}` : ""}`;
     });
   const draft = closeDraft(project, work, {
-    summary: `Adds the Features section to ${target}${target === "AGENTS.md" ? " and imports AGENTS.md from CLAUDE.md (Claude Code reads CLAUDE.md, not AGENTS.md)" : ""}, so every session knows the manifests and the probe agents.`,
+    summary: "Adds the Features section to AGENTS.md, which every coding agent reads: the manifests, finding a feature, working on one and checking it after a change. CLAUDE.md imports AGENTS.md, since Claude Code reads CLAUDE.md.",
     runId: run.id,
     origin: "init",
     step: "agentfile",
   });
   if (draft) {
     run.drafts.push(draft.id);
-    log(`agent file: drafted the Features section for ${target} — review it in Studio → Setup`);
+    log("agent file: drafted the Features section for AGENTS.md — review it in Studio → Setup");
   }
 }
 
 function featuresSection(features: string[]): string {
-  return `## Features
-
-Every feature has a manifest, \`${FEATURES_DIR}/<id>.yaml\` (format: \`${FEATURES_DIR}/README.md\`):
-what it is, where it lives, its user flows, the rules it must keep, and the exact test that proves
-each rule (\`covered_by\`) or why none does yet (\`gap\`). Read it before changing a feature. When it
-names a \`brief\`, that doc's "At a glance" section is the short version; \`also_read\` lists the rest.
-
-- \`probe-lead\` maps a question or a set of changed files to features; \`probe-feature explain <id>\`
-  briefs you on one, \`probe-feature maintain <id>\` checks it after a change.
-- Changing a rule's behaviour means changing its invariant in the manifest in the same change. A
-  test that proves a rule goes in its \`covered_by\` as \`TestClass :: exact test name\`; a renamed
-  test breaks the link, and Probe's turn-end check reports it.
-- A rule only a device can prove lists its cards (\`probe/cards/<feature>/<id>.yaml\`) under \`cards:\`.
-  \`probe rules <feature>\` shows each rule's tests and cards; \`probe rule <feature/rule> --run\`
-  (or \`probe_card_run\` with \`rule\`) runs its cards on an emulator. Never start a card run unasked.
-- With the Probe plugin installed, edits mark their features stale and the turn ends with their
-  unit tests and a link check; corrections to manifests and briefs arrive as drafts to approve in
-  Probe Studio.
-
-Features: ${features.join(" · ")}.`;
+  return `${featuresGuide.trimEnd()}\n\nFeatures: ${features.join(" · ")}.`;
 }
 
 /** The pending drafts init made, for review in one place. */
