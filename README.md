@@ -14,10 +14,23 @@ edits YAML by hand.
 
 ## Install (Claude Code)
 
+Inside Claude Code:
+
 ```
 /plugin marketplace add jalilmtn/probe
 /plugin install probe@probe-tools
 ```
+
+Or from a terminal:
+
+```bash
+claude plugin marketplace add jalilmtn/probe
+claude plugin install probe@probe-tools
+```
+
+To update later: `claude plugin marketplace update probe-tools`, then start a new session. A
+marketplace added from an older address (`claude plugin marketplace list` shows its source) is
+switched with `claude plugin marketplace remove probe-tools` before adding it again.
 
 Then, inside a project, `/probe init` sets it up: settings, the manifest format, a scan, the features to cover, an agent-drafted manifest per
 feature (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
