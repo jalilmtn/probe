@@ -5,7 +5,7 @@ import type { Card, ModuleInfo } from "../core/types.js";
 import type { Project } from "./project.js";
 
 function git(root: string, args: string[], input?: string): string {
-  const r = spawnSync("git", args, { cwd: root, encoding: "utf8", input, maxBuffer: 512 * 1024 * 1024, timeout: 60_000 });
+  const r = spawnSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input, maxBuffer: 512 * 1024 * 1024, timeout: 60_000 });
   return r.status === 0 ? r.stdout : "";
 }
 

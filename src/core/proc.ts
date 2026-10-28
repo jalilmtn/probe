@@ -5,7 +5,7 @@ export const isWindows = process.platform === "win32";
 
 /** Runs a short command and returns its trimmed stdout, or null if it failed to start or exited non-zero. */
 export function capture(cmd: string, args: string[], cwd?: string): string | null {
-  const res = spawnSync(cmd, args, { cwd, encoding: "utf8", shell: isWindows, timeout: 20_000 });
+  const res = spawnSync(cmd, args, { cwd, encoding: "utf8", shell: isWindows, windowsHide: true, timeout: 20_000 });
   if (res.error || res.status !== 0) return null;
   return `${res.stdout ?? ""}`.trim();
 }
@@ -27,7 +27,7 @@ export function throwIfStopped(): void {
 /** Kills a process and everything it started: on Windows the shell's children (gradle, claude) outlive the shell. */
 function killTree(child: ChildProcess): void {
   if (child.pid === undefined || child.exitCode !== null) return;
-  if (isWindows) spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  if (isWindows) spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
   else child.kill("SIGTERM");
 }
 
@@ -50,7 +50,7 @@ export function stream(
   return new Promise((resolvePromise, reject) => {
     // With a shell (Windows, for .bat/.cmd shims) arguments are joined, so quote the ones that need it.
     const finalArgs = isWindows ? args.map(quoteForCmd) : args;
-    const child = spawn(cmd, finalArgs, { cwd, shell: isWindows, env: options.env ?? process.env });
+    const child = spawn(cmd, finalArgs, { cwd, shell: isWindows, windowsHide: true, env: options.env ?? process.env });
     child.stdin.end(options.input ?? "");
     const pipe = (chunkStream: NodeJS.ReadableStream) => {
       let buffer = "";
@@ -85,5 +85,5 @@ export function openInBrowser(url: string): void {
     : process.platform === "darwin"
       ? ["open", [url]]
       : ["xdg-open", [url]];
-  spawn(cmd, args as string[], { detached: true, stdio: "ignore" }).unref();
+  spawn(cmd, args as string[], { detached: true, stdio: "ignore", windowsHide: true }).unref();
 }

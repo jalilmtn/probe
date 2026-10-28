@@ -66,7 +66,7 @@ async function waitFor<T>(probe: () => Promise<T | undefined>, timeoutMs: number
 
 /** Emulator images (AVDs) on this machine. */
 export function listAvds(projectRoot: string): string[] {
-  const r = spawnSync(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", timeout: 15_000 });
+  const r = spawnSync(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15_000 });
   return (r.stdout ?? "")
     .split(/\r?\n/)
     .map((l) => l.trim())

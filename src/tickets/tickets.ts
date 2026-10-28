@@ -94,7 +94,7 @@ export function fileTicket(project: Project, run: Run, draft: TicketDraft = tick
   writeFileSync(file, draft.body);
   const quote = (s: string) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file));
-  const r = spawnSync(command, { cwd: project.root, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 60_000 });
+  const r = spawnSync(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 60_000 });
   if (r.status !== 0) throw new Error(`Filing failed (${r.status}): ${(r.stderr || r.stdout).trim().slice(0, 500)}`);
   return r.stdout.trim();
 }

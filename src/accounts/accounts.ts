@@ -105,6 +105,7 @@ const PS_UNPROTECT =
 function powershell(script: string, input: string): string {
   const r = spawnSync("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
     encoding: "utf8",
+    windowsHide: true,
     env: { ...process.env, PROBE_SECRET: input },
     timeout: 20_000,
   });

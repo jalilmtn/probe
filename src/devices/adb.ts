@@ -33,18 +33,18 @@ export class Adb {
   }
 
   run(args: string[], timeoutMs = 30_000): { ok: boolean; out: string; err: string } {
-    const r = spawnSync(this.bin, args, { encoding: "utf8", timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
+    const r = spawnSync(this.bin, args, { encoding: "utf8", windowsHide: true, timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
     return { ok: !r.error && r.status === 0, out: r.stdout ?? "", err: r.stderr ?? String(r.error ?? "") };
   }
 
   binary(args: string[], timeoutMs = 30_000): Buffer | null {
-    const r = spawnSync(this.bin, args, { timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
+    const r = spawnSync(this.bin, args, { windowsHide: true, timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
     return !r.error && r.status === 0 ? (r.stdout as Buffer) : null;
   }
 
   /** Long-running adb command (e.g. screenrecord); returns the child so it can be stopped. */
   spawn(args: string[]) {
-    return spawn(this.bin, args, { stdio: "ignore" });
+    return spawn(this.bin, args, { stdio: "ignore", windowsHide: true });
   }
 }
 

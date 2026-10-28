@@ -14598,7 +14598,7 @@ var import_node_async_hooks = require("node:async_hooks");
 var import_node_child_process = require("node:child_process");
 var isWindows = process.platform === "win32";
 function capture(cmd, args, cwd) {
-  const res = (0, import_node_child_process.spawnSync)(cmd, args, { cwd, encoding: "utf8", shell: isWindows, timeout: 2e4 });
+  const res = (0, import_node_child_process.spawnSync)(cmd, args, { cwd, encoding: "utf8", shell: isWindows, windowsHide: true, timeout: 2e4 });
   if (res.error || res.status !== 0) return null;
   return `${res.stdout ?? ""}`.trim();
 }
@@ -14613,7 +14613,7 @@ function throwIfStopped() {
 }
 function killTree(child) {
   if (child.pid === void 0 || child.exitCode !== null) return;
-  if (isWindows) (0, import_node_child_process.spawnSync)("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  if (isWindows) (0, import_node_child_process.spawnSync)("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
   else child.kill("SIGTERM");
 }
 function stream(cmd, args, cwd, onLine, options = {}) {
@@ -14621,7 +14621,7 @@ function stream(cmd, args, cwd, onLine, options = {}) {
   if (signal?.aborted) return Promise.reject(new StoppedError());
   return new Promise((resolvePromise, reject) => {
     const finalArgs = isWindows ? args.map(quoteForCmd) : args;
-    const child = (0, import_node_child_process.spawn)(cmd, finalArgs, { cwd, shell: isWindows, env: options.env ?? process.env });
+    const child = (0, import_node_child_process.spawn)(cmd, finalArgs, { cwd, shell: isWindows, windowsHide: true, env: options.env ?? process.env });
     child.stdin.end(options.input ?? "");
     const pipe2 = (chunkStream) => {
       let buffer = "";
@@ -14650,7 +14650,7 @@ function quoteForCmd(arg) {
 }
 function openInBrowser(url) {
   const [cmd, args] = isWindows ? ["cmd", ["/c", "start", "", url]] : process.platform === "darwin" ? ["open", [url]] : ["xdg-open", [url]];
-  (0, import_node_child_process.spawn)(cmd, args, { detached: true, stdio: "ignore" }).unref();
+  (0, import_node_child_process.spawn)(cmd, args, { detached: true, stdio: "ignore", windowsHide: true }).unref();
 }
 
 // src/agent/headless.ts
@@ -19537,6 +19537,7 @@ var PS_UNPROTECT = "Add-Type -AssemblyName System.Security; [Text.Encoding]::UTF
 function powershell(script, input) {
   const r = (0, import_node_child_process2.spawnSync)("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
     encoding: "utf8",
+    windowsHide: true,
     env: { ...process.env, PROBE_SECRET: input },
     timeout: 2e4
   });
@@ -19599,16 +19600,16 @@ var Adb = class _Adb {
     return new _Adb(sdkTool(projectRoot, "platform-tools", "adb"));
   }
   run(args, timeoutMs = 3e4) {
-    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { encoding: "utf8", timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
+    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { encoding: "utf8", windowsHide: true, timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
     return { ok: !r.error && r.status === 0, out: r.stdout ?? "", err: r.stderr ?? String(r.error ?? "") };
   }
   binary(args, timeoutMs = 3e4) {
-    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
+    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { windowsHide: true, timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
     return !r.error && r.status === 0 ? r.stdout : null;
   }
   /** Long-running adb command (e.g. screenrecord); returns the child so it can be stopped. */
   spawn(args) {
-    return (0, import_node_child_process3.spawn)(this.bin, args, { stdio: "ignore" });
+    return (0, import_node_child_process3.spawn)(this.bin, args, { stdio: "ignore", windowsHide: true });
   }
 };
 function shQuote(s) {
@@ -19946,7 +19947,7 @@ async function waitFor(probe, timeoutMs) {
   return void 0;
 }
 function listAvds(projectRoot) {
-  const r = (0, import_node_child_process4.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", timeout: 15e3 });
+  const r = (0, import_node_child_process4.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15e3 });
   return (r.stdout ?? "").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !/^(INFO|WARNING|ERROR)\b/.test(l));
 }
 
@@ -20039,7 +20040,7 @@ var import_node_child_process5 = require("node:child_process");
 var import_node_crypto2 = require("node:crypto");
 var import_node_path11 = require("node:path");
 function git(root, args, input) {
-  const r = (0, import_node_child_process5.spawnSync)("git", args, { cwd: root, encoding: "utf8", input, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
+  const r = (0, import_node_child_process5.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
   return r.status === 0 ? r.stdout : "";
 }
 var short = (text2) => (0, import_node_crypto2.createHash)("sha256").update(text2).digest("hex").slice(0, 12);
@@ -32598,7 +32599,7 @@ function fileTicket(project, run, draft = ticketDraft(project, run)) {
   (0, import_node_fs20.writeFileSync)(file, draft.body);
   const quote = (s) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file));
-  const r = (0, import_node_child_process6.spawnSync)(command, { cwd: project.root, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
+  const r = (0, import_node_child_process6.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
   if (r.status !== 0) throw new Error(`Filing failed (${r.status}): ${(r.stderr || r.stdout).trim().slice(0, 500)}`);
   return r.stdout.trim();
 }
