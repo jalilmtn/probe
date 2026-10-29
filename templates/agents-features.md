@@ -4,6 +4,8 @@ Every feature has a manifest, `probe/features/<id>.yaml` (format: `probe/feature
 what it is, where it lives, its user flows, the rules it must keep, and the exact test that proves
 each rule (`covered_by`) or why none does yet (`gap`). Read it before changing a feature. When it
 names a `brief`, that doc's "At a glance" section is the short version; `also_read` lists the rest.
+Shared code has manifests of the same shape with `kind: platform` (`core:database` is
+`core__database.yaml`): the contract it keeps for the code built on it, proven by unit tests.
 The folder is the index: list it rather than relying on memory, and never invent a feature, path
 or test that no manifest, brief or code names.
 
@@ -14,7 +16,8 @@ or test that no manifest, brief or code names.
   summary, brief and the class to open first (the brief's At a glance), then brief yourself on it
   as below. Nothing matches: say so and name the closest.
 - **Which features does a change touch?** A file under a manifest's `paths` is owned by that
-  feature (by each, when several claim it); one under its `related` only makes it stale. A file
+  feature (by each, when several claim it); one under its `related` only makes it stale, and so
+  does an edit in a platform module it depends on (`probe stale` names it "depends on …"). A file
   nobody claims is unmapped: say so, do not guess. A change owned by more than 3 features (an edit
   under a shared module) gets unit tests for all of them and the full check below for the 3 with
   the most owned files.

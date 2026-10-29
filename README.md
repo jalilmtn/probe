@@ -7,8 +7,10 @@ running cards, mapping screens, measuring performance. `verify` checks a whole c
 end. Runs locally; works with Claude Code as a plugin and with any MCP-capable agent.
 
 Probe is **project-agnostic**. Knowledge about a kind of project lives in an *adapter*
-(`src/adapters/`); Android/Gradle is the first. A project needs no setup: Probe finds the app
-module, its install task and application id, an emulator image and the base branch on its own.
+(`src/adapters/`): Android/Gradle (everything, devices included), Node/TypeScript, and a generic
+one for any other git repository (see [Project types](#project-types)). A project needs no setup:
+Probe finds the app module, its install task and application id, an emulator image and the base
+branch on its own.
 Anything it guessed wrong is changed in Studio → Settings, which writes `probe/probe.yaml`; nobody
 edits YAML by hand.
 
@@ -32,8 +34,8 @@ To update later: `claude plugin marketplace update probe-tools`, then start a ne
 marketplace added from an older address (`claude plugin marketplace list` shows its source) is
 switched with `claude plugin marketplace remove probe-tools` before adding it again.
 
-Then, inside a project, `/probe init` sets it up: settings, the manifest format, a scan, the features to cover, an agent-drafted manifest per
-feature (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
+Then, inside a project, `/probe init` sets it up: settings, the manifest format, a scan, the features and platform areas (core, common, the app module) to cover, an agent-drafted manifest per
+feature or area (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
 test can prove, and the Features section in `AGENTS.md`: how any coding agent
 finds a feature, works on it and checks it after a change (`CLAUDE.md` imports it). It resumes where it stopped;
 everything it writes into the project's knowledge arrives as a draft to review.
@@ -53,8 +55,44 @@ place that fixes it. A project that cannot be tested yet opens on that tab.
 /probe ticket PROJ-1234
 ```
 
-Other agents (Cursor, Codex, Copilot, Gemini CLI): register the MCP server
-`node <path-to-probe>/dist/probe.cjs mcp` and, where supported, add `skills/probe/SKILL.md`.
+## Other agents
+
+Probe is not tied to Claude. Three parts, each usable on its own:
+
+1. **Knowledge and tools — any MCP-capable agent** (Cursor, Codex, Copilot, Gemini CLI, …).
+   Register the MCP server `node <path-to-probe>/dist/probe.cjs mcp` (set `PROBE_PROJECT` to the
+   project, or run it from inside it) and, where the agent supports skills, add
+   `skills/probe/SKILL.md`. `probe init` writes the Features section into `AGENTS.md`, which most
+   agents read on their own; the manifests and briefs are plain YAML and Markdown.
+
+2. **The agents Probe starts itself** (drafting cards, device runs, explore, login, writing unit
+   tests, fix, init, manifest drafts) run headless on a coding-agent CLI chosen with
+   `agents.runner`, in `probe/probe.yaml` for the team or Studio → Settings → Agents for this
+   machine:
+
+   | `agents.runner` | CLI | How Probe runs it |
+   |---|---|---|
+   | `claude` (default) | Claude Code | `claude -p --output-format stream-json`, Probe as the only MCP server, built-in tools allow-listed (read-only unless the job writes files; never a shell) |
+   | `codex` | Codex CLI | `codex exec --json --ignore-user-config`, Probe attached with `-c mcp_servers.probe.*` (only the job's tools enabled and pre-approved), `--sandbox read-only`, or `workspace-write` for jobs that write files. Codex reads files through sandboxed shell commands, so it keeps a shell (device runs get none); it reports tokens, not a price. Your `~/.codex/config.toml` model and Windows sandbox mode are carried over |
+
+   `agents.model` is a name that runner's `--model` accepts; left out, Claude Code uses `sonnet`
+   and Codex its own default. A model set by the team is dropped on a machine that switches to
+   another runner. `probe doctor` checks that the chosen CLI is installed.
+
+3. **The watch loop** (edits mark features stale; a check runs their tests and drafts manifest
+   corrections). Claude Code feeds it through `hooks/hooks.json`. Any other agent feeds it with
+   the same entry points, called from its own hooks, rules or a wrapper script:
+
+   ```bash
+   probe hook edit src/foo.ts src/bar.ts   # after an edit (no files: what changed since the last sweep)
+   probe hook stop                         # end of a turn: prints problems a check found, else starts a check
+   probe hook prompt                       # results that arrived since; --session <id> per agent
+   ```
+
+   They print plain text and never fail. Two ways that need no agent support at all:
+   `probe hooks install` adds a git **pre-commit** hook that marks the staged files' features
+   stale and starts a check in the background (it never blocks a commit; `probe hooks uninstall`
+   removes it), and Studio's **file watcher** checks edits made while Studio is open.
 
 ## What it does
 
@@ -70,7 +108,7 @@ Other agents (Cursor, Codex, Copilot, Gemini CLI): register the MCP server
 | Verify | Diff → features → unit tests → reinstall → cards on device | `verify`, Studio → Verify |
 | Tickets | In: commits/features/cards of a ticket, cards from ticket text. Out: ticket draft of a failed run | `ticket`, Studio → Verify, ⧉ Ticket draft |
 | Fix | Every problem a run found gets **⧉ Fix prompt** (context to paste into any coding agent) and **✦ Fix** (an agent edits the code, then Probe re-runs the unit tests and the card) | `issues`, `fix-prompt`, `fix`; under every run |
-| Watch | While you code: an edit marks its features as edited; at the end of a Claude turn (or 45s after edits in an IDE, while Studio runs) a check runs their unit tests and manifest test links, and drafts manifest/brief corrections for review. Rules only a device card proves are named, with an offer to run their cards. Results go back to the Claude session | `hooks/hooks.json`, `check`, `stale`, Studio → feature |
+| Watch | While you code: an edit marks its features as edited, and an edit in a platform module also marks the areas that depend on it (`watch.impactDepth`, from the build files); at the end of an agent's turn, on a commit (or 45s after edits in an IDE, while Studio runs) a check runs their unit tests and manifest test links, and drafts manifest/brief corrections for review. Rules only a device card proves are named, with an offer to run their cards. Results go back to the agent session | `hooks/hooks.json`, `hook edit\|stop\|prompt`, `hooks install`, `check`, `stale`, Studio → feature |
 | Rules | Each manifest rule lists the unit tests and device cards that prove it; ask whether a rule holds, or run its cards on an emulator by rule | `rules`, `rule --run`, `probe_rule`, `probe_card_run { rule }`, Studio → feature |
 | Stop | Any running run stops: its build or agent is killed, it is saved as `stopped` and never counts toward health | ■ Stop, Ctrl+C in the CLI |
 
@@ -94,11 +132,14 @@ node dist/probe.cjs devices [allow <serial> | avd <name>]
 node dist/probe.cjs check [features] [--no-drafts] | stale | manifest <feature>
 node dist/probe.cjs rules <feature> | rule <feature/rule> [--run] [--device <serial>]
 node dist/probe.cjs drafts [feature] | draft show|approve|reject <id>
+node dist/probe.cjs hook edit [files…] | hook stop | hook prompt [--session <id>]
+node dist/probe.cjs hooks install | uninstall | status
 ```
 
-Agents run on your own Claude Code login and plan. They use `agents.model` from `probe.yaml`
-(default `sonnet`), never your Claude Code default, which may be a model your plan bills from
-usage credits; `--model <name>` overrides it for one run.
+Agents run on your own login and plan for the CLI `agents.runner` names (Claude Code by default,
+or Codex CLI; see [Other agents](#other-agents)). They use `agents.model` from `probe.yaml`
+(Claude Code default `sonnet`), never your own CLI default, which may be a model your plan bills
+from usage credits; `--model <name>` overrides it for one run.
 
 ## Device runs
 
@@ -163,6 +204,43 @@ project is on the base branch itself, on a detached HEAD, or behind its upstream
 the base branch from a list. Probe never checks out, commits or pulls: switching branches stays
 with the person.
 
+## Project types
+
+The first adapter that recognises the project folder wins:
+
+| Adapter | Recognised by | Areas | Unit tests | Devices |
+|---|---|---|---|---|
+| Android/Gradle | `settings.gradle(.kts)` | Gradle modules; `:feature:<name>:*` is one feature | each module's Gradle test task, JUnit XML from `build/test-results` | ✅ emulator or allowed phone |
+| Node/TypeScript | `package.json` | workspaces (`workspaces` or `pnpm-workspace.yaml`), else folders as below | the package manager's `test` script, per workspace when each has one | — |
+| Generic | a `.git` folder or `probe/probe.yaml` | top-level folders with code, and each folder inside `src/`, `lib/`, `packages/`, `apps/`, `services/`… | `unit.command` from `probe.yaml` | — |
+
+Without a build tool to ask, the Node and generic adapters inventory **files**, not classes: a
+file is covered *directly* when a test is named after it (`jobs.test.ts` → `jobs.ts`) and
+*referenced* when a test imports it. Test code is found by convention (`*.test.*`, `*.spec.*`,
+`*_test.*`, `test_*.py`, `*Test.kt`, and anything under `test/`, `tests/`, `__tests__/`,
+`src/test/`); tests in a folder of their own count for every area they import. Results come from
+JUnit XML when `unit.junit` points at it, else from the runner's summary line (node --test, Jest,
+Vitest, pytest, cargo), else from the exit code alone, which counts the command as one test.
+Device features (cards on a device, screen mapping, login checks) are shown as unavailable on
+these projects, and `verify` checks their unit tests only; cards can still be drafted and reviewed.
+
+```yaml
+# probe/probe.yaml, for a project without Gradle (all optional)
+areas: [packages/*, services/*]      # each matching folder is an area
+# areas:                             # or name them
+#   engine: src/engine
+#   web: [web/src, web/public]
+unit:
+  command: npm test                  # pytest, go test ./..., cargo test, ...
+  areas:
+    engine: npx vitest run src/engine  # one area's own command
+  junit: reports/junit.xml           # file or folder; optional
+```
+
+Adding a project type means one adapter implementing `ProjectAdapter`
+(`src/adapters/adapter.ts`), registered in `src/adapters/registry.ts` before the generic one. An
+adapter also names its build-output folders (`ignoredDirs`), which edit tracking skips.
+
 ## App detection (Android)
 
 | Value | Found from |
@@ -206,10 +284,10 @@ tickets:
 ```
 src/
   core/        data model, config, local store, process helpers
-  adapters/    one folder per project type (android-gradle)
+  adapters/    one folder per project type (android-gradle, node, generic)
   engine/      project, scan, health, unit runs, test writing, verify, git history, docs, doctor
   cards/       feature cards: schema, store, context, backfill, card runs, explore
-  agent/       headless Claude Code runner
+  agent/       headless agent runners (Claude Code, Codex CLI) behind one AgentRunner interface
   devices/     adb, UI tree, emulator selection, run sessions, device-run harness (perf, video)
   accounts/    test accounts, machine-local secrets, login check
   tickets/     ticket context in, ticket drafts out
@@ -228,11 +306,12 @@ dist/probe.cjs   bundled build, committed so the plugin runs without npm install
 ```
 npm install
 npm run build      # typecheck + bundle to dist/probe.cjs (commit dist/)
+npm test           # unit tests under test/ (node --test)
 ```
 
 ## Static coverage, by design
 
-The scan judges coverage from source: a class is *direct* when a test class is named after it,
+The scan judges coverage from source (files instead of classes for Node and generic projects): a class is *direct* when a test class is named after it,
 *referenced* when a test uses it, *untested* otherwise. It needs no build and takes seconds on
 a large app. Measured line coverage (Kover/JaCoCo) can be added as an extra layer.
 
@@ -243,4 +322,4 @@ a large app. Measured line coverage (Kover/JaCoCo) can be added as an extra laye
 3. ✅ Agents on an emulator: cards, navigation map, login, performance, video
 4. ✅ `verify`: a change's unit tests and cards end to end
 5. ✅ Writing missing unit tests · tickets in/out · health map
-6. Next: Test Bridge (app-side hooks for state checks) · record/replay · measured coverage · iOS/web adapters · server mode
+6. Next: Test Bridge (app-side hooks for state checks) · record/replay · measured coverage · more adapters (Python, Go, iOS) and device support beyond Android · server mode

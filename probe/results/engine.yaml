@@ -1,0 +1,15 @@
+# Probe results for "engine": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-10-28T14:30:31.099Z
+  run: 20261028-143029
+  commit: 1bf68ffbf0
+  dirty: 42
+  by: Jalil
+  tests: 8
+  failed: 0
+  fingerprint:
+    own:
+      :src:engine: daa7d178a6e5
+    deps: e3b0c44298fc

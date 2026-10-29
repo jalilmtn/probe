@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
-import { configPath } from "../core/config.js";
+import { agentRunner } from "../agent/runners.js";
+import { configPath, type AgentRunnerId } from "../core/config.js";
 import { capture } from "../core/proc.js";
 import type { DoctorCheck } from "../core/types.js";
 import { resolveApp } from "./app.js";
@@ -18,14 +19,7 @@ export function doctor(project: Project | null, error?: string): DoctorCheck[] {
     },
   ];
 
-  const claude = capture("claude", ["--version"]);
-  checks.push({
-    id: "claude",
-    label: "Claude Code CLI",
-    status: claude ? "ok" : "warn",
-    detail: claude ?? "not found (only needed for agent features)",
-    fix: claude ? undefined : "Install Claude Code",
-  });
+  checks.push(agentCliCheck(project?.config.agents.runner));
 
   if (!project) {
     checks.push({ id: "project", label: "Project", status: "fail", detail: error ?? "no supported project found" });
@@ -41,7 +35,8 @@ export function doctor(project: Project | null, error?: string): DoctorCheck[] {
     detail: hasConfig ? "found" : "none yet: defaults and what Probe detects (Studio → Settings writes it when something is changed)",
   });
   const app = resolveApp(project);
-  checks.push({
+  if (!project.adapter.supportsDevices) checks.push({ id: "app", label: "App to test", status: "ok", detail: `none: agents do not run ${project.adapter.label} apps on a device` });
+  else checks.push({
     id: "app",
     label: "App to test",
     status: app.package && app.installTask ? "ok" : app.installTask ? "warn" : "fail",
@@ -57,9 +52,22 @@ export function doctor(project: Project | null, error?: string): DoctorCheck[] {
     status: git?.branch ? "ok" : "warn",
     detail: git ? `${git.branch ?? "detached HEAD"} @ ${git.commit}${git.dirty ? ` + ${git.dirty} uncommitted` : ""}` : "not a git repository",
   });
-  checks.push(...project.adapter.doctor(project.root));
+  checks.push(...project.adapter.doctor(project.root, project.config));
   checks.push({ id: "store", label: "Local results", status: "ok", detail: project.store.dir });
   return checks;
+}
+
+/** The CLI `agents.runner` names, which every Probe agent job runs on. */
+export function agentCliCheck(runnerId: AgentRunnerId | undefined, version = (cmd: string, args: string[]) => capture(cmd, args)): DoctorCheck {
+  const runner = agentRunner(runnerId);
+  const found = version(runner.command, runner.versionArgs);
+  return {
+    id: "agent-cli",
+    label: `Agent CLI (${runner.id})`,
+    status: found ? "ok" : "warn",
+    detail: found ? `${runner.label} ${found}` : `${runner.command} not found (only needed for agent features: cards, device runs, test writing)`,
+    fix: found ? undefined : `${runner.installHint}, or set agents.runner in probe/probe.yaml or Studio → Settings`,
+  };
 }
 
 export function formatDoctor(checks: DoctorCheck[]): string {

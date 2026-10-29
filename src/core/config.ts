@@ -14,11 +14,24 @@ export interface ProbeConfig {
   };
   /** Feature ids or module ids (prefix match) to leave out of scans and runs. */
   exclude: string[];
+  /**
+   * Areas of a project without a build tool Probe knows (generic and Node adapters): a list of
+   * folder globs, each matching folder its own area (`[packages/*, services/*]`), or area name
+   * to glob(s) (`{ engine: src/engine, web: [web/src, web/public] }`). Unset: top-level folders,
+   * and the folders inside `src/`, `lib/`, `packages/`, `apps/` and the like.
+   */
+  areas?: string[] | Record<string, string | string[]>;
   unit: {
     /** Unit test task for Android modules. */
     androidTask: string;
     /** Unit test task for plain JVM modules. */
     jvmTask: string;
+    /** Shell command that runs the unit tests (generic and Node adapters), e.g. `npm test`, `pytest`, `go test ./...`. */
+    command?: string;
+    /** Area id to the command that runs only that area's tests; areas not listed use `command`. */
+    areas?: Record<string, string>;
+    /** JUnit XML the command writes (file or folder, relative to the project). Unset: results come from the output and exit code. */
+    junit?: string;
   };
   app: {
     /** Package agents test, e.g. the debug build's application id. */
@@ -53,10 +66,13 @@ export interface ProbeConfig {
     fileCommand?: string;
   };
   agents: {
+    /** The coding-agent CLI every Probe agent runs on: Claude Code (default) or Codex CLI. */
+    runner: AgentRunnerId;
     /**
      * Model for every Probe agent (cards, device runs, test writing), unless a run names one.
-     * Fixed rather than inherited: the user's own Claude Code default may be a model their plan
-     * bills from usage credits, which would fail every background run.
+     * Fixed rather than inherited for Claude Code: the user's own default may be a model their
+     * plan bills from usage credits, which would fail every background run. Empty means the
+     * runner's own default (Codex: the model in the user's ~/.codex/config.toml).
      */
     model: string;
   };
@@ -71,6 +87,11 @@ export interface ProbeConfig {
     drafts: boolean;
     /** At most this many features per check; a wider change leaves the rest stale for a manual check. */
     maxFeatures: number;
+    /**
+     * How far an edit in a platform module reaches: 1 marks the areas that depend on it directly
+     * as stale, 2 their dependents too, 0 only the area that owns the file.
+     */
+    impactDepth: number;
   };
   /** Per machine, from the local settings file — never from the shared probe.yaml. */
   devices: {
@@ -79,6 +100,17 @@ export interface ProbeConfig {
     /** Real phones agents may use. A phone usually carries someone's own accounts. */
     allowReal: string[];
   };
+}
+
+/** Coding-agent CLIs Probe can run its agents on. */
+export const AGENT_RUNNERS = ["claude", "codex"] as const;
+export type AgentRunnerId = (typeof AGENT_RUNNERS)[number];
+
+/** The model a runner uses when nobody chose one. A model name only means something to its own CLI. */
+export const RUNNER_DEFAULT_MODEL: Record<AgentRunnerId, string> = { claude: "sonnet", codex: "" };
+
+export function isAgentRunner(value: unknown): value is AgentRunnerId {
+  return AGENT_RUNNERS.includes(value as AgentRunnerId);
 }
 
 export const CONFIG_DIR = "probe";
@@ -94,8 +126,8 @@ const DEFAULTS: ProbeConfig = {
   verify: { cards: "approved", maxCards: 10 },
   perf: { maxStartupMs: 4000, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
-  agents: { model: "sonnet" },
-  watch: { enabled: true, drafts: true, maxFeatures: 3 },
+  agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
+  watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
   devices: { allowReal: [] },
 };
 
@@ -112,20 +144,32 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
     name: raw.name,
     features: { roots: raw.features?.roots ?? DEFAULTS.features.roots },
     exclude: raw.exclude ?? [],
+    areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
     app: { ...raw.app },
     verify: { ...DEFAULTS.verify, ...raw.verify },
     perf: { ...DEFAULTS.perf, ...raw.perf },
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
-    // This machine's choice wins over the team's: each developer's plan decides which models they can use.
-    agents: { ...DEFAULTS.agents, ...raw.agents, ...local.agents },
+    agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] },
   };
 }
 
+/**
+ * This machine's choice wins over the team's: each developer's plan decides which CLI and models
+ * they can use. A model belongs to its runner, so a team model is dropped when this machine
+ * switches to another runner.
+ */
+export function resolveAgents(team: Partial<ProbeConfig["agents"]> | undefined, machine: Partial<ProbeConfig["agents"]> | undefined): ProbeConfig["agents"] {
+  const teamRunner = isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner;
+  const runner = isAgentRunner(machine?.runner) ? machine.runner : teamRunner;
+  const model = machine?.model ?? (runner === teamRunner ? team?.model : undefined) ?? RUNNER_DEFAULT_MODEL[runner];
+  return { runner, model: String(model ?? "") };
+}
+
 /** What a machine may set for itself, in `<store>/local.yaml`. */
-export type LocalSettings = Partial<Pick<ProbeConfig, "devices" | "agents">>;
+export type LocalSettings = Partial<Pick<ProbeConfig, "devices">> & { agents?: Partial<ProbeConfig["agents"]> };
 
 function readLocal(localDir: string): LocalSettings {
   const file = join(localDir, LOCAL_CONFIG_FILE);
@@ -139,16 +183,57 @@ export function saveLocal(localDir: string, patch: LocalSettings): void {
   writeFileSync(join(localDir, LOCAL_CONFIG_FILE), stringify(merged));
 }
 
+export function readLocalAgents(localDir: string): LocalSettings["agents"] {
+  return readLocal(localDir).agents;
+}
+
+/**
+ * This machine's agent settings after a change from Studio, or an error message. `runner`: a
+ * runner id, or ""/null for the team's. `model`: a name, or "" for the default. Switching runner
+ * without naming a model drops the old one: a model name only means something to its own CLI.
+ */
+export function localAgents(current: LocalSettings["agents"], change: { runner?: string | null; model?: string }): LocalSettings["agents"] | string {
+  const next: Partial<ProbeConfig["agents"]> = { ...current };
+  if (change.runner !== undefined) {
+    const runner = change.runner?.trim() || undefined;
+    if (runner !== undefined && !isAgentRunner(runner)) return `Runner: one of ${AGENT_RUNNERS.join(", ")}`;
+    if (runner !== current?.runner && change.model === undefined) delete next.model;
+    if (runner) next.runner = runner;
+    else delete next.runner;
+  }
+  if (change.model !== undefined) {
+    const model = change.model.trim();
+    if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return "Model: a name the runner's --model accepts, e.g. sonnet";
+    if (model) next.model = model;
+    else delete next.model;
+  }
+  return Object.keys(next).length ? next : undefined;
+}
+
 export function saveLocalDevices(localDir: string, devices: ProbeConfig["devices"]): void {
   saveLocal(localDir, { devices });
 }
 
+export type SettingSource = "machine" | "project" | "default";
+
 /** Where the agent model in effect comes from, for Studio. */
-export function agentModelSource(root: string, localDir: string): "machine" | "project" | "default" {
-  if (readLocal(localDir).agents?.model) return "machine";
+export function agentModelSource(root: string, localDir: string): SettingSource {
+  const local = readLocal(localDir).agents;
+  if (local?.model) return "machine";
+  const team = readRaw(root).agents;
+  const switched = isAgentRunner(local?.runner) && local.runner !== (isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner);
+  return team?.model && !switched ? "project" : "default";
+}
+
+/** Where the agent runner in effect comes from, for Studio. */
+export function agentRunnerSource(root: string, localDir: string): SettingSource {
+  if (isAgentRunner(readLocal(localDir).agents?.runner)) return "machine";
+  return isAgentRunner(readRaw(root).agents?.runner) ? "project" : "default";
+}
+
+function readRaw(root: string): Partial<ProbeConfig> {
   const file = configPath(root);
-  const raw = (existsSync(file) ? (parse(readFileSync(file, "utf8")) ?? {}) : {}) as Partial<ProbeConfig>;
-  return raw.agents?.model ? "project" : "default";
+  return (existsSync(file) ? (parse(readFileSync(file, "utf8")) ?? {}) : {}) as Partial<ProbeConfig>;
 }
 
 export const CONFIG_TEMPLATE = `# Probe settings for this project. Everything here is optional.
@@ -168,6 +253,19 @@ exclude: []
 unit:
   androidTask: testDebugUnitTest
   jvmTask: test
+  # Projects without Gradle: the command that runs the unit tests, optionally per area,
+  # and where it writes JUnit XML (else results come from its output and exit code).
+  # command: npm test
+  # areas:
+  #   engine: npx vitest run src/engine
+  # junit: reports/junit.xml
+
+# Areas of a project without Gradle (default: top-level folders and those inside src/,
+# lib/, packages/, apps/...). A list makes each matching folder an area; a map names them.
+# areas: [packages/*, services/*]
+# areas:
+#   engine: src/engine
+#   web: [web/src, web/public]
 
 # The app agents test on a device.
 app:
@@ -177,8 +275,12 @@ app:
 # Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
 # probe/hints/accounts.yaml; passwords stay encrypted on each machine).
 
-# Model for Probe's background agents (any name claude --model accepts).
+# Probe's background agents: the coding-agent CLI they run on and its model.
+# runner: claude (Claude Code, default) or codex (Codex CLI). Each machine can override both
+# in Studio -> Settings. A model is a name that runner's --model accepts; leave it out for
+# the runner's default (claude: sonnet, codex: your ~/.codex/config.toml model).
 agents:
+  runner: claude
   model: sonnet
 
 # probe verify: what a change is checked against.
@@ -199,6 +301,7 @@ watch:
   enabled: true
   drafts: true         # an agent drafts manifest and brief corrections for review
   maxFeatures: 3
+  impactDepth: 1       # a platform edit marks the areas depending on it stale; 2 reaches theirs, 0 is off
 
 tickets:
   # pattern: 'PROJ-\\d+'
@@ -218,7 +321,7 @@ export interface ProjectPatch {
   verify?: { base?: string | null; cards?: "approved" | "all"; maxCards?: number };
   perf?: { maxStartupMs?: number; maxJankyPct?: number; maxP90Ms?: number; maxMemoryMb?: number | null };
   tickets?: { pattern?: string | null; url?: string | null; fileCommand?: string | null };
-  agents?: { model?: string | null };
+  agents?: { runner?: AgentRunnerId | null; model?: string | null };
 }
 
 /**

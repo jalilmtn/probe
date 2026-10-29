@@ -1,6 +1,8 @@
 import { listAccounts, Secrets } from "../accounts/accounts.js";
 import { listCards } from "../cards/store.js";
-import { agentModelSource, configPath, loadConfig, saveLocal, saveProject, type ProjectPatch } from "../core/config.js";
+import { agentRunner, allRunners } from "../agent/runners.js";
+import { agentModelSource, agentRunnerSource, configPath, loadConfig, saveLocal, saveProject, type ProjectPatch } from "../core/config.js";
+import { devicesUnsupported } from "../adapters/adapter.js";
 import { Adb } from "../devices/adb.js";
 import { listDevices } from "../devices/android.js";
 import { listAvds } from "../devices/select.js";
@@ -12,21 +14,37 @@ import { existsSync } from "node:fs";
 /** Everything Studio's Project settings show: what Probe found, what is set, and where each value came from. */
 export function projectSettings(project: Project) {
   const c = project.config;
-  const devices = listDevices(Adb.forProject(project.root));
+  // No adb or emulator to ask on a project whose app cannot run on a device.
+  const supported = project.adapter.supportsDevices;
+  const devices = supported ? listDevices(Adb.forProject(project.root)) : [];
   return {
     configFile: existsSync(configPath(project.root)),
     app: resolveApp(project),
     appSet: c.app,
     devices: {
+      supported,
+      unsupported: supported ? null : devicesUnsupported(project.adapter),
       avd: c.devices.avd ?? null,
       allowReal: c.devices.allowReal,
-      avds: listAvds(project.root),
+      avds: supported ? listAvds(project.root) : [],
       connected: devices,
     },
     verify: { ...c.verify, base: c.verify.base ?? null, defaultBase: defaultBase(project.root, c.verify.base) },
     perf: c.perf,
     tickets: c.tickets,
-    agents: { model: c.agents.model, source: agentModelSource(project.root, project.store.dir) },
+    agents: agentSettings(project),
+  };
+}
+
+/** The agent runner and model in effect, where each comes from, and the runners to choose from. */
+export function agentSettings(project: Project) {
+  const { runner, model } = project.config.agents;
+  return {
+    runner,
+    runnerSource: agentRunnerSource(project.root, project.store.dir),
+    model,
+    source: agentModelSource(project.root, project.store.dir),
+    runners: allRunners().map((r) => ({ id: r.id, label: r.label, models: r.models })),
   };
 }
 
@@ -82,6 +100,57 @@ export interface SetupItem {
 
 /** What a new project still needs before agents can test it, each with where to fix it. */
 export function setupChecklist(project: Project): SetupItem[] {
+  const items: SetupItem[] = project.adapter.supportsDevices
+    ? appAndDevice(project)
+    : [{ id: "device", label: "Device testing", status: "warn", detail: devicesUnsupported(project.adapter) }];
+
+  // Test accounts are for agents logging into the app on a device.
+  const secrets = new Secrets(project.store.dir);
+  const accounts = listAccounts(project.root);
+  const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
+  if (project.adapter.supportsDevices) items.push({
+    id: "accounts",
+    label: "Test account",
+    status: withPassword.length ? "ok" : "warn",
+    detail: withPassword.length
+      ? withPassword.map((a) => a.role).join(", ")
+      : accounts.length
+        ? `${accounts.map((a) => a.role).join(", ")}: no password on this machine yet`
+        : "None yet. Agents can only test screens that need no login.",
+    action: { label: "Add an account", tab: "settings" },
+  });
+
+  items.push({
+    id: "model",
+    label: "Agent model",
+    status: "ok",
+    detail: `${agentRunner(project.config.agents.runner).label} · ${project.config.agents.model || "its default model"} (${agentModelSource(project.root, project.store.dir) === "default" ? "default" : "set"}) · use Test on my plan to check it works`,
+    action: { label: "Settings", tab: "settings" },
+  });
+
+  const cards = listCards(project.root);
+  items.push({
+    id: "cards",
+    label: "Feature cards",
+    status: cards.some((c) => c.status === "approved") ? "ok" : "warn",
+    detail: cards.length
+      ? `${cards.length} cards, ${cards.filter((c) => c.status === "approved").length} approved${cards.some((c) => c.status === "approved") ? "" : ". Verify runs approved cards only: review drafts in Cards."}`
+      : "None yet. Open a feature in Atlas and press Generate cards.",
+    action: { label: cards.length ? "Review cards" : "Atlas", tab: cards.length ? "cards" : "atlas" },
+  });
+
+  const git = gitState(project.root);
+  items.push({
+    id: "git",
+    label: "Branch",
+    status: !git ? "warn" : git.branch ? "ok" : "warn",
+    detail: !git ? "Not a git repository: verify and tickets need git." : git.branch ? `${git.branch} @ ${git.commit}` : `detached HEAD @ ${git.commit}`,
+  });
+  return items;
+}
+
+/** The app agents test and the emulator they test it on. */
+function appAndDevice(project: Project): SetupItem[] {
   const items: SetupItem[] = [];
   const app = resolveApp(project);
   items.push({
@@ -110,48 +179,6 @@ export function setupChecklist(project: Project): SetupItem[] {
         ? `${avd} starts when a run needs it${project.config.devices.avd ? "" : " (first image on this machine)"}`
         : "No emulator image on this machine. Create one in Android Studio → Device Manager (x86_64, API 34+).",
     action: { label: "Choose emulator", tab: "settings" },
-  });
-
-  const secrets = new Secrets(project.store.dir);
-  const accounts = listAccounts(project.root);
-  const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
-  items.push({
-    id: "accounts",
-    label: "Test account",
-    status: withPassword.length ? "ok" : "warn",
-    detail: withPassword.length
-      ? withPassword.map((a) => a.role).join(", ")
-      : accounts.length
-        ? `${accounts.map((a) => a.role).join(", ")}: no password on this machine yet`
-        : "None yet. Agents can only test screens that need no login.",
-    action: { label: "Add an account", tab: "settings" },
-  });
-
-  items.push({
-    id: "model",
-    label: "Agent model",
-    status: "ok",
-    detail: `${project.config.agents.model} (${agentModelSource(project.root, project.store.dir) === "default" ? "default" : "set"}) · use Test on my plan to check it works`,
-    action: { label: "Settings", tab: "settings" },
-  });
-
-  const cards = listCards(project.root);
-  items.push({
-    id: "cards",
-    label: "Feature cards",
-    status: cards.some((c) => c.status === "approved") ? "ok" : "warn",
-    detail: cards.length
-      ? `${cards.length} cards, ${cards.filter((c) => c.status === "approved").length} approved${cards.some((c) => c.status === "approved") ? "" : ". Verify runs approved cards only: review drafts in Cards."}`
-      : "None yet. Open a feature in Atlas and press Generate cards.",
-    action: { label: cards.length ? "Review cards" : "Atlas", tab: cards.length ? "cards" : "atlas" },
-  });
-
-  const git = gitState(project.root);
-  items.push({
-    id: "git",
-    label: "Branch",
-    status: !git ? "warn" : git.branch ? "ok" : "warn",
-    detail: !git ? "Not a git repository: verify and tickets need git." : git.branch ? `${git.branch} @ ${git.commit}` : `detached HEAD @ ${git.commit}`,
   });
   return items;
 }

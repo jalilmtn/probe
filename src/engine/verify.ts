@@ -68,6 +68,8 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
   const base = options.base ?? defaultBase(project.root, project.config.verify.base);
   if (!base && !options.features?.length && !options.ticket && !options.outdated) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
 
+  // A project whose app cannot run on a device is verified by its unit tests alone.
+  const noDevice = options.noDevice || !project.adapter.supportsDevices;
   const run: VerifyRun = {
     id: newRunId(),
     kind: "verify",
@@ -78,7 +80,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
     changed: [],
     unowned: [],
     features: [],
-    device: !options.noDevice,
+    device: !noDevice,
     costUsd: 0,
   };
 
@@ -92,7 +94,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
       const wanted = result.features.filter((f) => {
         const unitOld = f.stats.testFiles > 0 && overview.unit.get(f.id)?.state !== "fresh";
         const cardsOld = pickCards(listCards(project.root, f.id), which).some((c) => overview.cards.get(`${f.id}/${c.id}`)?.state !== "fresh");
-        return (!options.features?.length || options.features.includes(f.id)) && (unitOld || (!options.noDevice && cardsOld));
+        return (!options.features?.length || options.features.includes(f.id)) && (unitOld || (!noDevice && cardsOld));
       });
       targets = new Map(wanted.map((f) => [f.id, []]));
       log(`${targets.size} features have outdated or missing results`);
@@ -138,7 +140,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
       log(`${f.feature}: unit ${finished.status}`);
     }
 
-    if (!options.noDevice) {
+    if (!noDevice) {
       let budget = options.maxCards ?? project.config.verify.maxCards;
       let first = true;
       for (const f of run.features) {

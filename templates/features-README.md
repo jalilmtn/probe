@@ -4,6 +4,11 @@ One file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id
 uses (`call`, `universe`, `chat`, ...). Together they are the feature index: agents list
 this folder and reads each `summary`, so there is no separate index file to fall out of date.
 
+Shared code gets a manifest too. A **platform area** is what the scan groups outside the feature
+folders (`core:database`, `common:image`, `app`): code features build on rather than a screen a
+user opens. Its manifest has the same shape with `kind: platform`, and a `:` in its id becomes
+`__` in the file name (`core:database` → `core__database.yaml`), since Windows allows no `:`.
+
 Each feature has three layers:
 
 | Layer | Where | Answers | Read by |
@@ -18,6 +23,7 @@ The manifest never repeats the brief. It points into it.
 
 ```yaml
 id: call                      # Probe feature id; must match the scan
+kind: feature                 # feature (the default) or platform
 name: Calling                 # display name
 summary: >-                   # one or two lines, from the user's point of view
   ...
@@ -72,10 +78,24 @@ device_only:                  # checks no unit test can make; candidates for car
 - `paths` decide ownership when the edit hook asks "which feature did this file touch?". A file
   matched by two features' `paths` belongs to both; `related` only marks a feature stale.
 
+### Platform areas
+
+A `kind: platform` manifest states the contract shared code keeps for the code built on it:
+
+- `summary` says what it provides to that code; `flows` are what that code does with it (the
+  calls or services it offers), not screens.
+- `invariants` are proven by **unit tests**. Cards stay optional: give one only to a rule no unit
+  test can reach (real hardware, the OS). `probe init` drafts cards for a platform area only when
+  you name it (`probe init --step cards --features core:database`).
+- Do not list the areas that use it under `related`. Probe reads the module graph from the build
+  files: an edit in a platform module marks every area that depends on it directly as stale too
+  (`watch.impactDepth` in `probe.yaml`: 2 reaches their dependents as well, 0 turns it off).
+  `related` is still the way to name a dependency the build files do not show.
+
 ### Derived fields
 
-Modules, classes, test files and coverage are not written here. Probe's scan derives them from the
-code on every run, so they cannot go stale. Do not add them by hand.
+Modules, classes, test files, coverage and who depends on whom are not written here. Probe's scan
+derives them from the code on every run, so they cannot go stale. Do not add them by hand.
 
 ## Brief format
 
@@ -95,7 +115,8 @@ The rest of the doc stays as the team writes it. A feature with no doc yet has n
 
 ## Keeping it current
 
-When code under a feature's `paths` changes, the feature is stale. Whoever changed it, or Probe's
+When code under a feature's `paths` changes, the feature is stale; so is every area that depends
+on an edited platform module. Whoever changed it, or Probe's
 check, then confirms:
 
 1. Every `covered_by` test still exists under that exact name.

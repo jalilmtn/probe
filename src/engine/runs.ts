@@ -11,6 +11,8 @@ interface LiveRun {
   stop: AbortController;
   events: EventEmitter;
   log: string[];
+  /** Started by another run (verify -> unit and card runs), not by a person. */
+  child: boolean;
 }
 
 /** Runs of this process, so Studio can attach to one that is already going. */
@@ -19,6 +21,17 @@ const live = new Map<string, LiveRun>();
 export function liveRun(id: string): LiveRun | undefined {
   return live.get(id);
 }
+
+/** Runs of this process that are still going, oldest first. */
+export function runningRuns(): { run: Run; child: boolean }[] {
+  return [...live.values()]
+    .filter((e) => e.run.status === "running")
+    .map(({ run, child }) => ({ run, child }))
+    .sort((a, b) => a.run.startedAt.localeCompare(b.run.startedAt));
+}
+
+/** How long a finished run stays in memory; after that its saved record answers for it. */
+const FINISHED_KEPT_MS = 10 * 60_000;
 
 /**
  * Stops a running run of this process: its build or agent is killed and it ends as "stopped".
@@ -45,8 +58,9 @@ export function launchRun<R extends Run>(
   if (git) run.git = { branch: git.branch, commit: git.commit, dirty: git.dirty };
   const stop = new AbortController();
   // A run started by another (verify -> card runs) stops when its parent does.
-  runSignal.getStore()?.addEventListener("abort", () => stop.abort(), { once: true });
-  const entry: LiveRun = { run, stop, events: new EventEmitter(), log: [] };
+  const parent = runSignal.getStore();
+  parent?.addEventListener("abort", () => stop.abort(), { once: true });
+  const entry: LiveRun = { run, stop, events: new EventEmitter(), log: [], child: parent !== undefined };
   live.set(run.id, entry);
   const log = (line: string) => {
     entry.log.push(line);
@@ -71,6 +85,7 @@ export function launchRun<R extends Run>(
     run.finishedAt = new Date().toISOString();
     project.store.writeRun(run.id, { ...run, log: entry.log.slice(-400) });
     entry.events.emit("event", { type: "done", run } satisfies RunEvent);
+    setTimeout(() => live.get(run.id) === entry && live.delete(run.id), FINISHED_KEPT_MS).unref();
     return run;
   })();
 

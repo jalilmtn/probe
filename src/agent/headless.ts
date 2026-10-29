@@ -1,109 +1,32 @@
 import { rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { stream } from "../core/proc.js";
 import type { Project } from "../engine/project.js";
+import type { AgentLaunch, AgentResult, AgentTask, McpServerSpec, ModelCheck } from "./runner.js";
+import { agentRunner } from "./runners.js";
 
-export interface AgentTask {
-  prompt: string;
-  /** Probe MCP tool names (without prefix) the agent may call. */
-  probeTools: string[];
-  /** Read-only built-in tools are allowed by default; nothing that edits or runs commands. */
-  builtinTools?: string[];
-  model?: string;
-  /** Extra environment for the agent's Probe MCP server, e.g. the device session. */
-  mcpEnv?: Record<string, string>;
-  /** Lets the agent create and edit files (writing unit tests). It still never runs commands. */
-  allowEdits?: boolean;
-  /** Folder the agent works in; the project by default. */
-  cwd?: string;
-  /** More folders the agent may read, e.g. the project when it works in a scratch folder. */
-  addDirs?: string[];
-  /**
-   * Lets the agent edit only files matching these permission patterns (`./**` = its own folder).
-   * Everything else stays read-only, unlike allowEdits.
-   */
-  editOnly?: string[];
-}
-
-export interface AgentResult {
-  ok: boolean;
-  summary: string;
-  costUsd: number;
-  turns: number;
-}
+export type { AgentResult, AgentTask } from "./runner.js";
 
 /**
- * Runs Claude Code headless (`claude -p`) in the project, with this Probe build as its only
- * MCP server. It uses the user's own Claude Code login, so there is no API key to manage.
+ * Runs one Probe agent headless in the project, on the coding-agent CLI `agents.runner` names
+ * (Claude Code by default), with this Probe build as its MCP server. It uses the user's own login
+ * for that CLI, so there is no API key to manage. Stopping the run (`runSignal`) kills it.
  */
 export async function runAgent(project: Project, task: AgentTask, log: (line: string) => void): Promise<AgentResult> {
-  // One config per agent: two agents running at once must not share a session.
-  const mcpConfig = join(project.store.dir, `agent-mcp-${process.pid}-${Date.now()}.json`);
-  writeFileSync(
-    mcpConfig,
-    JSON.stringify({
-      mcpServers: {
-        probe: { command: process.execPath, args: [resolve(process.argv[1]!), "mcp"], env: { PROBE_PROJECT: project.root, ...task.mcpEnv } },
-      },
-    }),
+  const runner = agentRunner(project.config.agents.runner);
+  const launch = runner.launch({
+    task,
+    model: task.model ?? project.config.agents.model,
+    mcp: probeMcpServer(project, task.mcpEnv),
+    scratchDir: project.store.dir,
+    // Two agents running at once must not share a config file.
+    id: `${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  });
+  const parser = runner.parser();
+  const exitCode = await withFiles(launch, () =>
+    stream(launch.command, launch.args, task.cwd ?? project.root, (line) => parser.line(line).forEach(log), { input: launch.input, env: launch.env }),
   );
-
-  const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
-  const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
-  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...(task.allowEdits ? ["Edit", "Write"] : []), ...scoped];
-  // A denied tool beats any allowed pattern, so scoped edits leave Edit and Write off this list.
-  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...(task.allowEdits || scoped.length ? [] : ["Edit", "Write"])];
-  const args = [
-    "-p",
-    "--output-format",
-    "stream-json",
-    "--verbose",
-    "--mcp-config",
-    mcpConfig,
-    "--strict-mcp-config",
-    "--allowedTools",
-    allowed.join(","),
-    "--disallowedTools",
-    denied.join(","),
-    ...(task.addDirs ?? []).flatMap((d) => ["--add-dir", d]),
-  ];
-  // Always explicit: without it the agent inherits the user's Claude Code default model.
-  args.push("--model", task.model ?? project.config.agents.model);
-
-  // A nested Claude Code refuses to start when it thinks it is inside another session.
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
-  delete env.CLAUDE_CODE_ENTRYPOINT;
-
-  let result: AgentResult = { ok: false, summary: "Agent ended without a result.", costUsd: 0, turns: 0 };
-  let exitCode: number;
-  try {
-  exitCode = await stream(
-    "claude",
-    args,
-    task.cwd ?? project.root,
-    (line) => {
-      const event = parseEvent(line);
-      if (!event) {
-        if (line.trim()) log(line);
-        return;
-      }
-      for (const text of describe(event)) log(text);
-      if (event.type === "result") {
-        result = {
-          ok: event.subtype === "success" && !event.is_error,
-          summary: String(event.result ?? event.subtype ?? ""),
-          costUsd: Number(event.total_cost_usd ?? 0),
-          turns: Number(event.num_turns ?? 0),
-        };
-      }
-    },
-    { input: task.prompt, env },
-  );
-  } finally {
-    // Also when the run is stopped mid-way.
-    rmSync(mcpConfig, { force: true });
-  }
+  const result = parser.result();
   if (exitCode !== 0 && result.ok) result.ok = false;
   return result;
 }
@@ -112,62 +35,29 @@ export async function runAgent(project: Project, task: AgentTask, log: (line: st
  * One tiny prompt on `model` with the user's login, to see whether their plan can run it
  * before a long run fails on "out of usage credits".
  */
-export async function checkModel(project: Project, model: string): Promise<{ ok: boolean; model: string; message: string; costUsd: number }> {
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
-  delete env.CLAUDE_CODE_ENTRYPOINT;
+export async function checkModel(project: Project, model: string): Promise<ModelCheck> {
+  const runner = agentRunner(project.config.agents.runner);
+  const launch = runner.checkLaunch(model);
   let out = "";
-  await stream("claude", ["-p", "--model", model, "--output-format", "json", "--max-turns", "1", "--strict-mcp-config"], project.root, (l) => (out += l), {
-    input: "Reply with the single word OK.",
-    env,
-  });
   try {
-    const r = JSON.parse(out.slice(out.indexOf("{"))) as { result?: string; is_error?: boolean; total_cost_usd?: number; modelUsage?: Record<string, unknown> };
-    const text = String(r.result ?? "").trim();
-    const used = Object.keys(r.modelUsage ?? {})[0] ?? model;
-    // A plan limit comes back as a normal "result" whose text is the limit message.
-    const limited = /usage credits|usage limit|out of .*credits|rate limit/i.test(text);
-    return { ok: !r.is_error && !limited, model: used, message: text.slice(0, 300), costUsd: Number(r.total_cost_usd ?? 0) };
-  } catch {
-    return { ok: false, model, message: out.slice(0, 300) || "claude did not answer", costUsd: 0 };
+    await withFiles(launch, () => stream(launch.command, launch.args, project.root, (l) => (out += `${l}\n`), { input: launch.input, env: launch.env }));
+  } catch (e) {
+    return { ok: false, model, message: `${runner.label} did not start: ${(e as Error).message}`, costUsd: 0 };
   }
+  return runner.parseCheck(out, model);
 }
 
-// stream-json events are loosely typed on purpose: only a few fields are read.
-type StreamEvent = { type: string; subtype?: string; [key: string]: unknown };
+/** This Probe build as an MCP server for the project. */
+export function probeMcpServer(project: Project, extraEnv: Record<string, string> = {}): McpServerSpec {
+  return { command: process.execPath, args: [resolve(process.argv[1]!), "mcp"], env: { PROBE_PROJECT: project.root, ...extraEnv } };
+}
 
-function parseEvent(line: string): StreamEvent | null {
-  if (!line.startsWith("{")) return null;
+async function withFiles<T>(launch: AgentLaunch, work: () => Promise<T>): Promise<T> {
+  for (const f of launch.files) writeFileSync(f.path, f.content);
   try {
-    return JSON.parse(line) as StreamEvent;
-  } catch {
-    return null;
+    return await work();
+  } finally {
+    // Also when the run is stopped mid-way.
+    for (const f of launch.files) rmSync(f.path, { force: true });
   }
-}
-
-/** Turns agent events into short log lines for Studio and the terminal. */
-function describe(event: StreamEvent): string[] {
-  if (event.type === "system" && event.subtype === "init") return [`agent started (${String(event.model ?? "default model")})`];
-  if (event.type === "assistant") {
-    const content = ((event.message as { content?: unknown[] })?.content ?? []) as { type: string; text?: string; name?: string; input?: Record<string, unknown> }[];
-    return content.flatMap((c) => {
-      if (c.type === "text" && c.text?.trim()) return [`💬 ${c.text.trim().replace(/\s+/g, " ").slice(0, 300)}`];
-      if (c.type === "tool_use") return [`→ ${String(c.name).replace(/^mcp__probe__/, "")} ${toolArg(c.input)}`];
-      return [];
-    });
-  }
-  if (event.type === "result") {
-    return [`agent finished: ${event.subtype} · ${event.num_turns ?? "?"} turns · $${Number(event.total_cost_usd ?? 0).toFixed(3)}`];
-  }
-  return [];
-}
-
-function toolArg(input: Record<string, unknown> | undefined): string {
-  if (!input) return "";
-  if (input.action) return [input.action, input.element ?? input.text ?? input.key ?? input.direction ?? ""].join(" ").trim();
-  if (input.result) return String(input.result);
-  const first = input.file_path ?? input.pattern ?? input.path ?? input.feature ?? input.role;
-  if (first !== undefined) return String(first).slice(0, 120);
-  if (Array.isArray(input.cards)) return `(${input.cards.length} cards)`;
-  return "";
 }

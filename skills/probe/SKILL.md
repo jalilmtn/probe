@@ -35,6 +35,11 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 
 Always pass `projectDir` as the current working directory.
 
+A "background agent" is a separate headless coding agent Probe starts, on the CLI
+`agents.runner` names (Claude Code by default, or Codex CLI), with the user's own login for it;
+it costs their plan and takes minutes. Whichever agent you are, you can do the same work yourself
+with the other tools, which is usually better when you can.
+
 ## Setup
 
 A project needs none. Probe detects the app (module, install task, application id), an emulator
@@ -60,10 +65,16 @@ cards, say so: the change was not checked on a device.
 
 ## Keeping features current
 
-The plugin's hooks run on their own: an Edit or Write marks the features the file belongs to as
-edited (instant, no build), and when you end a turn a check starts in the background. When it
-finds failing tests or broken manifest links, they come back to you once: at the end of the turn
-or with the user's next message. Fix them before going on, or say why they are expected.
+An edit marks the features the file belongs to as edited (instant, no build), and when you end a
+turn a check starts in the background. When it finds failing tests or broken manifest links,
+they come back to you once: at the end of the turn or with the user's next message. Fix them
+before going on, or say why they are expected.
+
+Where your agent has hooks wired to Probe (the Claude Code plugin does this itself), all of that
+runs on its own. Otherwise feed it yourself: after editing files run `probe hook edit <files…>`,
+and at the end of your turn `probe hook stop`, which prints any problems a finished check found
+(else starts a check). `probe hook prompt` prints results that arrived since. A git pre-commit
+hook (`probe hooks install`) and Studio's file watcher also mark edits, with no agent involved.
 
 A feature with a manifest (`probe/features/<id>.yaml`, format in `probe/features/README.md`)
 also gets an agent-drafted correction to its manifest and brief after a change. It is never

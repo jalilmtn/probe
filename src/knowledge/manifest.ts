@@ -3,14 +3,18 @@ import { basename, join } from "node:path";
 import { parse } from "yaml";
 import { listCards } from "../cards/store.js";
 import { capture } from "../core/proc.js";
+import { isTestPath, SOURCE_EXT, stemOf, testNamesIn } from "../core/testfiles.js";
 
 /**
  * What a team writes down about one feature, in `probe/features/<id>.yaml`: the code it owns,
  * what a user can do with it, and the rules that must hold, each tied to the test that proves it.
  * Modules, classes and coverage are not in here: the scan derives those from the code.
+ * A platform area (shared code such as `core:database`) has a manifest of the same shape.
  */
 export interface FeatureManifest {
   id: string;
+  /** A product feature, or a platform area other code builds on. Unset reads as "feature". */
+  kind: ManifestKind;
   name?: string;
   summary?: string;
   owner?: string | null;
@@ -42,10 +46,22 @@ export interface Invariant {
   gap?: string | null;
 }
 
+export type ManifestKind = "feature" | "platform";
+export const MANIFEST_KINDS: readonly ManifestKind[] = ["feature", "platform"];
+
 export const FEATURES_DIR = "probe/features";
 
+/**
+ * Platform ids contain ":" (`core:database`), which no Windows file name may: it becomes "__",
+ * as in card folders and result ledgers.
+ */
 export function manifestFile(id: string): string {
-  return `${FEATURES_DIR}/${id}.yaml`;
+  return `${FEATURES_DIR}/${id.replace(/:/g, "__")}.yaml`;
+}
+
+/** The id a manifest file name stands for: `core__database.yaml` → "core:database". */
+export function manifestIdOf(fileName: string): string {
+  return basename(fileName, ".yaml").replace(/__/g, ":");
 }
 
 export function loadManifest(root: string, id: string): FeatureManifest | null {
@@ -62,7 +78,7 @@ export function loadManifests(root: string): FeatureManifest[] {
   const out: FeatureManifest[] = [];
   for (const name of readdirSync(dir).filter((n) => n.endsWith(".yaml")).sort()) {
     try {
-      const m = loadManifest(root, name.slice(0, -".yaml".length));
+      const m = loadManifest(root, manifestIdOf(name));
       if (m) out.push(m);
     } catch {
       // A half-edited manifest must not stop the edit hook; checkManifest reports it.
@@ -77,7 +93,8 @@ function normalize(raw: Raw, file: string): FeatureManifest {
   const list = <T>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
   const slash = (p: string) => String(p).replace(/\\/g, "/");
   return {
-    id: String(raw.id ?? basename(file, ".yaml")),
+    id: String(raw.id ?? manifestIdOf(file)),
+    kind: raw.kind === "platform" ? "platform" : "feature",
     name: raw.name as string | undefined,
     summary: raw.summary as string | undefined,
     owner: (raw.owner as string | null | undefined) ?? null,
@@ -138,18 +155,21 @@ export function cardRef(feature: string, ref: string): { feature: string; id: st
 export function checkManifest(root: string, id: string, text?: string): ManifestCheck {
   const file = manifestFile(id);
   const result: ManifestCheck = { feature: id, file, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
-  let m: FeatureManifest | null;
+  let raw: Raw | null;
   try {
-    m = text === undefined ? loadManifest(root, id) : normalize(parse(text) ?? {}, file);
+    const source = text ?? (existsSync(join(root, file)) ? readFileSync(join(root, file), "utf8") : null);
+    raw = source === null ? null : ((parse(source) ?? {}) as Raw);
   } catch (e) {
     result.errors.push(`Does not parse: ${(e as Error).message.split("\n")[0]}`);
     return result;
   }
-  if (!m) {
+  if (!raw) {
     result.errors.push("No manifest.");
     return result;
   }
-  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${id}.yaml`);
+  const m = normalize(raw, file);
+  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${basename(file)}`);
+  if (raw.kind !== undefined && !MANIFEST_KINDS.includes(raw.kind as ManifestKind)) result.errors.push(`kind is "${String(raw.kind)}"; it is one of ${MANIFEST_KINDS.join(", ")}.`);
   if (!m.summary) result.errors.push("No summary.");
   if (m.brief && !existsSync(join(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
   for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!existsSync(join(root, p))) result.missingPaths.push(p);
@@ -192,18 +212,21 @@ export function testIndex(root: string): Map<string, string[]> {
   const out = new Map<string, string[]>();
   const listed = capture("git", ["ls-files", "-co", "--exclude-standard"], root) ?? "";
   for (const f of listed.split("\n")) {
-    if (!/\/src\/(test|androidTest)[^/]*\//.test(f) || !/\.(kt|java)$/.test(f)) continue;
-    const cls = basename(f).replace(/\.(kt|java)$/, "");
+    // Kotlin and Java tests live in Gradle's test source sets; any other language by its own conventions.
+    const jvm = /\.(kt|java)$/.test(f);
+    if (jvm ? !/\/src\/(test|androidTest)[^/]*\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
+    const cls = stemOf(basename(f));
     out.set(cls, [...(out.get(cls) ?? []), f]);
   }
   indexed = { root, at: Date.now(), tests: out };
   return out;
 }
 
-/** Kotlin backtick names, plus plain `fun name(` / Java `void name(` methods for the rest. */
+/** Kotlin backtick names, plain `fun name(` / Java `void name(` methods; other languages' `test("…")`, `def test_…`, `func Test…`. */
 export function testNames(file: string): string[] {
   const text = readFileSync(file, "utf8");
-  return [...text.matchAll(/fun\s+`([^`]+)`/g), ...text.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]!);
+  if (/\.(kt|java)$/.test(file)) return [...text.matchAll(/fun\s+`([^`]+)`/g), ...text.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]!);
+  return testNamesIn(text);
 }
 
 function closest(name: string, names: string[]): string | undefined {

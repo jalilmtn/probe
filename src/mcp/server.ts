@@ -25,7 +25,7 @@ import { startFix, summarizeFix } from "../engine/fix.js";
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { startVerify, summarizeVerify } from "../engine/verify.js";
 import { ticketDraft, ticketInfo } from "../tickets/tickets.js";
-import { loadWatch, runningCheck, startCheck, summarizeCheckRun } from "../engine/watch.js";
+import { loadWatch, runningCheck, staleLabel, startCheck, summarizeCheckRun } from "../engine/watch.js";
 import { listDrafts } from "../knowledge/draft.js";
 import { checkManifest, loadManifest, summarizeCheck } from "../knowledge/manifest.js";
 import { formatInitStatus, INIT_STEPS, initStatus, startInit, summarizeInit } from "../engine/init.js";
@@ -95,7 +95,7 @@ export async function runMcpServer(version: string): Promise<void> {
     async ({ projectDir: dir }) => {
       const project = openProject(dir);
       const { stale } = loadWatch(project);
-      const lines = Object.entries(stale).map(([id, e]) => `${id}${e.owned ? "" : " (related)"} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}\n${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
+      const lines = Object.entries(stale).map(([id, e]) => `${id}${staleLabel(e)} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}\n${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
       const drafts = listDrafts(project).filter((d) => d.status === "pending");
       if (drafts.length) lines.push(`Drafts to review: ${drafts.map((d) => `${d.id} (${d.feature})`).join(", ")}`);
       const running = runningCheck(project);

@@ -14,6 +14,9 @@ import { includedModules, settingsFile } from "./settings.js";
 
 export const androidGradleAdapter: ProjectAdapter = {
   id: "android-gradle",
+  label: "Android/Gradle",
+  ignoredDirs: ["build", ".gradle", ".kotlin", ".cxx"],
+  supportsDevices: true,
 
   detect(root) {
     return settingsFile(root) !== null;

@@ -39,6 +39,11 @@ export interface ModuleInfo {
   /** Task/command that runs this module's unit tests, or null when it has none. */
   unitTestTask: string | null;
   classes: ClassInfo[];
+  /**
+   * The area this module belongs to, when the adapter decides it (folders, probe.yaml areas,
+   * workspaces). Unset: derived from the module id and `features.roots` (Gradle paths).
+   */
+  feature?: { id: string; group: "feature" | "platform" };
 }
 
 export interface FeatureStats {
@@ -62,6 +67,8 @@ export interface ProjectInfo {
   root: string;
   name: string;
   adapter: string;
+  /** Whether agents can run this project's app on a device; absent in scans from before it was recorded (they could). */
+  devices?: boolean;
 }
 
 export interface ScanResult {
@@ -280,8 +287,10 @@ export interface FixRun extends BaseRun {
 export interface CheckFeature {
   feature: string;
   files: string[];
-  /** False when the feature only depends on the changed code (its manifest's `related`). */
+  /** False when the feature only depends on the changed code (its manifest's `related`, or the module graph). */
   owned: boolean;
+  /** Edited platform areas it depends on, when the module graph is what reached it. */
+  dependsOn?: string[];
   unitRun?: string;
   unitStatus?: RunStatus | "skipped";
   /** "Class.test: message" for the first failing tests. */
@@ -298,7 +307,7 @@ export interface CheckFeature {
 export interface CheckRun extends BaseRun {
   kind: "check";
   /** What changed the code: Claude's edits, an editor outside Claude, or a person pressing Check. */
-  trigger: "claude" | "editor" | "manual";
+  trigger: "claude" | "agent" | "commit" | "editor" | "manual";
   features: CheckFeature[];
   /** Stale features left for later: over watch.maxFeatures. */
   skipped: string[];

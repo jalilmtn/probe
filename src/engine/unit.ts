@@ -26,17 +26,17 @@ export function startUnitRun(project: Project, featureId: string): { run: UnitRu
 
   return launchRun(project, run, async (log) => {
     if (modules.length === 0) {
-      run.error = "This feature has no unit tests.";
+      run.error = feature.stats.testFiles > 0 ? "This feature has tests but no command to run them: set unit.command in probe/probe.yaml." : "This feature has no unit tests.";
       return;
     }
     const fingerprint = unitFingerprint(project, latestScan(project), feature.id);
     const since = Date.now();
-    const inv = await project.adapter.runUnitTests(project.root, modules, log);
+    const inv = await project.adapter.runUnitTests(project.root, modules, log, project.config);
     run.command = inv.command;
     run.results = project.adapter.collectUnitResults(project.root, modules, since, inv);
     const failed = run.results.some((r) => r.failed > 0);
     run.status = failed ? "failed" : inv.exitCode === 0 ? "passed" : "error";
-    if (run.status === "error") run.error = `Build exited with code ${inv.exitCode} (see log: compile error or missing task).`;
+    if (run.status === "error") run.error = `${project.adapter.supportsDevices ? "Build" : "The test command"} exited with code ${inv.exitCode} (see log: compile error or missing task).`;
     if (run.status === "passed" && run.results.length === 0) {
       run.status = "error";
       run.error = "The build succeeded but wrote no test reports.";

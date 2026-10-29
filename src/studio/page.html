@@ -110,6 +110,8 @@
   .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
   .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }
   .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .jobs[hidden] { display: none; }
   .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
   .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }
   ul.setup { list-style: none; padding: 0; margin: 0; }
@@ -157,6 +159,7 @@
   <h1>Probe</h1>
   <div class="meta" id="meta">loading…</div>
   <span class="branch" id="branch" title="Branch this project is on">…</span>
+  <button class="jobs" id="jobs" hidden></button>
   <div class="spacer"></div>
   <nav>
     <button data-tab="atlas" class="active">Atlas</button>
@@ -173,7 +176,7 @@
 <script>
 const $view = document.getElementById("view");
 const $meta = document.getElementById("meta");
-const state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null };
+const state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };
 
 const api = (path, opts) => fetch(path, opts).then((r) => r.json());
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -195,13 +198,135 @@ function closeStream() { if (state.eventSource) { state.eventSource.close(); sta
 async function render() {
   closeStream();
   document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
-  if (state.tab === "setup") return renderSetup();
-  if (state.tab === "atlas") return state.feature ? renderFeature(state.feature) : renderAtlas();
-  if (state.tab === "cards") return renderCards();
-  if (state.tab === "verify") return renderVerify();
-  if (state.tab === "runs") return renderRuns();
-  if (state.tab === "settings") return renderSettings();
+  saveRoute();
+  if (state.tab === "setup") await renderSetup();
+  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());
+  else if (state.tab === "cards") await renderCards();
+  else if (state.tab === "verify") await renderVerify();
+  else if (state.tab === "runs") await renderRuns();
+  else if (state.tab === "settings") await renderSettings();
+  showJobs();
 }
+
+// ── Where the page is, in the address, so a reopened tab comes back to it ──
+
+function saveRoute() {
+  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : null;
+  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));
+}
+
+function loadRoute() {
+  const m = /^#(atlas|cards|verify|runs|settings|setup)(?:\/(.+))?$/.exec(location.hash);
+  if (!m) return false;
+  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });
+  return true;
+}
+
+function goTo(route) {
+  state.tab = route.tab;
+  state.feature = route.tab === "atlas" ? route.feature || null : null;
+  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };
+}
+
+// ── Jobs: work the server is doing (drafting cards, unit runs, verify…), whoever started it ──
+// The server is the record. A page opened mid-run asks for it, marks the buttons that started
+// it as busy and follows the run, so closing the tab never hides work that is still going.
+
+/** The same keys as the server's jobKeys (src/studio/jobs.ts). */
+const jobKey = {
+  unit: (f) => `unit:${f}`,
+  backfill: (f) => `backfill:${f}`,
+  explore: (f) => `explore:${f}`,
+  unitwrite: (f) => `unitwrite:${f}`,
+  card: (f, id) => `card:${f}/${id}`,
+  login: (role) => `login:${role || "check"}`,
+  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,
+  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,
+  verifyBase: (base) => `verify:base:${base || ""}`,
+};
+
+/** Where a job's button lives, to open the page on it. */
+function routeOf(j) {
+  const [kind, ...rest] = j.key.split(":");
+  const arg = rest.join(":");
+  if (kind === "init") return { tab: "setup" };
+  if (kind === "login") return { tab: "settings" };
+  if (kind === "check") return { tab: "atlas" };
+  if (kind === "verify") {
+    if (arg === "outdated") return { tab: "atlas" };
+    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };
+    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };
+    return { tab: "verify" };
+  }
+  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };
+  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };
+  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };
+  return { tab: "runs" };
+}
+
+function onRoute(route) {
+  if (route.tab !== state.tab) return false;
+  if (route.tab === "atlas") return (route.feature || null) === state.feature;
+  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;
+  return true;
+}
+
+const jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} · started ${ago(j.startedAt)}`;
+
+async function refreshJobs() {
+  const jobs = await api("/api/jobs").catch(() => null);
+  if (!jobs) return;
+  state.jobs = jobs.filter((j) => !j.child);
+  showJobs();
+}
+
+/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */
+function showJobs() {
+  const chip = document.getElementById("jobs");
+  chip.hidden = !state.jobs.length;
+  chip.textContent = `● ${state.jobs.length} running`;
+  chip.title = state.jobs.map(jobLabel).join("\n") + "\nClick to open the latest";
+  const running = new Set(state.jobs.map((j) => j.key));
+  document.querySelectorAll("[data-job]").forEach((b) => {
+    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;
+    if (running.has(b.dataset.job)) {
+      if (b.dataset.marked) return;
+      b.dataset.marked = "1";
+      b.disabled = true;
+      if (b.dataset.busy) b.textContent = b.dataset.busy;
+    } else if (b.dataset.marked) {
+      delete b.dataset.marked;
+      b.disabled = false;
+      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;
+    }
+  });
+  followJob();
+}
+
+/** Into an empty run panel: the run asked for, else the latest job this view started. */
+function followJob() {
+  const panel = document.getElementById("runpanel");
+  if (!panel || panel.innerHTML.trim() || state.eventSource) return;
+  if (state.showRun) {
+    const id = state.showRun;
+    state.showRun = null;
+    return followRun(id, panel);
+  }
+  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);
+  state.followId = null;
+  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));
+  // When it ends, the view reloads with what it made and shows the finished run again.
+  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });
+}
+
+document.getElementById("jobs").addEventListener("click", () => {
+  const j = state.jobs[state.jobs.length - 1];
+  if (!j) return;
+  goTo(routeOf(j));
+  state.followId = j.runId;
+  render();
+});
+setInterval(refreshJobs, 3000);
 
 function coverageBar(s) {
   const t = Math.max(1, s.testable);
@@ -249,6 +374,15 @@ function lastRunPill(r) {
   return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;
 }
 
+const GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };
+
+/** A feature's or platform area's manifest: its rules, and how many nothing proves yet. */
+function manifestPill(f) {
+  const m = f.manifest;
+  if (!m) return `<span class="pill none" title="No manifest yet: Setup → Feature knowledge drafts one">none</span>`;
+  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules · ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` · ${m.unproven} unproven` : ""}</span>`;
+}
+
 function cardsPill(c) {
   if (!c) return `<span class="pill none">none</span>`;
   const title = `${c.approved} approved · ${c.draft} draft · ${c.rejected} rejected`;
@@ -279,7 +413,8 @@ async function renderAtlas() {
 
   $view.innerHTML = `
     <div class="cards">
-      <div class="card"><div class="k">${state.group === "platform" ? "Platform groups" : "Features"}</div><div class="v">${list.length}</div></div>
+      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>
+      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>
       <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>
       <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>
       <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>
@@ -294,7 +429,7 @@ async function renderAtlas() {
       </div>
       <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>
       <div style="flex:1"></div>
-      ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">⟳ Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}
+      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date…" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">⟳ Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}
       <button class="btn secondary" id="rescan">Rescan</button>
     </div>
     ${watchBanner(watch)}
@@ -302,26 +437,27 @@ async function renderAtlas() {
     ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}
     ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\n"))}">
         <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>
-        <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `✗${f.unit.failed}` : "✓") : "—"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>
+        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `✗${f.unit.failed}` : "✓") : "—"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>
         <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>
       </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `
     <table>
       <thead><tr>
-        <th>Feature</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>
-        <th class="num hide-sm">Untested</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>
+        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>
+        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>
       </tr></thead>
       <tbody>
         ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">
-          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}</td>
+          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>
           <td class="num hide-sm">${f.stats.modules}</td>
           <td class="num">${f.stats.testable}</td>
           <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>
           <td class="num hide-sm">${f.stats.untested}</td>
+          <td>${manifestPill(f)}</td>
           <td>${cardsPill(f.cards)}</td>
           <td>${runPill(f.lastUnitRun)}</td>
           <td>${devicePill(f.device)}</td>
           <td>${healthPill(f)}</td>
-        </tr>`).join("") || `<tr><td colspan="9" class="empty">Nothing matches.</td></tr>`}
+        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}
       </tbody>
     </table>`}`;
 
@@ -355,7 +491,9 @@ async function renderAtlas() {
 function stalePill(watch, id) {
   const e = watch.stale[id];
   if (!e) return "";
-  return ` <span class="pill warn" title="Edited since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\n${esc(e.files.slice(0, 12).join("\n"))}">edited</span>`;
+  // Reached through the module graph: none of its own files changed, code it depends on did.
+  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;
+  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\n${esc(e.files.slice(0, 12).join("\n"))}">${via ? "dependency edited" : "edited"}</span>`;
 }
 
 function watchBanner(watch) {
@@ -400,13 +538,17 @@ async function renderKnowledge(id) {
   // Looked up after the fetch: the page may have re-rendered while it loaded.
   const el = document.getElementById("knowledge");
   if (!el) return;
+  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";
+  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.
+  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);
+  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" · ")}</div>` : "";
   if (!k.manifest && !k.check && k.drafts.length) {
-    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span></div>`;
+    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;
     el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });
     return;
   }
   if (!k.manifest && !k.check) {
-    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup → Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives this feature a summary, its rules and the tests that prove them; Probe then keeps them in step with the code.</span></div>`;
+    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup → Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;
     return;
   }
   const m = k.manifest || {};
@@ -418,7 +560,7 @@ async function renderKnowledge(id) {
   // A card proves its rule only while its last pass still holds for this code.
   const cardPill = (x) => {
     const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";
-    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" title="Run this card on a device">▶</button>`;
+    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="…" title="Run this card on a device">▶</button>`;
     return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} · ${esc(x.text)}</span>${run}</div>`;
   };
   const proof = (inv) => {
@@ -432,15 +574,16 @@ async function renderKnowledge(id) {
       (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">✗ card ${esc(b.card)} — no such card${b.closest ? `; closest: “${esc(b.closest)}”` : ""}</div>`).join("");
   };
   el.innerHTML = `
-    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">edited</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature">✓ Check now</button></div></div>` : ""}
+    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking…">✓ Check now</button></div></div>` : ""}
     ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">· ${ago(d.createdAt)}${d.runId ? ` · check ${esc(d.runId)}` : ""}</span></h3>
       <p style="margin:4px 0 8px">${esc(d.summary)}</p>
       ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}
       <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}
-    <div class="box"><h3>${esc(m.name || id)} ${m.owner ? `<span class="muted" style="font-weight:400">· owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature's manifest and brief yet">no owner</span>`}</h3>
+    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">· owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature's manifest and brief yet">no owner</span>`}</h3>
       ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}
       ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}
       <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> · ` : ""}manifest <span class="mono">${esc(k.file)}</span> · ${c.links} test links · ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` · <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>
+      ${linksHtml}
       ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">✗ ${esc(e)}</div>`).join("")}
     </div>
     ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules · ${c.gaps.length} unproven${c.broken.length ? ` · ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">
@@ -459,6 +602,7 @@ async function renderKnowledge(id) {
     if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "✓ Check now"; return; }
     followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));
   });
+  showJobs();
   el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {
     const approve = !!b.dataset.approve;
     const draftId = b.dataset.approve || b.dataset.reject;
@@ -473,6 +617,8 @@ async function renderKnowledge(id) {
 async function renderFeature(id) {
   $view.innerHTML = `<div class="empty">Loading ${esc(id)}…</div>`;
   const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);
+  // A remembered address can name a feature that is gone since.
+  if (f.error) { state.feature = null; return render(); }
   if (!state.scan) await loadScan(false);
   const h = state.scan.features.find((x) => x.id === f.id);
   const nav = navmap[f.id];
@@ -481,11 +627,11 @@ async function renderFeature(id) {
   $view.innerHTML = `
     <button class="back" id="back">← Atlas</button>
     <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>
-      <button class="btn secondary" id="backfill" title="A background agent reads code, docs and git history and drafts cards">✦ Draft cards</button>
-      <button class="btn secondary" id="explore" title="An agent walks this feature's screens on an emulator and maps how each is reached">⌖ Map screens</button>
-      <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">✎ Write missing tests</button>
-      <button class="btn secondary" id="verifyf" title="Unit tests, then this feature's approved cards on a device">✓ Verify</button>
-      <button class="btn" id="run" ${withTests ? "" : "disabled"}>▶ Run unit tests</button></div>
+      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting…" title="A background agent reads code, docs and git history and drafts cards">✦ Draft cards</button>
+      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping…" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature's screens on an emulator and maps how each is reached"`}>⌖ Map screens</button>
+      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests…" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">✎ Write missing tests</button>
+      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying…" title="Unit tests, then this feature's approved cards on a device">✓ Verify</button>
+      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running…" ${withTests ? "" : "disabled"}>▶ Run unit tests</button></div>
     <div id="knowledge"></div>
     ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}
     <div class="cards">
@@ -522,6 +668,7 @@ async function renderFeature(id) {
     if (!el) return;
     el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>✦ Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;
     bindCardActions(el, showCards);
+    showJobs();
   };
   showCards();
   document.getElementById("backfill").addEventListener("click", async (e) => {
@@ -532,8 +679,9 @@ async function renderFeature(id) {
   });
   document.getElementById("run").addEventListener("click", async (e) => {
     e.target.disabled = true; e.target.textContent = "Running…";
-    const { runId } = await api("/api/unit/" + encodeURIComponent(f.id), { method: "POST" });
-    followRun(runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "▶ Run unit tests"; state.scan = null; });
+    const res = await post("/api/unit/" + encodeURIComponent(f.id));
+    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "▶ Run unit tests"; return; }
+    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "▶ Run unit tests"; state.scan = null; });
   });
   const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {
     const label = e.target.textContent;
@@ -606,7 +754,10 @@ function followRun(runId, el, onDone) {
       bindTicket(rr);
       renderIssues(e.run, rr.querySelector("#ri"), el);
       rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));
+      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.
+      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);
       onDone && onDone(e.run);
+      showJobs();
     }
   };
   es.onerror = () => { es.close(); state.eventSource = null; };
@@ -765,7 +916,7 @@ function cardHtml(c) {
       <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` — ${esc(s.note)}` : ""}</li>`).join("")}</ul>
       <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} · ${esc(c.modules.join(", "))} · ${c.createdBy}, ${ago(c.updatedAt)}</div>
       <div class="row" style="margin-top:10px">
-        <button class="btn" data-run title="An agent performs this card on an emulator and checks every expectation">▶ Run on device</button>
+        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing…" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>▶ Run on device</button>
         ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}
         ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}
         ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}
@@ -816,7 +967,7 @@ async function renderCards() {
   const fl = state.cardFilter;
   const all = await api("/api/cards");
   if (!all.length) {
-    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose ✦ Draft cards, or <button class="btn secondary" id="bfall">✦ Draft cards for every feature</button></div><div id="runpanel"></div>`;
+    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose ✦ Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting…">✦ Draft cards for every feature</button></div><div id="runpanel"></div>`;
     return bindBackfillAll();
   }
   const features = cardFeatures(all);
@@ -825,6 +976,7 @@ async function renderCards() {
     .filter((f) => fl.side === "all" || f[fl.side] > 0);
   // Open on what needs a person: a failing feature, else one with drafts.
   if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;
+  saveRoute();
   const f = features.find((x) => x.id === fl.feature);
   const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));
   const total = (k) => features.reduce((n, x) => n + x[k], 0);
@@ -837,7 +989,7 @@ async function renderCards() {
       <span class="pill st-approved">${total("approved")} approved</span>
       ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}
       <div style="flex:1"></div>
-      <button class="btn secondary" id="bfall" title="Runs a background agent per feature that has no cards yet">✦ Draft cards for features without any</button>
+      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting…" title="Runs a background agent per feature that has no cards yet">✦ Draft cards for features without any</button>
     </div>
     <div id="runpanel"></div>
     <div class="split">
@@ -854,7 +1006,7 @@ async function renderCards() {
           <h2 style="margin:0">${esc(f.id)}</h2>
           <span class="muted">${f.cards.length} cards · ${f.approved} approved · ${f.draft} to review${f.failing ? ` · <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` · <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>
           <div style="flex:1"></div>
-          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" title="Runs this feature's approved cards whose result is outdated or missing">⟳ Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}
+          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running…" title="Runs this feature's approved cards whose result is outdated or missing">⟳ Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}
           ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}
         </div>
         <div class="toolbar">
@@ -876,7 +1028,7 @@ async function renderCards() {
     });
   });
   q.addEventListener("change", () => { fl.q = q.value; });
-  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; renderCards(); }));
+  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));
   $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));
   $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));
   $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));
@@ -922,7 +1074,7 @@ async function renderRuns() {
       else if (r.kind === "check") result = `${esc(r.trigger)} · ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "—"}${f.draftId ? " ✎" : ""}`).join(", ") || "nothing stale"}`;
       else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files · $${r.costUsd.toFixed(2)}`;
       else {
-        const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);
+        const t = (r.results || []).reduce((n, x) => n + x.tests, 0), f = (r.results || []).reduce((n, x) => n + x.failed, 0);
         result = `${t} tests${f ? ` · <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;
       }
       return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">■ Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;
@@ -953,7 +1105,7 @@ async function renderVerify() {
         <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>
         <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>
         <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>
-        <button class="btn" type="submit" ${ch.features.length ? "" : "disabled"}>✓ Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>
+        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying…" ${ch.features.length ? "" : "disabled"}>✓ Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>
         <button class="btn secondary" type="button" id="vrefresh">Refresh</button>
       </form>
       <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>
@@ -1015,14 +1167,14 @@ async function renderAccounts(el) {
   el.innerHTML = `
     <div class="box"><h3>Who the app on the device is logged in as</h3>
       <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">· ${esc(login.run.device)} · ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>
-        <button class="btn secondary" id="logincheck" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>
+        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking…" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>
       <div id="runpanel"></div></div>`;
   el.innerHTML += `
     <div class="box"><h3>Test accounts</h3>
     <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them — Probe types them on the device.</p>
     ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>
       ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>
-        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}
+        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in…" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}
     </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}
     <form class="acct" autocomplete="off">
       <label>Role<input name="role" placeholder="user_a" required pattern="[\\w-]{1,40}"></label>
@@ -1061,13 +1213,12 @@ async function renderAccounts(el) {
   }));
 }
 
-const MODELS = [
-  ["sonnet", "Sonnet — balanced, included in most plans (recommended)"],
-  ["haiku", "Haiku — fastest and cheapest, fine for simple cards"],
-  ["opus", "Opus — strongest, uses your plan faster"],
-  ["fable", "Fable — may bill usage credits on your plan"],
-];
 const SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe's default" };
+
+/** Why device features are off for this project, or "" when its app runs on a device. */
+function noDevices() {
+  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";
+}
 
 const APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };
 
@@ -1077,21 +1228,22 @@ function projectBox(p) {
   const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;
   const branches = p.branches || [];
   const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;
+  const dev = p.devices.supported !== false;
   return `<div class="box"><h3>Project</h3>
     <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>
     <form class="inline" id="pf">
-      <label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>
+      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>
       <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>
       <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>
       ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine · a phone usually carries someone's own accounts</span></div>
-        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}
+        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}
       <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>
       <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>
       <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>
-      <label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>
+      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>
       <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>
       <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>
-      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>
+      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}
       <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>
       <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>
       <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>
@@ -1107,13 +1259,16 @@ function bindProject() {
     e.preventDefault();
     const num = (v) => (v === "" ? null : Number(v));
     const body = {
-      app: { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null },
-      devices: { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) },
       verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },
-      perf: { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) },
       tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },
     };
-    for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];
+    // App, device and performance fields only exist on a project whose app runs on a device.
+    if (f.package) {
+      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };
+      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };
+      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };
+      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];
+    }
     const res = await post("/api/project", body);
     document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;
     if (!res.error) setTimeout(renderSettings, 700);
@@ -1125,18 +1280,21 @@ async function renderSettings() {
   const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);
   p.branches = br.branches;
   const current = s.agents.model;
-  const known = MODELS.some(([m]) => m === current);
+  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];
+  const models = runner.models;
+  const known = models.some(([m]) => m === current);
   $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `
-    <div class="box"><h3>Agent model</h3>
-      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs on your own Claude Code login and plan, with this model. It is saved for this machine only, since each developer's plan differs; a run started from the CLI can still pass <span class="mono">--model</span>.</p>
+    <div class="box"><h3>Agents</h3>
+      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer's tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>
       <form class="inline" id="sf">
-        <label>Model<select name="pick">${MODELS.map(([m, label]) => `<option value="${m}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other…</option></select></label>
-        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="claude-sonnet-5-5"></label>
+        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>
+        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other…</option></select></label>
+        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>
         <button class="btn" type="submit">Save</button>
         <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>
-        ${s.agents.source === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}
+        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}
       </form>
-      <p style="margin-bottom:0">In use: <strong class="mono">${esc(current)}</strong> <span class="muted">· ${SOURCE_LABEL[s.agents.source]}</span></p>
+      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">· ${SOURCE_LABEL[s.agents.runnerSource]}</span> · <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">· ${SOURCE_LABEL[s.agents.source]}</span></p>
       <p id="sout" style="margin-bottom:0"></p>
     </div>`;
   bindProject();
@@ -1144,6 +1302,12 @@ async function renderSettings() {
   const form = document.getElementById("sf");
   const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);
   form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });
+  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.
+  form.runner.addEventListener("change", async () => {
+    const res = await post("/api/settings", { runner: form.runner.value });
+    if (res.error) return alert(res.error);
+    renderSettings();
+  });
   const out = document.getElementById("sout");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1152,7 +1316,7 @@ async function renderSettings() {
     renderSettings();
   });
   document.getElementById("stest").addEventListener("click", async (e) => {
-    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen())}…</span>`;
+    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}…</span>`;
     const r = await post("/api/settings/test", { model: chosen() });
     e.target.disabled = false;
     out.innerHTML = r.ok
@@ -1160,7 +1324,7 @@ async function renderSettings() {
       : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;
   });
   const reset = document.getElementById("sreset");
-  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { model: "" }); renderSettings(); });
+  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });
 }
 
 async function renderDoctor(el) {
@@ -1175,6 +1339,24 @@ const STATUS_ICON = { ok: "✓", warn: "!", fail: "✕" };
 const INIT_PILL = { done: ["ok", "✓"], todo: ["none", "·"], waiting: ["warn", "…"], warn: ["warn", "!"] };
 const INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);
 
+/**
+ * Which features and platform areas get a manifest, side by side. Before any choice everything is
+ * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with
+ * a written manifest stays chosen.
+ */
+function areaPicker(k) {
+  const first = !k.chosen;
+  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules · ${a.testable} testable classes · ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;
+  const group = (kind, label, hint) => {
+    const list = k.proposed.filter((a) => a.kind === kind);
+    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">· ${hint}</span>` : ""}</div>
+      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";
+  };
+  return `${group("feature", "Features to give a manifest", "")}
+    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}
+    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;
+}
+
 /** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */
 async function renderInit(el) {
   const k = await api("/api/init");
@@ -1186,9 +1368,7 @@ async function renderInit(el) {
     <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>
       <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>
       ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>
-    ${features.status === "waiting" && k.proposed.length ? `<div class="k" style="margin-top:10px">Features to give a manifest (${k.proposed.length} proposed by the scan)</div>
-      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${k.proposed.map((f) => `<label style="font-size:13px"><input type="checkbox" data-feat="${esc(f)}" checked> ${esc(f)}</label>`).join("")}</div>
-      <div class="row"><button class="btn" id="initchoose">Use these features</button><button class="btn secondary" id="initnone">Untick all</button></div>` : ""}
+    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}
   </div>
   <div id="initpanel"></div>
   ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">· drafted ${ago(d.createdAt)}</span></h3>
@@ -1204,10 +1384,11 @@ async function renderInit(el) {
   };
   el.querySelector("#initrun")?.addEventListener("click", () => start({}));
   el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));
-  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]").forEach((c) => (c.checked = false)));
+  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));
+  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll('[data-feat][data-kind="platform"]').forEach((c) => (c.checked = true)));
   el.querySelector("#initchoose")?.addEventListener("click", async () => {
     const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);
-    if (!chosen.length) return alert("Tick at least one feature.");
+    if (!chosen.length) return alert("Tick at least one feature or platform area.");
     const res = await post("/api/init/features", { features: chosen });
     if (res.error) return alert(res.error);
     renderInit(el);
@@ -1240,8 +1421,16 @@ async function renderSetup() {
 }
 
 (async () => {
-  await checkBranch();
-  // A project that cannot be tested yet opens on what is missing.
+  await Promise.all([checkBranch(), refreshJobs()]);
+  // Back where the page was; else on work still going; else a project that cannot be tested
+  // yet opens on what is missing.
+  if (loadRoute()) return render();
+  const latest = state.jobs[state.jobs.length - 1];
+  if (latest) {
+    goTo(routeOf(latest));
+    state.followId = latest.runId;
+    return render();
+  }
   const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);
   const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");
   if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";

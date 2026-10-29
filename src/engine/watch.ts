@@ -1,17 +1,19 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
+import { ignoredPathPattern } from "../adapters/adapter.js";
 import { isWindows, throwIfStopped } from "../core/proc.js";
 import { newRunId } from "../core/store.js";
 import type { CheckFeature, CheckRun, ScanResult } from "../core/types.js";
 import { draftCorrections, listDrafts } from "../knowledge/draft.js";
-import { checkManifest, loadManifest, loadManifests } from "../knowledge/manifest.js";
+import { checkManifest, loadManifest, loadManifests, manifestFile } from "../knowledge/manifest.js";
 import { describeCardProof, ruleProofs } from "../knowledge/proof.js";
 import { dirtyFiles } from "./history.js";
 import type { Project } from "./project.js";
 import { launchRun, liveRun } from "./runs.js";
 import { findFeature, latestScan } from "./scan.js";
 import { startUnitRun } from "./unit.js";
+import { areaGraph, dependentAreas, moduleOfFile } from "./impact.js";
 import { featuresOfFiles } from "./verify.js";
 
 /**
@@ -21,12 +23,18 @@ import { featuresOfFiles } from "./verify.js";
  * edits caused them.
  */
 
-export type ChangeSource = "claude" | "editor" | "manual";
+/**
+ * Who reported an edit: Claude Code's hooks, another coding agent through `probe hook`, a git
+ * pre-commit hook, the IDE file watcher, or a person.
+ */
+export type ChangeSource = "claude" | "agent" | "commit" | "editor" | "manual";
 
 export interface StaleEntry {
   files: string[];
   /** True when the feature owns a changed file; false when it only depends on one. */
   owned: boolean;
+  /** Platform areas whose edits reached it through the module graph, not through a file it owns. */
+  dependsOn?: string[];
   since: string;
   last: string;
   sources: ChangeSource[];
@@ -60,8 +68,6 @@ interface WatchState {
 const STATE = "watch.json";
 const LOCK = "check.lock";
 const STUDIO = "studio.json";
-/** Folders whose files are never anyone's code. */
-const IGNORED = /(^|\/)(build|\.gradle|\.git|\.idea|node_modules|\.kotlin|\.cxx)\//;
 
 export function loadWatch(project: Project): WatchState {
   return { stale: {}, checks: [], ...(project.store.read<WatchState>(STATE) ?? {}) };
@@ -84,21 +90,24 @@ function update(project: Project, change: (state: WatchState) => void): WatchSta
 
 /** Repo-relative forward-slash paths of the files that can belong to a feature. */
 function projectFiles(project: Project, files: string[]): string[] {
+  const ignored = ignoredPathPattern(project.adapter);
   return files
     .map((f) => relative(project.root, isAbsolute(f) ? f : resolve(project.root, f)).replace(/\\/g, "/"))
-    .filter((f) => f && !f.startsWith("..") && !IGNORED.test(f) && !f.startsWith("probe/"));
+    .filter((f) => f && !f.startsWith("..") && !ignored.test(f) && !f.startsWith("probe/"));
 }
 
 /**
  * The features a set of files touches: owned through the scan's modules or a manifest's
- * `paths`, related through a manifest's `related`.
+ * `paths`; related through a manifest's `related`, or by depending on an edited platform module
+ * (up to `watch.impactDepth` steps away), which names that area in `dependsOn`.
  */
-export function featuresForFiles(project: Project, files: string[], result: ScanResult = latestScan(project)): Map<string, { files: string[]; owned: boolean }> {
-  const out = new Map<string, { files: string[]; owned: boolean }>();
-  const add = (feature: string, file: string, owned: boolean) => {
-    const entry = out.get(feature) ?? { files: [], owned: false };
+export function featuresForFiles(project: Project, files: string[], result: ScanResult = latestScan(project)): Map<string, Touched> {
+  const out = new Map<string, Touched>();
+  const add = (feature: string, file: string, owned: boolean, via?: string) => {
+    const entry = out.get(feature) ?? { files: [], owned: false, dependsOn: [] };
     if (!entry.files.includes(file)) entry.files.push(file);
     entry.owned ||= owned;
+    if (via && !entry.dependsOn.includes(via)) entry.dependsOn.push(via);
     out.set(feature, entry);
   };
   for (const [feature, fs] of featuresOfFiles(project, result, files).byFeature) for (const f of fs) add(feature, f, true);
@@ -108,7 +117,25 @@ export function featuresForFiles(project: Project, files: string[], result: Scan
       else if (m.related.some((r) => f.startsWith(r.path))) add(m.id, f, false);
     }
   }
+  const depth = project.config.watch?.impactDepth ?? 1;
+  const platform = new Set(result.features.filter((f) => f.group === "platform").map((f) => f.id));
+  if (depth > 0 && [...out].some(([id, e]) => e.owned && platform.has(id))) {
+    const graph = areaGraph(project, result);
+    for (const f of files) {
+      const module = moduleOfFile(graph, f);
+      const area = module && graph.areaOf.get(module);
+      if (!module || !area || !platform.has(area)) continue;
+      for (const dependent of dependentAreas(graph, module, depth).keys()) add(dependent, f, false, area);
+    }
+  }
   return out;
+}
+
+export interface Touched {
+  files: string[];
+  owned: boolean;
+  /** Edited platform areas it depends on, when that is how the files reached it. */
+  dependsOn: string[];
 }
 
 /** Marks the features these files touch as stale. Cheap: no build, no git. Returns their ids. */
@@ -119,10 +146,11 @@ export function markStale(project: Project, files: string[], source: ChangeSourc
   if (!touched.size) return [];
   const now = new Date().toISOString();
   update(project, (state) => {
-    for (const [feature, { files: fs, owned }] of touched) {
+    for (const [feature, { files: fs, owned, dependsOn }] of touched) {
       const e = state.stale[feature] ?? { files: [], owned: false, since: now, last: now, sources: [], sessions: [] };
       e.files = [...new Set([...e.files, ...fs])];
       e.owned ||= owned;
+      if (dependsOn.length) e.dependsOn = [...new Set([...(e.dependsOn ?? []), ...dependsOn])];
       e.last = now;
       if (!e.sources.includes(source)) e.sources.push(source);
       if (session && !e.sessions.includes(session)) e.sessions.push(session);
@@ -226,7 +254,9 @@ export function startCheck(project: Project, options: CheckOptions = {}): { run:
   return started;
 }
 
-function pickTargets(project: Project, options: CheckOptions, run: CheckRun, round: number): { feature: string; files: string[]; owned: boolean; sessions: string[] }[] {
+type Target = { feature: string; files: string[]; owned: boolean; dependsOn?: string[]; sessions: string[] };
+
+function pickTargets(project: Project, options: CheckOptions, run: CheckRun, round: number): Target[] {
   const state = loadWatch(project);
   if (options.features?.length) {
     if (round > 0) return [];
@@ -239,17 +269,17 @@ function pickTargets(project: Project, options: CheckOptions, run: CheckRun, rou
     .sort(([, a], [, b]) => Number(b.owned) - Number(a.owned) || b.files.length - a.files.length);
   const budget = Math.max(1, project.config.watch.maxFeatures);
   if (round === 0) run.skipped = entries.slice(budget).map(([id]) => id);
-  return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, sessions: e.sessions }));
+  return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, dependsOn: e.dependsOn, sessions: e.sessions }));
 }
 
 async function checkFeature(
   project: Project,
   run: CheckRun,
-  target: { feature: string; files: string[]; owned: boolean; sessions: string[] },
+  target: Target,
   options: CheckOptions,
   log: (line: string) => void,
 ): Promise<void> {
-  const f: CheckFeature = { feature: target.feature, files: target.files, owned: target.owned, failures: [] };
+  const f: CheckFeature = { feature: target.feature, files: target.files, owned: target.owned, ...(target.dependsOn?.length && !target.owned ? { dependsOn: target.dependsOn } : {}), failures: [] };
   run.features.push(f);
 
   // Unit tests, when the scan knows modules with tests for it.
@@ -281,7 +311,7 @@ async function checkFeature(
       return null;
     }
   })();
-  const check = existsSync(join(project.root, "probe", "features", `${target.feature}.yaml`)) ? checkManifest(project.root, target.feature) : null;
+  const check = existsSync(join(project.root, manifestFile(target.feature))) ? checkManifest(project.root, target.feature) : null;
   if (check) {
     const broken = check.broken.length + check.brokenCards.length;
     f.manifest = { links: check.links + check.cardLinks, broken, gaps: check.gaps.length, errors: check.errors.length };
@@ -340,11 +370,17 @@ function clearStale(project: Project, feature: string, checkedAt: string): void 
   });
 }
 
+/** How a feature that owns none of the changed files was reached. */
+export function staleLabel(e: { owned: boolean; dependsOn?: string[] }): string {
+  if (e.owned) return "";
+  return e.dependsOn?.length ? ` (depends on ${e.dependsOn.join(", ")})` : " (related)";
+}
+
 export function summarizeCheckRun(run: CheckRun): string {
   const lines = [`Check ${run.id} · ${run.trigger} · ${run.status.toUpperCase()} · ${run.features.length} features · $${run.costUsd.toFixed(2)}`];
   if (run.error) lines.push(run.error);
   for (const f of run.features) {
-    lines.push(`  ${f.feature}${f.owned ? "" : " (related)"}: unit ${f.unitStatus ?? "—"}${f.unitRun ? ` (${f.unitRun})` : ""}${f.manifest ? ` · manifest ${f.manifest.broken} broken links, ${f.manifest.gaps} unproven` : ""}${f.draftId ? ` · draft ${f.draftId} to review` : ""}${f.note ? ` · ${f.note}` : ""}`);
+    lines.push(`  ${f.feature}${staleLabel(f)}: unit ${f.unitStatus ?? "—"}${f.unitRun ? ` (${f.unitRun})` : ""}${f.manifest ? ` · manifest ${f.manifest.broken} broken links, ${f.manifest.gaps} unproven` : ""}${f.draftId ? ` · draft ${f.draftId} to review` : ""}${f.note ? ` · ${f.note}` : ""}`);
     for (const x of f.failures) lines.push(`      - ${x}`);
     for (const r of f.deviceRules ?? []) lines.push(`      device: ${r}`);
   }

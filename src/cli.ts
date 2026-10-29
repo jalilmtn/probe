@@ -7,6 +7,7 @@ import { listCards } from "./cards/store.js";
 import { listAccounts, Secrets, type SecretKind } from "./accounts/accounts.js";
 import { Adb } from "./devices/adb.js";
 import { listDevices } from "./devices/android.js";
+import { devicesUnsupported } from "./adapters/adapter.js";
 import { formatAtlas, formatCards } from "./cli/format.js";
 import { saveLocalDevices } from "./core/config.js";
 import { formatInitStatus, initStatus, isInitStep, startInit, summarizeInit } from "./engine/init.js";
@@ -28,8 +29,8 @@ import { startUnitWrite, summarizeUnitWrite } from "./engine/unitwrite.js";
 import { startVerify, summarizeVerify } from "./engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "./tickets/tickets.js";
 import { startStudio } from "./studio/server.js";
-import { runHook } from "./cli/hook.js";
-import { type ChangeSource, loadWatch, runningCheck, startCheck, summarizeCheckRun } from "./engine/watch.js";
+import { gitHooks, runHook } from "./cli/hook.js";
+import { type ChangeSource, loadWatch, runningCheck, staleLabel, startCheck, summarizeCheckRun } from "./engine/watch.js";
 import { checkManifest, loadManifest, summarizeCheck } from "./knowledge/manifest.js";
 import { findRule, ruleProofs, runRuleCards, summarizeRule, summarizeRuleRun, summarizeRules } from "./knowledge/proof.js";
 import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./knowledge/draft.js";
@@ -43,8 +44,9 @@ Usage: probe <command> [options]
   doctor                 Check setup (Node, project, SDK, devices)
   init                   Set the project up step by step: settings, agents, feature manifests, rule
                          cards, the agent file. Resumes where it stopped; manifests arrive as drafts
-                         --status: only show the steps; --step <id>: one step; --yes: take the
-                         proposed features; --features a,b: choose (or limit agents to) these
+                         --status: only show the steps; --step <id>: one step; --yes: take every
+                         proposed feature and platform area; --features a,b: add these to the
+                         chosen (\`features\` or \`platform\` names a whole kind), or limit agents to them
   scan                   Map features: unit coverage and health
   feature <id>           One feature: modules + riskiest untested classes
   unit <feature>         Run a feature's unit tests
@@ -72,14 +74,20 @@ Usage: probe <command> [options]
   devices allow <serial> Let agents use a real phone (this machine only)
   devices avd <name>     Emulator to boot when none is running
   check [features]       Check stale features now: unit tests, manifest links, drafted corrections
-                         --no-drafts: no agent; --trigger claude|editor|manual
+                         --no-drafts: no agent; --trigger claude|agent|commit|editor|manual
   stale                  Features edited since their last check
   manifest <feature>     Check a feature manifest's test and card links, paths and unproven rules
   rules <feature>        A feature's rules, the tests and cards proving each, the cards' last results
   rule <feature/rule>    One rule and what proves it; --run runs its cards on a device
   drafts [feature]       Drafted corrections to manifests and briefs
   draft show|approve|reject <id>
-  hook <event>           Claude Code hook entry (edit, stop, prompt); see hooks/hooks.json
+  hook edit [files…]     Feed the watch loop from any coding agent: mark edited files' features
+                         stale (no files: what changed since the last sweep)
+  hook stop              End of an agent turn: report problems a check found, else check what is stale
+  hook prompt            Results that arrived since (--session <id> keeps each agent's reports apart)
+                         Claude Code calls these itself (hooks/hooks.json) with JSON on stdin
+  hooks install          Add a git pre-commit hook that marks staged files stale and starts a check
+                         (never blocks a commit); hooks uninstall | hooks status
   studio                 Open the local GUI
   mcp                    Run as an MCP server (stdio) for AI agents
 
@@ -87,7 +95,7 @@ Options:
   --project <dir>        Project root (default: current directory)
   --port <n>             Studio port (default 7777)
   --no-open              Don't open the browser for studio
-  --model <name>         Model for agent tasks (default: agents.model, else sonnet)
+  --model <name>         Model for agent tasks (default: agents.model, else the runner's default)
   --device <serial>      Device for run (default: a running emulator)`;
 
 async function main(argv: string[]): Promise<number> {
@@ -107,6 +115,7 @@ async function main(argv: string[]): Promise<number> {
   const maxCardsArg = opt("--max-cards");
   const triggerArg = opt("--trigger");
   const stepArg = opt("--step");
+  const sessionArg = opt("--session");
   const flags = new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
   const runFlag = argv.includes("--run");
   const noDrafts = argv.includes("--no-drafts");
@@ -348,6 +357,10 @@ async function main(argv: string[]): Promise<number> {
     }
     case "devices": {
       const project = openProject(projectArg);
+      if (!project.adapter.supportsDevices) {
+        console.log(devicesUnsupported(project.adapter));
+        return 0;
+      }
       const local = project.config.devices;
       if (arg === "allow" && arg2) {
         saveLocalDevices(project.store.dir, { ...local, allowReal: [...new Set([...local.allowReal, arg2])] });
@@ -369,8 +382,11 @@ async function main(argv: string[]): Promise<number> {
       return 0;
     }
     case "hook":
-      // Called by Claude Code (hooks/hooks.json), never by a person.
-      return runHook(arg ?? "");
+      // Claude Code (hooks/hooks.json), other agents' own hooks or rules, the git pre-commit hook.
+      return runHook(arg ?? "", { files: argv.filter((a) => !flags.has(a)).slice(2), session: sessionArg, project: projectArg });
+    case "hooks":
+      console.log(gitHooks(openProject(projectArg), arg ?? "status"));
+      return 0;
     case "check": {
       // What the edit hooks start in the background; by hand: `probe check call`.
       const project = openProject(projectArg);
@@ -399,7 +415,7 @@ async function main(argv: string[]): Promise<number> {
       }
       for (const id of ids) {
         const e = stale[id]!;
-        console.log(`${id}${e.owned ? "" : " (related)"} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}`);
+        console.log(`${id}${staleLabel(e)} · ${e.files.length} files · since ${e.since} · by ${e.sources.join(", ")}`);
         for (const f of e.files.slice(0, 10)) console.log(`    ${f}`);
       }
       return 0;

@@ -14,6 +14,7 @@
   "scripts": {
     "build": "tsc --noEmit && node build.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "node test.mjs",
     "probe": "node build.mjs && node dist/probe.cjs"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 node_modules/
 *.log
+.test-dist/
 .DS_Store
 # dist/ is committed on purpose: the plugin runs it directly from the checkout.

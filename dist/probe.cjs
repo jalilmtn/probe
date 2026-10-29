@@ -602,8 +602,8 @@ var require_Node = __commonJS({
         };
         const res = toJS.toJS(this, "", ctx);
         if (typeof onAnchor === "function")
-          for (const { count, res: res2 } of ctx.anchors.values())
-            onAnchor(res2, count);
+          for (const { count: count2, res: res2 } of ctx.anchors.values())
+            onAnchor(res2, count2);
         return typeof reviver === "function" ? applyReviver.applyReviver(reviver, { "": res }, "", res) : res;
       }
     };
@@ -711,13 +711,13 @@ var require_Alias = __commonJS({
         const anchor = anchors2 && source && anchors2.get(source);
         return anchor ? anchor.count * anchor.aliasCount : 0;
       } else if (identity.isCollection(node)) {
-        let count = 0;
+        let count2 = 0;
         for (const item of node.items) {
           const c = getAliasCount(doc, item, anchors2);
-          if (c > count)
-            count = c;
+          if (c > count2)
+            count2 = c;
         }
-        return count;
+        return count2;
       } else if (identity.isPair(node)) {
         const kc = getAliasCount(doc, node.key, anchors2);
         const vc = getAliasCount(doc, node.value, anchors2);
@@ -2702,12 +2702,12 @@ ${cn.comment}` : item.comment;
             } else
               throw new TypeError(`Expected [key, value] tuple: ${it}`);
           } else if (it && it instanceof Object) {
-            const keys = Object.keys(it);
-            if (keys.length === 1) {
-              key = keys[0];
+            const keys2 = Object.keys(it);
+            if (keys2.length === 1) {
+              key = keys2[0];
               value = it[key];
             } else {
-              throw new TypeError(`Expected tuple with one key, not ${keys.length} keys`);
+              throw new TypeError(`Expected tuple with one key, not ${keys2.length} keys`);
             }
           } else {
             key = it;
@@ -3253,8 +3253,8 @@ var require_tags = __commonJS({
         if (Array.isArray(customTags))
           tags = [];
         else {
-          const keys = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
-          throw new Error(`Unknown schema "${schemaName}"; use one of ${keys} or define customTags array`);
+          const keys2 = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
+          throw new Error(`Unknown schema "${schemaName}"; use one of ${keys2} or define customTags array`);
         }
       }
       if (Array.isArray(customTags)) {
@@ -3269,8 +3269,8 @@ var require_tags = __commonJS({
         const tagObj = typeof tag === "string" ? tagsByName[tag] : tag;
         if (!tagObj) {
           const tagName = JSON.stringify(tag);
-          const keys = Object.keys(tagsByName).map((key) => JSON.stringify(key)).join(", ");
-          throw new Error(`Unknown custom tag ${tagName}; use one of ${keys}`);
+          const keys2 = Object.keys(tagsByName).map((key) => JSON.stringify(key)).join(", ");
+          throw new Error(`Unknown custom tag ${tagName}; use one of ${keys2}`);
         }
         if (!tags2.includes(tagObj))
           tags2.push(tagObj);
@@ -3670,8 +3670,8 @@ var require_Document = __commonJS({
         };
         const res = toJS.toJS(this.contents, jsonArg ?? "", ctx);
         if (typeof onAnchor === "function")
-          for (const { count, res: res2 } of ctx.anchors.values())
-            onAnchor(res2, count);
+          for (const { count: count2, res: res2 } of ctx.anchors.values())
+            onAnchor(res2, count2);
         return typeof reviver === "function" ? applyReviver.applyReviver(reviver, { "": res }, "", res) : res;
       }
       /**
@@ -3748,12 +3748,12 @@ var require_errors = __commonJS({
         lineStr = prev + lineStr;
       }
       if (/[^ ]/.test(lineStr)) {
-        let count = 1;
+        let count2 = 1;
         const end = error2.linePos[1];
         if (end?.line === line && end.col > col) {
-          count = Math.max(1, Math.min(end.col - col, 80 - ci));
+          count2 = Math.max(1, Math.min(end.col - col, 80 - ci));
         }
-        const pointer = " ".repeat(ci) + "^".repeat(count);
+        const pointer = " ".repeat(ci) + "^".repeat(count2);
         error2.message += `:
 
 ${lineStr}
@@ -7264,7 +7264,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse8(src, reviver, options) {
+    function parse9(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -7305,7 +7305,7 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse8;
+    exports2.parse = parse9;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument2;
     exports2.stringify = stringify7;
@@ -9379,7 +9379,7 @@ var require_fast_deep_equal = __commonJS({
       if (a === b) return true;
       if (a && b && typeof a == "object" && typeof b == "object") {
         if (a.constructor !== b.constructor) return false;
-        var length, i, keys;
+        var length, i, keys2;
         if (Array.isArray(a)) {
           length = a.length;
           if (length != b.length) return false;
@@ -9390,13 +9390,13 @@ var require_fast_deep_equal = __commonJS({
         if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
         if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
         if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
-        keys = Object.keys(a);
-        length = keys.length;
+        keys2 = Object.keys(a);
+        length = keys2.length;
         if (length !== Object.keys(b).length) return false;
         for (i = length; i-- !== 0; )
-          if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+          if (!Object.prototype.hasOwnProperty.call(b, keys2[i])) return false;
         for (i = length; i-- !== 0; ) {
-          var key = keys[i];
+          var key = keys2[i];
           if (!equal(a[key], b[key])) return false;
         }
         return true;
@@ -9551,20 +9551,20 @@ var require_resolve = __commonJS({
       return false;
     }
     function countKeys(schema) {
-      let count = 0;
+      let count2 = 0;
       for (const key in schema) {
         if (key === "$ref")
           return Infinity;
-        count++;
+        count2++;
         if (SIMPLE_INLINED.has(key))
           continue;
         if (typeof schema[key] == "object") {
-          (0, util_1.eachItem)(schema[key], (sch) => count += countKeys(sch));
+          (0, util_1.eachItem)(schema[key], (sch) => count2 += countKeys(sch));
         }
-        if (count === Infinity)
+        if (count2 === Infinity)
           return Infinity;
       }
-      return count;
+      return count2;
     }
     function getFullPath(resolver, id = "", normalize3) {
       if (normalize3 !== false)
@@ -10315,7 +10315,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve5.call(this, root, ref);
+      let _sch = resolve7.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref];
         const { schemaId } = this.opts;
@@ -10342,7 +10342,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve5(root, ref) {
+    function resolve7(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -11202,11 +11202,11 @@ var require_fast_uri = __commonJS({
         normalizeString(uri, options);
       } else if (typeof uri === "object") {
         uri = /** @type {T} */
-        parse8(serialize(uri, options), options);
+        parse9(serialize(uri, options), options);
       }
       return uri;
     }
-    function resolve5(baseURI, relativeURI, options) {
+    function resolve7(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const {
         parsed: baseParsed,
@@ -11242,50 +11242,50 @@ var require_fast_uri = __commonJS({
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
-    function resolveComponent(base, relative10, options, skipNormalization) {
+    function resolveComponent(base, relative11, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base = parse8(serialize(base, options), options);
-        relative10 = parse8(serialize(relative10, options), options);
+        base = parse9(serialize(base, options), options);
+        relative11 = parse9(serialize(relative11, options), options);
       }
       options = options || {};
-      if (!options.tolerant && relative10.scheme) {
-        target.scheme = relative10.scheme;
-        target.userinfo = relative10.userinfo;
-        target.host = relative10.host;
-        target.port = relative10.port;
-        target.path = removeDotSegments(relative10.path || "");
-        target.query = relative10.query;
+      if (!options.tolerant && relative11.scheme) {
+        target.scheme = relative11.scheme;
+        target.userinfo = relative11.userinfo;
+        target.host = relative11.host;
+        target.port = relative11.port;
+        target.path = removeDotSegments(relative11.path || "");
+        target.query = relative11.query;
       } else {
-        if (relative10.userinfo !== void 0 || relative10.host !== void 0 || relative10.port !== void 0) {
-          target.userinfo = relative10.userinfo;
-          target.host = relative10.host;
-          target.port = relative10.port;
-          target.path = removeDotSegments(relative10.path || "");
-          target.query = relative10.query;
+        if (relative11.userinfo !== void 0 || relative11.host !== void 0 || relative11.port !== void 0) {
+          target.userinfo = relative11.userinfo;
+          target.host = relative11.host;
+          target.port = relative11.port;
+          target.path = removeDotSegments(relative11.path || "");
+          target.query = relative11.query;
         } else {
-          if (!relative10.path) {
+          if (!relative11.path) {
             target.path = base.path;
-            if (relative10.query !== void 0) {
-              target.query = relative10.query;
+            if (relative11.query !== void 0) {
+              target.query = relative11.query;
             } else {
               target.query = base.query;
             }
           } else {
-            if (relative10.path[0] === "/") {
-              target.path = removeDotSegments(relative10.path);
+            if (relative11.path[0] === "/") {
+              target.path = removeDotSegments(relative11.path);
             } else {
               const baseHasAuthority = base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0;
               if (baseHasAuthority && !base.path) {
-                target.path = "/" + relative10.path;
+                target.path = "/" + relative11.path;
               } else if (!base.path) {
-                target.path = relative10.path;
+                target.path = relative11.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative10.path;
+                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative11.path;
               }
               target.path = base.scheme === void 0 && !baseHasAuthority && target.path[0] !== "/" ? removeDotSegmentsRelative(target.path) : removeDotSegments(target.path);
             }
-            target.query = relative10.query;
+            target.query = relative11.query;
           }
           target.userinfo = base.userinfo;
           target.host = base.host;
@@ -11293,7 +11293,7 @@ var require_fast_uri = __commonJS({
         }
         target.scheme = base.scheme;
       }
-      target.fragment = relative10.fragment;
+      target.fragment = relative11.fragment;
       return target;
     }
     function equal(uriA, uriB, options) {
@@ -11564,7 +11564,7 @@ var require_fast_uri = __commonJS({
       }
       return { parsed, malformedAuthorityOrPort, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme };
     }
-    function parse8(uri, opts) {
+    function parse9(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
     }
     function normalizeString(uri, opts) {
@@ -11597,11 +11597,11 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize: normalize3,
-      resolve: resolve5,
+      resolve: resolve7,
       resolveComponent,
       equal,
       serialize,
-      parse: parse8
+      parse: parse9
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -13102,8 +13102,8 @@ var require_contains = __commonJS({
         cxt.result(valid, () => cxt.reset());
         function validateItemsWithCount() {
           const schValid = gen.name("_valid");
-          const count = gen.let("count", 0);
-          validateItems(schValid, () => gen.if(schValid, () => checkLimits(count)));
+          const count2 = gen.let("count", 0);
+          validateItems(schValid, () => gen.if(schValid, () => checkLimits(count2)));
         }
         function validateItems(_valid, block) {
           gen.forRange("i", 0, len, (i) => {
@@ -13116,16 +13116,16 @@ var require_contains = __commonJS({
             block();
           });
         }
-        function checkLimits(count) {
-          gen.code((0, codegen_1._)`${count}++`);
+        function checkLimits(count2) {
+          gen.code((0, codegen_1._)`${count2}++`);
           if (max === void 0) {
-            gen.if((0, codegen_1._)`${count} >= ${min}`, () => gen.assign(valid, true).break());
+            gen.if((0, codegen_1._)`${count2} >= ${min}`, () => gen.assign(valid, true).break());
           } else {
-            gen.if((0, codegen_1._)`${count} > ${max}`, () => gen.assign(valid, false).break());
+            gen.if((0, codegen_1._)`${count2} > ${max}`, () => gen.assign(valid, false).break());
             if (min === 1)
               gen.assign(valid, true);
             else
-              gen.if((0, codegen_1._)`${count} >= ${min}`, () => gen.assign(valid, true));
+              gen.if((0, codegen_1._)`${count2} >= ${min}`, () => gen.assign(valid, true));
           }
         }
       }
@@ -14587,11 +14587,11 @@ var require_dist2 = __commonJS({
 });
 
 // src/cli.ts
-var import_node_fs26 = require("node:fs");
+var import_node_fs31 = require("node:fs");
 
 // src/agent/headless.ts
-var import_node_fs = require("node:fs");
-var import_node_path = require("node:path");
+var import_node_fs2 = require("node:fs");
+var import_node_path3 = require("node:path");
 
 // src/core/proc.ts
 var import_node_async_hooks = require("node:async_hooks");
@@ -14653,112 +14653,10 @@ function openInBrowser(url) {
   (0, import_node_child_process.spawn)(cmd, args, { detached: true, stdio: "ignore", windowsHide: true }).unref();
 }
 
-// src/agent/headless.ts
-async function runAgent(project, task, log) {
-  const mcpConfig = (0, import_node_path.join)(project.store.dir, `agent-mcp-${process.pid}-${Date.now()}.json`);
-  (0, import_node_fs.writeFileSync)(
-    mcpConfig,
-    JSON.stringify({
-      mcpServers: {
-        probe: { command: process.execPath, args: [(0, import_node_path.resolve)(process.argv[1]), "mcp"], env: { PROBE_PROJECT: project.root, ...task.mcpEnv } }
-      }
-    })
-  );
-  const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
-  const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
-  const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...task.allowEdits ? ["Edit", "Write"] : [], ...scoped];
-  const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...task.allowEdits || scoped.length ? [] : ["Edit", "Write"]];
-  const args = [
-    "-p",
-    "--output-format",
-    "stream-json",
-    "--verbose",
-    "--mcp-config",
-    mcpConfig,
-    "--strict-mcp-config",
-    "--allowedTools",
-    allowed.join(","),
-    "--disallowedTools",
-    denied.join(","),
-    ...(task.addDirs ?? []).flatMap((d) => ["--add-dir", d])
-  ];
-  args.push("--model", task.model ?? project.config.agents.model);
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
-  delete env.CLAUDE_CODE_ENTRYPOINT;
-  let result = { ok: false, summary: "Agent ended without a result.", costUsd: 0, turns: 0 };
-  let exitCode;
-  try {
-    exitCode = await stream(
-      "claude",
-      args,
-      task.cwd ?? project.root,
-      (line) => {
-        const event = parseEvent(line);
-        if (!event) {
-          if (line.trim()) log(line);
-          return;
-        }
-        for (const text2 of describe(event)) log(text2);
-        if (event.type === "result") {
-          result = {
-            ok: event.subtype === "success" && !event.is_error,
-            summary: String(event.result ?? event.subtype ?? ""),
-            costUsd: Number(event.total_cost_usd ?? 0),
-            turns: Number(event.num_turns ?? 0)
-          };
-        }
-      },
-      { input: task.prompt, env }
-    );
-  } finally {
-    (0, import_node_fs.rmSync)(mcpConfig, { force: true });
-  }
-  if (exitCode !== 0 && result.ok) result.ok = false;
-  return result;
-}
-async function checkModel(project, model) {
-  const env = { ...process.env };
-  delete env.CLAUDECODE;
-  delete env.CLAUDE_CODE_ENTRYPOINT;
-  let out = "";
-  await stream("claude", ["-p", "--model", model, "--output-format", "json", "--max-turns", "1", "--strict-mcp-config"], project.root, (l) => out += l, {
-    input: "Reply with the single word OK.",
-    env
-  });
-  try {
-    const r = JSON.parse(out.slice(out.indexOf("{")));
-    const text2 = String(r.result ?? "").trim();
-    const used = Object.keys(r.modelUsage ?? {})[0] ?? model;
-    const limited = /usage credits|usage limit|out of .*credits|rate limit/i.test(text2);
-    return { ok: !r.is_error && !limited, model: used, message: text2.slice(0, 300), costUsd: Number(r.total_cost_usd ?? 0) };
-  } catch {
-    return { ok: false, model, message: out.slice(0, 300) || "claude did not answer", costUsd: 0 };
-  }
-}
-function parseEvent(line) {
-  if (!line.startsWith("{")) return null;
-  try {
-    return JSON.parse(line);
-  } catch {
-    return null;
-  }
-}
-function describe(event) {
-  if (event.type === "system" && event.subtype === "init") return [`agent started (${String(event.model ?? "default model")})`];
-  if (event.type === "assistant") {
-    const content = event.message?.content ?? [];
-    return content.flatMap((c) => {
-      if (c.type === "text" && c.text?.trim()) return [`\u{1F4AC} ${c.text.trim().replace(/\s+/g, " ").slice(0, 300)}`];
-      if (c.type === "tool_use") return [`\u2192 ${String(c.name).replace(/^mcp__probe__/, "")} ${toolArg(c.input)}`];
-      return [];
-    });
-  }
-  if (event.type === "result") {
-    return [`agent finished: ${event.subtype} \xB7 ${event.num_turns ?? "?"} turns \xB7 $${Number(event.total_cost_usd ?? 0).toFixed(3)}`];
-  }
-  return [];
-}
+// src/agent/claude.ts
+var import_node_path = require("node:path");
+
+// src/agent/runner.ts
 function toolArg(input) {
   if (!input) return "";
   if (input.action) return [input.action, input.element ?? input.text ?? input.key ?? input.direction ?? ""].join(" ").trim();
@@ -14768,33 +14666,353 @@ function toolArg(input) {
   if (Array.isArray(input.cards)) return `(${input.cards.length} cards)`;
   return "";
 }
+function oneLine(text2, max = 300) {
+  return text2.trim().replace(/\s+/g, " ").slice(0, max);
+}
+function looksLimited(text2) {
+  return /usage credits|usage limit|out of .*credits|rate limit|quota/i.test(text2);
+}
+function parseJsonLine(line) {
+  if (!line.startsWith("{")) return null;
+  try {
+    const value = JSON.parse(line);
+    return value && typeof value === "object" && typeof value.type === "string" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+// src/agent/claude.ts
+var claudeRunner = {
+  id: "claude",
+  label: "Claude Code",
+  command: "claude",
+  versionArgs: ["--version"],
+  installHint: "Install Claude Code (https://claude.com/claude-code) and log in",
+  models: [
+    ["sonnet", "Sonnet \u2014 balanced, included in most plans (recommended)"],
+    ["haiku", "Haiku \u2014 fastest and cheapest, fine for simple cards"],
+    ["opus", "Opus \u2014 strongest, uses your plan faster"],
+    ["fable", "Fable \u2014 may bill usage credits on your plan"]
+  ],
+  launch({ task, model, mcp, scratchDir, id }) {
+    const mcpConfig = (0, import_node_path.join)(scratchDir, `agent-mcp-${id}.json`);
+    const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
+    const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
+    const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...task.allowEdits ? ["Edit", "Write"] : [], ...scoped];
+    const denied = ["NotebookEdit", "Bash", "PowerShell", "WebFetch", "WebSearch", ...task.allowEdits || scoped.length ? [] : ["Edit", "Write"]];
+    const args = [
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--mcp-config",
+      mcpConfig,
+      "--strict-mcp-config",
+      "--allowedTools",
+      allowed.join(","),
+      "--disallowedTools",
+      denied.join(","),
+      ...(task.addDirs ?? []).flatMap((d) => ["--add-dir", d])
+    ];
+    if (model) args.push("--model", model);
+    return {
+      command: "claude",
+      args,
+      input: task.prompt,
+      env: nestedEnv(),
+      files: [{ path: mcpConfig, content: JSON.stringify({ mcpServers: { probe: mcp } }) }]
+    };
+  },
+  parser() {
+    let result = { ok: false, summary: "Agent ended without a result.", costUsd: 0, turns: 0 };
+    return {
+      line(line) {
+        const event = parseJsonLine(line);
+        if (!event) return line.trim() ? [line] : [];
+        if (event.type === "result") {
+          result = {
+            ok: event.subtype === "success" && !event.is_error,
+            summary: String(event.result ?? event.subtype ?? ""),
+            costUsd: Number(event.total_cost_usd ?? 0),
+            turns: Number(event.num_turns ?? 0)
+          };
+        }
+        return describe(event);
+      },
+      result: () => result
+    };
+  },
+  checkLaunch(model) {
+    return {
+      command: "claude",
+      args: ["-p", "--model", model, "--output-format", "json", "--max-turns", "1", "--strict-mcp-config"],
+      input: "Reply with the single word OK.",
+      env: nestedEnv(),
+      files: []
+    };
+  },
+  parseCheck(out, model) {
+    try {
+      const r = JSON.parse(out.slice(out.indexOf("{")));
+      const text2 = String(r.result ?? "").trim();
+      const used = Object.keys(r.modelUsage ?? {})[0] ?? model;
+      return { ok: !r.is_error && !looksLimited(text2), model: used, message: text2.slice(0, 300), costUsd: Number(r.total_cost_usd ?? 0) };
+    } catch {
+      return { ok: false, model, message: out.slice(0, 300) || "claude did not answer", costUsd: 0 };
+    }
+  }
+};
+function nestedEnv() {
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+  delete env.CLAUDE_CODE_ENTRYPOINT;
+  return env;
+}
+function describe(event) {
+  if (event.type === "system" && event.subtype === "init") return [`agent started (${String(event.model ?? "default model")})`];
+  if (event.type === "assistant") {
+    const content = event.message?.content ?? [];
+    return content.flatMap((c) => {
+      if (c.type === "text" && c.text?.trim()) return [`\u{1F4AC} ${oneLine(c.text)}`];
+      if (c.type === "tool_use") return [`\u2192 ${String(c.name).replace(/^mcp__probe__/, "")} ${toolArg(c.input)}`];
+      return [];
+    });
+  }
+  if (event.type === "result") {
+    return [`agent finished: ${event.subtype} \xB7 ${event.num_turns ?? "?"} turns \xB7 $${Number(event.total_cost_usd ?? 0).toFixed(3)}`];
+  }
+  return [];
+}
+
+// src/agent/codex.ts
+var import_node_fs = require("node:fs");
+var import_node_os = require("node:os");
+var import_node_path2 = require("node:path");
+function codexRunner(readSettings = readCodexUserSettings) {
+  const base = (settings, model, sandbox) => [
+    "exec",
+    "--json",
+    "--skip-git-repo-check",
+    "--ephemeral",
+    "--ignore-user-config",
+    "--sandbox",
+    sandbox,
+    ...model || settings.model ? ["--model", model || settings.model] : [],
+    ...settings.windowsSandbox ? ["-c", `windows.sandbox=${tomlString(settings.windowsSandbox)}`] : [],
+    // Tools an agent run has no use for.
+    ...UNUSED_FEATURES.flatMap((f) => ["--disable", f])
+  ];
+  return {
+    id: "codex",
+    label: "Codex CLI",
+    command: "codex",
+    versionArgs: ["--version"],
+    installHint: "Install Codex CLI (npm install -g @openai/codex) and run codex login",
+    models: [["", "Codex default (your ~/.codex/config.toml)"]],
+    launch({ task, model, mcp }) {
+      const edits = Boolean(task.allowEdits || task.editOnly?.length);
+      const noShell = !edits && task.builtinTools !== void 0 && task.builtinTools.length === 0;
+      const args = [
+        ...base(readSettings(), model, edits ? "workspace-write" : "read-only"),
+        ...noShell ? ["--disable", "shell_tool", "--disable", "unified_exec"] : [],
+        ...mcpOverrides(mcp, task.probeTools),
+        // The prompt comes on stdin.
+        "-"
+      ];
+      return { command: "codex", args, input: task.prompt, env: { ...process.env }, files: [] };
+    },
+    parser: codexParser,
+    checkLaunch(model) {
+      return {
+        command: "codex",
+        args: [...base(readSettings(), model, "read-only"), "--disable", "shell_tool", "--disable", "unified_exec", "-"],
+        input: "Reply with the single word OK.",
+        env: { ...process.env },
+        files: []
+      };
+    },
+    parseCheck(out, model) {
+      const parser = codexParser();
+      for (const line of out.split(/\r?\n/)) parser.line(line);
+      const r = parser.result();
+      const message = (r.summary || out).trim().slice(0, 300) || "codex did not answer";
+      return { ok: r.ok && !looksLimited(r.summary), model: model || readSettings().model || "Codex default", message, costUsd: 0 };
+    }
+  };
+}
+var UNUSED_FEATURES = ["apps", "browser_use", "computer_use", "in_app_browser", "image_generation"];
+function mcpOverrides(mcp, tools) {
+  const set = (key, value) => ["-c", `mcp_servers.probe.${key}=${value}`];
+  return [
+    ...set("command", tomlString(mcp.command)),
+    ...set("args", `[${mcp.args.map(tomlString).join(", ")}]`),
+    ...set("env", `{ ${Object.entries(mcp.env).map(([k, v]) => `${tomlString(k)} = ${tomlString(v)}`).join(", ")} }`),
+    ...set("enabled_tools", `[${tools.map(tomlString).join(", ")}]`),
+    // Without it every Probe tool call fails with "requires approval, but approval policy is never".
+    ...set("default_tools_approval_mode", tomlString("approve")),
+    // Running unit tests or a device step through Probe takes minutes, not Codex's default seconds.
+    ...set("tool_timeout_sec", "3600")
+  ];
+}
+function tomlString(value) {
+  return /['\r\n]/.test(value) ? JSON.stringify(value) : `'${value}'`;
+}
+function codexParser() {
+  let result = { ok: false, summary: "", costUsd: 0, turns: 0 };
+  let lastMessage = "";
+  let steps = 0;
+  let failure = "";
+  return {
+    line(line) {
+      const event = parseJsonLine(line);
+      if (!event) return line.trim() ? [line] : [];
+      const item = event.item ?? {};
+      switch (event.type) {
+        case "thread.started":
+          return ["agent started (codex)"];
+        case "item.started":
+          if (item.type === "mcp_tool_call") return [`\u2192 ${item.tool} ${toolArg(item.arguments)}`];
+          if (item.type === "command_execution") return [`$ ${oneLine(String(item.command ?? ""), 160)}`];
+          return [];
+        case "item.completed":
+          if (item.type === "agent_message" && item.text?.trim()) {
+            lastMessage = item.text.trim();
+            steps++;
+            return [`\u{1F4AC} ${oneLine(item.text)}`];
+          }
+          if (item.type === "mcp_tool_call" || item.type === "command_execution" || item.type === "file_change") steps++;
+          if (item.type === "mcp_tool_call" && item.error?.message) return [`\u26A0 ${item.tool}: ${oneLine(item.error.message)}`];
+          if (item.type === "file_change") return (item.changes ?? []).map((c) => `\u270E ${c.path ?? "file"}`);
+          if (item.type === "error" && item.message) return [`\u26A0 ${oneLine(item.message)}`];
+          return [];
+        case "turn.completed": {
+          result = { ok: true, summary: lastMessage, costUsd: 0, turns: steps };
+          const usage2 = event.usage ?? {};
+          return [`agent finished: success \xB7 ${steps} steps \xB7 ${usage2.input_tokens ?? "?"} in / ${usage2.output_tokens ?? "?"} out tokens`];
+        }
+        case "turn.failed":
+          failure = String((event.error ?? {}).message ?? "turn failed");
+          result = { ok: false, summary: failure, costUsd: 0, turns: steps };
+          return [`agent finished: failed \xB7 ${oneLine(failure)}`];
+        case "error":
+          failure = String(event.message ?? "");
+          return failure ? [`\u26A0 ${oneLine(failure)}`] : [];
+        default:
+          return [];
+      }
+    },
+    result() {
+      if (result.ok || result.summary) return result;
+      return { ok: false, summary: failure || lastMessage || "Agent ended without a result.", costUsd: 0, turns: steps };
+    }
+  };
+}
+function readCodexUserSettings(home = process.env.CODEX_HOME || (0, import_node_path2.join)((0, import_node_os.homedir)(), ".codex")) {
+  const file = (0, import_node_path2.join)(home, "config.toml");
+  if (!(0, import_node_fs.existsSync)(file)) return {};
+  return parseCodexUserSettings((0, import_node_fs.readFileSync)(file, "utf8"));
+}
+function parseCodexUserSettings(text2) {
+  const settings = {};
+  let table = "";
+  for (const raw of text2.split(/\r?\n/)) {
+    const line = raw.trim();
+    const header = /^\[([^\]]+)\]$/.exec(line);
+    if (header) {
+      table = header[1].trim();
+      continue;
+    }
+    const kv = /^([\w-]+)\s*=\s*["']([^"']*)["']/.exec(line);
+    if (!kv) continue;
+    if (table === "" && kv[1] === "model") settings.model = kv[2];
+    if (table === "windows" && kv[1] === "sandbox") settings.windowsSandbox = kv[2];
+  }
+  return settings;
+}
+
+// src/agent/runners.ts
+var RUNNERS = {
+  claude: claudeRunner,
+  codex: codexRunner()
+};
+function agentRunner(id) {
+  return RUNNERS[id ?? "claude"] ?? claudeRunner;
+}
+function allRunners() {
+  return Object.values(RUNNERS);
+}
+
+// src/agent/headless.ts
+async function runAgent(project, task, log) {
+  const runner = agentRunner(project.config.agents.runner);
+  const launch = runner.launch({
+    task,
+    model: task.model ?? project.config.agents.model,
+    mcp: probeMcpServer(project, task.mcpEnv),
+    scratchDir: project.store.dir,
+    // Two agents running at once must not share a config file.
+    id: `${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  });
+  const parser = runner.parser();
+  const exitCode = await withFiles(
+    launch,
+    () => stream(launch.command, launch.args, task.cwd ?? project.root, (line) => parser.line(line).forEach(log), { input: launch.input, env: launch.env })
+  );
+  const result = parser.result();
+  if (exitCode !== 0 && result.ok) result.ok = false;
+  return result;
+}
+async function checkModel(project, model) {
+  const runner = agentRunner(project.config.agents.runner);
+  const launch = runner.checkLaunch(model);
+  let out = "";
+  try {
+    await withFiles(launch, () => stream(launch.command, launch.args, project.root, (l) => out += `${l}
+`, { input: launch.input, env: launch.env }));
+  } catch (e) {
+    return { ok: false, model, message: `${runner.label} did not start: ${e.message}`, costUsd: 0 };
+  }
+  return runner.parseCheck(out, model);
+}
+function probeMcpServer(project, extraEnv = {}) {
+  return { command: process.execPath, args: [(0, import_node_path3.resolve)(process.argv[1]), "mcp"], env: { PROBE_PROJECT: project.root, ...extraEnv } };
+}
+async function withFiles(launch, work) {
+  for (const f of launch.files) (0, import_node_fs2.writeFileSync)(f.path, f.content);
+  try {
+    return await work();
+  } finally {
+    for (const f of launch.files) (0, import_node_fs2.rmSync)(f.path, { force: true });
+  }
+}
 
 // src/core/store.ts
 var import_node_crypto = require("node:crypto");
-var import_node_fs2 = require("node:fs");
-var import_node_os = require("node:os");
-var import_node_path2 = require("node:path");
+var import_node_fs3 = require("node:fs");
+var import_node_os2 = require("node:os");
+var import_node_path4 = require("node:path");
 var Store = class {
   dir;
   constructor(projectRoot) {
-    const abs = (0, import_node_path2.resolve)(projectRoot);
+    const abs = (0, import_node_path4.resolve)(projectRoot);
     const hash2 = (0, import_node_crypto.createHash)("sha1").update(abs.toLowerCase()).digest("hex").slice(0, 10);
-    this.dir = (0, import_node_path2.join)((0, import_node_os.homedir)(), ".probe", "projects", `${(0, import_node_path2.basename)(abs)}-${hash2}`);
-    (0, import_node_fs2.mkdirSync)((0, import_node_path2.join)(this.dir, "runs"), { recursive: true });
+    this.dir = (0, import_node_path4.join)((0, import_node_os2.homedir)(), ".probe", "projects", `${(0, import_node_path4.basename)(abs)}-${hash2}`);
+    (0, import_node_fs3.mkdirSync)((0, import_node_path4.join)(this.dir, "runs"), { recursive: true });
   }
   read(name) {
-    const file = (0, import_node_path2.join)(this.dir, name);
-    if (!(0, import_node_fs2.existsSync)(file)) return null;
-    return JSON.parse((0, import_node_fs2.readFileSync)(file, "utf8"));
+    const file = (0, import_node_path4.join)(this.dir, name);
+    if (!(0, import_node_fs3.existsSync)(file)) return null;
+    return JSON.parse((0, import_node_fs3.readFileSync)(file, "utf8"));
   }
   write(name, value) {
-    (0, import_node_fs2.writeFileSync)((0, import_node_path2.join)(this.dir, name), JSON.stringify(value, null, 2));
+    (0, import_node_fs3.writeFileSync)((0, import_node_path4.join)(this.dir, name), JSON.stringify(value, null, 2));
   }
   writeRun(id, value) {
-    this.write((0, import_node_path2.join)("runs", `${id}.json`), value);
+    this.write((0, import_node_path4.join)("runs", `${id}.json`), value);
   }
   listRuns() {
-    return (0, import_node_fs2.readdirSync)((0, import_node_path2.join)(this.dir, "runs")).filter((f) => f.endsWith(".json")).sort().reverse().map((f) => this.read((0, import_node_path2.join)("runs", f))).filter((r) => r !== null);
+    return (0, import_node_fs3.readdirSync)((0, import_node_path4.join)(this.dir, "runs")).filter((f) => f.endsWith(".json")).sort().reverse().map((f) => this.read((0, import_node_path4.join)("runs", f))).filter((r) => r !== null);
   }
 };
 var issued = /* @__PURE__ */ new Set();
@@ -14883,6 +15101,10 @@ var live = /* @__PURE__ */ new Map();
 function liveRun(id) {
   return live.get(id);
 }
+function runningRuns() {
+  return [...live.values()].filter((e) => e.run.status === "running").map(({ run, child }) => ({ run, child })).sort((a, b) => a.run.startedAt.localeCompare(b.run.startedAt));
+}
+var FINISHED_KEPT_MS = 10 * 6e4;
 function stopRun(id) {
   const entry = live.get(id);
   if (!entry || entry.run.status !== "running") return false;
@@ -14893,8 +15115,9 @@ function launchRun(project, run, work) {
   const git2 = gitState(project.root);
   if (git2) run.git = { branch: git2.branch, commit: git2.commit, dirty: git2.dirty };
   const stop = new AbortController();
-  runSignal.getStore()?.addEventListener("abort", () => stop.abort(), { once: true });
-  const entry = { run, stop, events: new import_node_events.EventEmitter(), log: [] };
+  const parent = runSignal.getStore();
+  parent?.addEventListener("abort", () => stop.abort(), { once: true });
+  const entry = { run, stop, events: new import_node_events.EventEmitter(), log: [], child: parent !== void 0 };
   live.set(run.id, entry);
   const log = (line) => {
     entry.log.push(line);
@@ -14917,15 +15140,21 @@ function launchRun(project, run, work) {
     run.finishedAt = (/* @__PURE__ */ new Date()).toISOString();
     project.store.writeRun(run.id, { ...run, log: entry.log.slice(-400) });
     entry.events.emit("event", { type: "done", run });
+    setTimeout(() => live.get(run.id) === entry && live.delete(run.id), FINISHED_KEPT_MS).unref();
     return run;
   })();
   return { run, done };
 }
 
 // src/core/config.ts
-var import_node_fs3 = require("node:fs");
-var import_node_path3 = require("node:path");
+var import_node_fs4 = require("node:fs");
+var import_node_path5 = require("node:path");
 var import_yaml = __toESM(require_dist(), 1);
+var AGENT_RUNNERS = ["claude", "codex"];
+var RUNNER_DEFAULT_MODEL = { claude: "sonnet", codex: "" };
+function isAgentRunner(value) {
+  return AGENT_RUNNERS.includes(value);
+}
 var CONFIG_DIR = "probe";
 var CONFIG_FILE = "probe.yaml";
 var LOCAL_CONFIG_FILE = "local.yaml";
@@ -14937,50 +15166,85 @@ var DEFAULTS = {
   verify: { cards: "approved", maxCards: 10 },
   perf: { maxStartupMs: 4e3, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
-  agents: { model: "sonnet" },
-  watch: { enabled: true, drafts: true, maxFeatures: 3 },
+  agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
+  watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
   devices: { allowReal: [] }
 };
 function configPath(root) {
-  return (0, import_node_path3.join)(root, CONFIG_DIR, CONFIG_FILE);
+  return (0, import_node_path5.join)(root, CONFIG_DIR, CONFIG_FILE);
 }
 function loadConfig(root, localDir) {
   const file = configPath(root);
-  const raw = (0, import_node_fs3.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs3.readFileSync)(file, "utf8")) ?? {} : {};
-  const localFile = (0, import_node_path3.join)(localDir, LOCAL_CONFIG_FILE);
+  const raw = (0, import_node_fs4.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file, "utf8")) ?? {} : {};
+  const localFile = (0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE);
   const local = readLocal(localDir);
   return {
     name: raw.name,
     features: { roots: raw.features?.roots ?? DEFAULTS.features.roots },
     exclude: raw.exclude ?? [],
+    areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
     app: { ...raw.app },
     verify: { ...DEFAULTS.verify, ...raw.verify },
     perf: { ...DEFAULTS.perf, ...raw.perf },
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
-    // This machine's choice wins over the team's: each developer's plan decides which models they can use.
-    agents: { ...DEFAULTS.agents, ...raw.agents, ...local.agents },
+    agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] }
   };
 }
+function resolveAgents(team, machine) {
+  const teamRunner = isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner;
+  const runner = isAgentRunner(machine?.runner) ? machine.runner : teamRunner;
+  const model = machine?.model ?? (runner === teamRunner ? team?.model : void 0) ?? RUNNER_DEFAULT_MODEL[runner];
+  return { runner, model: String(model ?? "") };
+}
 function readLocal(localDir) {
-  const file = (0, import_node_path3.join)(localDir, LOCAL_CONFIG_FILE);
-  return (0, import_node_fs3.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs3.readFileSync)(file, "utf8")) ?? {} : {};
+  const file = (0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE);
+  return (0, import_node_fs4.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file, "utf8")) ?? {} : {};
 }
 function saveLocal(localDir, patch) {
   const merged = { ...readLocal(localDir), ...patch };
   for (const key of Object.keys(merged)) if (merged[key] === void 0) delete merged[key];
-  (0, import_node_fs3.writeFileSync)((0, import_node_path3.join)(localDir, LOCAL_CONFIG_FILE), (0, import_yaml.stringify)(merged));
+  (0, import_node_fs4.writeFileSync)((0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE), (0, import_yaml.stringify)(merged));
+}
+function readLocalAgents(localDir) {
+  return readLocal(localDir).agents;
+}
+function localAgents(current3, change) {
+  const next = { ...current3 };
+  if (change.runner !== void 0) {
+    const runner = change.runner?.trim() || void 0;
+    if (runner !== void 0 && !isAgentRunner(runner)) return `Runner: one of ${AGENT_RUNNERS.join(", ")}`;
+    if (runner !== current3?.runner && change.model === void 0) delete next.model;
+    if (runner) next.runner = runner;
+    else delete next.runner;
+  }
+  if (change.model !== void 0) {
+    const model = change.model.trim();
+    if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return "Model: a name the runner's --model accepts, e.g. sonnet";
+    if (model) next.model = model;
+    else delete next.model;
+  }
+  return Object.keys(next).length ? next : void 0;
 }
 function saveLocalDevices(localDir, devices) {
   saveLocal(localDir, { devices });
 }
 function agentModelSource(root, localDir) {
-  if (readLocal(localDir).agents?.model) return "machine";
+  const local = readLocal(localDir).agents;
+  if (local?.model) return "machine";
+  const team = readRaw(root).agents;
+  const switched = isAgentRunner(local?.runner) && local.runner !== (isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner);
+  return team?.model && !switched ? "project" : "default";
+}
+function agentRunnerSource(root, localDir) {
+  if (isAgentRunner(readLocal(localDir).agents?.runner)) return "machine";
+  return isAgentRunner(readRaw(root).agents?.runner) ? "project" : "default";
+}
+function readRaw(root) {
   const file = configPath(root);
-  const raw = (0, import_node_fs3.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs3.readFileSync)(file, "utf8")) ?? {} : {};
-  return raw.agents?.model ? "project" : "default";
+  return (0, import_node_fs4.existsSync)(file) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file, "utf8")) ?? {} : {};
 }
 var CONFIG_TEMPLATE = `# Probe settings for this project. Everything here is optional.
 # Shared with the team: commit this folder. Local results live outside the repo.
@@ -14999,6 +15263,19 @@ exclude: []
 unit:
   androidTask: testDebugUnitTest
   jvmTask: test
+  # Projects without Gradle: the command that runs the unit tests, optionally per area,
+  # and where it writes JUnit XML (else results come from its output and exit code).
+  # command: npm test
+  # areas:
+  #   engine: npx vitest run src/engine
+  # junit: reports/junit.xml
+
+# Areas of a project without Gradle (default: top-level folders and those inside src/,
+# lib/, packages/, apps/...). A list makes each matching folder an area; a map names them.
+# areas: [packages/*, services/*]
+# areas:
+#   engine: src/engine
+#   web: [web/src, web/public]
 
 # The app agents test on a device.
 app:
@@ -15008,8 +15285,12 @@ app:
 # Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
 # probe/hints/accounts.yaml; passwords stay encrypted on each machine).
 
-# Model for Probe's background agents (any name claude --model accepts).
+# Probe's background agents: the coding-agent CLI they run on and its model.
+# runner: claude (Claude Code, default) or codex (Codex CLI). Each machine can override both
+# in Studio -> Settings. A model is a name that runner's --model accepts; leave it out for
+# the runner's default (claude: sonnet, codex: your ~/.codex/config.toml model).
 agents:
+  runner: claude
   model: sonnet
 
 # probe verify: what a change is checked against.
@@ -15030,6 +15311,7 @@ watch:
   enabled: true
   drafts: true         # an agent drafts manifest and brief corrections for review
   maxFeatures: 3
+  impactDepth: 1       # a platform edit marks the areas depending on it stale; 2 reaches theirs, 0 is off
 
 tickets:
   # pattern: 'PROJ-\\d+'
@@ -15043,11 +15325,11 @@ function isExcluded(config2, featureId, moduleId) {
 }
 function saveProject(root, patch) {
   const file = configPath(root);
-  if (!(0, import_node_fs3.existsSync)(file)) {
-    (0, import_node_fs3.mkdirSync)((0, import_node_path3.join)(root, CONFIG_DIR), { recursive: true });
-    (0, import_node_fs3.writeFileSync)(file, CONFIG_TEMPLATE);
+  if (!(0, import_node_fs4.existsSync)(file)) {
+    (0, import_node_fs4.mkdirSync)((0, import_node_path5.join)(root, CONFIG_DIR), { recursive: true });
+    (0, import_node_fs4.writeFileSync)(file, CONFIG_TEMPLATE);
   }
-  const doc = (0, import_yaml.parseDocument)((0, import_node_fs3.readFileSync)(file, "utf8"));
+  const doc = (0, import_yaml.parseDocument)((0, import_node_fs4.readFileSync)(file, "utf8"));
   for (const [section, values] of Object.entries(patch)) {
     if (!(0, import_yaml.isMap)(doc.get(section))) doc.set(section, doc.createNode({}));
     for (const [key, value] of Object.entries(values ?? {})) {
@@ -15056,7 +15338,7 @@ function saveProject(root, patch) {
       else doc.setIn([section, key], value);
     }
   }
-  (0, import_node_fs3.writeFileSync)(file, doc.toString());
+  (0, import_node_fs4.writeFileSync)(file, doc.toString());
 }
 
 // src/core/kinds.ts
@@ -15084,7 +15366,7 @@ function scan(project) {
   const groups = /* @__PURE__ */ new Map();
   const excluded = /* @__PURE__ */ new Set();
   for (const m of modules) {
-    const { id, group } = featureOf(m.id, project.config.features.roots);
+    const { id, group } = m.feature ?? featureOf(m.id, project.config.features.roots);
     if (isExcluded(project.config, id, m.id)) {
       excluded.add(id);
       continue;
@@ -15095,7 +15377,7 @@ function scan(project) {
   }
   const features = [...groups.entries()].map(([id, { group, modules: ms }]) => ({ id, group, modules: ms, stats: stats(ms) })).sort((a, b) => a.group === b.group ? a.id.localeCompare(b.id) : a.group === "feature" ? -1 : 1);
   const result = {
-    project: { root: project.root, name: project.name, adapter: project.adapter.id },
+    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: project.adapter.supportsDevices },
     scannedAt: (/* @__PURE__ */ new Date()).toISOString(),
     features,
     excluded: [...excluded].sort()
@@ -15131,8 +15413,8 @@ function riskyGaps(feature, limit = 25) {
 }
 
 // src/cards/store.ts
-var import_node_fs4 = require("node:fs");
-var import_node_path4 = require("node:path");
+var import_node_fs5 = require("node:fs");
+var import_node_path6 = require("node:path");
 var import_yaml2 = __toESM(require_dist(), 1);
 
 // node_modules/zod/v3/external.js
@@ -15280,13 +15562,13 @@ var util;
     });
   };
   util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object3) => {
-    const keys = [];
+    const keys2 = [];
     for (const key in object3) {
       if (Object.prototype.hasOwnProperty.call(object3, key)) {
-        keys.push(key);
+        keys2.push(key);
       }
     }
-    return keys;
+    return keys2;
   };
   util2.find = (arr, checker) => {
     for (const item of arr) {
@@ -17514,8 +17796,8 @@ var ZodObject = class _ZodObject extends ZodType {
     if (this._cached !== null)
       return this._cached;
     const shape = this._def.shape();
-    const keys = util.objectKeys(shape);
-    this._cached = { shape, keys };
+    const keys2 = util.objectKeys(shape);
+    this._cached = { shape, keys: keys2 };
     return this._cached;
   }
   _parse(input) {
@@ -19206,14 +19488,14 @@ var CardInput = external_exports.object({
 
 // src/cards/store.ts
 function cardsDir(root, feature) {
-  const base = (0, import_node_path4.join)(root, CONFIG_DIR, "cards");
-  return feature ? (0, import_node_path4.join)(base, feature.replace(/:/g, "__")) : base;
+  const base = (0, import_node_path6.join)(root, CONFIG_DIR, "cards");
+  return feature ? (0, import_node_path6.join)(base, feature.replace(/:/g, "__")) : base;
 }
 function listCards(root, feature) {
   const base = cardsDir(root);
-  if (!(0, import_node_fs4.existsSync)(base)) return [];
-  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs4.readdirSync)(base).map((d) => (0, import_node_path4.join)(base, d));
-  return folders.filter(import_node_fs4.existsSync).flatMap((dir) => (0, import_node_fs4.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path4.join)(dir, f))).map((file) => (0, import_yaml2.parse)((0, import_node_fs4.readFileSync)(file, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
+  if (!(0, import_node_fs5.existsSync)(base)) return [];
+  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs5.readdirSync)(base).map((d) => (0, import_node_path6.join)(base, d));
+  return folders.filter(import_node_fs5.existsSync).flatMap((dir) => (0, import_node_fs5.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path6.join)(dir, f))).map((file) => (0, import_yaml2.parse)((0, import_node_fs5.readFileSync)(file, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
 }
 function findCard(root, feature, id) {
   return listCards(root, feature).find((c) => c.id === id);
@@ -19222,7 +19504,7 @@ function saveCards(root, feature, inputs, createdBy) {
   const result = { written: [], kept: [], errors: [] };
   const existing = new Map(listCards(root, feature).map((c) => [c.id, c]));
   const dir = cardsDir(root, feature);
-  (0, import_node_fs4.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs5.mkdirSync)(dir, { recursive: true });
   inputs.forEach((raw, i) => {
     const parsed = CardInput.safeParse(raw);
     if (!parsed.success) {
@@ -19274,7 +19556,7 @@ function recordDeviceRun(root, feature, id, runId) {
   writeCard(root, { ...card, confidence: "high", sources, updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
 }
 function writeCard(root, card) {
-  (0, import_node_fs4.writeFileSync)((0, import_node_path4.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml2.stringify)(card, { lineWidth: 100 }));
+  (0, import_node_fs5.writeFileSync)((0, import_node_path6.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml2.stringify)(card, { lineWidth: 100 }));
 }
 function levelOrder(c) {
   return c.level === "feature" ? 0 : c.level === "capability" ? 1 : 2;
@@ -19355,11 +19637,11 @@ function summarizeBackfill(run) {
 }
 
 // src/cards/context.ts
-var import_node_path6 = require("node:path");
+var import_node_path8 = require("node:path");
 
 // src/engine/docs.ts
-var import_node_fs5 = require("node:fs");
-var import_node_path5 = require("node:path");
+var import_node_fs6 = require("node:fs");
+var import_node_path7 = require("node:path");
 function nameVariants(featureId) {
   const last = featureId.split(":").pop();
   const words = last.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").toLowerCase().trim();
@@ -19383,9 +19665,9 @@ function docsAbout(root, featureId, budget = 16e3) {
     used += clipped.length;
   };
   const named = files.filter((f) => variants.some((v) => f.toLowerCase().split("/").pop().includes(v.replace(/ /g, ""))));
-  for (const f of named) add(f, (0, import_node_fs5.readFileSync)((0, import_node_path5.join)(root, f), "utf8"));
+  for (const f of named) add(f, (0, import_node_fs6.readFileSync)((0, import_node_path7.join)(root, f), "utf8"));
   for (const f of files.filter((x) => !named.includes(x))) {
-    for (const section of sections((0, import_node_fs5.readFileSync)((0, import_node_path5.join)(root, f), "utf8"))) {
+    for (const section of sections((0, import_node_fs6.readFileSync)((0, import_node_path7.join)(root, f), "utf8"))) {
       if (mentions(section.heading) > 0) add(`${f}#${section.heading}`, `${section.heading}
 ${section.body}`);
     }
@@ -19428,11 +19710,11 @@ var CARD_RULES = `## How to write cards
 - Cards someone already approved or rejected are kept as they are; don't re-propose them.`;
 function cardContext(project, feature) {
   const root = project.root;
-  const dirs = feature.modules.map((m) => (0, import_node_path6.relative)(root, m.dir).replace(/\\/g, "/"));
+  const dirs = feature.modules.map((m) => (0, import_node_path8.relative)(root, m.dir).replace(/\\/g, "/"));
   const classes = feature.modules.flatMap((m) => m.classes.map((c) => ({ ...c, module: m.id })));
   const out = [`# Feature: ${feature.id} (${project.name})`, ""];
   out.push("## Modules");
-  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path6.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
+  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path8.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
   out.push("", "## Key classes", "Test status: direct = has its own test class, referenced = used by tests, none = untested.");
   for (const kind of KEY_KINDS) {
     const ofKind = classes.filter((c) => c.kind === kind).sort((a, b) => b.lines - a.lines).slice(0, kind === "ui" ? 25 : 15);
@@ -19469,16 +19751,16 @@ var import_yaml5 = __toESM(require_dist(), 1);
 
 // src/accounts/accounts.ts
 var import_node_child_process2 = require("node:child_process");
-var import_node_fs6 = require("node:fs");
-var import_node_path7 = require("node:path");
+var import_node_fs7 = require("node:fs");
+var import_node_path9 = require("node:path");
 var import_yaml3 = __toESM(require_dist(), 1);
 function accountsFile(root) {
-  return (0, import_node_path7.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
+  return (0, import_node_path9.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
 }
 function listAccounts(root) {
   const file = accountsFile(root);
-  if (!(0, import_node_fs6.existsSync)(file)) return [];
-  const raw = (0, import_yaml3.parse)((0, import_node_fs6.readFileSync)(file, "utf8")) ?? {};
+  if (!(0, import_node_fs7.existsSync)(file)) return [];
+  const raw = (0, import_yaml3.parse)((0, import_node_fs7.readFileSync)(file, "utf8")) ?? {};
   return (raw.accounts ?? []).filter((a) => a.role && a.username);
 }
 function accountsForPrompt(project) {
@@ -19500,17 +19782,17 @@ function removeAccount(root, role) {
 }
 function writeAccounts(root, accounts) {
   const file = accountsFile(root);
-  (0, import_node_fs6.mkdirSync)((0, import_node_path7.dirname)(file), { recursive: true });
-  (0, import_node_fs6.writeFileSync)(file, `# Test accounts: roles and usernames only. Passwords stay on each machine.
+  (0, import_node_fs7.mkdirSync)((0, import_node_path9.dirname)(file), { recursive: true });
+  (0, import_node_fs7.writeFileSync)(file, `# Test accounts: roles and usernames only. Passwords stay on each machine.
 ${(0, import_yaml3.stringify)({ accounts })}`);
 }
 var Secrets = class {
   file;
   constructor(storeDir) {
-    this.file = (0, import_node_path7.join)(storeDir, "secrets.json");
+    this.file = (0, import_node_path9.join)(storeDir, "secrets.json");
   }
   load() {
-    return (0, import_node_fs6.existsSync)(this.file) ? JSON.parse((0, import_node_fs6.readFileSync)(this.file, "utf8")) : {};
+    return (0, import_node_fs7.existsSync)(this.file) ? JSON.parse((0, import_node_fs7.readFileSync)(this.file, "utf8")) : {};
   }
   has(role, kind) {
     return `${role}.${kind}` in this.load();
@@ -19522,14 +19804,14 @@ var Secrets = class {
   set(role, kind, value) {
     const all = this.load();
     all[`${role}.${kind}`] = seal(value);
-    (0, import_node_fs6.writeFileSync)(this.file, JSON.stringify(all, null, 2));
-    if (!isWindows) (0, import_node_fs6.chmodSync)(this.file, 384);
+    (0, import_node_fs7.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+    if (!isWindows) (0, import_node_fs7.chmodSync)(this.file, 384);
   }
   /** Forgets every secret of a role. */
   remove(role) {
     const all = this.load();
     for (const kind of ["password", "code"]) delete all[`${role}.${kind}`];
-    (0, import_node_fs6.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+    (0, import_node_fs7.writeFileSync)(this.file, JSON.stringify(all, null, 2));
   }
 };
 var PS_PROTECT = "Add-Type -AssemblyName System.Security; [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect([Text.Encoding]::UTF8.GetBytes($env:PROBE_SECRET), $null, 'CurrentUser'))";
@@ -19553,7 +19835,17 @@ function unseal(sealed) {
 }
 
 // src/devices/harness.ts
-var import_node_path10 = require("node:path");
+var import_node_path12 = require("node:path");
+
+// src/adapters/adapter.ts
+var ALWAYS_IGNORED = [".git", ".idea", "node_modules"];
+function ignoredPathPattern(adapter) {
+  const names = [.../* @__PURE__ */ new Set([...ALWAYS_IGNORED, ...adapter.ignoredDirs ?? []])].map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`(^|/)(${names.join("|")})(/|$)`);
+}
+function devicesUnsupported(adapter) {
+  return `Device testing is not available for ${adapter.label} projects yet: unit tests, coverage, manifests and cards work, running the app on a device does not.`;
+}
 
 // src/engine/app.ts
 function resolveApp(project) {
@@ -19569,27 +19861,27 @@ function resolveApp(project) {
 }
 
 // src/devices/session.ts
-var import_node_fs8 = require("node:fs");
-var import_node_path9 = require("node:path");
+var import_node_fs9 = require("node:fs");
+var import_node_path11 = require("node:path");
 
 // src/devices/adb.ts
 var import_node_child_process3 = require("node:child_process");
-var import_node_fs7 = require("node:fs");
-var import_node_path8 = require("node:path");
+var import_node_fs8 = require("node:fs");
+var import_node_path10 = require("node:path");
 function androidSdk(projectRoot) {
   const env = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT;
-  if (env && (0, import_node_fs7.existsSync)(env)) return env;
+  if (env && (0, import_node_fs8.existsSync)(env)) return env;
   if (!projectRoot) return null;
-  const local = (0, import_node_path8.join)(projectRoot, "local.properties");
-  if (!(0, import_node_fs7.existsSync)(local)) return null;
-  const raw = /^sdk\.dir=(.*)$/m.exec((0, import_node_fs7.readFileSync)(local, "utf8"))?.[1];
+  const local = (0, import_node_path10.join)(projectRoot, "local.properties");
+  if (!(0, import_node_fs8.existsSync)(local)) return null;
+  const raw = /^sdk\.dir=(.*)$/m.exec((0, import_node_fs8.readFileSync)(local, "utf8"))?.[1];
   const dir = raw?.trim().replace(/\\:/g, ":").replace(/\\\\/g, "\\");
-  return dir && (0, import_node_fs7.existsSync)(dir) ? dir : null;
+  return dir && (0, import_node_fs8.existsSync)(dir) ? dir : null;
 }
 function sdkTool(projectRoot, ...path) {
   const sdk = androidSdk(projectRoot);
-  const exe = (0, import_node_path8.join)(...path) + (isWindows ? ".exe" : "");
-  return sdk && (0, import_node_fs7.existsSync)((0, import_node_path8.join)(sdk, exe)) ? (0, import_node_path8.join)(sdk, exe) : path[path.length - 1];
+  const exe = (0, import_node_path10.join)(...path) + (isWindows ? ".exe" : "");
+  return sdk && (0, import_node_fs8.existsSync)((0, import_node_path10.join)(sdk, exe)) ? (0, import_node_path10.join)(sdk, exe) : path[path.length - 1];
 }
 var Adb = class _Adb {
   constructor(bin) {
@@ -19831,13 +20123,13 @@ var AndroidDevice = class {
 
 // src/devices/session.ts
 function sessionFile(storeDir, id) {
-  return (0, import_node_path9.join)(storeDir, "sessions", `${id}.json`);
+  return (0, import_node_path11.join)(storeDir, "sessions", `${id}.json`);
 }
 function createSession(storeDir, info) {
-  const session = { ...info, evidenceDir: (0, import_node_path9.join)(storeDir, "runs", info.id) };
-  (0, import_node_fs8.mkdirSync)((0, import_node_path9.join)(storeDir, "sessions"), { recursive: true });
-  (0, import_node_fs8.mkdirSync)(session.evidenceDir, { recursive: true });
-  (0, import_node_fs8.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
+  const session = { ...info, evidenceDir: (0, import_node_path11.join)(storeDir, "runs", info.id) };
+  (0, import_node_fs9.mkdirSync)((0, import_node_path11.join)(storeDir, "sessions"), { recursive: true });
+  (0, import_node_fs9.mkdirSync)(session.evidenceDir, { recursive: true });
+  (0, import_node_fs9.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
   return session;
 }
 var DeviceSession = class _DeviceSession {
@@ -19845,8 +20137,8 @@ var DeviceSession = class _DeviceSession {
     this.info = info;
     this.device = new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
     this.step = this.timeline().length;
-    const tree = (0, import_node_path9.join)(info.evidenceDir, "last-tree.json");
-    if ((0, import_node_fs8.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs8.readFileSync)(tree, "utf8"));
+    const tree = (0, import_node_path11.join)(info.evidenceDir, "last-tree.json");
+    if ((0, import_node_fs9.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs9.readFileSync)(tree, "utf8"));
   }
   info;
   device;
@@ -19857,40 +20149,40 @@ var DeviceSession = class _DeviceSession {
    */
   observe() {
     const elements = this.device.uiTree();
-    (0, import_node_fs8.writeFileSync)((0, import_node_path9.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
+    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
     return elements;
   }
   static open(storeDir, id) {
     const file = sessionFile(storeDir, id);
-    if (!(0, import_node_fs8.existsSync)(file)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
-    return new _DeviceSession(JSON.parse((0, import_node_fs8.readFileSync)(file, "utf8")));
+    if (!(0, import_node_fs9.existsSync)(file)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
+    return new _DeviceSession(JSON.parse((0, import_node_fs9.readFileSync)(file, "utf8")));
   }
   /** Saves a screenshot as the next step's evidence and returns it. */
   capture() {
     const png = this.device.screenshot();
     if (!png) return null;
     const name = `step-${String(this.step + 1).padStart(3, "0")}.png`;
-    (0, import_node_fs8.writeFileSync)((0, import_node_path9.join)(this.info.evidenceDir, name), png);
+    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, name), png);
     return { png, name };
   }
   record(action, detail, screenshot) {
     this.step++;
     const entry = { at: (/* @__PURE__ */ new Date()).toISOString(), action, detail, screenshot };
-    (0, import_node_fs8.appendFileSync)((0, import_node_path9.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
+    (0, import_node_fs9.appendFileSync)((0, import_node_path11.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
 `);
   }
   timeline() {
-    const file = (0, import_node_path9.join)(this.info.evidenceDir, "timeline.jsonl");
-    if (!(0, import_node_fs8.existsSync)(file)) return [];
-    return (0, import_node_fs8.readFileSync)(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    const file = (0, import_node_path11.join)(this.info.evidenceDir, "timeline.jsonl");
+    if (!(0, import_node_fs9.existsSync)(file)) return [];
+    return (0, import_node_fs9.readFileSync)(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   }
   /** What the agent's report tool handed in (verdict, login state, explored screens). */
   saveReport(name, value) {
-    (0, import_node_fs8.writeFileSync)((0, import_node_path9.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
+    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
   }
   report(name) {
-    const file = (0, import_node_path9.join)(this.info.evidenceDir, `${name}.json`);
-    return (0, import_node_fs8.existsSync)(file) ? JSON.parse((0, import_node_fs8.readFileSync)(file, "utf8")) : null;
+    const file = (0, import_node_path11.join)(this.info.evidenceDir, `${name}.json`);
+    return (0, import_node_fs9.existsSync)(file) ? JSON.parse((0, import_node_fs9.readFileSync)(file, "utf8")) : null;
   }
   saveVerdict(verdict) {
     this.saveReport("verdict", verdict);
@@ -19965,6 +20257,7 @@ var DEVICE_HOW_TO = `## How to work
 - Never buy, pay, change account or privacy settings, or touch anything outside this app.
 - Only create or delete content with a test account, and only what the task needs.`;
 async function runOnDevice(project, run, options, log) {
+  if (!project.adapter.supportsDevices) throw new Error(devicesUnsupported(project.adapter));
   let app = resolveApp(project);
   if (!app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio \u2192 Settings \u2192 Project.");
   const { device, info } = await pickDevice(project.root, project.config, options.device, log);
@@ -20004,7 +20297,7 @@ async function runOnDevice(project, run, options, log) {
     run.costUsd += result.costUsd;
     if (!result.ok) log(`agent: ${result.summary.slice(0, 300)}`);
   } finally {
-    if (await stopRecording((0, import_node_path10.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
+    if (await stopRecording((0, import_node_path12.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
   }
   run.timeline = session.timeline();
   run.crashes = device.crashes(pkg);
@@ -20031,14 +20324,14 @@ function crashError(run) {
 }
 
 // src/engine/ledger.ts
-var import_node_fs9 = require("node:fs");
-var import_node_path12 = require("node:path");
+var import_node_fs10 = require("node:fs");
+var import_node_path14 = require("node:path");
 var import_yaml4 = __toESM(require_dist(), 1);
 
 // src/engine/fingerprint.ts
 var import_node_child_process5 = require("node:child_process");
 var import_node_crypto2 = require("node:crypto");
-var import_node_path11 = require("node:path");
+var import_node_path13 = require("node:path");
 function git(root, args, input) {
   const r = (0, import_node_child_process5.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
   return r.status === 0 ? r.stdout : "";
@@ -20070,7 +20363,7 @@ var ContentIndex = class {
       const hashes = git(root, ["hash-object", "--stdin-paths"], changed.join("\n") + "\n").split("\n");
       changed.forEach((p, n) => hashes[n] && blobs.set(p, hashes[n].trim()));
     }
-    const byDir = new Map(modules.map((m) => [(0, import_node_path11.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
+    const byDir = new Map(modules.map((m) => [(0, import_node_path13.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
     for (const [path, blob] of blobs) {
       if (path.startsWith("probe/")) continue;
       let dir = path;
@@ -20138,16 +20431,16 @@ function cardHash(card) {
 // src/engine/ledger.ts
 var RESULTS_DIR = "results";
 function ledgerFile(root, feature) {
-  return (0, import_node_path12.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
+  return (0, import_node_path14.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
 }
 function readLedger(root, feature) {
   const file = ledgerFile(root, feature);
-  return (0, import_node_fs9.existsSync)(file) ? (0, import_yaml4.parse)((0, import_node_fs9.readFileSync)(file, "utf8")) ?? {} : {};
+  return (0, import_node_fs10.existsSync)(file) ? (0, import_yaml4.parse)((0, import_node_fs10.readFileSync)(file, "utf8")) ?? {} : {};
 }
 function writeLedger(root, feature, ledger) {
-  (0, import_node_fs9.mkdirSync)((0, import_node_path12.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
+  (0, import_node_fs10.mkdirSync)((0, import_node_path14.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
   const cards = ledger.cards ? Object.fromEntries(Object.entries(ledger.cards).sort(([a], [b]) => a.localeCompare(b))) : void 0;
-  (0, import_node_fs9.writeFileSync)(
+  (0, import_node_fs10.writeFileSync)(
     ledgerFile(root, feature),
     `# Probe results for "${feature}": written after each run, committed with the code.
 # A result is up to date while the code and card it ran on are unchanged.
@@ -20212,7 +20505,7 @@ var ResultFreshness = class {
     this.scan = scan2;
     const modules = allModules(scan2);
     this.index = new ContentIndex(project, modules);
-    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path12.relative)(project.root, m.dir).replace(/\\/g, "/")]));
+    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path14.relative)(project.root, m.dir).replace(/\\/g, "/")]));
   }
   project;
   scan;
@@ -20383,19 +20676,47 @@ function formatAtlas(result, health) {
 }
 
 // src/engine/init.ts
-var import_node_fs13 = require("node:fs");
-var import_node_path15 = require("node:path");
+var import_node_fs14 = require("node:fs");
+
+// src/core/testfiles.ts
+var SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb|php|cs|cpp|cc|c|h|hpp|m|mm|scala|dart|ex|exs|lua|vue|svelte)$/;
+var TEST_NAME = /(\.(test|spec)\.[^./]+$)|(_(test|spec)\.[^./]+$)|(^test_[^/]*\.py$)|((Test|Tests|Spec)\.(kt|java|swift|cs|scala|php)$)/;
+var TEST_DIR = /(^|\/)(test|tests|__tests__|spec|specs|src\/(test|androidTest|testFixtures|sharedTest)[^/]*)\//;
+function isTestPath(relPath) {
+  const path = relPath.replace(/\\/g, "/");
+  const name = path.slice(path.lastIndexOf("/") + 1);
+  return TEST_NAME.test(name) || TEST_DIR.test(path);
+}
+var TEST_ONLY_DIRS = /* @__PURE__ */ new Set(["test", "tests", "__tests__", "spec", "specs", "e2e"]);
+function testedName(fileName) {
+  return fileName.replace(/\.[^.]+$/, "").replace(/[._-](test|spec)$/i, "").replace(/^test_/, "").replace(/(Test|Tests|Spec)$/, "");
+}
+function stemOf(fileName) {
+  return fileName.replace(/\.[^.]+$/, "");
+}
+function testNamesIn(text2) {
+  return [
+    ...text2.matchAll(/fun\s+`([^`]+)`/g),
+    ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g),
+    ...text2.matchAll(/\b(?:test|it)(?:\.\w+)?\(\s*(["'`])((?:(?!\1).)+)\1/g),
+    ...text2.matchAll(/\bdef\s+(test_\w+)\s*\(/g),
+    ...text2.matchAll(/\bfunc\s+(Test\w+)\s*\(/g)
+  ].map((m) => m[m.length - 1]);
+}
+
+// src/engine/init.ts
+var import_node_path18 = require("node:path");
 
 // templates/agents-features.md
-var agents_features_default = "## Features\n\nEvery feature has a manifest, `probe/features/<id>.yaml` (format: `probe/features/README.md`):\nwhat it is, where it lives, its user flows, the rules it must keep, and the exact test that proves\neach rule (`covered_by`) or why none does yet (`gap`). Read it before changing a feature. When it\nnames a `brief`, that doc's \"At a glance\" section is the short version; `also_read` lists the rest.\nThe folder is the index: list it rather than relying on memory, and never invent a feature, path\nor test that no manifest, brief or code names.\n\n### Finding the feature\n\n- **What features are there?** Each manifest's `id`, `name` and `summary`.\n- **What is X / where do I start on X?** Match the manifest by `id`, `name` or `summary`; give its\n  summary, brief and the class to open first (the brief's At a glance), then brief yourself on it\n  as below. Nothing matches: say so and name the closest.\n- **Which features does a change touch?** A file under a manifest's `paths` is owned by that\n  feature (by each, when several claim it); one under its `related` only makes it stale. A file\n  nobody claims is unmapped: say so, do not guess. A change owned by more than 3 features (an edit\n  under a shared module) gets unit tests for all of them and the full check below for the 3 with\n  the most owned files.\n\n### Before working on a feature\n\nLoad the manifest, its brief (At a glance first) and every `also_read` entry fresh; read code only\nunder its `paths`. Know, in this order: what it is; the class to open first and the module layout;\nthe main data flow; every invariant (one with a `gap` is unproven by any test); how to test it (the\nunit command, and the rules only device cards prove); the brief's gotchas.\n\n### After changing a feature\n\n1. **Test links.** Every `covered_by` entry `TestClass :: test name` names a test that exists under\n   exactly that name. A renamed test breaks the link: fix the entry or give the rule a `gap`.\n2. **Unit tests.** Run the manifest's `unit.command`; tie each failure to its invariant.\n3. **Rules against the change.** Read the diff. A change that contradicts an invariant, a flow or\n   the brief's At a glance means the code or the rule is wrong: fix one in the same change.\n4. **Missing knowledge.** New behaviour (a signal, state, endpoint, push type, screen or rule) gets\n   an invariant or a flow; a new test proving something no invariant claims gets one.\n5. **Cards.** A rule only a device can prove lists its cards (`probe/cards/<feature>/<id>.yaml`)\n   under `cards:`. `probe rules <feature>` shows each rule's tests and cards and whether a card's\n   last pass still holds; `probe rule <feature/rule> --run` (or `probe_card_run` with `rule`) runs\n   them on an emulator, minutes per card. Name the card-only rules the change touches; never start\n   a card run unasked.\n\nBehaviour goes in `invariants`, architecture stays in the brief. A `covered_by` entry must name a\ntest you have found, never one you expect. With the Probe plugin installed, edits mark their\nfeatures stale, the end of a turn runs their unit tests and a link check, and corrections to\nmanifests and briefs arrive as drafts to approve in Probe Studio.\n";
+var agents_features_default = "## Features\n\nEvery feature has a manifest, `probe/features/<id>.yaml` (format: `probe/features/README.md`):\nwhat it is, where it lives, its user flows, the rules it must keep, and the exact test that proves\neach rule (`covered_by`) or why none does yet (`gap`). Read it before changing a feature. When it\nnames a `brief`, that doc's \"At a glance\" section is the short version; `also_read` lists the rest.\nShared code has manifests of the same shape with `kind: platform` (`core:database` is\n`core__database.yaml`): the contract it keeps for the code built on it, proven by unit tests.\nThe folder is the index: list it rather than relying on memory, and never invent a feature, path\nor test that no manifest, brief or code names.\n\n### Finding the feature\n\n- **What features are there?** Each manifest's `id`, `name` and `summary`.\n- **What is X / where do I start on X?** Match the manifest by `id`, `name` or `summary`; give its\n  summary, brief and the class to open first (the brief's At a glance), then brief yourself on it\n  as below. Nothing matches: say so and name the closest.\n- **Which features does a change touch?** A file under a manifest's `paths` is owned by that\n  feature (by each, when several claim it); one under its `related` only makes it stale, and so\n  does an edit in a platform module it depends on (`probe stale` names it \"depends on \u2026\"). A file\n  nobody claims is unmapped: say so, do not guess. A change owned by more than 3 features (an edit\n  under a shared module) gets unit tests for all of them and the full check below for the 3 with\n  the most owned files.\n\n### Before working on a feature\n\nLoad the manifest, its brief (At a glance first) and every `also_read` entry fresh; read code only\nunder its `paths`. Know, in this order: what it is; the class to open first and the module layout;\nthe main data flow; every invariant (one with a `gap` is unproven by any test); how to test it (the\nunit command, and the rules only device cards prove); the brief's gotchas.\n\n### After changing a feature\n\n1. **Test links.** Every `covered_by` entry `TestClass :: test name` names a test that exists under\n   exactly that name. A renamed test breaks the link: fix the entry or give the rule a `gap`.\n2. **Unit tests.** Run the manifest's `unit.command`; tie each failure to its invariant.\n3. **Rules against the change.** Read the diff. A change that contradicts an invariant, a flow or\n   the brief's At a glance means the code or the rule is wrong: fix one in the same change.\n4. **Missing knowledge.** New behaviour (a signal, state, endpoint, push type, screen or rule) gets\n   an invariant or a flow; a new test proving something no invariant claims gets one.\n5. **Cards.** A rule only a device can prove lists its cards (`probe/cards/<feature>/<id>.yaml`)\n   under `cards:`. `probe rules <feature>` shows each rule's tests and cards and whether a card's\n   last pass still holds; `probe rule <feature/rule> --run` (or `probe_card_run` with `rule`) runs\n   them on an emulator, minutes per card. Name the card-only rules the change touches; never start\n   a card run unasked.\n\nBehaviour goes in `invariants`, architecture stays in the brief. A `covered_by` entry must name a\ntest you have found, never one you expect. With the Probe plugin installed, edits mark their\nfeatures stale, the end of a turn runs their unit tests and a link check, and corrections to\nmanifests and briefs arrive as drafts to approve in Probe Studio.\n";
 
 // templates/features-README.md
-var features_README_default = '# Feature manifests\n\nOne file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id Probe\'s scan\nuses (`call`, `universe`, `chat`, ...). Together they are the feature index: agents list\nthis folder and reads each `summary`, so there is no separate index file to fall out of date.\n\nEach feature has three layers:\n\n| Layer | Where | Answers | Read by |\n|---|---|---|---|\n| Summary | `summary:` in the manifest | What is this, in one line? | agents, Studio, people browsing |\n| Brief | the doc `brief:` points to (`docs/features/<name>.md`) | What it does, how it works, what must never break | people and agents starting work |\n| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and agents working on the feature |\n\nThe manifest never repeats the brief. It points into it.\n\n## Manifest format\n\n```yaml\nid: call                      # Probe feature id; must match the scan\nname: Calling                 # display name\nsummary: >-                   # one or two lines, from the user\'s point of view\n  ...\nowner: "@someone"             # who approves changes to the authored parts; null until agreed\nbrief: docs/features/calling.md\nalso_read:                    # other docs an agent should load, with anchors where useful\n  - CLAUDE.md#calling\n\npaths:                        # code that belongs to this feature (prefix match, repo relative)\n  - feature/call/\nrelated:                      # code owned elsewhere that this feature depends on; an edit here\n  - path: core/push/impl/     # marks the feature stale but does not make it the owner\n    why: push types and categories that wake a call\n\nunit:                         # how to run this feature\'s unit tests\n  command: ./gradlew :feature:call:impl:testDebugUnitTest\n\nflows:                        # what a user can do, one line each; each becomes a card candidate\n  - id: dial\n    text: Start a call from a chat or a profile\n\ninvariants:                   # rules that must hold, each tied to what proves it\n  - id: own-call-never-rings\n    rule: Reconcile never rings for a call this device placed.\n    covered_by:               # "TestClass :: test name", exactly as written in the test\n      - "CallSignalSourceImplTest :: a reconcile never rings for a call this device placed"\n    cards: []                 # device cards that prove it: "card-id" in probe/cards/<this feature>/,\n                              # or "other-feature/card-id"\n    gap: null                 # why no unit test proves it (needed when covered_by is empty)\n\ndevice_only:                  # checks no unit test can make; candidates for cards\n  - text: Lock screen, incoming call\n```\n\n### Rules for the authored fields\n\n- **`invariants`** are behaviour, not architecture. "The reducer is pure" belongs in the brief;\n  "a declined outgoing call sends no DELETE" belongs here, because a test or a card can fail on it.\n- An invariant with empty `covered_by`, no `cards` and a `gap` is a known hole. One with all three\n  empty is invalid: say why it is not covered.\n- **`cards`** tie a rule to the device cards in `probe/cards/` that show it on a phone. Use them for\n  what a unit test cannot reach (a locked screen, the system ringer, a payment sheet, two devices).\n  A rule may have tests and cards both. A card link that names no card is a broken link, like a\n  renamed test. A card proves its rule only while its last pass still holds for the code; Probe\n  reads that from `probe/results/`. Keep `gap` on a card-only rule to say why no unit test can.\n- To check a rule on a device, ask your agent ("does the locked-phone ring rule still hold?"): it runs\n  `probe_card_run { rule: "call/full-screen-intent-rings" }`. From a shell: `probe rule\n  call/full-screen-intent-rings --run`. `probe rules <feature>` lists every rule with its proof.\n  The older single `card: <id>` still reads as a one-item `cards`.\n- `covered_by` names must match a real test exactly, so a renamed or deleted test shows up as a\n  broken link instead of silently passing.\n- `paths` decide ownership when the edit hook asks "which feature did this file touch?". A file\n  matched by two features\' `paths` belongs to both; `related` only marks a feature stale.\n\n### Derived fields\n\nModules, classes, test files and coverage are not written here. Probe\'s scan derives them from the\ncode on every run, so they cannot go stale. Do not add them by hand.\n\n## Brief format\n\nThe brief is the feature\'s doc in whatever form the team keeps docs (often `docs/features/<name>.md`).\nIt starts with an **At a glance** section, the part a newcomer reads first:\n\n```\n## 0) At a glance\n- What it is      \u2014 2\u20134 lines, user\'s point of view\n- Where it lives  \u2014 modules, and the one class to open first\n- User flows      \u2014 the main paths\n- Rules           \u2014 pointer to the manifest\'s invariants, plus the gaps that are still open\n- How to test     \u2014 unit command, and what needs a device\n```\n\nThe rest of the doc stays as the team writes it. A feature with no doc yet has no `brief:`.\n\n## Keeping it current\n\nWhen code under a feature\'s `paths` changes, the feature is stale. Whoever changed it, or Probe\'s\ncheck, then confirms:\n\n1. Every `covered_by` test still exists under that exact name.\n2. The change does not contradict an invariant, a flow or the brief\'s At a glance.\n3. New behaviour (a new signal, endpoint, screen or rule) has an invariant or flow to go with it.\n\nIt drafts the corrections; a person approves them. Nothing here is rewritten without review.\n';
+var features_README_default = '# Feature manifests\n\nOne file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id Probe\'s scan\nuses (`call`, `universe`, `chat`, ...). Together they are the feature index: agents list\nthis folder and reads each `summary`, so there is no separate index file to fall out of date.\n\nShared code gets a manifest too. A **platform area** is what the scan groups outside the feature\nfolders (`core:database`, `common:image`, `app`): code features build on rather than a screen a\nuser opens. Its manifest has the same shape with `kind: platform`, and a `:` in its id becomes\n`__` in the file name (`core:database` \u2192 `core__database.yaml`), since Windows allows no `:`.\n\nEach feature has three layers:\n\n| Layer | Where | Answers | Read by |\n|---|---|---|---|\n| Summary | `summary:` in the manifest | What is this, in one line? | agents, Studio, people browsing |\n| Brief | the doc `brief:` points to (`docs/features/<name>.md`) | What it does, how it works, what must never break | people and agents starting work |\n| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and agents working on the feature |\n\nThe manifest never repeats the brief. It points into it.\n\n## Manifest format\n\n```yaml\nid: call                      # Probe feature id; must match the scan\nkind: feature                 # feature (the default) or platform\nname: Calling                 # display name\nsummary: >-                   # one or two lines, from the user\'s point of view\n  ...\nowner: "@someone"             # who approves changes to the authored parts; null until agreed\nbrief: docs/features/calling.md\nalso_read:                    # other docs an agent should load, with anchors where useful\n  - CLAUDE.md#calling\n\npaths:                        # code that belongs to this feature (prefix match, repo relative)\n  - feature/call/\nrelated:                      # code owned elsewhere that this feature depends on; an edit here\n  - path: core/push/impl/     # marks the feature stale but does not make it the owner\n    why: push types and categories that wake a call\n\nunit:                         # how to run this feature\'s unit tests\n  command: ./gradlew :feature:call:impl:testDebugUnitTest\n\nflows:                        # what a user can do, one line each; each becomes a card candidate\n  - id: dial\n    text: Start a call from a chat or a profile\n\ninvariants:                   # rules that must hold, each tied to what proves it\n  - id: own-call-never-rings\n    rule: Reconcile never rings for a call this device placed.\n    covered_by:               # "TestClass :: test name", exactly as written in the test\n      - "CallSignalSourceImplTest :: a reconcile never rings for a call this device placed"\n    cards: []                 # device cards that prove it: "card-id" in probe/cards/<this feature>/,\n                              # or "other-feature/card-id"\n    gap: null                 # why no unit test proves it (needed when covered_by is empty)\n\ndevice_only:                  # checks no unit test can make; candidates for cards\n  - text: Lock screen, incoming call\n```\n\n### Rules for the authored fields\n\n- **`invariants`** are behaviour, not architecture. "The reducer is pure" belongs in the brief;\n  "a declined outgoing call sends no DELETE" belongs here, because a test or a card can fail on it.\n- An invariant with empty `covered_by`, no `cards` and a `gap` is a known hole. One with all three\n  empty is invalid: say why it is not covered.\n- **`cards`** tie a rule to the device cards in `probe/cards/` that show it on a phone. Use them for\n  what a unit test cannot reach (a locked screen, the system ringer, a payment sheet, two devices).\n  A rule may have tests and cards both. A card link that names no card is a broken link, like a\n  renamed test. A card proves its rule only while its last pass still holds for the code; Probe\n  reads that from `probe/results/`. Keep `gap` on a card-only rule to say why no unit test can.\n- To check a rule on a device, ask your agent ("does the locked-phone ring rule still hold?"): it runs\n  `probe_card_run { rule: "call/full-screen-intent-rings" }`. From a shell: `probe rule\n  call/full-screen-intent-rings --run`. `probe rules <feature>` lists every rule with its proof.\n  The older single `card: <id>` still reads as a one-item `cards`.\n- `covered_by` names must match a real test exactly, so a renamed or deleted test shows up as a\n  broken link instead of silently passing.\n- `paths` decide ownership when the edit hook asks "which feature did this file touch?". A file\n  matched by two features\' `paths` belongs to both; `related` only marks a feature stale.\n\n### Platform areas\n\nA `kind: platform` manifest states the contract shared code keeps for the code built on it:\n\n- `summary` says what it provides to that code; `flows` are what that code does with it (the\n  calls or services it offers), not screens.\n- `invariants` are proven by **unit tests**. Cards stay optional: give one only to a rule no unit\n  test can reach (real hardware, the OS). `probe init` drafts cards for a platform area only when\n  you name it (`probe init --step cards --features core:database`).\n- Do not list the areas that use it under `related`. Probe reads the module graph from the build\n  files: an edit in a platform module marks every area that depends on it directly as stale too\n  (`watch.impactDepth` in `probe.yaml`: 2 reaches their dependents as well, 0 turns it off).\n  `related` is still the way to name a dependency the build files do not show.\n\n### Derived fields\n\nModules, classes, test files, coverage and who depends on whom are not written here. Probe\'s scan\nderives them from the code on every run, so they cannot go stale. Do not add them by hand.\n\n## Brief format\n\nThe brief is the feature\'s doc in whatever form the team keeps docs (often `docs/features/<name>.md`).\nIt starts with an **At a glance** section, the part a newcomer reads first:\n\n```\n## 0) At a glance\n- What it is      \u2014 2\u20134 lines, user\'s point of view\n- Where it lives  \u2014 modules, and the one class to open first\n- User flows      \u2014 the main paths\n- Rules           \u2014 pointer to the manifest\'s invariants, plus the gaps that are still open\n- How to test     \u2014 unit command, and what needs a device\n```\n\nThe rest of the doc stays as the team writes it. A feature with no doc yet has no `brief:`.\n\n## Keeping it current\n\nWhen code under a feature\'s `paths` changes, the feature is stale; so is every area that depends\non an edited platform module. Whoever changed it, or Probe\'s\ncheck, then confirms:\n\n1. Every `covered_by` test still exists under that exact name.\n2. The change does not contradict an invariant, a flow or the brief\'s At a glance.\n3. New behaviour (a new signal, endpoint, screen or rule) has an invariant or flow to go with it.\n\nIt drafts the corrections; a person approves them. Nothing here is rewritten without review.\n';
 
 // src/knowledge/draft.ts
 var import_node_crypto3 = require("node:crypto");
-var import_node_fs11 = require("node:fs");
-var import_node_path14 = require("node:path");
+var import_node_fs12 = require("node:fs");
+var import_node_path16 = require("node:path");
 
 // src/core/diff.ts
 function unifiedDiff(before, after, path, context = 3) {
@@ -20453,26 +20774,30 @@ function lineOps(a, b) {
 }
 
 // src/knowledge/manifest.ts
-var import_node_fs10 = require("node:fs");
-var import_node_path13 = require("node:path");
+var import_node_fs11 = require("node:fs");
+var import_node_path15 = require("node:path");
 var import_yaml6 = __toESM(require_dist(), 1);
+var MANIFEST_KINDS = ["feature", "platform"];
 var FEATURES_DIR = "probe/features";
 function manifestFile(id) {
-  return `${FEATURES_DIR}/${id}.yaml`;
+  return `${FEATURES_DIR}/${id.replace(/:/g, "__")}.yaml`;
+}
+function manifestIdOf(fileName) {
+  return (0, import_node_path15.basename)(fileName, ".yaml").replace(/__/g, ":");
 }
 function loadManifest(root, id) {
   const file = manifestFile(id);
-  const abs = (0, import_node_path13.join)(root, file);
-  if (!(0, import_node_fs10.existsSync)(abs)) return null;
-  return normalize((0, import_yaml6.parse)((0, import_node_fs10.readFileSync)(abs, "utf8")) ?? {}, file);
+  const abs = (0, import_node_path15.join)(root, file);
+  if (!(0, import_node_fs11.existsSync)(abs)) return null;
+  return normalize((0, import_yaml6.parse)((0, import_node_fs11.readFileSync)(abs, "utf8")) ?? {}, file);
 }
 function loadManifests(root) {
-  const dir = (0, import_node_path13.join)(root, FEATURES_DIR);
-  if (!(0, import_node_fs10.existsSync)(dir)) return [];
+  const dir = (0, import_node_path15.join)(root, FEATURES_DIR);
+  if (!(0, import_node_fs11.existsSync)(dir)) return [];
   const out = [];
-  for (const name of (0, import_node_fs10.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
+  for (const name of (0, import_node_fs11.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
     try {
-      const m = loadManifest(root, name.slice(0, -".yaml".length));
+      const m = loadManifest(root, manifestIdOf(name));
       if (m) out.push(m);
     } catch {
     }
@@ -20483,7 +20808,8 @@ function normalize(raw, file) {
   const list = (v) => Array.isArray(v) ? v : [];
   const slash = (p) => String(p).replace(/\\/g, "/");
   return {
-    id: String(raw.id ?? (0, import_node_path13.basename)(file, ".yaml")),
+    id: String(raw.id ?? manifestIdOf(file)),
+    kind: raw.kind === "platform" ? "platform" : "feature",
     name: raw.name,
     summary: raw.summary,
     owner: raw.owner ?? null,
@@ -20511,21 +20837,24 @@ function cardRef(feature, ref) {
 function checkManifest(root, id, text2) {
   const file = manifestFile(id);
   const result = { feature: id, file, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
-  let m;
+  let raw;
   try {
-    m = text2 === void 0 ? loadManifest(root, id) : normalize((0, import_yaml6.parse)(text2) ?? {}, file);
+    const source = text2 ?? ((0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, file)) ? (0, import_node_fs11.readFileSync)((0, import_node_path15.join)(root, file), "utf8") : null);
+    raw = source === null ? null : (0, import_yaml6.parse)(source) ?? {};
   } catch (e) {
     result.errors.push(`Does not parse: ${e.message.split("\n")[0]}`);
     return result;
   }
-  if (!m) {
+  if (!raw) {
     result.errors.push("No manifest.");
     return result;
   }
-  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${id}.yaml`);
+  const m = normalize(raw, file);
+  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${(0, import_node_path15.basename)(file)}`);
+  if (raw.kind !== void 0 && !MANIFEST_KINDS.includes(raw.kind)) result.errors.push(`kind is "${String(raw.kind)}"; it is one of ${MANIFEST_KINDS.join(", ")}.`);
   if (!m.summary) result.errors.push("No summary.");
-  if (m.brief && !(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
-  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, p))) result.missingPaths.push(p);
+  if (m.brief && !(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
+  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, p))) result.missingPaths.push(p);
   const tests = testIndex(root);
   for (const inv of m.invariants) {
     if (!inv.coveredBy.length && !inv.cards.length) {
@@ -20548,7 +20877,7 @@ function checkManifest(root, id, text2) {
         result.broken.push({ invariant: inv.id, entry, problem: "no test class" });
         continue;
       }
-      const names = files.flatMap((f) => testNames((0, import_node_path13.join)(root, f)));
+      const names = files.flatMap((f) => testNames((0, import_node_path15.join)(root, f)));
       if (!names.includes(name ?? "")) result.broken.push({ invariant: inv.id, entry, problem: "no such test", closest: closest(name ?? "", names) });
     }
   }
@@ -20560,16 +20889,18 @@ function testIndex(root) {
   const out = /* @__PURE__ */ new Map();
   const listed = capture("git", ["ls-files", "-co", "--exclude-standard"], root) ?? "";
   for (const f of listed.split("\n")) {
-    if (!/\/src\/(test|androidTest)[^/]*\//.test(f) || !/\.(kt|java)$/.test(f)) continue;
-    const cls = (0, import_node_path13.basename)(f).replace(/\.(kt|java)$/, "");
+    const jvm = /\.(kt|java)$/.test(f);
+    if (jvm ? !/\/src\/(test|androidTest)[^/]*\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
+    const cls = stemOf((0, import_node_path15.basename)(f));
     out.set(cls, [...out.get(cls) ?? [], f]);
   }
   indexed = { root, at: Date.now(), tests: out };
   return out;
 }
 function testNames(file) {
-  const text2 = (0, import_node_fs10.readFileSync)(file, "utf8");
-  return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
+  const text2 = (0, import_node_fs11.readFileSync)(file, "utf8");
+  if (/\.(kt|java)$/.test(file)) return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
+  return testNamesIn(text2);
 }
 function closest(name, names) {
   const words = new Set(name.toLowerCase().split(/\W+/).filter(Boolean));
@@ -20582,8 +20913,8 @@ function closest(name, names) {
   return best && best.score >= 0.5 ? best.n : void 0;
 }
 function briefGlance(root, m) {
-  if (!m.brief || !(0, import_node_fs10.existsSync)((0, import_node_path13.join)(root, m.brief))) return null;
-  const text2 = (0, import_node_fs10.readFileSync)((0, import_node_path13.join)(root, m.brief), "utf8");
+  if (!m.brief || !(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, m.brief))) return null;
+  const text2 = (0, import_node_fs11.readFileSync)((0, import_node_path15.join)(root, m.brief), "utf8");
   const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text2);
   return match ? match[1].trim() : null;
 }
@@ -20603,47 +20934,47 @@ function summarizeCheck(c) {
 // src/knowledge/draft.ts
 var DRAFTS = "drafts";
 function draftDir(project, id) {
-  return (0, import_node_path14.join)(project.store.dir, DRAFTS, id);
+  return (0, import_node_path16.join)(project.store.dir, DRAFTS, id);
 }
 var hash = (text2) => (0, import_node_crypto3.createHash)("sha1").update(text2).digest("hex");
 var current = (project, path) => {
-  const abs = (0, import_node_path14.join)(project.root, path);
-  return (0, import_node_fs11.existsSync)(abs) ? (0, import_node_fs11.readFileSync)(abs, "utf8") : "";
+  const abs = (0, import_node_path16.join)(project.root, path);
+  return (0, import_node_fs12.existsSync)(abs) ? (0, import_node_fs12.readFileSync)(abs, "utf8") : "";
 };
 function openDraft(project, feature, files) {
   const id = `${newRunId()}-${feature.replace(/[^\w-]/g, "_")}`;
   const dir = draftDir(project, id);
-  (0, import_node_fs11.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs12.mkdirSync)(dir, { recursive: true });
   const staged = files.map((f) => {
     const text2 = current(project, f.path);
-    (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(dir, f.staged), (0, import_node_fs11.existsSync)((0, import_node_path14.join)(project.root, f.path)) ? text2 : f.initial ?? "");
+    (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(dir, f.staged), (0, import_node_fs12.existsSync)((0, import_node_path16.join)(project.root, f.path)) ? text2 : f.initial ?? "");
     return { path: f.path, base: hash(text2), staged: f.staged };
   });
-  const format = (0, import_node_path14.join)(project.root, FEATURES_DIR, "README.md");
-  if ((0, import_node_fs11.existsSync)(format)) (0, import_node_fs11.copyFileSync)(format, (0, import_node_path14.join)(dir, "FORMAT.md"));
+  const format = (0, import_node_path16.join)(project.root, FEATURES_DIR, "README.md");
+  if ((0, import_node_fs12.existsSync)(format)) (0, import_node_fs12.copyFileSync)(format, (0, import_node_path16.join)(dir, "FORMAT.md"));
   return { id, dir, feature, files: staged };
 }
 function closeDraft(project, work, details) {
   const changed = work.files.filter((f) => {
-    const staged = (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(work.dir, f.staged), "utf8");
+    const staged = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(work.dir, f.staged), "utf8");
     return staged.trim() !== "" && staged !== current(project, f.path);
   });
   if (!changed.length) {
-    (0, import_node_fs11.rmSync)(work.dir, { recursive: true, force: true });
+    (0, import_node_fs12.rmSync)(work.dir, { recursive: true, force: true });
     return null;
   }
   const draft = { id: work.id, feature: work.feature, createdAt: (/* @__PURE__ */ new Date()).toISOString(), status: "pending", ...details, summary: details.summary.slice(0, 4e3), files: changed };
-  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
+  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
   return draft;
 }
 async function draftCorrections(project, input, log) {
   const { manifest } = input;
   const work = openDraft(project, manifest.id, [
     { path: manifest.file, staged: "manifest.yaml" },
-    ...manifest.brief && (0, import_node_fs11.existsSync)((0, import_node_path14.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
+    ...manifest.brief && (0, import_node_fs12.existsSync)((0, import_node_path16.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
   ]);
   const { dir, files } = work;
-  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(dir, "CHANGE.md"), changeContext(project, input));
+  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(dir, "CHANGE.md"), changeContext(project, input));
   const result = await runAgent(
     project,
     {
@@ -20670,7 +21001,7 @@ function changeContext(project, input) {
   const untracked = (capture("git", ["ls-files", "--others", "--exclude-standard", "--", ...files], project.root) ?? "").split("\n").filter(Boolean);
   const added = untracked.map((f) => `### new file ${f}
 \`\`\`
-${(0, import_node_fs11.readFileSync)((0, import_node_path14.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
+${(0, import_node_fs12.readFileSync)((0, import_node_path16.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
 \`\`\``).join("\n\n");
   const diff = `${tracked}
 ${added}`.slice(0, 6e4);
@@ -20717,18 +21048,18 @@ Do this:
 If nothing needs correcting, change no file. Finish with two or three sentences: what you changed and why, or that nothing needed changing.`;
 }
 function listDrafts(project, feature) {
-  const root = (0, import_node_path14.join)(project.store.dir, DRAFTS);
-  if (!(0, import_node_fs11.existsSync)(root)) return [];
-  return (0, import_node_fs11.readdirSync)(root).map((id) => (0, import_node_path14.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs11.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs11.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const root = (0, import_node_path16.join)(project.store.dir, DRAFTS);
+  if (!(0, import_node_fs12.existsSync)(root)) return [];
+  return (0, import_node_fs12.readdirSync)(root).map((id) => (0, import_node_path16.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs12.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs12.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 function findDraft(project, id) {
-  const file = (0, import_node_path14.join)(draftDir(project, id), "draft.json");
-  return (0, import_node_fs11.existsSync)(file) ? JSON.parse((0, import_node_fs11.readFileSync)(file, "utf8")) : null;
+  const file = (0, import_node_path16.join)(draftDir(project, id), "draft.json");
+  return (0, import_node_fs12.existsSync)(file) ? JSON.parse((0, import_node_fs12.readFileSync)(file, "utf8")) : null;
 }
 function draftDiffs(project, draft) {
   return draft.files.map((f) => {
     const now = current(project, f.path);
-    const staged = (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(draftDir(project, draft.id), f.staged), "utf8");
+    const staged = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(draftDir(project, draft.id), f.staged), "utf8");
     return { path: f.path, diff: unifiedDiff(now, staged, f.path), conflict: hash(now) !== f.base };
   });
 }
@@ -20739,9 +21070,9 @@ function approveDraft(project, id) {
   const conflicts = draftDiffs(project, draft).filter((d) => d.conflict);
   if (conflicts.length) return { ok: false, error: `${conflicts.map((c) => c.path).join(", ")} changed after this draft was made. Reject it and check the feature again.` };
   for (const f of draft.files) {
-    const abs = (0, import_node_path14.join)(project.root, f.path);
-    (0, import_node_fs11.mkdirSync)((0, import_node_path14.dirname)(abs), { recursive: true });
-    (0, import_node_fs11.writeFileSync)(abs, (0, import_node_fs11.readFileSync)((0, import_node_path14.join)(draftDir(project, id), f.staged), "utf8"));
+    const abs = (0, import_node_path16.join)(project.root, f.path);
+    (0, import_node_fs12.mkdirSync)((0, import_node_path16.dirname)(abs), { recursive: true });
+    (0, import_node_fs12.writeFileSync)(abs, (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(draftDir(project, id), f.staged), "utf8"));
   }
   setStatus(project, draft, "approved");
   return { ok: true, files: draft.files.map((f) => f.path) };
@@ -20754,11 +21085,71 @@ function rejectDraft(project, id) {
   return { ok: true };
 }
 function setStatus(project, draft, status) {
-  (0, import_node_fs11.writeFileSync)((0, import_node_path14.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
+  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
+}
+
+// src/engine/impact.ts
+var import_node_path17 = require("node:path");
+var cached = null;
+function areaGraph(project, result) {
+  if (cached && cached.root === project.root && cached.scannedAt === result.scannedAt && Date.now() - cached.at < 5e3) return cached.graph;
+  const graph = buildGraph(project.root, result, project.adapter.moduleDependencies(project.root));
+  cached = { root: project.root, scannedAt: result.scannedAt, at: Date.now(), graph };
+  return graph;
+}
+function buildGraph(root, result, deps) {
+  const areaOf = /* @__PURE__ */ new Map();
+  const modulesOf = /* @__PURE__ */ new Map();
+  const dirs = [];
+  for (const f of result.features) {
+    modulesOf.set(f.id, f.modules.map((m) => m.id));
+    for (const m of f.modules) {
+      areaOf.set(m.id, f.id);
+      dirs.push({ module: m.id, dir: `${(0, import_node_path17.relative)(root, m.dir).replace(/\\/g, "/")}/` });
+    }
+  }
+  dirs.sort((a, b) => b.dir.length - a.dir.length);
+  const dependents = /* @__PURE__ */ new Map();
+  for (const [module2, uses2] of deps) for (const used of uses2) dependents.set(used, [...dependents.get(used) ?? [], module2]);
+  return { areaOf, deps, dependents, modulesOf, dirs };
+}
+function moduleOfFile(graph, file) {
+  return graph.dirs.find((d) => file.startsWith(d.dir))?.module;
+}
+function dependentAreas(graph, module2, depth) {
+  const own = graph.areaOf.get(module2);
+  const out = /* @__PURE__ */ new Map();
+  let frontier = [module2];
+  for (let step = 1; step <= depth && frontier.length; step++) {
+    const reached = /* @__PURE__ */ new Set();
+    for (const m of frontier) {
+      for (const user of graph.dependents.get(m) ?? []) {
+        const area = graph.areaOf.get(user);
+        if (!area || area === own || out.has(area)) continue;
+        out.set(area, step);
+        reached.add(area);
+      }
+    }
+    frontier = [...reached].flatMap((a) => graph.modulesOf.get(a) ?? []);
+  }
+  return out;
+}
+function usedBy(graph, area) {
+  const out = /* @__PURE__ */ new Set();
+  for (const m of graph.modulesOf.get(area) ?? []) for (const a of dependentAreas(graph, m, 1).keys()) out.add(a);
+  return [...out].sort();
+}
+function uses(graph, area) {
+  const out = /* @__PURE__ */ new Set();
+  for (const m of graph.modulesOf.get(area) ?? []) for (const d of graph.deps.get(m) ?? []) {
+    const a = graph.areaOf.get(d);
+    if (a && a !== area) out.add(a);
+  }
+  return [...out].sort();
 }
 
 // src/engine/doctor.ts
-var import_node_fs12 = require("node:fs");
+var import_node_fs13 = require("node:fs");
 function doctor(project, error2) {
   const major = Number(process.versions.node.split(".")[0]);
   const checks = [
@@ -20770,20 +21161,13 @@ function doctor(project, error2) {
       fix: major >= 20 ? void 0 : "Install Node 20 or newer"
     }
   ];
-  const claude = capture("claude", ["--version"]);
-  checks.push({
-    id: "claude",
-    label: "Claude Code CLI",
-    status: claude ? "ok" : "warn",
-    detail: claude ?? "not found (only needed for agent features)",
-    fix: claude ? void 0 : "Install Claude Code"
-  });
+  checks.push(agentCliCheck(project?.config.agents.runner));
   if (!project) {
     checks.push({ id: "project", label: "Project", status: "fail", detail: error2 ?? "no supported project found" });
     return checks;
   }
   checks.push({ id: "project", label: "Project", status: "ok", detail: `${project.name} (${project.adapter.id}) at ${project.root}` });
-  const hasConfig = (0, import_node_fs12.existsSync)(configPath(project.root));
+  const hasConfig = (0, import_node_fs13.existsSync)(configPath(project.root));
   checks.push({
     id: "config",
     label: "probe/probe.yaml",
@@ -20791,7 +21175,8 @@ function doctor(project, error2) {
     detail: hasConfig ? "found" : "none yet: defaults and what Probe detects (Studio \u2192 Settings writes it when something is changed)"
   });
   const app = resolveApp(project);
-  checks.push({
+  if (!project.adapter.supportsDevices) checks.push({ id: "app", label: "App to test", status: "ok", detail: `none: agents do not run ${project.adapter.label} apps on a device` });
+  else checks.push({
     id: "app",
     label: "App to test",
     status: app.package && app.installTask ? "ok" : app.installTask ? "warn" : "fail",
@@ -20805,9 +21190,20 @@ function doctor(project, error2) {
     status: git2?.branch ? "ok" : "warn",
     detail: git2 ? `${git2.branch ?? "detached HEAD"} @ ${git2.commit}${git2.dirty ? ` + ${git2.dirty} uncommitted` : ""}` : "not a git repository"
   });
-  checks.push(...project.adapter.doctor(project.root));
+  checks.push(...project.adapter.doctor(project.root, project.config));
   checks.push({ id: "store", label: "Local results", status: "ok", detail: project.store.dir });
   return checks;
+}
+function agentCliCheck(runnerId, version2 = (cmd, args) => capture(cmd, args)) {
+  const runner = agentRunner(runnerId);
+  const found = version2(runner.command, runner.versionArgs);
+  return {
+    id: "agent-cli",
+    label: `Agent CLI (${runner.id})`,
+    status: found ? "ok" : "warn",
+    detail: found ? `${runner.label} ${found}` : `${runner.command} not found (only needed for agent features: cards, device runs, test writing)`,
+    fix: found ? void 0 : `${runner.installHint}, or set agents.runner in probe/probe.yaml or Studio \u2192 Settings`
+  };
 }
 function formatDoctor(checks) {
   const icon = { ok: "\u2705", warn: "\u26A0\uFE0F ", fail: "\u274C" };
@@ -20821,9 +21217,9 @@ var INIT_STEPS = [
   { id: "config", label: "Settings file", what: "probe/probe.yaml, every setting optional" },
   { id: "kit", label: "Manifest format", what: "probe/features/README.md: the manifest and brief formats" },
   { id: "scan", label: "Scan", what: "modules, test classes and coverage" },
-  { id: "features", label: "Features", what: "which features get a manifest" },
-  { id: "manifests", label: "Manifests", what: "an agent drafts each feature's manifest: paths, flows, rules and the tests proving them" },
-  { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the rules no unit test can prove" },
+  { id: "features", label: "Features", what: "which features and platform areas (core, common, the app module) get a manifest" },
+  { id: "manifests", label: "Manifests", what: "an agent drafts each feature's or platform area's manifest: paths, flows, rules and the tests proving them" },
+  { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the feature rules no unit test can prove; platform areas only when named" },
   { id: "agentfile", label: "Agent file", what: "the Features section in AGENTS.md (CLAUDE.md imports it), so every coding agent knows the manifests and how to work with them" },
   { id: "check", label: "Link check", what: "every test and card link in the manifests resolves" }
 ];
@@ -20834,35 +21230,71 @@ var KIT = [{ path: `${FEATURES_DIR}/README.md`, text: features_README_default }]
 function initDrafts(project, step, feature) {
   return listDrafts(project, feature).filter((d) => d.origin === "init" && d.step === step);
 }
+function proposedAreas(project) {
+  const areas = latestScan(project).features.filter((f) => f.group === "feature" || f.stats.testable > 0 || f.stats.testFiles > 0).map((f) => ({ id: f.id, kind: f.group, modules: f.stats.modules, testable: f.stats.testable, testFiles: f.stats.testFiles }));
+  const platform = areas.filter((a) => a.kind === "platform").sort((a, b) => b.testable - a.testable || a.id.localeCompare(b.id));
+  return [...areas.filter((a) => a.kind === "feature"), ...platform];
+}
 function proposedFeatures(project) {
-  return latestScan(project).features.filter((f) => f.group === "feature").map((f) => f.id);
+  return proposedAreas(project).map((a) => a.id);
+}
+function kindOf(project, id) {
+  try {
+    const m = loadManifest(project.root, id);
+    if (m) return m.kind;
+  } catch {
+  }
+  return latestScan(project).features.find((f) => f.id === id)?.group ?? "feature";
 }
 function chosenFeatures(project) {
   const state = readState(project);
-  if (state.features) return state.features;
   const written = loadManifests(project.root).map((m) => m.id);
-  return written.length ? written : null;
+  if (!state.features && !written.length) return null;
+  return [.../* @__PURE__ */ new Set([...state.features ?? [], ...written])];
 }
-function chooseFeatures(project, features) {
+function undecidedAreas(project) {
+  const chosen = new Set(chosenFeatures(project) ?? []);
+  const seen = new Set(readState(project).seen ?? []);
+  return proposedAreas(project).filter((a) => !chosen.has(a.id) && !seen.has(a.id));
+}
+function chooseFeatures(project, features, mode = "replace") {
+  const proposed = proposedAreas(project);
+  const expanded = features.flatMap((f) => f === "features" || f === "platform" ? proposed.filter((a) => a.kind === (f === "features" ? "feature" : "platform")).map((a) => a.id) : [f]);
   const known = new Set(latestScan(project).features.map((f) => f.id));
-  const unknown2 = features.filter((f) => !known.has(f));
-  if (unknown2.length) throw new Error(`Not features of this project: ${unknown2.join(", ")}. Run \`probe scan\` to list them.`);
-  writeState(project, { features: [...new Set(features)] });
-  return features;
+  const unknown2 = expanded.filter((f) => !known.has(f));
+  if (unknown2.length) throw new Error(`Not features or platform areas of this project: ${unknown2.join(", ")}. Run \`probe scan\` to list them.`);
+  const state = readState(project);
+  const chosen = [.../* @__PURE__ */ new Set([...mode === "add" ? state.features ?? [] : [], ...expanded])];
+  const seen = mode === "add" ? [.../* @__PURE__ */ new Set([...state.seen ?? [], ...expanded])] : proposed.map((a) => a.id);
+  writeState(project, { features: chosen, seen });
+  return chosen;
 }
-var hasManifest = (project, id) => (0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, manifestFile(id)));
+var hasManifest = (project, id) => (0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, manifestFile(id)));
 function initStatus(project) {
   const steps = [];
   const add = (id, status, detail) => steps.push({ id, label: INIT_STEPS.find((s) => s.id === id).label, status, detail });
   const failing = doctor(project).filter((c) => c.status === "fail");
   add("doctor", failing.length ? "warn" : "done", failing.length ? `${failing.map((c) => c.label).join(", ")}: see \`probe doctor\`. Only device runs need these.` : "ready");
-  add("config", (0, import_node_fs13.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path15.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
-  const missingKit = KIT.filter((k) => !(0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, k.path))).map((k) => k.path);
+  add("config", (0, import_node_fs14.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path18.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
+  const missingKit = KIT.filter((k) => !(0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, k.path))).map((k) => k.path);
   add("kit", missingKit.length ? "todo" : "done", missingKit.length ? `to write: ${missingKit.join(", ")}` : KIT.map((k) => k.path).join(", "));
   const scanned = project.store.read("scan.json");
-  add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform modules` : "not scanned yet");
+  add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform areas` : "not scanned yet");
   const chosen = chosenFeatures(project);
-  add("features", chosen ? "done" : scanned ? "waiting" : "todo", chosen ? `${chosen.length}: ${chosen.join(", ")}` : scanned ? `choose from ${proposedFeatures(project).length} proposed: \`probe init --yes\` takes them all, \`--features a,b\` some` : "after the scan");
+  const proposed = scanned ? proposedAreas(project) : [];
+  const undecided = chosen ? undecidedAreas(project) : [];
+  const kinds = (list) => {
+    const platform = list.filter((a) => a.kind === "platform").length;
+    return `${list.length - platform} features, ${platform} platform areas`;
+  };
+  add(
+    "features",
+    !scanned ? "todo" : !chosen || undecided.length ? "waiting" : "done",
+    !scanned ? "after the scan" : !chosen ? `choose from ${proposed.length} proposed (${kinds(proposed)}): \`probe init --yes\` takes them all, \`--step features --features a,b\` some (\`features\` or \`platform\` names a whole kind), or tick them in Studio \u2192 Setup` : [
+      `${chosen.length} chosen: ${chosen.join(", ")}`,
+      undecided.length ? `${undecided.length} more proposed (${kinds(undecided)}): ${undecided.slice(0, 12).map((a) => a.id).join(", ")}${undecided.length > 12 ? " \u2026" : ""} \u2014 \`probe init --step features --features a,b\` adds some (\`platform\` adds them all), Studio \u2192 Setup ticks or declines them` : ""
+    ].filter(Boolean).join(" \xB7 ")
+  );
   const features = chosen ?? [];
   const manifests = manifestProgress(project, features);
   add(
@@ -20914,6 +21346,7 @@ function cardProgress(project, features, named) {
   const none = new Set(readState(project).cardsNone ?? []);
   const out = { todo: [], pending: [], done: [], waiting: [], optional: 0 };
   for (const f of named ?? features) {
+    if (!named && kindOf(project, f) === "platform") continue;
     const drafts = initDrafts(project, "cards", f);
     if (none.has(f) || drafts.some((d) => d.status !== "pending")) out.done.push(f);
     else if (drafts.length) out.pending.push(f);
@@ -20933,7 +21366,7 @@ function needsCards(project, feature) {
   }
 }
 function agentFileDone(project) {
-  const read = (p) => (0, import_node_fs13.existsSync)((0, import_node_path15.join)(project.root, p)) ? (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(project.root, p), "utf8") : "";
+  const read = (p) => (0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, p)) ? (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(project.root, p), "utf8") : "";
   return read("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
 }
 function isInitStep(id) {
@@ -20966,17 +21399,17 @@ function startInit(project, options = {}) {
       const failing = doctor(project).filter((c) => c.status === "fail");
       log(failing.length ? `tools: ${failing.map((c) => `${c.label} (${c.fix ?? c.detail})`).join("; ")} \u2014 device runs need these, the rest of init does not` : "tools: ready");
     }
-    if (wants("config") && !(0, import_node_fs13.existsSync)(configPath(project.root))) {
-      (0, import_node_fs13.mkdirSync)((0, import_node_path15.dirname)(configPath(project.root)), { recursive: true });
-      (0, import_node_fs13.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
-      log(`wrote ${(0, import_node_path15.relative)(project.root, configPath(project.root))}`);
+    if (wants("config") && !(0, import_node_fs14.existsSync)(configPath(project.root))) {
+      (0, import_node_fs14.mkdirSync)((0, import_node_path18.dirname)(configPath(project.root)), { recursive: true });
+      (0, import_node_fs14.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
+      log(`wrote ${(0, import_node_path18.relative)(project.root, configPath(project.root))}`);
     }
     if (wants("kit")) {
       for (const k of KIT) {
-        const abs = (0, import_node_path15.join)(project.root, k.path);
-        if ((0, import_node_fs13.existsSync)(abs)) continue;
-        (0, import_node_fs13.mkdirSync)((0, import_node_path15.dirname)(abs), { recursive: true });
-        (0, import_node_fs13.writeFileSync)(abs, k.text);
+        const abs = (0, import_node_path18.join)(project.root, k.path);
+        if ((0, import_node_fs14.existsSync)(abs)) continue;
+        (0, import_node_fs14.mkdirSync)((0, import_node_path18.dirname)(abs), { recursive: true });
+        (0, import_node_fs14.writeFileSync)(abs, k.text);
         log(`wrote ${k.path}`);
       }
     }
@@ -20985,14 +21418,18 @@ function startInit(project, options = {}) {
       log(`scanned: ${result.features.length} features and platform modules`);
     }
     if (wants("features") && (options.accept || options.step === "features" && options.features)) {
-      const chosen2 = chooseFeatures(project, options.features ?? proposedFeatures(project));
-      log(`features chosen: ${chosen2.length}`);
+      const chosen2 = chooseFeatures(project, options.features ?? proposedFeatures(project), "add");
+      log(`chosen: ${chosen2.length} features and platform areas`);
     }
     const chosen = chosenFeatures(project);
+    const undecided = chosen ? undecidedAreas(project) : [];
     if (!chosen) {
       if (!options.step || options.step === "features")
-        log(`waiting: choose the features \u2014 \`probe init --yes\` takes all ${proposedFeatures(project).length} proposed, \`probe init --step features --features a,b\` some, or tick them in Studio \u2192 Setup`);
-    } else {
+        log(`waiting: choose the features and platform areas \u2014 \`probe init --yes\` takes all ${proposedFeatures(project).length} proposed, \`probe init --step features --features a,b\` some, or tick them in Studio \u2192 Setup`);
+    } else if (undecided.length && (!options.step || options.step === "features")) {
+      log(`also proposed, not chosen yet: ${undecided.map((a) => `${a.id}${a.kind === "platform" ? " (platform)" : ""}`).join(", ")} \u2014 \`probe init --step features --features a,b\` adds them`);
+    }
+    if (chosen) {
       const only = (list) => options.features && options.step !== "features" ? list.filter((f) => options.features.includes(f)) : list;
       if (wants("manifests")) await draftManifests(project, run, only(manifestProgress(project, chosen).todo).slice(0, options.limit), options.model, log);
       if (wants("cards")) {
@@ -21028,15 +21465,16 @@ async function draftManifests(project, run, features, model, log) {
     const say = (line) => log(`[${id}] ${line}`);
     say(`drafting the manifest (${i + 1}/${features.length})`);
     const file = manifestFile(id);
+    const kind = feature.group === "platform" ? "kind: platform\n" : "";
     const work = openDraft(project, id, [{ path: file, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md
 id: ${id}
-` }]);
-    (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
-    if (!(0, import_node_fs13.existsSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"))) (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"), features_README_default);
+${kind}` }]);
+    (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
+    if (!(0, import_node_fs14.existsSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"))) (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"), features_README_default);
     const agent = (prompt6) => runAgent(project, { prompt: prompt6, probeTools: [], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model }, say);
     let result = await agent(manifestPrompt(project, feature));
     run.costUsd += result.costUsd;
-    let check2 = checkManifest(project.root, id, (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "manifest.yaml"), "utf8"));
+    let check2 = checkManifest(project.root, id, (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "manifest.yaml"), "utf8"));
     if (check2.errors.length || check2.broken.length || check2.unexplained.length) {
       say(`mending ${check2.errors.length + check2.broken.length + check2.unexplained.length} problems the link check found`);
       const fix = await agent(`The manifest.yaml you wrote for the feature "${id}" fails Probe's check:
@@ -21045,7 +21483,7 @@ ${summarizeCheck(check2)}
 
 Fix every problem in manifest.yaml: point a broken covered_by entry at the test's exact name (FEATURE.md lists them), or remove it and give the rule a gap. Change nothing else. Finish with one sentence.`);
       run.costUsd += fix.costUsd;
-      check2 = checkManifest(project.root, id, (0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "manifest.yaml"), "utf8"));
+      check2 = checkManifest(project.root, id, (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "manifest.yaml"), "utf8"));
       result = { ...result, summary: `${result.summary}
 
 ${fix.summary}` };
@@ -21059,25 +21497,36 @@ ${summarizeCheck(check2)}`, runId: run.id, origin: "init", step: "manifests" });
   });
 }
 function featureContext(project, feature, tests) {
-  const rel = (dir) => (0, import_node_path15.relative)(project.root, dir).replace(/\\/g, "/");
+  const rel = (dir) => (0, import_node_path18.relative)(project.root, dir).replace(/\\/g, "/");
   const dirs = feature.modules.map((m) => `${rel(m.dir)}/`);
   const tasks = feature.modules.map((m) => m.unitTestTask).filter((t) => !!t);
-  const command = tasks.length ? project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : tasks.join(" ") : null;
+  const command = tasks.length ? project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : [...new Set(tasks)].join(" && ") : null;
   const testFiles = [...tests.values()].flat().filter((f) => dirs.some((d) => f.startsWith(d)));
   const testList = testFiles.slice(0, 60).map((f) => {
-    const names = testNames((0, import_node_path15.join)(project.root, f));
-    return `### ${f.split("/").pop().replace(/\.(kt|java)$/, "")} (${f})
+    const names = testNames((0, import_node_path18.join)(project.root, f));
+    return `### ${stemOf(f.split("/").pop())} (${f})
 ${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `
 - \u2026 ${names.length - 80} more` : ""}`;
   });
-  const docs = docsAbout(project.root, feature.id, 12e3);
-  const examples = loadManifests(project.root).slice(0, 2).map((m) => m.file);
-  return `# Feature ${feature.id}
+  const platform = feature.group === "platform";
+  const docs = docsAbout(project.root, platform ? feature.id.split(":").pop() : feature.id, 12e3);
+  const manifests = loadManifests(project.root);
+  const examples = [...manifests.filter((m) => m.kind === "platform" === platform), ...manifests.filter((m) => m.kind === "platform" !== platform)].slice(0, 2).map((m) => m.file);
+  const graph = areaGraph(project, latestScan(project));
+  const users = usedBy(graph, feature.id);
+  const used = uses(graph, feature.id);
+  return `# ${platform ? "Platform area" : "Feature"} ${feature.id}
 
 ## Modules
 ${feature.modules.map((m) => `- ${m.id} \u2014 ${rel(m.dir)}/ (${m.mainFiles} source files, ${m.testFiles} test files${m.unitTestTask ? `, unit task ${m.unitTestTask}` : ""})`).join("\n")}
 
 Unit command: ${command ?? "none (no module has unit tests)"}
+
+## Depends on (areas its build files name)
+${used.join(", ") || "(none found)"}
+
+## Used by (areas whose build files name it; an edit here makes them stale)
+${users.length ? `${users.length}: ${users.join(", ")}` : "(none found; a convention plugin may add it everywhere)"}
 
 ## Unit tests in these modules (class, then each test's exact name)
 ${testList.join("\n\n") || "(none)"}${testFiles.length > 60 ? `
@@ -21093,6 +21542,30 @@ ${examples.map((e) => `- ${e}`).join("\n")}
 ` : ""}`;
 }
 function manifestPrompt(project, feature) {
+  return feature.group === "platform" ? platformPrompt(project, feature) : featurePrompt(project, feature);
+}
+function platformPrompt(project, feature) {
+  return `You write the Probe manifest for the platform area "${feature.id}" of the project at ${project.root}: shared code that features and other areas build on, not a feature a user sees.
+
+Your working folder holds:
+- manifest.yaml \u2014 the file you write. It starts with its id and kind.
+- FORMAT.md \u2014 the manifest format and its rules. Read it first.
+- FEATURE.md \u2014 the area's modules, its unit command, which areas use it, every unit test in its modules with its exact name, and docs that mention it.
+
+The project is read-only to you. Read its code: the public API the modules expose (interfaces, entry points, the types other modules import) and the tests FEATURE.md lists.
+
+Write manifest.yaml:
+1. id "${feature.id}", kind: platform, a name, a summary of one or two lines saying what it provides to the code that uses it, owner: null.
+2. paths: the folders of its modules. related: only code owned elsewhere whose change can break this area (another platform area it wraps), each with a why; only paths that exist. Do not list the areas that use it: Probe finds those from the build files.
+3. unit.command: the one FEATURE.md gives.
+4. flows: what the code using it does with it (the main calls or services it offers), one line each.
+5. invariants: the contract it must keep \u2014 behaviour a unit test can fail on (results, errors, persistence, threading, mapping), not architecture. For each, covered_by with the tests that prove it, written "TestClass :: exact test name" exactly as FEATURE.md lists them. Never invent a test name. A rule no test proves gets covered_by: [] and a gap saying why. Unit tests are the proof here; a device card only for what no unit test can reach (real hardware, the OS).
+6. device_only: usually empty; only checks no unit test can make.
+7. brief: its doc if one exists (FEATURE.md lists docs that mention it); otherwise leave it out.
+
+Prefer fewer, sharper rules that the tests really prove over many vague ones. Finish with two sentences: what the area provides, and what you could not work out.`;
+}
+function featurePrompt(project, feature) {
   return `You write the Probe manifest for the feature "${feature.id}" of the project at ${project.root}.
 
 Your working folder holds:
@@ -21121,7 +21594,7 @@ async function draftCards(project, run, features, model, log) {
     say(`looking for rules only a device can prove (${i + 1}/${features.length})`);
     const before = new Map(listCards(project.root, id).map((c) => [c.id, c.updatedAt]));
     const work = openDraft(project, id, [{ path: manifestFile(id), staged: "manifest.yaml" }]);
-    if (!(0, import_node_fs13.existsSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"))) (0, import_node_fs13.writeFileSync)((0, import_node_path15.join)(work.dir, "FORMAT.md"), features_README_default);
+    if (!(0, import_node_fs14.existsSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"))) (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"), features_README_default);
     const result = await runAgent(
       project,
       { prompt: cardsPrompt(project, id), probeTools: ["probe_cards_context", "probe_cards_save"], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model },
@@ -21163,13 +21636,13 @@ function draftAgentFile(project, run, log) {
     { path: "CLAUDE.md", staged: "claude.md" }
   ]);
   const edit = (staged, change) => {
-    const abs = (0, import_node_path15.join)(work.dir, staged);
-    const before = (0, import_node_fs13.readFileSync)(abs, "utf8");
+    const abs = (0, import_node_path18.join)(work.dir, staged);
+    const before = (0, import_node_fs14.readFileSync)(abs, "utf8");
     const crlf = before.includes("\r\n");
     const after = change(before.replace(/\r\n/g, "\n"));
-    (0, import_node_fs13.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
+    (0, import_node_fs14.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
   };
-  if (!(0, import_node_fs13.readFileSync)((0, import_node_path15.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(features)}
+  if (!(0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}
 `);
   edit("claude.md", (t) => {
     if (/^@AGENTS\.md\s*$/m.test(t)) return t;
@@ -21191,10 +21664,14 @@ ${t}` : ""}`;
     log("agent file: drafted the Features section for AGENTS.md \u2014 review it in Studio \u2192 Setup");
   }
 }
-function featuresSection(features) {
+function featuresSection(project, ids) {
+  const platform = ids.filter((id) => kindOf(project, id) === "platform");
+  const features = ids.filter((id) => !platform.includes(id));
   return `${agents_features_default.trimEnd()}
 
-Features: ${features.join(" \xB7 ")}.`;
+Features: ${features.join(" \xB7 ")}.${platform.length ? `
+
+Platform areas: ${platform.join(" \xB7 ")}.` : ""}`;
 }
 function initPendingDrafts(project) {
   return listDrafts(project).filter((d) => d.origin === "init" && d.status === "pending");
@@ -21218,28 +21695,28 @@ function formatInitStatus(steps) {
 }
 
 // src/engine/project.ts
-var import_node_path22 = require("node:path");
+var import_node_path30 = require("node:path");
 
 // src/adapters/android-gradle/index.ts
-var import_node_fs19 = require("node:fs");
-var import_node_path21 = require("node:path");
+var import_node_fs20 = require("node:fs");
+var import_node_path24 = require("node:path");
 
 // src/adapters/android-gradle/app.ts
-var import_node_fs15 = require("node:fs");
-var import_node_path17 = require("node:path");
+var import_node_fs16 = require("node:fs");
+var import_node_path20 = require("node:path");
 
 // src/adapters/android-gradle/settings.ts
-var import_node_fs14 = require("node:fs");
-var import_node_path16 = require("node:path");
+var import_node_fs15 = require("node:fs");
+var import_node_path19 = require("node:path");
 var SETTINGS_FILES = ["settings.gradle.kts", "settings.gradle"];
 function settingsFile(root) {
-  const name = SETTINGS_FILES.find((f) => (0, import_node_fs14.existsSync)((0, import_node_path16.join)(root, f)));
-  return name ? (0, import_node_path16.join)(root, name) : null;
+  const name = SETTINGS_FILES.find((f) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(root, f)));
+  return name ? (0, import_node_path19.join)(root, name) : null;
 }
 function includedModules(root) {
   const file = settingsFile(root);
   if (!file) return [];
-  const text2 = stripComments((0, import_node_fs14.readFileSync)(file, "utf8"));
+  const text2 = stripComments((0, import_node_fs15.readFileSync)(file, "utf8"));
   const overrides = /* @__PURE__ */ new Map();
   for (const m of text2.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
     overrides.set(m[1], m[2]);
@@ -21251,7 +21728,7 @@ function includedModules(root) {
       ids.add(raw.startsWith(":") ? raw : `:${raw}`);
     }
   }
-  return [...ids].map((id) => ({ id, dir: (0, import_node_path16.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs14.existsSync)((0, import_node_path16.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs14.existsSync)((0, import_node_path16.join)(m.dir, "build.gradle")));
+  return [...ids].map((id) => ({ id, dir: (0, import_node_path19.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs15.existsSync)((0, import_node_path19.join)(m.dir, "build.gradle")));
 }
 function stripComments(text2) {
   return text2.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -21260,20 +21737,20 @@ function stripComments(text2) {
 // src/adapters/android-gradle/app.ts
 var APPLICATION_PLUGIN = /com\.android\.application|android[.-]application|androidApplication/;
 function buildFileOf(dir) {
-  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs15.existsSync)((0, import_node_path17.join)(dir, name))) return (0, import_node_fs15.readFileSync)((0, import_node_path17.join)(dir, name), "utf8");
+  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs16.existsSync)((0, import_node_path20.join)(dir, name))) return (0, import_node_fs16.readFileSync)((0, import_node_path20.join)(dir, name), "utf8");
   return null;
 }
 function detectAndroidApp(root) {
   const apps = includedModules(root).map((m) => ({ ...m, build: buildFileOf(m.dir) })).filter((m) => m.build && APPLICATION_PLUGIN.test(m.build));
   if (apps.length === 0) return null;
   const app = apps.find((m) => m.id === ":app") ?? apps[0];
-  const apkDir = (0, import_node_path17.join)(app.dir, "build", "outputs", "apk");
+  const apkDir = (0, import_node_path20.join)(app.dir, "build", "outputs", "apk");
   let flavor = "";
-  let metadata = (0, import_node_fs15.existsSync)((0, import_node_path17.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path17.join)(apkDir, "debug", "output-metadata.json") : null;
-  if (!metadata && (0, import_node_fs15.existsSync)(apkDir)) {
-    for (const d of (0, import_node_fs15.readdirSync)(apkDir)) {
-      const file = (0, import_node_path17.join)(apkDir, d, "debug", "output-metadata.json");
-      if ((0, import_node_fs15.existsSync)(file)) {
+  let metadata = (0, import_node_fs16.existsSync)((0, import_node_path20.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path20.join)(apkDir, "debug", "output-metadata.json") : null;
+  if (!metadata && (0, import_node_fs16.existsSync)(apkDir)) {
+    for (const d of (0, import_node_fs16.readdirSync)(apkDir)) {
+      const file = (0, import_node_path20.join)(apkDir, d, "debug", "output-metadata.json");
+      if ((0, import_node_fs16.existsSync)(file)) {
         flavor = d;
         metadata = file;
         break;
@@ -21282,7 +21759,7 @@ function detectAndroidApp(root) {
   }
   const installTask = `${app.id}:install${flavor ? flavor[0].toUpperCase() + flavor.slice(1) : ""}Debug`;
   if (metadata) {
-    const id2 = JSON.parse((0, import_node_fs15.readFileSync)(metadata, "utf8")).applicationId;
+    const id2 = JSON.parse((0, import_node_fs16.readFileSync)(metadata, "utf8")).applicationId;
     if (id2) return { module: app.id, package: id2, installTask, source: "last build" };
   }
   const build = app.build;
@@ -21293,8 +21770,8 @@ function detectAndroidApp(root) {
 }
 
 // src/adapters/android-gradle/deps.ts
-var import_node_fs16 = require("node:fs");
-var import_node_path18 = require("node:path");
+var import_node_fs17 = require("node:fs");
+var import_node_path21 = require("node:path");
 function accessorSegment(segment) {
   return segment.replace(/[-_]+([a-zA-Z0-9])/g, (_, c) => c.toUpperCase());
 }
@@ -21303,9 +21780,9 @@ function moduleDependencies(modules) {
   const ids = new Set(modules.map((m) => m.id));
   const out = /* @__PURE__ */ new Map();
   for (const m of modules) {
-    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path18.join)(m.dir, f)).find(import_node_fs16.existsSync);
+    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path21.join)(m.dir, f)).find(import_node_fs17.existsSync);
     if (!file) continue;
-    const text2 = (0, import_node_fs16.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     const deps = /* @__PURE__ */ new Set();
     for (const x of text2.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
     for (const x of text2.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
@@ -21321,24 +21798,24 @@ function moduleDependencies(modules) {
 }
 
 // src/adapters/android-gradle/inventory.ts
-var import_node_fs17 = require("node:fs");
-var import_node_path19 = require("node:path");
-var SOURCE_EXT = /\.(kt|java)$/;
+var import_node_fs18 = require("node:fs");
+var import_node_path22 = require("node:path");
+var SOURCE_EXT2 = /\.(kt|java)$/;
 function sourceFiles(dir) {
-  if (!(0, import_node_fs17.existsSync)(dir)) return [];
+  if (!(0, import_node_fs18.existsSync)(dir)) return [];
   const out = [];
-  const walk = (d) => {
-    for (const entry of (0, import_node_fs17.readdirSync)(d, { withFileTypes: true })) {
-      const p = (0, import_node_path19.join)(d, entry.name);
-      if (entry.isDirectory()) walk(p);
-      else if (SOURCE_EXT.test(entry.name)) out.push(p);
+  const walk2 = (d) => {
+    for (const entry of (0, import_node_fs18.readdirSync)(d, { withFileTypes: true })) {
+      const p = (0, import_node_path22.join)(d, entry.name);
+      if (entry.isDirectory()) walk2(p);
+      else if (SOURCE_EXT2.test(entry.name)) out.push(p);
     }
   };
-  walk(dir);
+  walk2(dir);
   return out;
 }
 function sourceSetFiles(moduleDir, set) {
-  return sourceFiles((0, import_node_path19.join)(moduleDir, "src", set));
+  return sourceFiles((0, import_node_path22.join)(moduleDir, "src", set));
 }
 var DECLARATION = /^(?:@\w+(?:\([^)]*\))?\s+)*((?:(?:public|internal|private|protected|abstract|open|final|data|sealed|enum|value|inline|annotation|fun|static)\s+)*)(class|object|interface)\s+([A-Z]\w*)/;
 function declaredClasses(text2) {
@@ -21378,7 +21855,7 @@ function indexTests(testFiles) {
   const bases = /* @__PURE__ */ new Set();
   const identifiers = /* @__PURE__ */ new Set();
   for (const file of testFiles) {
-    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs18.readFileSync)(file, "utf8");
     for (const c of declaredClasses(text2)) {
       if (!TEST_SUFFIX.test(c.name)) continue;
       let base = c.name.replace(TEST_SUFFIX, "");
@@ -21400,7 +21877,7 @@ function testLink(name, index) {
 function inventory(projectRoot, mainFiles, tests) {
   const out = [];
   for (const file of mainFiles) {
-    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs18.readFileSync)(file, "utf8");
     const declared = declaredClasses(text2).filter((c) => !c.modifiers.includes("private"));
     if (declared.length === 0) continue;
     const lines = Math.max(1, Math.round(text2.split("\n").length / declared.length));
@@ -21410,7 +21887,7 @@ function inventory(projectRoot, mainFiles, tests) {
       const weight = KIND_WEIGHT[kind];
       out.push({
         name: c.name,
-        file: (0, import_node_path19.relative)(projectRoot, file).replace(/\\/g, "/"),
+        file: (0, import_node_path22.relative)(projectRoot, file).replace(/\\/g, "/"),
         kind,
         lines,
         test,
@@ -21421,37 +21898,47 @@ function inventory(projectRoot, mainFiles, tests) {
   return out;
 }
 
-// src/adapters/android-gradle/junit.ts
-var import_node_fs18 = require("node:fs");
-var import_node_path20 = require("node:path");
-function readJUnitResults(moduleId, resultsDir, sinceMs) {
-  if (!(0, import_node_fs18.existsSync)(resultsDir)) return null;
-  const files = (0, import_node_fs18.readdirSync)(resultsDir).filter((f) => f.startsWith("TEST-") && f.endsWith(".xml")).map((f) => (0, import_node_path20.join)(resultsDir, f)).filter((f) => (0, import_node_fs18.statSync)(f).mtimeMs >= sinceMs - 2e3);
-  if (files.length === 0) return null;
-  const result = { module: moduleId, tests: 0, failed: 0, skipped: 0, durationMs: 0, failures: [] };
-  for (const file of files) {
-    const xml = (0, import_node_fs18.readFileSync)(file, "utf8");
-    for (const tc of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
-      const attrs = tc[1];
-      const body = tc[3] ?? "";
-      const status = /<(failure|error)\b/.test(body) ? "failed" : /<skipped\b/.test(body) ? "skipped" : "passed";
-      const durationMs = Math.round(Number(attr(attrs, "time") ?? 0) * 1e3);
-      result.tests++;
-      result.durationMs += durationMs;
-      if (status === "skipped") result.skipped++;
-      if (status === "failed") {
-        result.failed++;
-        result.failures.push({
-          name: decode2(attr(attrs, "name") ?? "?"),
-          className: decode2(attr(attrs, "classname") ?? "?"),
-          status,
-          durationMs,
-          message: decode2(/<(?:failure|error)\b[^>]*message="([^"]*)"/.exec(body)?.[1] ?? firstLine(body))
-        });
-      }
+// src/core/junit.ts
+var import_node_fs19 = require("node:fs");
+var import_node_path23 = require("node:path");
+function addJUnitXml(result, xml) {
+  for (const tc of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
+    const attrs = tc[1];
+    const body = tc[3] ?? "";
+    const status = /<(failure|error)\b/.test(body) ? "failed" : /<skipped\b/.test(body) ? "skipped" : "passed";
+    const durationMs = Math.round(Number(attr(attrs, "time") ?? 0) * 1e3);
+    result.tests++;
+    result.durationMs += durationMs;
+    if (status === "skipped") result.skipped++;
+    if (status === "failed") {
+      result.failed++;
+      result.failures.push({
+        name: decode2(attr(attrs, "name") ?? "?"),
+        className: decode2(attr(attrs, "classname") ?? "?"),
+        status,
+        durationMs,
+        message: decode2(/<(?:failure|error)\b[^>]*message="([^"]*)"/.exec(body)?.[1] ?? firstLine(body))
+      });
     }
   }
+}
+function readJUnitReports(moduleId, path, sinceMs, filter = (n) => n.endsWith(".xml")) {
+  const files = reportFiles(path, filter).filter((f) => (0, import_node_fs19.statSync)(f).mtimeMs >= sinceMs - 2e3);
+  if (files.length === 0) return null;
+  const result = { module: moduleId, tests: 0, failed: 0, skipped: 0, durationMs: 0, failures: [] };
+  for (const file of files) addJUnitXml(result, (0, import_node_fs19.readFileSync)(file, "utf8"));
   return result;
+}
+function reportFiles(path, filter) {
+  if (!(0, import_node_fs19.existsSync)(path)) return [];
+  if ((0, import_node_fs19.statSync)(path).isFile()) return [path];
+  const out = [];
+  for (const entry of (0, import_node_fs19.readdirSync)(path, { withFileTypes: true })) {
+    const p = (0, import_node_path23.join)(path, entry.name);
+    if (entry.isDirectory()) out.push(...reportFiles(p, filter));
+    else if (filter(entry.name)) out.push(p);
+  }
+  return out;
 }
 function attr(attrs, name) {
   return new RegExp(`\\b${name}="([^"]*)"`).exec(attrs)?.[1];
@@ -21463,20 +21950,28 @@ function decode2(s) {
   return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#10;/g, "\n").replace(/&amp;/g, "&");
 }
 
+// src/adapters/android-gradle/junit.ts
+function readJUnitResults(moduleId, resultsDir, sinceMs) {
+  return readJUnitReports(moduleId, resultsDir, sinceMs, (f) => f.startsWith("TEST-") && f.endsWith(".xml"));
+}
+
 // src/adapters/android-gradle/index.ts
 var androidGradleAdapter = {
   id: "android-gradle",
+  label: "Android/Gradle",
+  ignoredDirs: ["build", ".gradle", ".kotlin", ".cxx"],
+  supportsDevices: true,
   detect(root) {
     return settingsFile(root) !== null;
   },
   projectName(root) {
     const file = settingsFile(root);
-    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs19.readFileSync)(file, "utf8"))?.[1];
-    return named || (0, import_node_path21.basename)(root);
+    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs20.readFileSync)(file, "utf8"))?.[1];
+    return named || (0, import_node_path24.basename)(root);
   },
   scanModules(root, config2) {
     return includedModules(root).map(({ id, dir }) => {
-      const buildFile = (0, import_node_fs19.readFileSync)((0, import_node_fs19.existsSync)((0, import_node_path21.join)(dir, "build.gradle.kts")) ? (0, import_node_path21.join)(dir, "build.gradle.kts") : (0, import_node_path21.join)(dir, "build.gradle"), "utf8");
+      const buildFile = (0, import_node_fs20.readFileSync)((0, import_node_fs20.existsSync)((0, import_node_path24.join)(dir, "build.gradle.kts")) ? (0, import_node_path24.join)(dir, "build.gradle.kts") : (0, import_node_path24.join)(dir, "build.gradle"), "utf8");
       const platform = /android/i.test(buildFile) ? "android" : /jvm|java-library|kotlin\("jvm"\)/.test(buildFile) ? "jvm" : "unknown";
       const main2 = sourceSetFiles(dir, "main");
       const test = sourceSetFiles(dir, "test");
@@ -21510,9 +22005,9 @@ var androidGradleAdapter = {
   collectUnitResults(_root, modules, sinceMs, invocation) {
     return modules.filter((m) => m.unitTestTask).map((m) => {
       const taskName = m.unitTestTask.split(":").pop();
-      const cached2 = invocation.reused.includes(m.id);
-      const result = readJUnitResults(m.id, (0, import_node_path21.join)(m.dir, "build", "test-results", taskName), cached2 ? 0 : sinceMs);
-      return result && { ...result, cached: cached2 };
+      const cached3 = invocation.reused.includes(m.id);
+      const result = readJUnitResults(m.id, (0, import_node_path24.join)(m.dir, "build", "test-results", taskName), cached3 ? 0 : sinceMs);
+      return result && { ...result, cached: cached3 };
     }).filter((r) => r !== null);
   },
   installApp(root, task, deviceSerial, onLine) {
@@ -21535,10 +22030,10 @@ var androidGradleAdapter = {
     const out = [];
     for (const m of modules) {
       for (const file of sourceSetFiles(m.dir, "main")) {
-        const lines = (0, import_node_fs19.readFileSync)(file, "utf8").split(/\r?\n/);
+        const lines = (0, import_node_fs20.readFileSync)(file, "utf8").split(/\r?\n/);
         lines.forEach((text2, i) => {
           if (out.length < limit && NAV_HINT.test(text2)) {
-            out.push(`${(0, import_node_path21.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+            out.push(`${(0, import_node_path24.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
           }
         });
       }
@@ -21547,7 +22042,7 @@ var androidGradleAdapter = {
   },
   doctor(root) {
     const checks = [];
-    const wrapper = (0, import_node_fs19.existsSync)((0, import_node_path21.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
+    const wrapper = (0, import_node_fs20.existsSync)((0, import_node_path24.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
     checks.push({
       id: "gradle-wrapper",
       label: "Gradle wrapper",
@@ -21579,8 +22074,8 @@ var androidGradleAdapter = {
       detail: devices.length > 0 ? devices.map((d) => `${d.serial} (${d.model}, ${d.emulator ? "emulator" : "real phone \u2014 agents need permission"})`).join(", ") : "none (only needed for agent tests)",
       fix: devices.length > 0 ? void 0 : "Start an emulator or connect a phone with USB debugging"
     });
-    const emulator = sdk ? (0, import_node_path21.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
-    const avds = emulator && (0, import_node_fs19.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
+    const emulator = sdk ? (0, import_node_path24.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
+    const avds = emulator && (0, import_node_fs20.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
     checks.push({
       id: "avds",
       label: "Emulator images",
@@ -21592,20 +22087,518 @@ var androidGradleAdapter = {
   }
 };
 function gradlew(root) {
-  const wrapper = (0, import_node_path21.join)(root, isWindows ? "gradlew.bat" : "gradlew");
+  const wrapper = (0, import_node_path24.join)(root, isWindows ? "gradlew.bat" : "gradlew");
   return isWindows ? `"${wrapper}"` : wrapper;
 }
 var NAV_HINT = /\bcomposable<|\bnavigation<|\bNavHost\(|startDestination|deepLinks?\s*[=(]|navDeepLink|uriPattern|@Serializable\s+(data\s+)?(object|class)\s+\w*(Route|Destination|Screen|Graph)\b|\bnavigateTo\w*\(|Intent\(\s*\w+,\s*\w+Activity::class/;
 
+// src/adapters/generic/index.ts
+var import_node_fs23 = require("node:fs");
+var import_node_path28 = require("node:path");
+
+// src/adapters/generic/areas.ts
+var import_node_child_process6 = require("node:child_process");
+var import_node_fs21 = require("node:fs");
+var import_node_path25 = require("node:path");
+var CONTAINER_DIRS = /* @__PURE__ */ new Set(["src", "lib", "libs", "packages", "apps", "modules", "services", "pkg", "internal", "cmd", "components", "crates", "plugins", "features"]);
+function listProjectFiles(root, ignored) {
+  const git2 = (0, import_node_child_process6.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
+  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored);
+  return listed.filter((f) => !ignored.test(f) && !f.startsWith("probe/"));
+}
+function walk(root, ignored) {
+  const out = [];
+  const visit = (rel) => {
+    for (const entry of (0, import_node_fs21.readdirSync)((0, import_node_path25.join)(root, rel), { withFileTypes: true })) {
+      const path = rel ? `${rel}/${entry.name}` : entry.name;
+      if (ignored.test(path)) continue;
+      if (entry.isDirectory()) visit(path);
+      else if (entry.isFile()) out.push(path);
+    }
+  };
+  visit("");
+  return out;
+}
+function discoverAreas(files) {
+  const areas = /* @__PURE__ */ new Map();
+  const add = (id, group, dir) => {
+    const area = areas.get(id) ?? { id, group, dirs: [] };
+    if (!area.dirs.includes(dir)) area.dirs.push(dir);
+    areas.set(id, area);
+  };
+  for (const file of files) {
+    if (!SOURCE_EXT.test(file) || isTestPath(file)) continue;
+    const parts = file.split("/");
+    if (parts.length < 2) continue;
+    const top = parts[0];
+    if (top.startsWith(".") || TEST_ONLY_DIRS.has(top)) continue;
+    if (CONTAINER_DIRS.has(top) && parts.length >= 3 && !TEST_ONLY_DIRS.has(parts[1])) add(parts[1], "feature", `${top}/${parts[1]}`);
+    else add(top, "platform", top);
+  }
+  return [...areas.values()];
+}
+function configuredAreas(spec, files) {
+  const dirs = allDirs(files);
+  if (Array.isArray(spec)) {
+    const matched = [...new Set(spec.flatMap((g) => dirs.filter((d) => globRegex(g).test(d))))].sort();
+    const last = (d) => d.slice(d.lastIndexOf("/") + 1);
+    const taken = /* @__PURE__ */ new Map();
+    for (const d of matched) taken.set(last(d), (taken.get(last(d)) ?? 0) + 1);
+    return matched.map((d) => ({ id: taken.get(last(d)) > 1 ? d : last(d), group: "feature", dirs: [d] }));
+  }
+  return Object.entries(spec).map(([id, globs]) => {
+    const patterns = (Array.isArray(globs) ? globs : [globs]).map(globRegex);
+    const matched = dirs.filter((d) => patterns.some((p) => p.test(d))).sort();
+    return { id, group: "feature", dirs: matched.filter((d, i) => !matched.slice(0, i).some((o) => d.startsWith(`${o}/`))) };
+  });
+}
+function allDirs(files) {
+  const dirs = /* @__PURE__ */ new Set();
+  for (const f of files) {
+    let i = f.indexOf("/");
+    while (i > 0) {
+      dirs.add(f.slice(0, i));
+      i = f.indexOf("/", i + 1);
+    }
+  }
+  return [...dirs];
+}
+function globRegex(glob) {
+  const g = glob.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+  let out = "";
+  for (let i = 0; i < g.length; i++) {
+    const c = g[i];
+    if (c === "*" && g[i + 1] === "*") {
+      out += ".*";
+      i++;
+      if (g[i + 1] === "/") i++;
+    } else if (c === "*") out += "[^/]*";
+    else if (c === "?") out += "[^/]";
+    else out += c.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  }
+  return new RegExp(`^${out}$`);
+}
+
+// src/adapters/generic/modules.ts
+var import_node_fs22 = require("node:fs");
+var import_node_path26 = require("node:path");
+function buildModules(root, files, areas, unitCommand) {
+  const byDir = /* @__PURE__ */ new Map();
+  for (const area of areas) for (const dir of area.dirs) if (!byDir.has(dir)) byDir.set(dir, { area, sources: [], tests: /* @__PURE__ */ new Set() });
+  const ownerOf = (file) => {
+    let dir = file;
+    while (dir.includes("/")) {
+      dir = dir.slice(0, dir.lastIndexOf("/"));
+      const owner = byDir.get(dir);
+      if (owner) return dir;
+    }
+    return void 0;
+  };
+  const code = files.filter((f) => SOURCE_EXT.test(f));
+  const orphanTests = [];
+  for (const file of code) {
+    const owner = ownerOf(file);
+    const test = isTestPath(file);
+    if (owner) {
+      if (test) byDir.get(owner).tests.add(file);
+      else byDir.get(owner).sources.push(file);
+    } else if (test) orphanTests.push(file);
+  }
+  const sourcesBySansExt = /* @__PURE__ */ new Map();
+  for (const m of byDir.values()) for (const f of m.sources) sourcesBySansExt.set(f.replace(/\.[^./]+$/, ""), f);
+  const direct = /* @__PURE__ */ new Set();
+  const referenced = /* @__PURE__ */ new Set();
+  const readTest = (test, scope) => {
+    const text2 = safeRead((0, import_node_path26.join)(root, test));
+    const imported = resolveImports(test, text2, sourcesBySansExt);
+    for (const f of imported) referenced.add(f);
+    const dirsTouched = scope ?? new Set([...imported].map((f) => ownerOf(f)).filter(Boolean));
+    const name = normal(testedName(import_node_path26.posix.basename(test)));
+    const named = [...dirsTouched].flatMap((d) => byDir.get(d).sources.filter((s) => normal(stemOf(import_node_path26.posix.basename(s))) === name));
+    for (const f of named) direct.add(f);
+    return dirsTouched;
+  };
+  for (const [dir, m] of byDir) for (const test of m.tests) readTest(test, /* @__PURE__ */ new Set([dir]));
+  for (const test of orphanTests) {
+    let touched = readTest(test, null);
+    if (touched.size === 0) {
+      const name = normal(testedName(import_node_path26.posix.basename(test)));
+      touched = new Set([...byDir].filter(([, m]) => m.sources.some((s) => normal(stemOf(import_node_path26.posix.basename(s))) === name)).map(([d]) => d));
+      readTest(test, touched);
+    }
+    for (const d of touched) byDir.get(d).tests.add(test);
+  }
+  return [...byDir].map(([dir, m]) => {
+    const sourcesOwned = m.sources;
+    const classes = sourcesOwned.map((file) => fileUnit(root, file, direct.has(file) ? "direct" : referenced.has(file) ? "referenced" : "none"));
+    const command = unitCommand(m.area, m.tests.size > 0);
+    return {
+      id: `:${dir.replace(/\//g, ":")}`,
+      dir: (0, import_node_path26.join)(root, dir),
+      platform: "unknown",
+      mainFiles: sourcesOwned.length,
+      testFiles: m.tests.size,
+      instrumentedTestFiles: 0,
+      unitTestTask: command,
+      classes,
+      feature: { id: m.area.id, group: m.area.group }
+    };
+  });
+}
+function resolveImports(file, text2, sources) {
+  const out = /* @__PURE__ */ new Set();
+  const dir = import_node_path26.posix.dirname(file);
+  const lookup = (path) => sources.get(path) ?? sources.get(`${path}/index`) ?? sources.get(`${path}/__init__`);
+  for (const m of text2.matchAll(/(?:\bfrom\s+|\bimport\s*\(?\s*|\brequire\(\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
+    const found = lookup(import_node_path26.posix.normalize(import_node_path26.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
+    if (found) out.add(found);
+  }
+  if (file.endsWith(".py")) {
+    for (const m of text2.matchAll(/^\s*(?:from|import)\s+([\w.]+)/gm)) {
+      const path = m[1].replace(/\./g, "/");
+      const found = lookup(path) ?? [...sources.keys()].filter((k) => k.endsWith(`/${path}`)).map((k) => sources.get(k))[0];
+      if (found) out.add(found);
+    }
+  }
+  return out;
+}
+function fileUnit(root, file, test) {
+  const base = import_node_path26.posix.basename(file);
+  const stem = stemOf(base);
+  const generic = /^(index|main|mod|__init__|lib)$/.test(stem);
+  const name = generic ? `${import_node_path26.posix.basename(import_node_path26.posix.dirname(file))}/${stem}` : stem;
+  const lines = Math.max(1, safeRead((0, import_node_path26.join)(root, file)).split("\n").length);
+  const kind = classifyFile(stem, base);
+  return { name, file, kind, lines, test, risk: Math.round(KIND_WEIGHT[kind] * Math.log2(lines + 1) * 10) / 10 };
+}
+function classifyFile(stem, fileName) {
+  if (/\.d$/.test(stem) || /^(types?|constants?|consts?|models?|schemas?|dtos?|enums?)$/i.test(stem) || /(Types?|Model|Dto|DTO|Schema|Entity|Enum|Constants)$/.test(stem)) return "model";
+  if (/reducer$/i.test(stem)) return "reducer";
+  if (/use-?case$/i.test(stem)) return "usecase";
+  if (/view-?model$/i.test(stem)) return "viewmodel";
+  if (/(repository|repo|dao|data-?source|store)$/i.test(stem)) return "repository";
+  if (/(mapper|converter|serializer|parser|formatter)$/i.test(stem)) return "mapper";
+  if (/\.(tsx|jsx|vue|svelte)$/.test(fileName) || /(component|view|page|screen|widget|layout)$/i.test(stem)) return "ui";
+  if (/(service|manager|handler|controller|engine|client|runner|scheduler|worker|validator|resolver|utils?|helpers?)$/i.test(stem)) return "logic";
+  return "other";
+}
+function normal(name) {
+  return name.toLowerCase().replace(/[-_.]/g, "");
+}
+function safeRead(path) {
+  try {
+    return (0, import_node_fs22.readFileSync)(path, "utf8");
+  } catch {
+    return "";
+  }
+}
+function routeHints(root, modules, limit) {
+  const out = [];
+  for (const m of modules) {
+    for (const c of m.classes) {
+      if (out.length >= limit) return out;
+      safeRead((0, import_node_path26.join)(root, c.file)).split(/\r?\n/).forEach((text2, i) => {
+        if (out.length < limit && ROUTE_HINT.test(text2)) out.push(`${c.file}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+      });
+    }
+  }
+  return out;
+}
+var ROUTE_HINT = /<Route\b|createBrowserRouter|\bpath:\s*["'`]\/|\b(app|router|server)\.(get|post|put|patch|delete|use|route)\(\s*["'`]\/|@(Get|Post|Put|Patch|Delete|Request)Mapping|@app\.(get|post|route)\(|\burlpatterns\b|\bpath\(\s*["']|HandleFunc\(\s*["']\/|\bdefineRoutes?\b/;
+
+// src/adapters/generic/unit.ts
+var import_node_path27 = require("node:path");
+var TAIL = 400;
+async function runCommands(root, modules, onLine, config2) {
+  const groups = /* @__PURE__ */ new Map();
+  for (const m of modules) if (m.unitTestTask) groups.set(m.unitTestTask, [...groups.get(m.unitTestTask) ?? [], m]);
+  const results = [];
+  let exitCode = 0;
+  for (const [command, members] of groups) {
+    const label = members.length === 1 ? members[0].id : command;
+    onLine(`$ ${command}`);
+    const tail = [];
+    const since = Date.now();
+    const code = await runShell(command, root, (line) => {
+      tail.push(line);
+      if (tail.length > TAIL) tail.shift();
+      onLine(line);
+    });
+    if (code !== 0 && exitCode === 0) exitCode = code;
+    const junit = config2.unit.junit ? readJUnitReports(label, (0, import_node_path27.resolve)(root, config2.unit.junit), since) : null;
+    results.push(junit ?? fromOutput(label, tail) ?? fromExitCode(label, command, code, tail));
+  }
+  return { command: [...groups.keys()].join(" && "), exitCode, reused: [], results };
+}
+function runShell(command, cwd, onLine) {
+  return isWindows ? stream(command, [], cwd, onLine) : stream("sh", ["-c", command], cwd, onLine);
+}
+function fromExitCode(module2, command, code, tail) {
+  const failures = code === 0 ? [] : [{ name: `exit code ${code}`, className: command, status: "failed", durationMs: 0, message: lastLines(tail) }];
+  return { module: module2, tests: 1, failed: code === 0 ? 0 : 1, skipped: 0, durationMs: 0, failures };
+}
+function lastLines(tail) {
+  return tail.filter((l) => l.trim()).slice(-8).join("\n").slice(0, 1e3);
+}
+function fromOutput(module2, lines) {
+  const text2 = lines.map(stripAnsi).join("\n");
+  const counts = nodeCounts(text2) ?? jestCounts(text2) ?? vitestCounts(text2) ?? pytestCounts(text2) ?? cargoCounts(text2);
+  if (!counts) return null;
+  const names = failedNames(text2).slice(0, 50);
+  const failures = names.map((name) => ({ name, className: "", status: "failed", durationMs: 0 }));
+  if (counts.failed > 0 && failures.length === 0) failures.push({ name: `${counts.failed} failed`, className: "", status: "failed", durationMs: 0, message: lastLines(lines.map(stripAnsi)) });
+  return { module: module2, ...counts, durationMs: 0, failures };
+}
+function stripAnsi(line) {
+  return line.replace(/\x1b\[[0-9;]*[A-Za-z]/g, "");
+}
+function count(text2, re) {
+  const all = [...text2.matchAll(re)];
+  return all.length ? Number(all[all.length - 1][1]) : void 0;
+}
+function nodeCounts(text2) {
+  const tests = count(text2, /^[ℹ#]\s+tests\s+(\d+)/gm);
+  if (tests === void 0) return null;
+  return { tests, failed: count(text2, /^[ℹ#]\s+fail\s+(\d+)/gm) ?? 0, skipped: (count(text2, /^[ℹ#]\s+skipped\s+(\d+)/gm) ?? count(text2, /^[ℹ#]\s+skip\s+(\d+)/gm) ?? 0) + (count(text2, /^[ℹ#]\s+todo\s+(\d+)/gm) ?? 0) };
+}
+function jestCounts(text2) {
+  const line = [...text2.matchAll(/^Tests:\s+(.+total)\s*$/gm)].pop()?.[1];
+  if (!line) return null;
+  const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(line)?.[1] ?? 0);
+  return { tests: n("total"), failed: n("failed"), skipped: n("skipped") + n("todo") };
+}
+function vitestCounts(text2) {
+  const m = [...text2.matchAll(/^\s*Tests\s+(.+)\((\d+)\)\s*$/gm)].pop();
+  if (!m) return null;
+  const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(m[1])?.[1] ?? 0);
+  return { tests: Number(m[2]), failed: n("failed"), skipped: n("skipped") + n("todo") };
+}
+function pytestCounts(text2) {
+  const line = [...text2.matchAll(/^=+ (.*\b(?:passed|failed|error)\b.*) in [\d.]+s.*=+\s*$/gm)].pop()?.[1];
+  if (!line) return null;
+  const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(line)?.[1] ?? 0);
+  const failed = n("failed") + n("errors?");
+  const skipped = n("skipped") + n("xfailed");
+  return { tests: n("passed") + failed + skipped + n("xpassed"), failed, skipped };
+}
+function cargoCounts(text2) {
+  const all = [...text2.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored/g)];
+  if (!all.length) return null;
+  const sum = (i) => all.reduce((n, m) => n + Number(m[i]), 0);
+  return { tests: sum(1) + sum(2) + sum(3), failed: sum(2), skipped: sum(3) };
+}
+function failedNames(text2) {
+  const names = [
+    ...text2.matchAll(/^\s*✖\s+(?!failing tests)(.+?)(?:\s+\([\d.]+m?s\))?\s*$/gm),
+    // node --test
+    ...text2.matchAll(/^\s*●\s+(?!Test suite failed)(.+?)\s*$/gm),
+    // Jest
+    ...text2.matchAll(/^\s*(?:×|FAIL)\s+(.+?)(?:\s+\d+m?s)?\s*$/gm),
+    // Vitest
+    ...text2.matchAll(/^FAILED\s+(\S+)/gm),
+    // pytest
+    ...text2.matchAll(/^test (\S+) \.\.\. FAILED$/gm)
+    // cargo
+  ].map((m) => m[1].trim());
+  return [...new Set(names)];
+}
+
+// src/adapters/generic/index.ts
+var GENERIC_IGNORED = ["build", "dist", "out", "target", "coverage", "vendor", "__pycache__", ".venv", "venv", ".tox", ".pytest_cache", ".mypy_cache", ".gradle", ".next", ".turbo", ".cache"];
+function areaModules(root, config2, adapter, options = {}) {
+  const files = listProjectFiles(root, ignoredPathPattern(adapter));
+  const areas = config2.areas ? configuredAreas(config2.areas, files) : options.fallback?.(files) ?? discoverAreas(files);
+  return buildModules(root, files, areas, (area, hasTests) => config2.unit.areas?.[area.id] ?? options.command?.(area, hasTests) ?? (hasTests ? config2.unit.command ?? null : null));
+}
+function unitAndDeviceChecks(config2, adapter, inferred) {
+  const command = config2.unit.command ?? inferred;
+  return [
+    {
+      id: "unit-command",
+      label: "Unit test command",
+      status: command || config2.unit.areas ? "ok" : "warn",
+      detail: command ? `${command}${config2.unit.command ? "" : " (detected)"}` : config2.unit.areas ? `per area: ${Object.keys(config2.unit.areas).join(", ")}` : "none: unit runs are unavailable",
+      fix: command || config2.unit.areas ? void 0 : "Set unit.command in probe/probe.yaml, e.g. `pytest` or `go test ./...`"
+    },
+    {
+      id: "unit-results",
+      label: "Unit results",
+      status: "ok",
+      detail: config2.unit.junit ? `JUnit XML at ${config2.unit.junit}` : "from the test runner's summary, else the exit code (set unit.junit for per-test results)"
+    },
+    { id: "devices", label: "Device testing", status: "warn", detail: devicesUnsupported(adapter) }
+  ];
+}
+var genericAdapter = {
+  id: "generic",
+  label: "generic",
+  ignoredDirs: GENERIC_IGNORED,
+  supportsDevices: false,
+  detect(root) {
+    return (0, import_node_fs23.existsSync)((0, import_node_path28.join)(root, ".git")) || (0, import_node_fs23.existsSync)(configPath(root));
+  },
+  projectName(root) {
+    return (0, import_node_path28.basename)(root);
+  },
+  scanModules(root, config2) {
+    return areaModules(root, config2, genericAdapter);
+  },
+  runUnitTests(root, modules, onLine, config2) {
+    return runCommands(root, modules, onLine, config2);
+  },
+  collectUnitResults(_root, _modules, _sinceMs, invocation) {
+    return invocation.results ?? [];
+  },
+  navigationHints(root, modules, limit) {
+    return routeHints(root, modules, limit);
+  },
+  installApp() {
+    return Promise.reject(new Error(devicesUnsupported(genericAdapter)));
+  },
+  detectApp() {
+    return null;
+  },
+  moduleDependencies() {
+    return /* @__PURE__ */ new Map();
+  },
+  isTestSource(relPath) {
+    return isTestPath(relPath);
+  },
+  doctor(_root, config2) {
+    return unitAndDeviceChecks(config2, genericAdapter, null);
+  }
+};
+
+// src/adapters/node/index.ts
+var import_node_fs24 = require("node:fs");
+var import_node_path29 = require("node:path");
+var import_yaml7 = __toESM(require_dist(), 1);
+var nodeAdapter = {
+  id: "node",
+  label: "Node/TypeScript",
+  ignoredDirs: [...GENERIC_IGNORED, ".svelte-kit", ".nuxt", ".parcel-cache", ".yarn", ".pnpm-store"],
+  supportsDevices: false,
+  detect(root) {
+    return (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "package.json"));
+  },
+  projectName(root) {
+    return readPackage(root)?.name ?? (0, import_node_path29.basename)(root);
+  },
+  scanModules(root, config2) {
+    const pm = packageManager(root);
+    const rootTest = config2.unit.command ?? (hasTestScript(readPackage(root)) ? `${pm} test` : null);
+    let spaces = [];
+    return areaModules(root, config2, nodeAdapter, {
+      fallback: (files) => {
+        spaces = workspaces(root, files);
+        return spaces.length ? spaces.map((w) => w.area) : null;
+      },
+      command: (area, hasTests) => {
+        if (config2.unit.command) return hasTests ? config2.unit.command : null;
+        const space = spaces.find((w) => w.area === area);
+        if (space) return hasTestScript(space.pkg) ? workspaceTest(pm, space) : null;
+        return hasTests ? rootTest : null;
+      }
+    });
+  },
+  runUnitTests(root, modules, onLine, config2) {
+    return runCommands(root, modules, onLine, config2);
+  },
+  collectUnitResults(_root, _modules, _sinceMs, invocation) {
+    return invocation.results ?? [];
+  },
+  navigationHints(root, modules, limit) {
+    return routeHints(root, modules, limit);
+  },
+  installApp() {
+    return Promise.reject(new Error(devicesUnsupported(nodeAdapter)));
+  },
+  detectApp() {
+    return null;
+  },
+  moduleDependencies(root) {
+    const spaces = workspaces(root, listProjectFiles(root, ignoredPathPattern(nodeAdapter)));
+    const idOf = new Map(spaces.map((w) => [w.pkg.name, `:${w.dir.replace(/\//g, ":")}`]));
+    return new Map(
+      spaces.map((w) => {
+        const deps = Object.keys({ ...w.pkg.dependencies, ...w.pkg.devDependencies, ...w.pkg.peerDependencies });
+        return [idOf.get(w.pkg.name), deps.map((d) => idOf.get(d)).filter((d) => !!d)];
+      })
+    );
+  },
+  isTestSource(relPath) {
+    return isTestPath(relPath);
+  },
+  doctor(root, config2) {
+    const pkg = readPackage(root);
+    const pm = packageManager(root);
+    const installed = (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "node_modules"));
+    return [
+      {
+        id: "node-modules",
+        label: "Dependencies",
+        status: installed ? "ok" : "warn",
+        detail: installed ? `installed (${pm})` : "node_modules missing: tests will not run",
+        fix: installed ? void 0 : `Run \`${pm} install\``
+      },
+      ...unitAndDeviceChecks(config2, nodeAdapter, hasTestScript(pkg) ? `${pm} test` : null)
+    ];
+  }
+};
+function readPackage(dir) {
+  try {
+    return JSON.parse((0, import_node_fs24.readFileSync)((0, import_node_path29.join)(dir, "package.json"), "utf8"));
+  } catch {
+    return null;
+  }
+}
+function hasTestScript(pkg) {
+  const test = pkg?.scripts?.test;
+  return !!test && !/no test specified/.test(test);
+}
+function packageManager(root) {
+  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "pnpm-lock.yaml"))) return "pnpm";
+  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "yarn.lock"))) return "yarn";
+  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "bun.lockb")) || (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "bun.lock"))) return "bun";
+  return "npm";
+}
+function workspaceTest(pm, w) {
+  const name = w.pkg.name ?? w.dir;
+  switch (pm) {
+    case "pnpm":
+      return `pnpm --filter ${name} test`;
+    case "yarn":
+      return `yarn workspace ${name} test`;
+    case "bun":
+      return `bun run --cwd ${w.dir} test`;
+    default:
+      return `npm test --workspace=${w.dir}`;
+  }
+}
+function workspaces(root, files) {
+  const pkg = readPackage(root);
+  let globs = Array.isArray(pkg?.workspaces) ? pkg.workspaces : pkg?.workspaces?.packages ?? [];
+  const pnpm = (0, import_node_path29.join)(root, "pnpm-workspace.yaml");
+  if (!globs.length && (0, import_node_fs24.existsSync)(pnpm)) globs = ((0, import_yaml7.parse)((0, import_node_fs24.readFileSync)(pnpm, "utf8")) ?? {}).packages ?? [];
+  const include = globs.filter((g) => !g.startsWith("!")).map(globRegex);
+  const exclude = globs.filter((g) => g.startsWith("!")).map((g) => globRegex(g.slice(1)));
+  const dirs = files.filter((f) => f.endsWith("/package.json")).map((f) => f.slice(0, -"/package.json".length)).filter((d) => include.some((r) => r.test(d)) && !exclude.some((r) => r.test(d))).sort();
+  const named = dirs.map((dir) => ({ dir, pkg: readPackage((0, import_node_path29.join)(root, dir)) ?? {} }));
+  const short2 = (w) => (w.pkg.name ?? (0, import_node_path29.basename)(w.dir)).replace(/^@[^/]+\//, "");
+  const counts = /* @__PURE__ */ new Map();
+  for (const w of named) counts.set(short2(w), (counts.get(short2(w)) ?? 0) + 1);
+  return named.map((w) => ({ ...w, area: { id: counts.get(short2(w)) > 1 ? w.pkg.name ?? w.dir : short2(w), group: "feature", dirs: [w.dir] } }));
+}
+
 // src/adapters/registry.ts
-var ADAPTERS = [androidGradleAdapter];
+var ADAPTERS = [androidGradleAdapter, nodeAdapter, genericAdapter];
 function detectAdapter(root) {
   return ADAPTERS.find((a) => a.detect(root)) ?? null;
 }
 
 // src/engine/project.ts
 function openProject(explicit) {
-  const start = (0, import_node_path22.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
+  const start = (0, import_node_path30.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
   let dir = start;
   for (; ; ) {
     const adapter = detectAdapter(dir);
@@ -21614,14 +22607,14 @@ function openProject(explicit) {
       const config2 = loadConfig(dir, store.dir);
       return { root: dir, name: config2.name ?? adapter.projectName(dir), adapter, config: config2, store };
     }
-    const parent = (0, import_node_path22.dirname)(dir);
-    if (parent === dir) throw new Error(`No supported project found at or above ${start}. Supported: Android/Gradle.`);
+    const parent = (0, import_node_path30.dirname)(dir);
+    if (parent === dir) throw new Error(`No supported project found at or above ${start}. Probe works on a git repository or a folder with probe/probe.yaml (adapters: ${ADAPTERS.map((a) => a.label).join(", ")}).`);
     dir = parent;
   }
 }
 
 // src/engine/issues.ts
-var import_node_path23 = require("node:path");
+var import_node_path31 = require("node:path");
 function issuesOf(project, run) {
   const read = (id) => id ? project.store.read(`runs/${id}.json`) : null;
   if (run.kind === "verify") {
@@ -21673,7 +22666,7 @@ function findIssue(project, issueId) {
 }
 function fixPrompt(project, issue2, run, forProbe) {
   const feature = findFeature(latestScan(project), issue2.feature);
-  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path23.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
+  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path31.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
   const parts = [`Fix one problem that Probe found in the "${issue2.feature}" feature of the project in the current directory.`, `## The problem
 ${issue2.title}
 
@@ -21731,17 +22724,17 @@ function startUnitRun(project, featureId) {
   };
   return launchRun(project, run, async (log) => {
     if (modules.length === 0) {
-      run.error = "This feature has no unit tests.";
+      run.error = feature.stats.testFiles > 0 ? "This feature has tests but no command to run them: set unit.command in probe/probe.yaml." : "This feature has no unit tests.";
       return;
     }
     const fingerprint = unitFingerprint(project, latestScan(project), feature.id);
     const since = Date.now();
-    const inv = await project.adapter.runUnitTests(project.root, modules, log);
+    const inv = await project.adapter.runUnitTests(project.root, modules, log, project.config);
     run.command = inv.command;
     run.results = project.adapter.collectUnitResults(project.root, modules, since, inv);
     const failed = run.results.some((r) => r.failed > 0);
     run.status = failed ? "failed" : inv.exitCode === 0 ? "passed" : "error";
-    if (run.status === "error") run.error = `Build exited with code ${inv.exitCode} (see log: compile error or missing task).`;
+    if (run.status === "error") run.error = `${project.adapter.supportsDevices ? "Build" : "The test command"} exited with code ${inv.exitCode} (see log: compile error or missing task).`;
     if (run.status === "passed" && run.results.length === 0) {
       run.status = "error";
       run.error = "The build succeeded but wrote no test reports.";
@@ -21900,7 +22893,7 @@ __export(util_exports, {
   assertNever: () => assertNever,
   assertNotEqual: () => assertNotEqual,
   assignProp: () => assignProp,
-  cached: () => cached,
+  cached: () => cached2,
   captureStackTrace: () => captureStackTrace,
   cleanEnum: () => cleanEnum,
   cleanRegex: () => cleanRegex,
@@ -21965,7 +22958,7 @@ function jsonStringifyReplacer(_, value) {
     return value.toString();
   return value;
 }
-function cached(getter) {
+function cached2(getter) {
   const set = false;
   return {
     get value() {
@@ -22028,12 +23021,12 @@ function getElementAtPath(obj, path) {
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
-  const keys = Object.keys(promisesObj);
-  const promises = keys.map((key) => promisesObj[key]);
+  const keys2 = Object.keys(promisesObj);
+  const promises = keys2.map((key) => promisesObj[key]);
   return Promise.all(promises).then((results) => {
     const resolvedObj = {};
-    for (let i = 0; i < keys.length; i++) {
-      resolvedObj[keys[i]] = results[i];
+    for (let i = 0; i < keys2.length; i++) {
+      resolvedObj[keys2[i]] = results[i];
     }
     return resolvedObj;
   });
@@ -22054,7 +23047,7 @@ var captureStackTrace = Error.captureStackTrace ? Error.captureStackTrace : (...
 function isObject(data) {
   return typeof data === "object" && data !== null && !Array.isArray(data);
 }
-var allowsEval = cached(() => {
+var allowsEval = cached2(() => {
   if (typeof navigator !== "undefined" && navigator?.userAgent?.includes("Cloudflare")) {
     return false;
   }
@@ -22496,7 +23489,7 @@ var _parse = (_Err) => (schema, value, _ctx, _params) => {
   }
   return result.value;
 };
-var parse6 = /* @__PURE__ */ _parse($ZodRealError);
+var parse7 = /* @__PURE__ */ _parse($ZodRealError);
 var _parseAsync = (_Err) => async (schema, value, _ctx, params) => {
   const ctx = _ctx ? Object.assign(_ctx, { async: true }) : { async: true };
   let result = schema._zod.run({ value, issues: [] }, ctx);
@@ -23551,9 +24544,9 @@ function handleOptionalObjectResult(result, final, key, input) {
 }
 var $ZodObject = /* @__PURE__ */ $constructor("$ZodObject", (inst, def) => {
   $ZodType.init(inst, def);
-  const _normalized = cached(() => {
-    const keys = Object.keys(def.shape);
-    for (const k of keys) {
+  const _normalized = cached2(() => {
+    const keys2 = Object.keys(def.shape);
+    for (const k of keys2) {
       if (!(def.shape[k] instanceof $ZodType)) {
         throw new Error(`Invalid element at key "${k}": expected a Zod schema`);
       }
@@ -23561,9 +24554,9 @@ var $ZodObject = /* @__PURE__ */ $constructor("$ZodObject", (inst, def) => {
     const okeys = optionalKeys(def.shape);
     return {
       shape: def.shape,
-      keys,
-      keySet: new Set(keys),
-      numKeys: keys.length,
+      keys: keys2,
+      keySet: new Set(keys2),
+      numKeys: keys2.length,
       optionalKeys: new Set(okeys)
     };
   });
@@ -23786,7 +24779,7 @@ var $ZodDiscriminatedUnion = /* @__PURE__ */ $constructor("$ZodDiscriminatedUnio
     }
     return propValues;
   });
-  const disc = cached(() => {
+  const disc = cached2(() => {
     const opts = def.options;
     const map = /* @__PURE__ */ new Map();
     for (const o of opts) {
@@ -25636,7 +26629,7 @@ var ZodMiniType = /* @__PURE__ */ $constructor("ZodMiniType", (inst, def) => {
     throw new Error("Uninitialized schema in ZodMiniType.");
   $ZodType.init(inst, def);
   inst.def = def;
-  inst.parse = (data, params) => parse6(inst, data, params, { callee: inst.parse });
+  inst.parse = (data, params) => parse7(inst, data, params, { callee: inst.parse });
   inst.safeParse = (data, params) => safeParse(inst, data, params);
   inst.parseAsync = async (data, params) => parseAsync(inst, data, params, { callee: inst.parseAsync });
   inst.safeParseAsync = async (data, params) => safeParseAsync(inst, data, params);
@@ -25912,7 +26905,7 @@ var ZodRealError = $constructor("ZodError", initializer2, {
 });
 
 // node_modules/zod/v4/classic/parse.js
-var parse7 = /* @__PURE__ */ _parse(ZodRealError);
+var parse8 = /* @__PURE__ */ _parse(ZodRealError);
 var parseAsync2 = /* @__PURE__ */ _parseAsync(ZodRealError);
 var safeParse3 = /* @__PURE__ */ _safeParse(ZodRealError);
 var safeParseAsync3 = /* @__PURE__ */ _safeParseAsync(ZodRealError);
@@ -25940,7 +26933,7 @@ var ZodType2 = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
     reg.add(inst, meta);
     return inst;
   });
-  inst.parse = (data, params) => parse7(inst, data, params, { callee: inst.parse });
+  inst.parse = (data, params) => parse8(inst, data, params, { callee: inst.parse });
   inst.safeParse = (data, params) => safeParse3(inst, data, params);
   inst.parseAsync = async (data, params) => parseAsync2(inst, data, params, { callee: inst.parseAsync });
   inst.safeParseAsync = async (data, params) => safeParseAsync3(inst, data, params);
@@ -26291,11 +27284,11 @@ var ZodEnum2 = /* @__PURE__ */ $constructor("ZodEnum", (inst, def) => {
   ZodType2.init(inst, def);
   inst.enum = def.entries;
   inst.options = Object.values(def.entries);
-  const keys = new Set(Object.keys(def.entries));
+  const keys2 = new Set(Object.keys(def.entries));
   inst.extract = (values, params) => {
     const newEntries = {};
     for (const value of values) {
-      if (keys.has(value)) {
+      if (keys2.has(value)) {
         newEntries[value] = def.entries[value];
       } else
         throw new Error(`Key ${value} not found in enum`);
@@ -26310,7 +27303,7 @@ var ZodEnum2 = /* @__PURE__ */ $constructor("ZodEnum", (inst, def) => {
   inst.exclude = (values, params) => {
     const newEntries = { ...def.entries };
     for (const value of values) {
-      if (keys.has(value)) {
+      if (keys2.has(value)) {
         delete newEntries[value];
       } else
         throw new Error(`Key ${value} not found in enum`);
@@ -28775,7 +29768,7 @@ function parseMapDef(def, refs) {
   if (refs.mapStrategy === "record") {
     return parseRecordDef(def, refs);
   }
-  const keys = parseDef(def.keyType._def, {
+  const keys2 = parseDef(def.keyType._def, {
     ...refs,
     currentPath: [...refs.currentPath, "items", "items", "0"]
   }) || parseAnyDef(refs);
@@ -28788,7 +29781,7 @@ function parseMapDef(def, refs) {
     maxItems: 125,
     items: {
       type: "array",
-      items: [keys, values],
+      items: [keys2, values],
       minItems: 2,
       maxItems: 2
     }
@@ -29915,7 +30908,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
+        await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error2) {
@@ -29932,7 +30925,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve5, reject) => {
+    return new Promise((resolve7, reject) => {
       const earlyReject = (error2) => {
         reject(error2);
       };
@@ -30010,7 +31003,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve5(parseResult.data);
+            resolve7(parseResult.data);
           }
         } catch (error2) {
           reject(error2);
@@ -30272,12 +31265,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve5, reject) => {
+    return new Promise((resolve7, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve5, interval);
+      const timeoutId = setTimeout(resolve7, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -31146,7 +32139,7 @@ var ExperimentalMcpServerTasks = class {
 
 // node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js
 function toolInputElementCount(value, max) {
-  let count = 0;
+  let count2 = 0;
   const stack = [value];
   while (stack.length > 0) {
     const node = stack.pop();
@@ -31154,8 +32147,8 @@ function toolInputElementCount(value, max) {
       continue;
     if (Array.isArray(node)) {
       for (const child of node) {
-        if (++count > max)
-          return count;
+        if (++count2 > max)
+          return count2;
         if (child !== null && typeof child === "object")
           stack.push(child);
       }
@@ -31163,15 +32156,15 @@ function toolInputElementCount(value, max) {
       for (const key in node) {
         if (!Object.prototype.hasOwnProperty.call(node, key))
           continue;
-        if (++count > max)
-          return count;
+        if (++count2 > max)
+          return count2;
         const child = node[key];
         if (child !== null && typeof child === "object")
           stack.push(child);
       }
     }
   }
-  return count;
+  return count2;
 }
 function resolveMaxToolInputElements(value) {
   if (value === void 0 || value === Infinity)
@@ -31417,7 +32410,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
+      await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -32081,21 +33074,21 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve5) => {
+    return new Promise((resolve7) => {
       const json = serializeMessage(message);
       if (this._stdout.write(json)) {
-        resolve5();
+        resolve7();
       } else {
-        this._stdout.once("drain", resolve5);
+        this._stdout.once("drain", resolve7);
       }
     });
   }
 };
 
 // src/studio/server.ts
-var import_node_fs24 = require("node:fs");
+var import_node_fs29 = require("node:fs");
 var import_node_http = require("node:http");
-var import_node_path28 = require("node:path");
+var import_node_path36 = require("node:path");
 
 // src/accounts/login.ts
 function prompt3(project, wanted, device, pkg) {
@@ -32156,7 +33149,7 @@ function lastLogin(project) {
 }
 
 // src/cards/explore.ts
-var import_yaml7 = __toESM(require_dist(), 1);
+var import_yaml8 = __toESM(require_dist(), 1);
 var NAVMAP_FILE = "navmap.json";
 function prompt4(project, feature, device, pkg) {
   const cards = listCards(project.root, feature).map((c) => ({ title: c.title, reach: c.reach }));
@@ -32169,7 +33162,7 @@ Only look and navigate: do not post, send, delete or change anything.
 
 ## What Probe already knows about reaching it (feature cards)
 \`\`\`yaml
-${cards.length ? (0, import_yaml7.stringify)(cards) : "none yet\n"}\`\`\`
+${cards.length ? (0, import_yaml8.stringify)(cards) : "none yet\n"}\`\`\`
 
 ## Test accounts
 ${accountsForPrompt(project)}
@@ -32391,9 +33384,9 @@ function summarizeUnitWrite(run) {
 }
 
 // src/engine/verify.ts
-var import_node_path24 = require("node:path");
+var import_node_path32 = require("node:path");
 function featuresOfFiles(project, result, files) {
-  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path24.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
+  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path32.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
   const byFeature = /* @__PURE__ */ new Map();
   const unowned = [];
   for (const file of files) {
@@ -32413,6 +33406,7 @@ function pickCards(cards, which, ticket) {
 function startVerify(project, options = {}) {
   const base = options.base ?? defaultBase(project.root, project.config.verify.base);
   if (!base && !options.features?.length && !options.ticket && !options.outdated) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
+  const noDevice = options.noDevice || !project.adapter.supportsDevices;
   const run = {
     id: newRunId(),
     kind: "verify",
@@ -32423,7 +33417,7 @@ function startVerify(project, options = {}) {
     changed: [],
     unowned: [],
     features: [],
-    device: !options.noDevice,
+    device: !noDevice,
     costUsd: 0
   };
   return launchRun(project, run, async (log) => {
@@ -32435,7 +33429,7 @@ function startVerify(project, options = {}) {
       const wanted = result.features.filter((f) => {
         const unitOld = f.stats.testFiles > 0 && overview.unit.get(f.id)?.state !== "fresh";
         const cardsOld = pickCards(listCards(project.root, f.id), which).some((c) => overview.cards.get(`${f.id}/${c.id}`)?.state !== "fresh");
-        return (!options.features?.length || options.features.includes(f.id)) && (unitOld || !options.noDevice && cardsOld);
+        return (!options.features?.length || options.features.includes(f.id)) && (unitOld || !noDevice && cardsOld);
       });
       targets = new Map(wanted.map((f) => [f.id, []]));
       log(`${targets.size} features have outdated or missing results`);
@@ -32477,7 +33471,7 @@ function startVerify(project, options = {}) {
       f.unitStatus = finished.status;
       log(`${f.feature}: unit ${finished.status}`);
     }
-    if (!options.noDevice) {
+    if (!noDevice) {
       let budget = options.maxCards ?? project.config.verify.maxCards;
       let first = true;
       for (const f of run.features) {
@@ -32533,9 +33527,9 @@ function summarizeVerify(run) {
 }
 
 // src/tickets/tickets.ts
-var import_node_child_process6 = require("node:child_process");
-var import_node_fs20 = require("node:fs");
-var import_node_path25 = require("node:path");
+var import_node_child_process7 = require("node:child_process");
+var import_node_fs25 = require("node:fs");
+var import_node_path33 = require("node:path");
 function ticketUrl(project, id) {
   return project.config.tickets.url?.replace("{id}", encodeURIComponent(id));
 }
@@ -32547,7 +33541,7 @@ function ticketInfo(project, id) {
   return { id, url: ticketUrl(project, id), commits, features: [...byFeature.keys()], cards: cards.map((c) => `${c.feature}/${c.id}`) };
 }
 function ticketDraft(project, run) {
-  const evidence = (0, import_node_path25.join)(project.store.dir, "runs", run.id);
+  const evidence = (0, import_node_path33.join)(project.store.dir, "runs", run.id);
   const lines = [];
   let title = `[Probe] ${run.feature}: ${run.kind} ${run.status}`;
   switch (run.kind) {
@@ -32593,28 +33587,28 @@ function ticketDraft(project, run) {
 function fileTicket(project, run, draft = ticketDraft(project, run)) {
   const template = project.config.tickets.fileCommand;
   if (!template) throw new Error("No tickets.fileCommand in probe/probe.yaml; copy the draft instead.");
-  const dir = (0, import_node_path25.join)(project.store.dir, "tickets");
-  (0, import_node_fs20.mkdirSync)(dir, { recursive: true });
-  const file = (0, import_node_path25.join)(dir, `${run.id}.md`);
-  (0, import_node_fs20.writeFileSync)(file, draft.body);
+  const dir = (0, import_node_path33.join)(project.store.dir, "tickets");
+  (0, import_node_fs25.mkdirSync)(dir, { recursive: true });
+  const file = (0, import_node_path33.join)(dir, `${run.id}.md`);
+  (0, import_node_fs25.writeFileSync)(file, draft.body);
   const quote = (s) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file));
-  const r = (0, import_node_child_process6.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
+  const r = (0, import_node_child_process7.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
   if (r.status !== 0) throw new Error(`Filing failed (${r.status}): ${(r.stderr || r.stdout).trim().slice(0, 500)}`);
   return r.stdout.trim();
 }
 
 // src/studio/page.html
-var page_default = '<!doctype html>\r\n<html lang="en">\r\n<head>\r\n<meta charset="utf-8">\r\n<meta name="viewport" content="width=device-width, initial-scale=1">\r\n<title>Probe Studio</title>\r\n<style>\r\n  :root {\r\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\r\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\r\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\r\n  }\r\n  @media (prefers-color-scheme: dark) {\r\n    :root {\r\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\r\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\r\n    }\r\n  }\r\n  * { box-sizing: border-box; }\r\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\r\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\r\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\r\n  header .meta { color: var(--muted); font-size: 12px; }\r\n  header .spacer { flex: 1; }\r\n  nav { display: flex; gap: 4px; }\r\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\r\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\r\n  .btn.secondary { background: var(--track); color: var(--text); }\r\n  .btn:disabled { opacity: .5; cursor: default; }\r\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\r\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\r\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\r\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\r\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\r\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\r\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\r\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\r\n  .card .k { color: var(--muted); font-size: 12px; }\r\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\r\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\r\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\r\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\r\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\r\n  tbody tr:last-child td { border-bottom: 0; }\r\n  tr.click { cursor: pointer; }\r\n  tr.click:hover td { background: var(--track); }\r\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\r\n  .bar span { display: block; height: 100%; }\r\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\r\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\r\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\r\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\r\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\r\n  .tile:hover { background: var(--track); }\r\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\r\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\r\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\r\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\r\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\r\n  .box ul { margin: 4px 0; padding-left: 18px; }\r\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\r\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\r\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\r\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\r\n  .muted { color: var(--muted); }\r\n  .mono { font-family: var(--mono); font-size: 12px; }\r\n  td.mono { word-break: break-all; }\r\n  h2 { font-size: 15px; margin: 22px 0 10px; }\r\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\r\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\r\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\r\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\r\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\r\n  .row { display: flex; gap: 12px; align-items: center; }\r\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\r\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\r\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\r\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\r\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\r\n  details.fc > summary::-webkit-details-marker { display: none; }\r\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\r\n  .fc-body { padding: 4px 16px 14px; }\r\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\r\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\r\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\r\n  .fc-body ul.expect li { margin: 3px 0; }\r\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\r\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\r\n  .reach b { color: var(--muted); font-weight: 400; }\r\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\r\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\r\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\r\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }\r\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\r\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\r\n  ul.setup { list-style: none; padding: 0; margin: 0; }\r\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\r\n  ul.setup li:last-child { border-bottom: 0; }\r\n  ul.setup .what { flex: 1; min-width: 200px; }\r\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\r\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\r\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\r\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\r\n  .side .head input { width: 100%; min-width: 0; }\r\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\r\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\r\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\r\n  .side li:hover { background: var(--track); }\r\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\r\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\r\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\r\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\r\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\r\n  .issues { margin: 12px 0; }\r\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\r\n  .issue:last-child { border-bottom: 0; }\r\n  .issue .what { flex: 1; min-width: 220px; }\r\n  .issue .k { font-size: 11px; }\r\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\r\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\r\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\r\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\r\n  .box.stale { border-color: var(--warn); }\r\n  .box a { color: var(--accent); font-weight: 600; }\r\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\r\n  @media (max-width: 720px) {\r\n    header { flex-wrap: wrap; padding: 12px 16px; }\r\n    main { padding: 16px; }\r\n    .hide-sm { display: none; }\r\n    table { font-size: 13px; }\r\n  }\r\n</style>\r\n</head>\r\n<body>\r\n<header>\r\n  <h1>Probe</h1>\r\n  <div class="meta" id="meta">loading\u2026</div>\r\n  <span class="branch" id="branch" title="Branch this project is on">\u2026</span>\r\n  <div class="spacer"></div>\r\n  <nav>\r\n    <button data-tab="atlas" class="active">Atlas</button>\r\n    <button data-tab="cards">Cards</button>\r\n    <button data-tab="verify">Verify</button>\r\n    <button data-tab="runs">Runs</button>\r\n    <button data-tab="settings">Settings</button>\r\n    <button data-tab="setup">Setup</button>\r\n  </nav>\r\n</header>\r\n<div id="banner"></div>\r\n<main id="view"></main>\r\n\r\n<script>\r\nconst $view = document.getElementById("view");\r\nconst $meta = document.getElementById("meta");\r\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null };\r\n\r\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\r\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\r\nconst ago = (iso) => {\r\n  if (!iso) return "never";\r\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\r\n  if (s < 60) return "just now";\r\n  if (s < 3600) return Math.round(s / 60) + "m ago";\r\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\r\n  return Math.round(s / 86400) + "d ago";\r\n};\r\n\r\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\r\n  state.tab = b.dataset.tab; state.feature = null; render();\r\n}));\r\n\r\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\r\n\r\nasync function render() {\r\n  closeStream();\r\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\r\n  if (state.tab === "setup") return renderSetup();\r\n  if (state.tab === "atlas") return state.feature ? renderFeature(state.feature) : renderAtlas();\r\n  if (state.tab === "cards") return renderCards();\r\n  if (state.tab === "verify") return renderVerify();\r\n  if (state.tab === "runs") return renderRuns();\r\n  if (state.tab === "settings") return renderSettings();\r\n}\r\n\r\nfunction coverageBar(s) {\r\n  const t = Math.max(1, s.testable);\r\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\r\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\r\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\r\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\r\n  </div>`;\r\n}\r\n\r\nfunction runPill(r) {\r\n  if (!r) return `<span class="pill none">not run</span>`;\r\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\r\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\r\n}\r\n\r\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\r\nfunction healthPill(f) {\r\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\r\n}\r\n\r\nfunction devicePill(d) {\r\n  const ran = d.passed + d.failed + d.blocked + d.error;\r\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\r\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\r\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\r\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\r\n}\r\n\r\n/** Marks a result that no longer holds for the code checked out here. */\r\nfunction freshPill(r) {\r\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\r\n  const why = (r.freshReasons || []).join("\\n");\r\n  return r.fresh === "stale"\r\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\r\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\r\n}\r\n\r\nfunction whoRan(r) {\r\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\r\n}\r\n\r\nfunction lastRunPill(r) {\r\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\r\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\r\n}\r\n\r\nfunction cardsPill(c) {\r\n  if (!c) return `<span class="pill none">none</span>`;\r\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\r\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\r\n}\r\n\r\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\r\nfunction outdatedCount(features) {\r\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\r\n}\r\n\r\nasync function loadScan(refresh) {\r\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\r\n  const p = state.scan.project;\r\n  $meta.textContent = `${p.name} \xB7 ${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\r\n}\r\n\r\nasync function renderAtlas() {\r\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\r\n  const watch = await api("/api/watch");\r\n  const all = state.scan.features;\r\n  const list = all\r\n    .filter((f) => state.group === "all" || f.group === state.group)\r\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\r\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\r\n  const testable = sum("testable");\r\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\r\n\r\n  $view.innerHTML = `\r\n    <div class="cards">\r\n      <div class="card"><div class="k">${state.group === "platform" ? "Platform groups" : "Features"}</div><div class="v">${list.length}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\r\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\r\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\r\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\r\n    </div>\r\n    <div class="toolbar">\r\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\r\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\r\n      <div class="seg" id="group">\r\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\r\n      </div>\r\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\r\n      <div style="flex:1"></div>\r\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\r\n      <button class="btn secondary" id="rescan">Rescan</button>\r\n    </div>\r\n    ${watchBanner(watch)}\r\n    <div id="runpanel"></div>\r\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\r\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\r\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\r\n        <div class="sig"><span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\r\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\r\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\r\n    <table>\r\n      <thead><tr>\r\n        <th>Feature</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\r\n        <th class="num hide-sm">Untested</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\r\n      </tr></thead>\r\n      <tbody>\r\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\r\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}</td>\r\n          <td class="num hide-sm">${f.stats.modules}</td>\r\n          <td class="num">${f.stats.testable}</td>\r\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\r\n          <td class="num hide-sm">${f.stats.untested}</td>\r\n          <td>${cardsPill(f.cards)}</td>\r\n          <td>${runPill(f.lastUnitRun)}</td>\r\n          <td>${devicePill(f.device)}</td>\r\n          <td>${healthPill(f)}</td>\r\n        </tr>`).join("") || `<tr><td colspan="9" class="empty">Nothing matches.</td></tr>`}\r\n      </tbody>\r\n    </table>`}`;\r\n\r\n  const filter = document.getElementById("filter");\r\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\r\n  document.querySelectorAll("#group button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.g === state.group);\r\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\r\n  });\r\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("rescan").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\r\n    await loadScan(true); renderAtlas();\r\n  });\r\n  document.querySelectorAll("#view button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.v === state.view);\r\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\r\n  });\r\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\r\n  bindWatchBanner(() => renderAtlas());\r\n}\r\n\r\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\r\n\r\nfunction stalePill(watch, id) {\r\n  const e = watch.stale[id];\r\n  if (!e) return "";\r\n  return ` <span class="pill warn" title="Edited since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">edited</span>`;\r\n}\r\n\r\nfunction watchBanner(watch) {\r\n  if (!watch.enabled) return "";\r\n  const stale = Object.keys(watch.stale);\r\n  const parts = [];\r\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\r\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\r\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\r\n  if (!parts.length) return "";\r\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\r\n}\r\n\r\nfunction bindWatchBanner(refresh) {\r\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\r\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\r\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/watch/check", {});\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\r\n  });\r\n}\r\n\r\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\r\nfunction miniMd(text) {\r\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\r\n  const items = [];\r\n  for (const line of text.split("\\n")) {\r\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\r\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\r\n  }\r\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\r\n}\r\n\r\nfunction diffHtml(diff) {\r\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\r\n}\r\n\r\nasync function renderKnowledge(id) {\r\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\r\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\r\n  const el = document.getElementById("knowledge");\r\n  if (!el) return;\r\n  if (!k.manifest && !k.check && k.drafts.length) {\r\n    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span></div>`;\r\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\r\n    return;\r\n  }\r\n  if (!k.manifest && !k.check) {\r\n    el.innerHTML = `<div class="box"><h3>Feature knowledge</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives this feature a summary, its rules and the tests that prove them; Probe then keeps them in step with the code.</span></div>`;\r\n    return;\r\n  }\r\n  const m = k.manifest || {};\r\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\r\n  const brokenBy = {};\r\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\r\n  const brokenCardsBy = {};\r\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\r\n  // A card proves its rule only while its last pass still holds for this code.\r\n  const cardPill = (x) => {\r\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\r\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" title="Run this card on a device">\u25B6</button>`;\r\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\r\n  };\r\n  const proof = (inv) => {\r\n    const broken = brokenBy[inv.id] || [];\r\n    const pills = [];\r\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\r\n    const cards = (k.cards || {})[inv.id] || [];\r\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\r\n    return pills.join(" ") + cards.map(cardPill).join("") +\r\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\r\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\r\n  };\r\n  el.innerHTML = `\r\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">edited</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature">\u2713 Check now</button></div></div>` : ""}\r\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\r\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\r\n    <div class="box"><h3>${esc(m.name || id)} ${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\r\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\r\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\r\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\r\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\r\n    </div>\r\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\r\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\r\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\r\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\r\n    const at = b.dataset.runcard.lastIndexOf("/");\r\n    b.disabled = true; b.textContent = "\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  }));\r\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\r\n    const res = await post("/api/watch/check", { features: [id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  });\r\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.approve;\r\n    const draftId = b.dataset.approve || b.dataset.reject;\r\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderKnowledge(id);\r\n  }));\r\n}\r\n\r\nasync function renderFeature(id) {\r\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\r\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\r\n  if (!state.scan) await loadScan(false);\r\n  const h = state.scan.features.find((x) => x.id === f.id);\r\n  const nav = navmap[f.id];\r\n  const s = f.stats;\r\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\r\n  $view.innerHTML = `\r\n    <button class="back" id="back">\u2190 Atlas</button>\r\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\r\n      <button class="btn secondary" id="backfill" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\r\n      <button class="btn secondary" id="explore" title="An agent walks this feature\'s screens on an emulator and maps how each is reached">\u2316 Map screens</button>\r\n      <button class="btn secondary" id="unitwrite" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\r\n      <button class="btn secondary" id="verifyf" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\r\n      <button class="btn" id="run" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\r\n    <div id="knowledge"></div>\r\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\r\n    <div class="cards">\r\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\r\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\r\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <h2>Cards</h2>\r\n    <div id="featurecards"></div>\r\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\r\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\r\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\r\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\r\n    <h2>Riskiest untested classes</h2>\r\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\r\n    <table>\r\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\r\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\r\n    </table>\r\n    <h2>Modules</h2>\r\n    <table>\r\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\r\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\r\n    </table>`;\r\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\r\n  renderKnowledge(f.id);\r\n  const showCards = async () => {\r\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\r\n    const el = document.getElementById("featurecards");\r\n    if (!el) return;\r\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\r\n    bindCardActions(el, showCards);\r\n  };\r\n  showCards();\r\n  document.getElementById("backfill").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\r\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\r\n  });\r\n  document.getElementById("run").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\r\n    const { runId } = await api("/api/unit/" + encodeURIComponent(f.id), { method: "POST" });\r\n    followRun(runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\r\n  });\r\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\r\n    const label = e.target.textContent;\r\n    e.target.disabled = true; e.target.textContent = busy;\r\n    const res = await post(path, body);\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\r\n  });\r\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\r\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\r\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\r\n}\r\n\r\n// Every action carries the branch the person is looking at; the server refuses it if the\r\n// project has moved to another branch since (a checkout in a terminal or the IDE).\r\nconst post = async (path, body) => {\r\n  const headers = { "content-type": "application/json" };\r\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\r\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\r\n  if (res.branchChanged) checkBranch();\r\n  return res;\r\n};\r\n\r\nasync function checkBranch() {\r\n  const b = await api("/api/branch").catch(() => null);\r\n  if (!b) return;\r\n  state.branchInfo = b;\r\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\r\n  const chip = document.getElementById("branch");\r\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""}` : "no git";\r\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\r\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\r\n  const banner = document.getElementById("banner");\r\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\r\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\r\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\r\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\r\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\r\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\r\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\r\n  } else banner.innerHTML = "";\r\n}\r\nsetInterval(checkBranch, 5000);\r\n\r\nfunction followRun(runId, el, onDone) {\r\n  closeStream();\r\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\r\n  const log = el.querySelector("#log");\r\n  const stopBtn = el.querySelector("#rstop");\r\n  stopBtn.addEventListener("click", async () => {\r\n    if (!confirm(`Stop run ${runId}?`)) return;\r\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\r\n    const res = await stopRunReq(runId);\r\n    if (res.error) { alert(res.error); stopBtn.remove(); }\r\n  });\r\n  const es = new EventSource(`/api/runs/${runId}/stream`);\r\n  state.eventSource = es;\r\n  es.onmessage = (msg) => {\r\n    const e = JSON.parse(msg.data);\r\n    if (e.type === "log") {\r\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\r\n      log.textContent += e.line + "\\n";\r\n      if (atBottom) log.scrollTop = log.scrollHeight;\r\n    } else if (e.type === "done") {\r\n      es.close(); state.eventSource = null;\r\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\r\n      el.querySelector("#rstop")?.remove();\r\n      const rr = el.querySelector("#rr");\r\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\r\n      bindTicket(rr);\r\n      renderIssues(e.run, rr.querySelector("#ri"), el);\r\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));\r\n      onDone && onDone(e.run);\r\n    }\r\n  };\r\n  es.onerror = () => { es.close(); state.eventSource = null; };\r\n}\r\n\r\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };\r\n\r\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\r\nasync function renderIssues(run, el, panel) {\r\n  if (run.status === "running" || run.kind === "fix") return;\r\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\r\n  if (!Array.isArray(issues) || !issues.length) return;\r\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\r\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\r\n      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div></div>\r\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\r\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\r\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\r\n  el.querySelectorAll(".issue").forEach((row) => {\r\n    const id = row.dataset.issue;\r\n    const out = row.querySelector(".ip");\r\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\r\n      if (out.innerHTML) { out.innerHTML = ""; return; }\r\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\r\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\r\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\r\n        const ta = out.querySelector("textarea");\r\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\r\n        out.querySelector("[data-copied]").textContent = "Copied.";\r\n      });\r\n    });\r\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\r\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\r\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\r\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\r\n      if (res.error) return alert(res.error);\r\n      followRun(res.runId, panel);\r\n    });\r\n  });\r\n}\r\n\r\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\r\n\r\nfunction perfBlock(p) {\r\n  if (!p) return "";\r\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\r\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\r\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\r\n}\r\n\r\nfunction evidence(run) {\r\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\r\n  const shots = run.timeline.filter((t) => t.screenshot);\r\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\r\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\r\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\r\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\r\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\r\n}\r\n\r\nfunction ticketButton(run) {\r\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\r\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\r\n}\r\n\r\nasync function bindTicket(el) {\r\n  const b = el.querySelector("button[data-ticket]");\r\n  if (!b) return;\r\n  b.addEventListener("click", async () => {\r\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\r\n    const panel = el.querySelector(".ticketpanel");\r\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\r\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\r\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\r\n    const file = panel.querySelector("[data-file]");\r\n    if (file) file.addEventListener("click", async () => {\r\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\r\n      file.disabled = true;\r\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\r\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\r\n    });\r\n  });\r\n}\r\n\r\nfunction resultsTable(run) {\r\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\r\n  if (run.kind === "verify") {\r\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\r\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\r\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\r\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\r\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\r\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\r\n      </tbody></table>\r\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\r\n  }\r\n  if (run.kind === "init") {\r\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\r\n  }\r\n  if (run.kind === "login") {\r\n    const l = run.login;\r\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\r\n  }\r\n  if (run.kind === "explore") {\r\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "unitwrite") {\r\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\r\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\r\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\r\n  }\r\n  if (run.kind === "card") {\r\n    const v = run.verdict;\r\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\r\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "fix") {\r\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\r\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\r\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\r\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\r\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\r\n  }\r\n  if (run.kind === "backfill") {\r\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\r\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\r\n  }\r\n  if (!run.results.length) return err;\r\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\r\n    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\r\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\r\n\r\nfunction cardHtml(c) {\r\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\r\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\r\n    <summary>\r\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\r\n      <strong>${esc(c.title)}</strong>\r\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\r\n      <span style="flex:1"></span>\r\n      ${lastRunPill(c.lastRun)}\r\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\r\n      <span class="pill st-${c.status}">${c.status}</span>\r\n    </summary>\r\n    <div class="fc-body">\r\n      <p>${esc(c.summary)}</p>\r\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\r\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\r\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\r\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\r\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\r\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\r\n      <div class="row" style="margin-top:10px">\r\n        <button class="btn" data-run title="An agent performs this card on an emulator and checks every expectation">\u25B6 Run on device</button>\r\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\r\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\r\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\r\n      </div>\r\n    </div>\r\n  </details>`;\r\n}\r\n\r\nfunction bindCardActions(el, refresh) {\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\r\n    b.disabled = true; b.textContent = "Agent testing\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\r\n    let panel = d.querySelector(".runpanel");\r\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\r\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\r\n  })));\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\r\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\r\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\r\n    });\r\n    state.scan = null;\r\n    refresh();\r\n  })));\r\n}\r\n\r\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\r\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\r\n\r\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\r\nfunction cardFeatures(all) {\r\n  const by = new Map();\r\n  for (const c of all) {\r\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\r\n    f.cards.push(c);\r\n    if (c.status === "draft") f.draft++;\r\n    if (c.status === "approved") f.approved++;\r\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\r\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\r\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\r\n    by.set(c.feature, f);\r\n  }\r\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\r\n}\r\n\r\nasync function renderCards() {\r\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\r\n  const fl = state.cardFilter;\r\n  const all = await api("/api/cards");\r\n  if (!all.length) {\r\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\r\n    return bindBackfillAll();\r\n  }\r\n  const features = cardFeatures(all);\r\n  const listed = features\r\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\r\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\r\n  // Open on what needs a person: a failing feature, else one with drafts.\r\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\r\n  const f = features.find((x) => x.id === fl.feature);\r\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\r\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\r\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\r\n\r\n  $view.innerHTML = `\r\n    <div class="toolbar">\r\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\r\n      <span class="pill st-draft">${total("draft")} to review</span>\r\n      <span class="pill st-approved">${total("approved")} approved</span>\r\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\r\n      <div style="flex:1"></div>\r\n      <button class="btn secondary" id="bfall" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <div class="split">\r\n      <aside class="side">\r\n        <div class="head">\r\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\r\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\r\n        </div>\r\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\r\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\r\n      </aside>\r\n      <section>\r\n        <div class="toolbar">\r\n          <h2 style="margin:0">${esc(f.id)}</h2>\r\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\r\n          <div style="flex:1"></div>\r\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\r\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\r\n        </div>\r\n        <div class="toolbar">\r\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\r\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\r\n        </div>\r\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\r\n      </section>\r\n    </div>`;\r\n\r\n  bindCardActions(document.getElementById("cardlist"), renderCards);\r\n  const q = document.getElementById("cq");\r\n  q.addEventListener("input", () => {\r\n    const v = q.value.toLowerCase();\r\n    // Filter the sidebar in place, so typing never loses focus.\r\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\r\n      const x = features.find((y) => y.id === li.dataset.f);\r\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\r\n    });\r\n  });\r\n  q.addEventListener("change", () => { fl.q = q.value; });\r\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; renderCards(); }));\r\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\r\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\r\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\r\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\r\n  });\r\n  const approveAll = document.getElementById("approveall");\r\n  if (approveAll) approveAll.addEventListener("click", async () => {\r\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\r\n    approveAll.disabled = true;\r\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\r\n    renderCards();\r\n  });\r\n  bindBackfillAll();\r\n}\r\n\r\nfunction bindBackfillAll() {\r\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/cards/*/backfill");\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\r\n  });\r\n}\r\n\r\nasync function renderRuns() {\r\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\r\n  const runs = await api("/api/runs");\r\n  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\r\n  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>\r\n    ${runs.map((r) => {\r\n      let result;\r\n      if (r.kind === "backfill") result = `${r.written.length} cards \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else if (r.kind === "card") result = `${esc(r.cardId)} \xB7 ${r.timeline.length} steps \xB7 $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\r\n      else if (r.kind === "verify") result = `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\r\n      else if (r.kind === "explore") result = `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\r\n      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\r\n      else if (r.kind === "unitwrite") result = `${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else if (r.kind === "check") result = `${esc(r.trigger)} \xB7 ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "\u2014"}${f.draftId ? " \u270E" : ""}`).join(", ") || "nothing stale"}`;\r\n      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\r\n      else {\r\n        const t = r.results.reduce((n, x) => n + x.tests, 0), f = r.results.reduce((n, x) => n + x.failed, 0);\r\n        result = `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\r\n      }\r\n      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;\r\n    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;\r\n  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));\r\n  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\r\n    e.stopPropagation();\r\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\r\n    b.disabled = true;\r\n    const res = await stopRunReq(b.dataset.stop);\r\n    if (res.error) alert(res.error);\r\n    setTimeout(renderRuns, 1500);\r\n  }));\r\n}\r\n\r\nasync function renderVerify() {\r\n  if (!state.verify) state.verify = { base: "" };\r\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\r\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\r\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\r\n  $view.innerHTML = `\r\n    <div class="box"><h3>Verify this change</h3>\r\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\r\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\r\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\r\n      <form class="inline" id="vf">\r\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\r\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\r\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\r\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\r\n        <button class="btn" type="submit" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\r\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\r\n      </form>\r\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\r\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\r\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\r\n    </div>\r\n    <div class="box"><h3>From a ticket</h3>\r\n      <form class="inline" id="tf">\r\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\r\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\r\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\r\n      </form>\r\n      <div id="tinfo"></div>\r\n      <form class="inline" id="tc" style="margin-top:10px">\r\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\r\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\r\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\r\n      </form>\r\n    </div>\r\n    <div id="runpanel"></div>`;\r\n  const vf = document.getElementById("vf");\r\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  vf.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  const tf = document.getElementById("tf");\r\n  const ticket = () => tf.ticket.value.trim();\r\n  document.getElementById("tlook").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\r\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\r\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\r\n  });\r\n  document.getElementById("tverify").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("tc").addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    if (!ticket()) return alert("Enter the ticket id above.");\r\n    const tc = e.target;\r\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n}\r\n\r\nasync function renderAccounts(el) {\r\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\r\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\r\n  const l = login && login.run.login;\r\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\r\n  el.innerHTML = `\r\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\r\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\r\n        <button class="btn secondary" id="logincheck" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\r\n      <div id="runpanel"></div></div>`;\r\n  el.innerHTML += `\r\n    <div class="box"><h3>Test accounts</h3>\r\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\r\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\r\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\r\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\r\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\r\n    <form class="acct" autocomplete="off">\r\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\r\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\r\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\r\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\r\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\r\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\r\n      <button class="btn" type="submit">Save account</button>\r\n    </form></div>`;\r\n  const startLogin = async (role, b) => {\r\n    b.disabled = true;\r\n    const res = await post("/api/login", { role });\r\n    if (res.error) { alert(res.error); b.disabled = false; return; }\r\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\r\n  };\r\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\r\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\r\n  const form = el.querySelector("form.acct");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const body = Object.fromEntries(new FormData(form));\r\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\r\n    if (res.error) return alert(res.error);\r\n    renderAccounts(el);\r\n  });\r\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\r\n    const a = accounts.find((x) => x.role === b.dataset.edit);\r\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\r\n    form.password.focus();\r\n  }));\r\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\r\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\r\n    renderAccounts(el);\r\n  }));\r\n}\r\n\r\nconst MODELS = [\r\n  ["sonnet", "Sonnet \u2014 balanced, included in most plans (recommended)"],\r\n  ["haiku", "Haiku \u2014 fastest and cheapest, fine for simple cards"],\r\n  ["opus", "Opus \u2014 strongest, uses your plan faster"],\r\n  ["fable", "Fable \u2014 may bill usage credits on your plan"],\r\n];\r\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\r\n\r\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\r\n\r\nfunction projectBox(p) {\r\n  const a = p.app;\r\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\r\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\r\n  const branches = p.branches || [];\r\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\r\n  return `<div class="box"><h3>Project</h3>\r\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\r\n    <form class="inline" id="pf">\r\n      <label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\r\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\r\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\r\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\r\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}\r\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\r\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\r\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\r\n      <label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\r\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\r\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\r\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>\r\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\r\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\r\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\r\n      <button class="btn" type="submit">Save project settings</button>\r\n    </form>\r\n    <p id="pout" style="margin-bottom:0"></p>\r\n  </div>`;\r\n}\r\n\r\nfunction bindProject() {\r\n  const f = document.getElementById("pf");\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const num = (v) => (v === "" ? null : Number(v));\r\n    const body = {\r\n      app: { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null },\r\n      devices: { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) },\r\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\r\n      perf: { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) },\r\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\r\n    };\r\n    for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\r\n    const res = await post("/api/project", body);\r\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\r\n    if (!res.error) setTimeout(renderSettings, 700);\r\n  });\r\n}\r\n\r\nasync function renderSettings() {\r\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\r\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\r\n  p.branches = br.branches;\r\n  const current = s.agents.model;\r\n  const known = MODELS.some(([m]) => m === current);\r\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\r\n    <div class="box"><h3>Agent model</h3>\r\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs on your own Claude Code login and plan, with this model. It is saved for this machine only, since each developer\'s plan differs; a run started from the CLI can still pass <span class="mono">--model</span>.</p>\r\n      <form class="inline" id="sf">\r\n        <label>Model<select name="pick">${MODELS.map(([m, label]) => `<option value="${m}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\r\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="claude-sonnet-5-5"></label>\r\n        <button class="btn" type="submit">Save</button>\r\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\r\n        ${s.agents.source === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\r\n      </form>\r\n      <p style="margin-bottom:0">In use: <strong class="mono">${esc(current)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\r\n      <p id="sout" style="margin-bottom:0"></p>\r\n    </div>`;\r\n  bindProject();\r\n  renderAccounts(document.getElementById("acctwrap"));\r\n  const form = document.getElementById("sf");\r\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\r\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\r\n  const out = document.getElementById("sout");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/settings", { model: chosen() });\r\n    if (res.error) return alert(res.error);\r\n    renderSettings();\r\n  });\r\n  document.getElementById("stest").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen())}\u2026</span>`;\r\n    const r = await post("/api/settings/test", { model: chosen() });\r\n    e.target.disabled = false;\r\n    out.innerHTML = r.ok\r\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\r\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\r\n  });\r\n  const reset = document.getElementById("sreset");\r\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { model: "" }); renderSettings(); });\r\n}\r\n\r\nasync function renderDoctor(el) {\r\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\r\n  const checks = await api("/api/doctor");\r\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\r\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\r\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\r\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\r\n\r\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\r\nasync function renderInit(el) {\r\n  const k = await api("/api/init");\r\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\r\n  const features = k.steps.find((s) => s.id === "features");\r\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\r\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\r\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\r\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\r\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\r\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\r\n    ${features.status === "waiting" && k.proposed.length ? `<div class="k" style="margin-top:10px">Features to give a manifest (${k.proposed.length} proposed by the scan)</div>\r\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${k.proposed.map((f) => `<label style="font-size:13px"><input type="checkbox" data-feat="${esc(f)}" checked> ${esc(f)}</label>`).join("")}</div>\r\n      <div class="row"><button class="btn" id="initchoose">Use these features</button><button class="btn secondary" id="initnone">Untick all</button></div>` : ""}\r\n  </div>\r\n  <div id="initpanel"></div>\r\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\r\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\r\n\r\n  const start = async (body) => {\r\n    const res = await post("/api/init/run", body);\r\n    if (res.error) return alert(res.error);\r\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\r\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\r\n  };\r\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\r\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\r\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]").forEach((c) => (c.checked = false)));\r\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\r\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\r\n    if (!chosen.length) return alert("Tick at least one feature.");\r\n    const res = await post("/api/init/features", { features: chosen });\r\n    if (res.error) return alert(res.error);\r\n    renderInit(el);\r\n  });\r\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.iapprove;\r\n    const id = b.dataset.iapprove || b.dataset.ireject;\r\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderInit(el);\r\n  }));\r\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\r\n}\r\n\r\nasync function renderSetup() {\r\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\r\n  const items = await api("/api/setup");\r\n  const left = items.filter((i) => i.status !== "ok").length;\r\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\r\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\r\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\r\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\r\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\r\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\r\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\r\n  renderDoctor(document.getElementById("docwrap"));\r\n  renderInit(document.getElementById("initwrap"));\r\n}\r\n\r\n(async () => {\r\n  await checkBranch();\r\n  // A project that cannot be tested yet opens on what is missing.\r\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\r\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\r\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\r\n  render();\r\n})();\r\n</script>\r\n</body>\r\n</html>\r\n';
+var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <div class="meta" id="meta">loading\u2026</div>\n  <span class="branch" id="branch" title="Branch this project is on">\u2026</span>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  return { tab: "runs" };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.name} \xB7 ${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""}` : "no git";\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div></div>\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  if (!run.results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\nasync function renderRuns() {\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  const runs = await api("/api/runs");\n  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>\n    ${runs.map((r) => {\n      let result;\n      if (r.kind === "backfill") result = `${r.written.length} cards \xB7 $${r.costUsd.toFixed(2)}`;\n      else if (r.kind === "card") result = `${esc(r.cardId)} \xB7 ${r.timeline.length} steps \xB7 $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n      else if (r.kind === "verify") result = `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n      else if (r.kind === "explore") result = `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n      else if (r.kind === "unitwrite") result = `${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\n      else if (r.kind === "check") result = `${esc(r.trigger)} \xB7 ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "\u2014"}${f.draftId ? " \u270E" : ""}`).join(", ") || "nothing stale"}`;\n      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files \xB7 $${r.costUsd.toFixed(2)}`;\n      else {\n        const t = (r.results || []).reduce((n, x) => n + x.tests, 0), f = (r.results || []).reduce((n, x) => n + x.failed, 0);\n        result = `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n      }\n      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;\n    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;\n  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));\n  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
 
 // src/engine/watcher.ts
-var import_node_fs22 = require("node:fs");
-var import_node_path27 = require("node:path");
+var import_node_fs27 = require("node:fs");
+var import_node_path35 = require("node:path");
 
 // src/engine/watch.ts
-var import_node_child_process7 = require("node:child_process");
-var import_node_fs21 = require("node:fs");
-var import_node_path26 = require("node:path");
+var import_node_child_process8 = require("node:child_process");
+var import_node_fs26 = require("node:fs");
+var import_node_path34 = require("node:path");
 
 // src/knowledge/proof.ts
 function findRule(project, ref) {
@@ -32697,15 +33691,14 @@ function summarizeRuleRun(r) {
 var STATE2 = "watch.json";
 var LOCK = "check.lock";
 var STUDIO = "studio.json";
-var IGNORED = /(^|\/)(build|\.gradle|\.git|\.idea|node_modules|\.kotlin|\.cxx)\//;
 function loadWatch(project) {
   return { stale: {}, checks: [], ...project.store.read(STATE2) ?? {} };
 }
 function saveWatch(project, state) {
-  const file = (0, import_node_path26.join)(project.store.dir, STATE2);
+  const file = (0, import_node_path34.join)(project.store.dir, STATE2);
   const tmp = `${file}.${process.pid}.tmp`;
-  (0, import_node_fs21.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
-  (0, import_node_fs21.renameSync)(tmp, file);
+  (0, import_node_fs26.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
+  (0, import_node_fs26.renameSync)(tmp, file);
 }
 function update(project, change) {
   const state = loadWatch(project);
@@ -32714,14 +33707,16 @@ function update(project, change) {
   return state;
 }
 function projectFiles(project, files) {
-  return files.map((f) => (0, import_node_path26.relative)(project.root, (0, import_node_path26.isAbsolute)(f) ? f : (0, import_node_path26.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !IGNORED.test(f) && !f.startsWith("probe/"));
+  const ignored = ignoredPathPattern(project.adapter);
+  return files.map((f) => (0, import_node_path34.relative)(project.root, (0, import_node_path34.isAbsolute)(f) ? f : (0, import_node_path34.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !ignored.test(f) && !f.startsWith("probe/"));
 }
 function featuresForFiles(project, files, result = latestScan(project)) {
   const out = /* @__PURE__ */ new Map();
-  const add = (feature, file, owned) => {
-    const entry = out.get(feature) ?? { files: [], owned: false };
+  const add = (feature, file, owned, via) => {
+    const entry = out.get(feature) ?? { files: [], owned: false, dependsOn: [] };
     if (!entry.files.includes(file)) entry.files.push(file);
     entry.owned ||= owned;
+    if (via && !entry.dependsOn.includes(via)) entry.dependsOn.push(via);
     out.set(feature, entry);
   };
   for (const [feature, fs] of featuresOfFiles(project, result, files).byFeature) for (const f of fs) add(feature, f, true);
@@ -32729,6 +33724,17 @@ function featuresForFiles(project, files, result = latestScan(project)) {
     for (const f of files) {
       if (m.paths.some((p) => f.startsWith(p))) add(m.id, f, true);
       else if (m.related.some((r) => f.startsWith(r.path))) add(m.id, f, false);
+    }
+  }
+  const depth = project.config.watch?.impactDepth ?? 1;
+  const platform = new Set(result.features.filter((f) => f.group === "platform").map((f) => f.id));
+  if (depth > 0 && [...out].some(([id, e]) => e.owned && platform.has(id))) {
+    const graph = areaGraph(project, result);
+    for (const f of files) {
+      const module2 = moduleOfFile(graph, f);
+      const area = module2 && graph.areaOf.get(module2);
+      if (!module2 || !area || !platform.has(area)) continue;
+      for (const dependent of dependentAreas(graph, module2, depth).keys()) add(dependent, f, false, area);
     }
   }
   return out;
@@ -32740,10 +33746,11 @@ function markStale(project, files, source, session) {
   if (!touched.size) return [];
   const now = (/* @__PURE__ */ new Date()).toISOString();
   update(project, (state) => {
-    for (const [feature, { files: fs, owned }] of touched) {
+    for (const [feature, { files: fs, owned, dependsOn }] of touched) {
       const e = state.stale[feature] ?? { files: [], owned: false, since: now, last: now, sources: [], sessions: [] };
       e.files = [.../* @__PURE__ */ new Set([...e.files, ...fs])];
       e.owned ||= owned;
+      if (dependsOn.length) e.dependsOn = [.../* @__PURE__ */ new Set([...e.dependsOn ?? [], ...dependsOn])];
       e.last = now;
       if (!e.sources.includes(source)) e.sources.push(source);
       if (session && !e.sessions.includes(session)) e.sessions.push(session);
@@ -32760,7 +33767,7 @@ function sweepDirty(project, source, session) {
   if (since === null) return [];
   const recent = [...dirtyFiles(project.root).keys()].filter((f) => {
     try {
-      return (0, import_node_fs21.statSync)((0, import_node_path26.join)(project.root, f)).mtimeMs > since;
+      return (0, import_node_fs26.statSync)((0, import_node_path34.join)(project.root, f)).mtimeMs > since;
     } catch {
       return false;
     }
@@ -32813,7 +33820,7 @@ function startCheck(project, options = {}) {
       if (run.status === "error") run.error = `The build failed before the tests ran: ${run.features.filter((f) => f.unitStatus === "error").map((f) => f.feature).join(", ")}.`;
       if (!run.features.length) log("nothing stale to check");
     } finally {
-      (0, import_node_fs21.rmSync)((0, import_node_path26.join)(project.store.dir, LOCK), { force: true });
+      (0, import_node_fs26.rmSync)((0, import_node_path34.join)(project.store.dir, LOCK), { force: true });
     }
   });
   return started;
@@ -32827,10 +33834,10 @@ function pickTargets(project, options, run, round) {
   const entries = Object.entries(state.stale).filter(([id]) => !run.skipped.includes(id)).sort(([, a], [, b]) => Number(b.owned) - Number(a.owned) || b.files.length - a.files.length);
   const budget = Math.max(1, project.config.watch.maxFeatures);
   if (round === 0) run.skipped = entries.slice(budget).map(([id]) => id);
-  return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, sessions: e.sessions }));
+  return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, dependsOn: e.dependsOn, sessions: e.sessions }));
 }
 async function checkFeature(project, run, target, options, log) {
-  const f = { feature: target.feature, files: target.files, owned: target.owned, failures: [] };
+  const f = { feature: target.feature, files: target.files, owned: target.owned, ...target.dependsOn?.length && !target.owned ? { dependsOn: target.dependsOn } : {}, failures: [] };
   run.features.push(f);
   const scanned = findFeature(latestScan(project), target.feature);
   if (scanned?.modules.some((m) => m.unitTestTask)) {
@@ -32857,7 +33864,7 @@ async function checkFeature(project, run, target, options, log) {
       return null;
     }
   })();
-  const check2 = (0, import_node_fs21.existsSync)((0, import_node_path26.join)(project.root, "probe", "features", `${target.feature}.yaml`)) ? checkManifest(project.root, target.feature) : null;
+  const check2 = (0, import_node_fs26.existsSync)((0, import_node_path34.join)(project.root, manifestFile(target.feature))) ? checkManifest(project.root, target.feature) : null;
   if (check2) {
     const broken = check2.broken.length + check2.brokenCards.length;
     f.manifest = { links: check2.links + check2.cardLinks, broken, gaps: check2.gaps.length, errors: check2.errors.length };
@@ -32910,11 +33917,15 @@ function clearStale(project, feature, checkedAt) {
     if (e && e.last <= checkedAt) delete state.stale[feature];
   });
 }
+function staleLabel(e) {
+  if (e.owned) return "";
+  return e.dependsOn?.length ? ` (depends on ${e.dependsOn.join(", ")})` : " (related)";
+}
 function summarizeCheckRun(run) {
   const lines = [`Check ${run.id} \xB7 ${run.trigger} \xB7 ${run.status.toUpperCase()} \xB7 ${run.features.length} features \xB7 $${run.costUsd.toFixed(2)}`];
   if (run.error) lines.push(run.error);
   for (const f of run.features) {
-    lines.push(`  ${f.feature}${f.owned ? "" : " (related)"}: unit ${f.unitStatus ?? "\u2014"}${f.unitRun ? ` (${f.unitRun})` : ""}${f.manifest ? ` \xB7 manifest ${f.manifest.broken} broken links, ${f.manifest.gaps} unproven` : ""}${f.draftId ? ` \xB7 draft ${f.draftId} to review` : ""}${f.note ? ` \xB7 ${f.note}` : ""}`);
+    lines.push(`  ${f.feature}${staleLabel(f)}: unit ${f.unitStatus ?? "\u2014"}${f.unitRun ? ` (${f.unitRun})` : ""}${f.manifest ? ` \xB7 manifest ${f.manifest.broken} broken links, ${f.manifest.gaps} unproven` : ""}${f.draftId ? ` \xB7 draft ${f.draftId} to review` : ""}${f.note ? ` \xB7 ${f.note}` : ""}`);
     for (const x of f.failures) lines.push(`      - ${x}`);
     for (const r of f.deviceRules ?? []) lines.push(`      device: ${r}`);
   }
@@ -32934,7 +33945,7 @@ async function kickCheck(project, trigger) {
     } catch {
     }
   }
-  const child = (0, import_node_child_process7.spawn)(process.execPath, [(0, import_node_path26.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
+  const child = (0, import_node_child_process8.spawn)(process.execPath, [(0, import_node_path34.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
     cwd: project.root,
     detached: true,
     stdio: "ignore",
@@ -32997,7 +34008,7 @@ function startWatcher(project, log = () => {
       return;
     }
     const known = new Set(Object.values(loadWatch(project).stale).flatMap((e) => e.files));
-    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path27.join)(project.root, f)));
+    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path35.join)(project.root, f)));
     const features = markStale(project, fresh, "editor");
     if (!features.length) return;
     log(`watch: edits outside Claude made ${features.join(", ")} stale`);
@@ -33006,17 +34017,18 @@ function startWatcher(project, log = () => {
   };
   const autoCheck = () => {
     const stale = Object.values(loadWatch(project).stale);
-    const claudeActive = stale.some((e) => e.sources.includes("claude") && Date.now() - Date.parse(e.last) < CLAUDE_ACTIVE_MS);
+    const claudeActive = stale.some((e) => (e.sources.includes("claude") || e.sources.includes("agent")) && Date.now() - Date.parse(e.last) < CLAUDE_ACTIVE_MS);
     if (!stale.length || claudeActive || runningCheck(project)) return;
     const started = startCheck(project, { trigger: "editor" });
     if (started) log(`watch: checking ${stale.length} stale feature(s) (run ${started.run.id})`);
   };
+  const ignored = ignoredPathPattern(project.adapter);
   let watcher;
   try {
-    watcher = (0, import_node_fs22.watch)(project.root, { recursive: true }, (_event, name) => {
+    watcher = (0, import_node_fs27.watch)(project.root, { recursive: true }, (_event, name) => {
       if (!name) return;
       const file = name.toString().replace(/\\/g, "/");
-      if (/(^|\/)(build|\.gradle|\.git|\.idea|node_modules|\.kotlin|\.cxx)(\/|$)/.test(file)) return;
+      if (ignored.test(file)) return;
       pending.add(file);
       clearTimeout(settle);
       settle = setTimeout(flush, SETTLE_MS);
@@ -33034,7 +34046,7 @@ function startWatcher(project, log = () => {
 }
 function isFile(path) {
   try {
-    return (0, import_node_fs22.statSync)(path).isFile();
+    return (0, import_node_fs27.statSync)(path).isFile();
   } catch {
     return false;
   }
@@ -33044,25 +34056,88 @@ function headOf(project) {
   return git2 ? `${git2.branch}@${git2.commit}` : "";
 }
 
+// src/studio/jobs.ts
+var jobKeys = {
+  unit: (feature) => `unit:${feature}`,
+  backfill: (feature) => `backfill:${feature}`,
+  ticketCards: (ticket) => `backfill:ticket:${ticket}`,
+  explore: (feature) => `explore:${feature}`,
+  unitwrite: (feature) => `unitwrite:${feature}`,
+  card: (feature, cardId) => `card:${feature}/${cardId}`,
+  login: (role) => `login:${role || "check"}`,
+  fix: (issueId) => `fix:${issueId}`,
+  init: () => "init",
+  check: () => "check",
+  verify(o) {
+    if (o.outdated) return `verify:outdated${o.features?.length ? `:${[...o.features].sort().join(",")}` : ""}`;
+    if (o.ticket) return `verify:ticket:${o.ticket}`;
+    if (o.features?.length) return `verify:features:${[...o.features].sort().join(",")}`;
+    return `verify:base:${o.base ?? ""}`;
+  }
+};
+var keys = /* @__PURE__ */ new Map();
+function derivedKey(run) {
+  if (run.kind === "card") return jobKeys.card(run.feature, run.cardId);
+  if (run.kind === "init" || run.kind === "check") return run.kind;
+  return `${run.kind}:${run.feature}`;
+}
+function runningJobs() {
+  const running2 = runningRuns();
+  const ids = new Set(running2.map((r) => r.run.id));
+  for (const id of keys.keys()) if (!ids.has(id)) keys.delete(id);
+  return running2.map(({ run, child }) => ({
+    key: keys.get(run.id) ?? derivedKey(run),
+    runId: run.id,
+    kind: run.kind,
+    feature: run.feature,
+    cardId: run.kind === "card" ? run.cardId : void 0,
+    startedAt: run.startedAt,
+    child
+  }));
+}
+function runningJob(key) {
+  return runningJobs().find((j) => j.key === key && !j.child);
+}
+function startJob(key, start) {
+  const busy = runningJob(key);
+  if (busy) return { runId: busy.runId, attached: true };
+  const { run } = start();
+  keys.set(run.id, key);
+  return { runId: run.id, attached: false };
+}
+
 // src/studio/project.ts
-var import_node_fs23 = require("node:fs");
+var import_node_fs28 = require("node:fs");
 function projectSettings(project) {
   const c = project.config;
-  const devices = listDevices(Adb.forProject(project.root));
+  const supported = project.adapter.supportsDevices;
+  const devices = supported ? listDevices(Adb.forProject(project.root)) : [];
   return {
-    configFile: (0, import_node_fs23.existsSync)(configPath(project.root)),
+    configFile: (0, import_node_fs28.existsSync)(configPath(project.root)),
     app: resolveApp(project),
     appSet: c.app,
     devices: {
+      supported,
+      unsupported: supported ? null : devicesUnsupported(project.adapter),
       avd: c.devices.avd ?? null,
       allowReal: c.devices.allowReal,
-      avds: listAvds(project.root),
+      avds: supported ? listAvds(project.root) : [],
       connected: devices
     },
     verify: { ...c.verify, base: c.verify.base ?? null, defaultBase: defaultBase(project.root, c.verify.base) },
     perf: c.perf,
     tickets: c.tickets,
-    agents: { model: c.agents.model, source: agentModelSource(project.root, project.store.dir) }
+    agents: agentSettings(project)
+  };
+}
+function agentSettings(project) {
+  const { runner, model } = project.config.agents;
+  return {
+    runner,
+    runnerSource: agentRunnerSource(project.root, project.store.dir),
+    model,
+    source: agentModelSource(project.root, project.store.dir),
+    runners: allRunners().map((r) => ({ id: r.id, label: r.label, models: r.models }))
   };
 }
 var PACKAGE = /^[a-zA-Z][\w]*(\.[a-zA-Z_][\w]*)+$/;
@@ -33098,6 +34173,42 @@ function saveProjectSettings(project, body) {
   return null;
 }
 function setupChecklist(project) {
+  const items = project.adapter.supportsDevices ? appAndDevice(project) : [{ id: "device", label: "Device testing", status: "warn", detail: devicesUnsupported(project.adapter) }];
+  const secrets = new Secrets(project.store.dir);
+  const accounts = listAccounts(project.root);
+  const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
+  if (project.adapter.supportsDevices) items.push({
+    id: "accounts",
+    label: "Test account",
+    status: withPassword.length ? "ok" : "warn",
+    detail: withPassword.length ? withPassword.map((a) => a.role).join(", ") : accounts.length ? `${accounts.map((a) => a.role).join(", ")}: no password on this machine yet` : "None yet. Agents can only test screens that need no login.",
+    action: { label: "Add an account", tab: "settings" }
+  });
+  items.push({
+    id: "model",
+    label: "Agent model",
+    status: "ok",
+    detail: `${agentRunner(project.config.agents.runner).label} \xB7 ${project.config.agents.model || "its default model"} (${agentModelSource(project.root, project.store.dir) === "default" ? "default" : "set"}) \xB7 use Test on my plan to check it works`,
+    action: { label: "Settings", tab: "settings" }
+  });
+  const cards = listCards(project.root);
+  items.push({
+    id: "cards",
+    label: "Feature cards",
+    status: cards.some((c) => c.status === "approved") ? "ok" : "warn",
+    detail: cards.length ? `${cards.length} cards, ${cards.filter((c) => c.status === "approved").length} approved${cards.some((c) => c.status === "approved") ? "" : ". Verify runs approved cards only: review drafts in Cards."}` : "None yet. Open a feature in Atlas and press Generate cards.",
+    action: { label: cards.length ? "Review cards" : "Atlas", tab: cards.length ? "cards" : "atlas" }
+  });
+  const git2 = gitState(project.root);
+  items.push({
+    id: "git",
+    label: "Branch",
+    status: !git2 ? "warn" : git2.branch ? "ok" : "warn",
+    detail: !git2 ? "Not a git repository: verify and tickets need git." : git2.branch ? `${git2.branch} @ ${git2.commit}` : `detached HEAD @ ${git2.commit}`
+  });
+  return items;
+}
+function appAndDevice(project) {
   const items = [];
   const app = resolveApp(project);
   items.push({
@@ -33117,38 +34228,6 @@ function setupChecklist(project) {
     status: emulators.length || avd ? "ok" : "fail",
     detail: emulators.length ? `running: ${emulators.map((d) => d.serial).join(", ")}` : avd ? `${avd} starts when a run needs it${project.config.devices.avd ? "" : " (first image on this machine)"}` : "No emulator image on this machine. Create one in Android Studio \u2192 Device Manager (x86_64, API 34+).",
     action: { label: "Choose emulator", tab: "settings" }
-  });
-  const secrets = new Secrets(project.store.dir);
-  const accounts = listAccounts(project.root);
-  const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
-  items.push({
-    id: "accounts",
-    label: "Test account",
-    status: withPassword.length ? "ok" : "warn",
-    detail: withPassword.length ? withPassword.map((a) => a.role).join(", ") : accounts.length ? `${accounts.map((a) => a.role).join(", ")}: no password on this machine yet` : "None yet. Agents can only test screens that need no login.",
-    action: { label: "Add an account", tab: "settings" }
-  });
-  items.push({
-    id: "model",
-    label: "Agent model",
-    status: "ok",
-    detail: `${project.config.agents.model} (${agentModelSource(project.root, project.store.dir) === "default" ? "default" : "set"}) \xB7 use Test on my plan to check it works`,
-    action: { label: "Settings", tab: "settings" }
-  });
-  const cards = listCards(project.root);
-  items.push({
-    id: "cards",
-    label: "Feature cards",
-    status: cards.some((c) => c.status === "approved") ? "ok" : "warn",
-    detail: cards.length ? `${cards.length} cards, ${cards.filter((c) => c.status === "approved").length} approved${cards.some((c) => c.status === "approved") ? "" : ". Verify runs approved cards only: review drafts in Cards."}` : "None yet. Open a feature in Atlas and press Generate cards.",
-    action: { label: cards.length ? "Review cards" : "Atlas", tab: cards.length ? "cards" : "atlas" }
-  });
-  const git2 = gitState(project.root);
-  items.push({
-    id: "git",
-    label: "Branch",
-    status: !git2 ? "warn" : git2.branch ? "ok" : "warn",
-    detail: !git2 ? "Not a git repository: verify and tickets need git." : git2.branch ? `${git2.branch} @ ${git2.commit}` : `detached HEAD @ ${git2.commit}`
   });
   return items;
 }
@@ -33186,10 +34265,10 @@ var watchLog = [];
 async function startStudio(project, preferredPort = 7777) {
   if (running) return running.url;
   for (let port = preferredPort; port < preferredPort + 20; port++) {
-    const server = (0, import_node_http.createServer)((req, res) => handle(project, req, res).catch((e) => send(res, 500, { error: String(e) })));
-    const ok = await new Promise((resolve5) => {
-      server.once("error", () => resolve5(false));
-      server.listen(port, "127.0.0.1", () => resolve5(true));
+    const server = createStudioServer(project);
+    const ok = await new Promise((resolve7) => {
+      server.once("error", () => resolve7(false));
+      server.listen(port, "127.0.0.1", () => resolve7(true));
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
@@ -33199,6 +34278,9 @@ async function startStudio(project, preferredPort = 7777) {
     }
   }
   throw new Error(`No free port between ${preferredPort} and ${preferredPort + 19}`);
+}
+function createStudioServer(project) {
+  return (0, import_node_http.createServer)((req, res) => handle(project, req, res).catch((e) => send(res, 500, { error: String(e) })));
 }
 async function handle(project, req, res) {
   const url = new URL(req.url ?? "/", "http://localhost");
@@ -33221,7 +34303,8 @@ async function handle(project, req, res) {
     const scanned = project.store.read("scan.json") !== null;
     return send(res, 200, {
       steps: initStatus(project),
-      proposed: scanned ? proposedFeatures(project) : [],
+      // Each proposed feature or platform area, with whether it is chosen or not decided yet.
+      proposed: scanned ? proposedAreaRows(project) : [],
       chosen: chosenFeatures(project),
       drafts: initPendingDrafts(project).map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
       running: runningInit()
@@ -33231,8 +34314,9 @@ async function handle(project, req, res) {
     const body = JSON.parse(await readBody(req) || "{}");
     if (body.step && !isInitStep(body.step)) return send(res, 400, { error: `Unknown step ${body.step}.` });
     try {
-      const { run } = startInit(project, { step: body.step, features: body.features, accept: body.accept });
-      return send(res, 200, { runId: run.id });
+      const busy = runningInit();
+      if (busy) return send(res, 200, { runId: busy, attached: true });
+      return send(res, 200, startJob(jobKeys.init(), () => startInit(project, { step: body.step, features: body.features, accept: body.accept })));
     } catch (e) {
       return send(res, 409, { error: e.message });
     }
@@ -33261,8 +34345,8 @@ async function handle(project, req, res) {
   }
   m = /^\/api\/unit\/([^/]+)$/.exec(path);
   if (method === "POST" && m) {
-    const { run } = startUnitRun(project, decodeURIComponent(m[1]));
-    return send(res, 200, { runId: run.id });
+    const feature = decodeURIComponent(m[1]);
+    return send(res, 200, startJob(jobKeys.unit(feature), () => startUnitRun(project, feature)));
   }
   if (method === "GET" && path === "/api/cards") {
     const last = cardResults(project, latestScan(project));
@@ -33282,8 +34366,10 @@ async function handle(project, req, res) {
   }
   if (method === "POST" && path === "/api/watch/check") {
     const body = JSON.parse(await readBody(req));
+    const here = runningJobs().find((j) => j.kind === "check");
+    if (here) return send(res, 200, { runId: here.runId, attached: true });
     const started = startCheck(project, { trigger: body.trigger ?? "manual", features: body.features, drafts: body.drafts });
-    return started ? send(res, 200, { runId: started.run.id }) : send(res, 409, { error: `A check is already running (${runningCheck(project)?.runId}).` });
+    return started ? send(res, 200, { runId: started.run.id, attached: false }) : send(res, 409, { error: `A check is already running (${runningCheck(project)?.runId}).` });
   }
   m = /^\/api\/knowledge\/([^/]+)$/.exec(path);
   if (method === "GET" && m) {
@@ -33293,7 +34379,7 @@ async function handle(project, req, res) {
       manifest = loadManifest(project.root, id);
     } catch {
     }
-    const exists = (0, import_node_fs24.existsSync)((0, import_node_path28.join)(project.root, manifestFile(id)));
+    const exists = (0, import_node_fs29.existsSync)((0, import_node_path36.join)(project.root, manifestFile(id)));
     return send(res, 200, {
       file: manifestFile(id),
       manifest,
@@ -33307,6 +34393,8 @@ async function handle(project, req, res) {
         ])
       ) : {},
       stale: loadWatch(project).stale[id] ?? null,
+      kind: manifest?.kind ?? findFeature(latestScan(project), id)?.group ?? "feature",
+      ...areaLinks(project, id),
       drafts: listDrafts(project, id).filter((d) => d.status === "pending").map((d) => ({ ...d, diffs: draftDiffs(project, d) }))
     });
   }
@@ -33329,25 +34417,23 @@ async function handle(project, req, res) {
   }
   if (method === "POST" && path === "/api/verify") {
     const options = JSON.parse(await readBody(req));
-    const { run } = startVerify(project, options);
-    return send(res, 200, { runId: run.id });
+    return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
   }
   m = /^\/api\/unitwrite\/([^/]+)$/.exec(path);
   if (method === "POST" && m) {
     const { limit } = JSON.parse(await readBody(req));
-    const { run } = startUnitWrite(project, decodeURIComponent(m[1]), { limit });
-    return send(res, 200, { runId: run.id });
+    const feature = decodeURIComponent(m[1]);
+    return send(res, 200, startJob(jobKeys.unitwrite(feature), () => startUnitWrite(project, feature, { limit })));
   }
   m = /^\/api\/explore\/([^/]+)$/.exec(path);
   if (method === "POST" && m) {
-    const { run } = startExploreRun(project, decodeURIComponent(m[1]));
-    return send(res, 200, { runId: run.id });
+    const feature = decodeURIComponent(m[1]);
+    return send(res, 200, startJob(jobKeys.explore(feature), () => startExploreRun(project, feature)));
   }
   if (method === "GET" && path === "/api/login") return send(res, 200, lastLogin(project));
   if (method === "POST" && path === "/api/login") {
     const { role } = JSON.parse(await readBody(req));
-    const { run } = startLoginRun(project, role || void 0);
-    return send(res, 200, { runId: run.id });
+    return send(res, 200, startJob(jobKeys.login(role), () => startLoginRun(project, role || void 0)));
   }
   if (method === "GET" && path === "/api/tickets/config") {
     return send(res, 200, { canFile: !!project.config.tickets.fileCommand, pattern: project.config.tickets.pattern });
@@ -33360,8 +34446,7 @@ async function handle(project, req, res) {
     if (!ticket) return send(res, 400, { error: "Ticket id is required" });
     const features = body.features?.length ? body.features : ticketInfo(project, ticket).features;
     if (!features.length) return send(res, 400, { error: `No commits mention ${ticket}; choose the feature it belongs to.` });
-    const { run } = startBackfill(project, features, { ticket: { id: ticket, text: body.text?.trim() || void 0 } });
-    return send(res, 200, { runId: run.id });
+    return send(res, 200, startJob(jobKeys.ticketCards(ticket), () => startBackfill(project, features, { ticket: { id: ticket, text: body.text?.trim() || void 0 } })));
   }
   m = /^\/api\/runs\/([^/]+)\/ticket(\/file)?$/.exec(path);
   if (m) {
@@ -33372,20 +34457,20 @@ async function handle(project, req, res) {
   }
   m = /^\/api\/cards\/([^/]+)\/backfill$/.exec(path);
   if (method === "POST" && m) {
-    const { run } = startBackfill(project, decodeURIComponent(m[1]));
-    return send(res, 200, { runId: run.id });
+    const feature = decodeURIComponent(m[1]);
+    return send(res, 200, startJob(jobKeys.backfill(feature), () => startBackfill(project, feature)));
   }
   m = /^\/api\/cards\/([^/]+)\/([^/]+)\/run$/.exec(path);
   if (method === "POST" && m) {
-    const { run } = startCardRun(project, decodeURIComponent(m[1]), decodeURIComponent(m[2]));
-    return send(res, 200, { runId: run.id });
+    const [feature, cardId] = [decodeURIComponent(m[1]), decodeURIComponent(m[2])];
+    return send(res, 200, startJob(jobKeys.card(feature, cardId), () => startCardRun(project, feature, cardId)));
   }
   m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4))$/.exec(path);
   if (method === "GET" && m) {
-    const file = (0, import_node_path28.join)(project.store.dir, "runs", m[1], m[2]);
-    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs24.existsSync)(file)) return send(res, 404, { error: "no such file" });
+    const file = (0, import_node_path36.join)(project.store.dir, "runs", m[1], m[2]);
+    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs29.existsSync)(file)) return send(res, 404, { error: "no such file" });
     res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : "video/mp4", "cache-control": "max-age=3600" });
-    (0, import_node_fs24.createReadStream)(file).pipe(res);
+    (0, import_node_fs29.createReadStream)(file).pipe(res);
     return;
   }
   m = /^\/api\/cards\/([^/]+)\/([^/]+)\/status$/.exec(path);
@@ -33395,15 +34480,15 @@ async function handle(project, req, res) {
     return send(res, 200, setCardStatus(project.root, decodeURIComponent(m[1]), decodeURIComponent(m[2]), status));
   }
   if (method === "GET" && path === "/api/settings") {
-    return send(res, 200, { agents: { model: project.config.agents.model, source: agentModelSource(project.root, project.store.dir) } });
+    return send(res, 200, { agents: agentSettings(project) });
   }
   if (method === "POST" && path === "/api/settings") {
-    const { model } = JSON.parse(await readBody(req));
-    const value = model?.trim() ?? "";
-    if (value && !/^[\w.[\]:-]{2,80}$/.test(value)) return send(res, 400, { error: "Model: a name claude --model accepts, e.g. sonnet" });
-    saveLocal(project.store.dir, { agents: value ? { model: value } : void 0 });
+    const body = JSON.parse(await readBody(req));
+    const next = localAgents(readLocalAgents(project.store.dir), body);
+    if (typeof next === "string") return send(res, 400, { error: next });
+    saveLocal(project.store.dir, { agents: next });
     project.config = loadConfig(project.root, project.store.dir);
-    return send(res, 200, { agents: { model: project.config.agents.model, source: agentModelSource(project.root, project.store.dir) } });
+    return send(res, 200, { agents: agentSettings(project) });
   }
   if (method === "POST" && path === "/api/settings/test") {
     const { model } = JSON.parse(await readBody(req));
@@ -33431,8 +34516,12 @@ async function handle(project, req, res) {
     new Secrets(project.store.dir).remove(m[1]);
     return send(res, 200, { ok: true });
   }
+  if (method === "GET" && path === "/api/jobs") return send(res, 200, runningJobs());
   if (method === "GET" && path === "/api/runs") {
-    return send(res, 200, project.store.listRuns().map(({ log: _log, ...r }) => r));
+    const going = runningJobs().flatMap((j) => liveRun(j.runId)?.run ?? []).reverse();
+    const ids = new Set(going.map((r) => r.id));
+    const saved = project.store.listRuns().filter((r) => !ids.has(r.id)).map(({ log: _log, ...r }) => r);
+    return send(res, 200, [...going, ...saved]);
   }
   m = /^\/api\/runs\/([^/]+)$/.exec(path);
   if (method === "GET" && m) {
@@ -33454,8 +34543,7 @@ async function handle(project, req, res) {
     if (!found) return send(res, 404, { error: `unknown issue ${id}` });
     if (method === "GET" && m[2] === "prompt") return send(res, 200, { prompt: fixPrompt(project, found.issue, found.run, false) });
     if (method === "POST" && m[2] === "fix") {
-      const { run } = startFix(project, id);
-      return send(res, 200, { runId: run.id });
+      return send(res, 200, startJob(jobKeys.fix(id), () => startFix(project, id)));
     }
   }
   m = /^\/api\/runs\/([^/]+)\/stop$/.exec(path);
@@ -33496,21 +34584,50 @@ function streamRun(project, id, res) {
 }
 function summary(result, project) {
   const health = featureHealth(project, result);
+  const manifests = new Map(loadManifests(project.root).map((m) => [m.id, m]));
+  const graph = safeGraph(project, result);
   return {
     project: result.project,
     scannedAt: result.scannedAt,
     excluded: result.excluded,
     features: result.features.map((f) => {
       const h = health.get(f.id);
-      return { id: f.id, group: f.group, stats: f.stats, ...h, lastUnitRun: h.unit ? { ...h.unit, id: h.unit.runId, finishedAt: h.unit.at } : null };
+      const m = manifests.get(f.id);
+      return {
+        id: f.id,
+        group: f.group,
+        stats: f.stats,
+        ...h,
+        lastUnitRun: h.unit ? { ...h.unit, id: h.unit.runId, finishedAt: h.unit.at } : null,
+        // Its written knowledge at a glance: rules, and how many nothing proves yet.
+        manifest: m ? { kind: m.kind, rules: m.invariants.length, unproven: m.invariants.filter((i) => !i.coveredBy.length && !i.cards.length).length } : null,
+        usedBy: graph ? usedBy(graph, f.id).length : 0
+      };
     })
   };
 }
+function safeGraph(project, result) {
+  try {
+    return areaGraph(project, result);
+  } catch {
+    return null;
+  }
+}
+function areaLinks(project, id) {
+  const graph = safeGraph(project, latestScan(project));
+  return graph ? { usedBy: usedBy(graph, id), uses: uses(graph, id) } : { usedBy: [], uses: [] };
+}
+function proposedAreaRows(project) {
+  const chosen = new Set(chosenFeatures(project) ?? []);
+  const undecided = new Set(undecidedAreas(project).map((a) => a.id));
+  const written = new Set(loadManifests(project.root).map((m) => m.id));
+  return proposedAreas(project).map((a) => ({ ...a, chosen: chosen.has(a.id), undecided: undecided.has(a.id), manifest: written.has(a.id) }));
+}
 function readBody(req) {
-  return new Promise((resolve5, reject) => {
+  return new Promise((resolve7, reject) => {
     let body = "";
     req.on("data", (chunk) => body += chunk.toString());
-    req.on("end", () => resolve5(body || "{}"));
+    req.on("end", () => resolve7(body || "{}"));
     req.on("error", reject);
   });
 }
@@ -33569,7 +34686,7 @@ async function runMcpServer(version2) {
     async ({ projectDir: dir }) => {
       const project = openProject(dir);
       const { stale } = loadWatch(project);
-      const lines = Object.entries(stale).map(([id, e]) => `${id}${e.owned ? "" : " (related)"} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}
+      const lines = Object.entries(stale).map(([id, e]) => `${id}${staleLabel(e)} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}
 ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
       const drafts = listDrafts(project).filter((d) => d.status === "pending");
       if (drafts.length) lines.push(`Drafts to review: ${drafts.map((d) => `${d.id} (${d.feature})`).join(", ")}`);
@@ -34045,29 +35162,42 @@ ${d.body}`);
 }
 
 // src/cli/hook.ts
-var import_node_fs25 = require("node:fs");
-var import_node_path29 = require("node:path");
-async function runHook(event) {
+var import_node_fs30 = require("node:fs");
+var import_node_path37 = require("node:path");
+async function runHook(event, options = {}) {
   try {
-    const input = JSON.parse(await readStdin() || "{}");
-    const project = probeProject(input.cwd);
+    const stdin = options.files?.length ? "" : await readStdin();
+    const input = parseClaudeInput(stdin);
+    const claude = input !== null;
+    const hook = input ?? {};
+    const project = probeProject(hook.cwd ?? options.project);
     if (!project || !project.config.watch.enabled) return 0;
-    const session = input.session_id ?? "unknown";
+    const source = claude ? "claude" : event === "commit" ? "commit" : "agent";
+    const session = hook.session_id ?? options.session ?? "agent";
+    const say = (text2) => process.stdout.write(`${text2}
+`);
     if (event === "edit") {
-      const file = input.tool_input?.file_path ?? input.tool_input?.notebook_path;
-      if (file) markStale(project, [file], "claude", session);
+      const file = hook.tool_input?.file_path ?? hook.tool_input?.notebook_path;
+      const files = claude ? file ? [file] : [] : (options.files ?? []).map((f) => (0, import_node_path37.isAbsolute)(f) ? f : (0, import_node_path37.resolve)(process.cwd(), f));
+      const touched = files.length ? markStale(project, files, source, session) : claude ? [] : sweepDirty(project, source, session);
+      if (!claude && touched.length) say(`Probe: ${touched.join(", ")} stale`);
       return 0;
     }
     if (event === "stop") {
-      sweepDirty(project, "claude", session);
-      if (!input.stop_hook_active) {
+      sweepDirty(project, source, session);
+      if (!hook.stop_hook_active) {
         const problems = takeReports(project, session, isProblem);
         if (problems.length) {
-          process.stdout.write(JSON.stringify({ decision: "block", reason: formatReports(problems, studioUrl(project)) }));
+          const reason = formatReports(problems, studioUrl(project));
+          if (claude) process.stdout.write(JSON.stringify({ decision: "block", reason }));
+          else say(reason);
           return 0;
         }
       }
-      if (Object.keys(loadWatch(project).stale).length) await kickCheck(project, "claude");
+      if (Object.keys(loadWatch(project).stale).length) {
+        const started = await kickCheck(project, source);
+        if (!claude) say(`Probe: checking stale features (${started === "busy" ? "a check is already running" : `in ${started}`})`);
+      }
       return 0;
     }
     if (event === "prompt") {
@@ -34076,7 +35206,15 @@ async function runHook(event) {
       if (reports.length) lines.push(formatReports(reports, studioUrl(project)));
       const running2 = runningCheck(project);
       if (running2) lines.push(`Probe is still checking features after recent edits (run ${running2.runId}); results follow when it ends.`);
-      if (lines.length) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n\n") } }));
+      if (!lines.length) return 0;
+      if (claude) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n\n") } }));
+      else say(lines.join("\n\n"));
+      return 0;
+    }
+    if (event === "commit") {
+      const staged = capture("git", ["diff", "--cached", "--name-only", "--diff-filter=ACMR"], project.root);
+      const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => (0, import_node_path37.join)(project.root, f));
+      if (files.length && markStale(project, files, "commit", session).length) await kickCheck(project, "commit");
       return 0;
     }
   } catch (e) {
@@ -34085,23 +35223,80 @@ async function runHook(event) {
   }
   return 0;
 }
+function parseClaudeInput(stdin) {
+  if (!stdin.trim().startsWith("{")) return null;
+  try {
+    const input = JSON.parse(stdin);
+    return typeof input.hook_event_name === "string" ? input : null;
+  } catch {
+    return null;
+  }
+}
 function probeProject(cwd) {
   try {
     const project = openProject(cwd);
-    return (0, import_node_fs25.existsSync)((0, import_node_path29.join)(project.root, "probe")) ? project : null;
+    return (0, import_node_fs30.existsSync)((0, import_node_path37.join)(project.root, "probe")) ? project : null;
   } catch {
     return null;
   }
 }
 function readStdin() {
-  return new Promise((resolve5) => {
-    if (process.stdin.isTTY) return resolve5("");
+  return new Promise((resolve7) => {
+    if (process.stdin.isTTY) return resolve7("");
     let data = "";
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", (c) => data += c);
-    process.stdin.on("end", () => resolve5(data));
-    process.stdin.on("error", () => resolve5(data));
+    process.stdin.on("end", () => resolve7(data));
+    process.stdin.on("error", () => resolve7(data));
   });
+}
+var BEGIN = "# >>> probe (probe hooks install)";
+var END = "# <<< probe";
+function preCommitBlock(probeScript) {
+  return [
+    BEGIN,
+    "# Marks the features of staged files stale and starts a Probe check in the background.",
+    "if command -v probe >/dev/null 2>&1; then",
+    "  probe hook commit >/dev/null 2>&1 || true",
+    "else",
+    `  node "${probeScript.replace(/\\/g, "/")}" hook commit >/dev/null 2>&1 || true`,
+    "fi",
+    END
+  ].join("\n");
+}
+function withPreCommitBlock(existing, block) {
+  const kept = withoutPreCommitBlock(existing ?? "").trimEnd();
+  const base = kept || "#!/bin/sh";
+  return `${base}
+
+${block}
+`;
+}
+function withoutPreCommitBlock(text2) {
+  const start = text2.indexOf(BEGIN);
+  const end = text2.indexOf(END);
+  if (start < 0 || end < start) return text2;
+  const kept = [text2.slice(0, start).trimEnd(), text2.slice(end + END.length).trim()].filter(Boolean);
+  return kept.length ? `${kept.join("\n\n")}
+` : "";
+}
+function gitHooks(project, action) {
+  const dir = capture("git", ["rev-parse", "--git-path", "hooks"], project.root);
+  if (!dir) throw new Error("Not a git repository: the pre-commit hook needs git.");
+  const file = (0, import_node_path37.resolve)(project.root, dir, "pre-commit");
+  const existing = (0, import_node_fs30.existsSync)(file) ? (0, import_node_fs30.readFileSync)(file, "utf8") : null;
+  const installed = existing?.includes(BEGIN) ?? false;
+  if (action === "install") {
+    (0, import_node_fs30.mkdirSync)((0, import_node_path37.dirname)(file), { recursive: true });
+    (0, import_node_fs30.writeFileSync)(file, withPreCommitBlock(existing, preCommitBlock((0, import_node_path37.resolve)(process.argv[1]))), { mode: 493 });
+    return `${installed ? "Updated" : "Installed"} Probe's block in ${file}. Each commit now marks the staged files' features stale and starts a check in the background.`;
+  }
+  if (action === "uninstall") {
+    if (!installed) return `No Probe block in ${file}.`;
+    (0, import_node_fs30.writeFileSync)(file, withoutPreCommitBlock(existing));
+    return `Removed Probe's block from ${file}.`;
+  }
+  return installed ? `Installed in ${file}.` : `Not installed (probe hooks install adds it to ${file}).`;
 }
 
 // src/cli.ts
@@ -34113,8 +35308,9 @@ Usage: probe <command> [options]
   doctor                 Check setup (Node, project, SDK, devices)
   init                   Set the project up step by step: settings, agents, feature manifests, rule
                          cards, the agent file. Resumes where it stopped; manifests arrive as drafts
-                         --status: only show the steps; --step <id>: one step; --yes: take the
-                         proposed features; --features a,b: choose (or limit agents to) these
+                         --status: only show the steps; --step <id>: one step; --yes: take every
+                         proposed feature and platform area; --features a,b: add these to the
+                         chosen (\`features\` or \`platform\` names a whole kind), or limit agents to them
   scan                   Map features: unit coverage and health
   feature <id>           One feature: modules + riskiest untested classes
   unit <feature>         Run a feature's unit tests
@@ -34142,14 +35338,20 @@ Usage: probe <command> [options]
   devices allow <serial> Let agents use a real phone (this machine only)
   devices avd <name>     Emulator to boot when none is running
   check [features]       Check stale features now: unit tests, manifest links, drafted corrections
-                         --no-drafts: no agent; --trigger claude|editor|manual
+                         --no-drafts: no agent; --trigger claude|agent|commit|editor|manual
   stale                  Features edited since their last check
   manifest <feature>     Check a feature manifest's test and card links, paths and unproven rules
   rules <feature>        A feature's rules, the tests and cards proving each, the cards' last results
   rule <feature/rule>    One rule and what proves it; --run runs its cards on a device
   drafts [feature]       Drafted corrections to manifests and briefs
   draft show|approve|reject <id>
-  hook <event>           Claude Code hook entry (edit, stop, prompt); see hooks/hooks.json
+  hook edit [files\u2026]     Feed the watch loop from any coding agent: mark edited files' features
+                         stale (no files: what changed since the last sweep)
+  hook stop              End of an agent turn: report problems a check found, else check what is stale
+  hook prompt            Results that arrived since (--session <id> keeps each agent's reports apart)
+                         Claude Code calls these itself (hooks/hooks.json) with JSON on stdin
+  hooks install          Add a git pre-commit hook that marks staged files stale and starts a check
+                         (never blocks a commit); hooks uninstall | hooks status
   studio                 Open the local GUI
   mcp                    Run as an MCP server (stdio) for AI agents
 
@@ -34157,7 +35359,7 @@ Options:
   --project <dir>        Project root (default: current directory)
   --port <n>             Studio port (default 7777)
   --no-open              Don't open the browser for studio
-  --model <name>         Model for agent tasks (default: agents.model, else sonnet)
+  --model <name>         Model for agent tasks (default: agents.model, else the runner's default)
   --device <serial>      Device for run (default: a running emulator)`;
 async function main(argv) {
   const opt = (name) => {
@@ -34176,6 +35378,7 @@ async function main(argv) {
   const maxCardsArg = opt("--max-cards");
   const triggerArg = opt("--trigger");
   const stepArg = opt("--step");
+  const sessionArg = opt("--session");
   const flags = /* @__PURE__ */ new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
   const runFlag = argv.includes("--run");
   const noDrafts = argv.includes("--no-drafts");
@@ -34384,7 +35587,7 @@ Cards: ${info.cards.join(", ") || "none"}`);
       const project = openProject(projectArg);
       const targets = arg ?? (ticketArg ? ticketInfo(project, ticketArg).features : void 0);
       if (!targets || Array.isArray(targets) && targets.length === 0) return usage("probe backfill <feature|*> [--ticket <id> [--ticket-text <file>]]");
-      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs26.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
+      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs31.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
       const { run, done } = startBackfill(project, targets, { model, ticket });
       follow(run.id);
       const finished = await done;
@@ -34430,6 +35633,10 @@ ${summarizeCardRun(finished)}`);
     }
     case "devices": {
       const project = openProject(projectArg);
+      if (!project.adapter.supportsDevices) {
+        console.log(devicesUnsupported(project.adapter));
+        return 0;
+      }
       const local = project.config.devices;
       if (arg === "allow" && arg2) {
         saveLocalDevices(project.store.dir, { ...local, allowReal: [.../* @__PURE__ */ new Set([...local.allowReal, arg2])] });
@@ -34452,7 +35659,10 @@ Emulator to boot when none runs: ${local.avd ?? "not set (probe devices avd <nam
       return 0;
     }
     case "hook":
-      return runHook(arg ?? "");
+      return runHook(arg ?? "", { files: argv.filter((a) => !flags.has(a)).slice(2), session: sessionArg, project: projectArg });
+    case "hooks":
+      console.log(gitHooks(openProject(projectArg), arg ?? "status"));
+      return 0;
     case "check": {
       const project = openProject(projectArg);
       const started = startCheck(project, {
@@ -34481,7 +35691,7 @@ ${summarizeCheckRun(finished)}`);
       }
       for (const id of ids) {
         const e = stale[id];
-        console.log(`${id}${e.owned ? "" : " (related)"} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}`);
+        console.log(`${id}${staleLabel(e)} \xB7 ${e.files.length} files \xB7 since ${e.since} \xB7 by ${e.sources.join(", ")}`);
         for (const f of e.files.slice(0, 10)) console.log(`    ${f}`);
       }
       return 0;
@@ -34573,7 +35783,7 @@ async function readSecret(promptText) {
   process.stdout.write(promptText);
   stdin.setRawMode(true);
   stdin.resume();
-  return new Promise((resolve5) => {
+  return new Promise((resolve7) => {
     let value = "";
     const onData = (buf) => {
       for (const ch of buf.toString("utf8")) {
@@ -34582,7 +35792,7 @@ async function readSecret(promptText) {
           stdin.pause();
           stdin.off("data", onData);
           process.stdout.write("\n");
-          resolve5(value);
+          resolve7(value);
           return;
         }
         if (ch === "") process.exit(130);

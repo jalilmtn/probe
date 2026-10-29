@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { devicesUnsupported } from "../adapters/adapter.js";
 import { runAgent } from "../agent/headless.js";
 import { throwIfStopped } from "../core/proc.js";
 import type { ProbeConfig } from "../core/config.js";
@@ -40,6 +41,7 @@ export interface HarnessOptions {
  * session so the caller can read what its report tool saved.
  */
 export async function runOnDevice(project: Project, run: DeviceRun, options: HarnessOptions, log: (line: string) => void): Promise<DeviceSession> {
+  if (!project.adapter.supportsDevices) throw new Error(devicesUnsupported(project.adapter));
   let app = resolveApp(project);
   if (!app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio → Settings → Project.");
 

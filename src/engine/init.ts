@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { stemOf } from "../core/testfiles.js";
 import { dirname, join, relative } from "node:path";
 import featuresGuide from "../../templates/agents-features.md";
 import featuresReadme from "../../templates/features-README.md";
@@ -8,8 +9,9 @@ import { CONFIG_TEMPLATE, configPath } from "../core/config.js";
 import { newRunId } from "../core/store.js";
 import type { FeatureInfo, InitRun, InitStepState } from "../core/types.js";
 import { closeDraft, type Draft, listDrafts, openDraft } from "../knowledge/draft.js";
-import { checkManifest, FEATURES_DIR, loadManifest, loadManifests, manifestFile, summarizeCheck, testIndex, testNames } from "../knowledge/manifest.js";
+import { checkManifest, FEATURES_DIR, loadManifest, loadManifests, manifestFile, type ManifestKind, summarizeCheck, testIndex, testNames } from "../knowledge/manifest.js";
 import { docsAbout } from "./docs.js";
+import { areaGraph, usedBy, uses } from "./impact.js";
 import { doctor } from "./doctor.js";
 import type { Project } from "./project.js";
 import { launchRun, liveRun } from "./runs.js";
@@ -28,9 +30,9 @@ export const INIT_STEPS = [
   { id: "config", label: "Settings file", what: "probe/probe.yaml, every setting optional" },
   { id: "kit", label: "Manifest format", what: "probe/features/README.md: the manifest and brief formats" },
   { id: "scan", label: "Scan", what: "modules, test classes and coverage" },
-  { id: "features", label: "Features", what: "which features get a manifest" },
-  { id: "manifests", label: "Manifests", what: "an agent drafts each feature's manifest: paths, flows, rules and the tests proving them" },
-  { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the rules no unit test can prove" },
+  { id: "features", label: "Features", what: "which features and platform areas (core, common, the app module) get a manifest" },
+  { id: "manifests", label: "Manifests", what: "an agent drafts each feature's or platform area's manifest: paths, flows, rules and the tests proving them" },
+  { id: "cards", label: "Rule cards", what: "an agent drafts device cards for the feature rules no unit test can prove; platform areas only when named" },
   { id: "agentfile", label: "Agent file", what: "the Features section in AGENTS.md (CLAUDE.md imports it), so every coding agent knows the manifests and how to work with them" },
   { id: "check", label: "Link check", what: "every test and card link in the manifests resolves" },
 ] as const;
@@ -41,8 +43,10 @@ const STATE = "init.json";
 
 /** What only a person decides, so it cannot be read back from the project. Per machine. */
 interface InitState {
-  /** Features chosen for manifests. Unset: not chosen yet. */
+  /** Features and platform areas chosen for manifests. Unset: not chosen yet. */
   features?: string[];
+  /** Everything proposed when the choice was last made, so an area that appears later is offered. */
+  seen?: string[];
   /** Features whose cards step found no rule needing a device. */
   cardsNone?: string[];
 }
@@ -57,25 +61,80 @@ function initDrafts(project: Project, step: string, feature?: string): Draft[] {
   return listDrafts(project, feature).filter((d) => d.origin === "init" && d.step === step);
 }
 
-/** The features a scan proposes: the app's own features, not the platform modules under them. */
-export function proposedFeatures(project: Project): string[] {
-  return latestScan(project).features.filter((f) => f.group === "feature").map((f) => f.id);
+export interface ProposedArea {
+  id: string;
+  kind: ManifestKind;
+  modules: number;
+  testable: number;
+  testFiles: number;
 }
 
-/** The chosen features; a project that already has manifests chose them by writing them. */
+/**
+ * What a scan proposes for a manifest: the app's own features, then its platform areas (core,
+ * common, the app module) that hold code or tests. A platform area of resources or annotations
+ * alone has no behaviour to state a rule about.
+ */
+export function proposedAreas(project: Project): ProposedArea[] {
+  const areas = latestScan(project)
+    .features.filter((f) => f.group === "feature" || f.stats.testable > 0 || f.stats.testFiles > 0)
+    .map((f) => ({ id: f.id, kind: f.group, modules: f.stats.modules, testable: f.stats.testable, testFiles: f.stats.testFiles }));
+  // Platform areas with the most code first: a list cut short still names the ones worth a manifest.
+  const platform = areas.filter((a) => a.kind === "platform").sort((a, b) => b.testable - a.testable || a.id.localeCompare(b.id));
+  return [...areas.filter((a) => a.kind === "feature"), ...platform];
+}
+
+export function proposedFeatures(project: Project): string[] {
+  return proposedAreas(project).map((a) => a.id);
+}
+
+/** A manifest's own `kind` wins; otherwise the scan's group. */
+export function kindOf(project: Project, id: string): ManifestKind {
+  try {
+    const m = loadManifest(project.root, id);
+    if (m) return m.kind;
+  } catch {
+    // Falls back to the scan; the check step reports the manifest.
+  }
+  return latestScan(project).features.find((f) => f.id === id)?.group ?? "feature";
+}
+
+/**
+ * The chosen features and platform areas. A written manifest counts as chosen, so a project
+ * that already has manifests chose them by writing them.
+ */
 export function chosenFeatures(project: Project): string[] | null {
   const state = readState(project);
-  if (state.features) return state.features;
   const written = loadManifests(project.root).map((m) => m.id);
-  return written.length ? written : null;
+  if (!state.features && !written.length) return null;
+  return [...new Set([...(state.features ?? []), ...written])];
 }
 
-export function chooseFeatures(project: Project, features: string[]): string[] {
+/**
+ * Proposed areas nobody has decided on yet: neither chosen nor proposed when the choice was
+ * made. A project whose features all have manifests is offered its platform areas this way.
+ */
+export function undecidedAreas(project: Project): ProposedArea[] {
+  const chosen = new Set(chosenFeatures(project) ?? []);
+  const seen = new Set(readState(project).seen ?? []);
+  return proposedAreas(project).filter((a) => !chosen.has(a.id) && !seen.has(a.id));
+}
+
+/**
+ * Chooses which areas get a manifest. "replace" is a full choice (Studio's ticked list): what
+ * it leaves out is declined until chosen. "add" chooses more and keeps the rest. The words
+ * `features` and `platform` stand for every proposed area of that kind.
+ */
+export function chooseFeatures(project: Project, features: string[], mode: "replace" | "add" = "replace"): string[] {
+  const proposed = proposedAreas(project);
+  const expanded = features.flatMap((f) => (f === "features" || f === "platform" ? proposed.filter((a) => a.kind === (f === "features" ? "feature" : "platform")).map((a) => a.id) : [f]));
   const known = new Set(latestScan(project).features.map((f) => f.id));
-  const unknown = features.filter((f) => !known.has(f));
-  if (unknown.length) throw new Error(`Not features of this project: ${unknown.join(", ")}. Run \`probe scan\` to list them.`);
-  writeState(project, { features: [...new Set(features)] });
-  return features;
+  const unknown = expanded.filter((f) => !known.has(f));
+  if (unknown.length) throw new Error(`Not features or platform areas of this project: ${unknown.join(", ")}. Run \`probe scan\` to list them.`);
+  const state = readState(project);
+  const chosen = [...new Set([...(mode === "add" ? (state.features ?? []) : []), ...expanded])];
+  const seen = mode === "add" ? [...new Set([...(state.seen ?? []), ...expanded])] : proposed.map((a) => a.id);
+  writeState(project, { features: chosen, seen });
+  return chosen;
 }
 
 const hasManifest = (project: Project, id: string) => existsSync(join(project.root, manifestFile(id)));
@@ -95,10 +154,31 @@ export function initStatus(project: Project): InitStepState[] {
   add("kit", missingKit.length ? "todo" : "done", missingKit.length ? `to write: ${missingKit.join(", ")}` : KIT.map((k) => k.path).join(", "));
 
   const scanned = project.store.read<{ scannedAt: string; features: FeatureInfo[] }>("scan.json");
-  add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform modules` : "not scanned yet");
+  add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform areas` : "not scanned yet");
 
   const chosen = chosenFeatures(project);
-  add("features", chosen ? "done" : scanned ? "waiting" : "todo", chosen ? `${chosen.length}: ${chosen.join(", ")}` : scanned ? `choose from ${proposedFeatures(project).length} proposed: \`probe init --yes\` takes them all, \`--features a,b\` some` : "after the scan");
+  const proposed = scanned ? proposedAreas(project) : [];
+  const undecided = chosen ? undecidedAreas(project) : [];
+  const kinds = (list: ProposedArea[]) => {
+    const platform = list.filter((a) => a.kind === "platform").length;
+    return `${list.length - platform} features, ${platform} platform areas`;
+  };
+  add(
+    "features",
+    !scanned ? "todo" : !chosen || undecided.length ? "waiting" : "done",
+    !scanned
+      ? "after the scan"
+      : !chosen
+        ? `choose from ${proposed.length} proposed (${kinds(proposed)}): \`probe init --yes\` takes them all, \`--step features --features a,b\` some (\`features\` or \`platform\` names a whole kind), or tick them in Studio → Setup`
+        : [
+            `${chosen.length} chosen: ${chosen.join(", ")}`,
+            undecided.length
+              ? `${undecided.length} more proposed (${kinds(undecided)}): ${undecided.slice(0, 12).map((a) => a.id).join(", ")}${undecided.length > 12 ? " …" : ""} — \`probe init --step features --features a,b\` adds some (\`platform\` adds them all), Studio → Setup ticks or declines them`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" · "),
+  );
 
   const features = chosen ?? [];
   const manifests = manifestProgress(project, features);
@@ -170,6 +250,8 @@ function cardProgress(project: Project, features: string[], named?: string[]) {
   const none = new Set(readState(project).cardsNone ?? []);
   const out = { todo: [] as string[], pending: [] as string[], done: [] as string[], waiting: [] as string[], optional: 0 };
   for (const f of named ?? features) {
+    // A platform area's rules are proven by unit tests; it gets cards only when named on purpose.
+    if (!named && kindOf(project, f) === "platform") continue;
     const drafts = initDrafts(project, "cards", f);
     if (none.has(f) || drafts.some((d) => d.status !== "pending")) out.done.push(f);
     else if (drafts.length) out.pending.push(f);
@@ -266,15 +348,20 @@ export function startInit(project: Project, options: InitOptions = {}): { run: I
       log(`scanned: ${result.features.length} features and platform modules`);
     }
     if (wants("features") && (options.accept || (options.step === "features" && options.features))) {
-      const chosen = chooseFeatures(project, options.features ?? proposedFeatures(project));
-      log(`features chosen: ${chosen.length}`);
+      // Added to what is chosen, never replacing it: a CLI choice names what to add.
+      const chosen = chooseFeatures(project, options.features ?? proposedFeatures(project), "add");
+      log(`chosen: ${chosen.length} features and platform areas`);
     }
 
     const chosen = chosenFeatures(project);
+    const undecided = chosen ? undecidedAreas(project) : [];
     if (!chosen) {
       if (!options.step || options.step === "features")
-        log(`waiting: choose the features — \`probe init --yes\` takes all ${proposedFeatures(project).length} proposed, \`probe init --step features --features a,b\` some, or tick them in Studio → Setup`);
-    } else {
+        log(`waiting: choose the features and platform areas — \`probe init --yes\` takes all ${proposedFeatures(project).length} proposed, \`probe init --step features --features a,b\` some, or tick them in Studio → Setup`);
+    } else if (undecided.length && (!options.step || options.step === "features")) {
+      log(`also proposed, not chosen yet: ${undecided.map((a) => `${a.id}${a.kind === "platform" ? " (platform)" : ""}`).join(", ")} — \`probe init --step features --features a,b\` adds them`);
+    }
+    if (chosen) {
       const only = (list: string[]) => (options.features && options.step !== "features" ? list.filter((f) => options.features!.includes(f)) : list);
       if (wants("manifests")) await draftManifests(project, run, only(manifestProgress(project, chosen).todo).slice(0, options.limit), options.model, log);
       if (wants("cards")) {
@@ -313,7 +400,8 @@ async function draftManifests(project: Project, run: InitRun, features: string[]
     const say = (line: string) => log(`[${id}] ${line}`);
     say(`drafting the manifest (${i + 1}/${features.length})`);
     const file = manifestFile(id);
-    const work = openDraft(project, id, [{ path: file, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md\nid: ${id}\n` }]);
+    const kind = feature.group === "platform" ? "kind: platform\n" : "";
+    const work = openDraft(project, id, [{ path: file, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md\nid: ${id}\n${kind}` }]);
     writeFileSync(join(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
     if (!existsSync(join(work.dir, "FORMAT.md"))) writeFileSync(join(work.dir, "FORMAT.md"), featuresReadme);
 
@@ -341,20 +429,32 @@ function featureContext(project: Project, feature: FeatureInfo, tests: Map<strin
   const rel = (dir: string) => relative(project.root, dir).replace(/\\/g, "/");
   const dirs = feature.modules.map((m) => `${rel(m.dir)}/`);
   const tasks = feature.modules.map((m) => m.unitTestTask).filter((t): t is string => !!t);
-  const command = tasks.length ? (project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : tasks.join(" ")) : null;
+  const command = tasks.length ? (project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : [...new Set(tasks)].join(" && ")) : null;
   const testFiles = [...tests.values()].flat().filter((f) => dirs.some((d) => f.startsWith(d)));
   const testList = testFiles.slice(0, 60).map((f) => {
     const names = testNames(join(project.root, f));
-    return `### ${f.split("/").pop()!.replace(/\.(kt|java)$/, "")} (${f})\n${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `\n- … ${names.length - 80} more` : ""}`;
+    return `### ${stemOf(f.split("/").pop()!)} (${f})\n${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `\n- … ${names.length - 80} more` : ""}`;
   });
-  const docs = docsAbout(project.root, feature.id, 12_000);
-  const examples = loadManifests(project.root).slice(0, 2).map((m) => m.file);
-  return `# Feature ${feature.id}
+  const platform = feature.group === "platform";
+  // "core:database" is written "database" in prose.
+  const docs = docsAbout(project.root, platform ? feature.id.split(":").pop()! : feature.id, 12_000);
+  const manifests = loadManifests(project.root);
+  const examples = [...manifests.filter((m) => (m.kind === "platform") === platform), ...manifests.filter((m) => (m.kind === "platform") !== platform)].slice(0, 2).map((m) => m.file);
+  const graph = areaGraph(project, latestScan(project));
+  const users = usedBy(graph, feature.id);
+  const used = uses(graph, feature.id);
+  return `# ${platform ? "Platform area" : "Feature"} ${feature.id}
 
 ## Modules
 ${feature.modules.map((m) => `- ${m.id} — ${rel(m.dir)}/ (${m.mainFiles} source files, ${m.testFiles} test files${m.unitTestTask ? `, unit task ${m.unitTestTask}` : ""})`).join("\n")}
 
 Unit command: ${command ?? "none (no module has unit tests)"}
+
+## Depends on (areas its build files name)
+${used.join(", ") || "(none found)"}
+
+## Used by (areas whose build files name it; an edit here makes them stale)
+${users.length ? `${users.length}: ${users.join(", ")}` : "(none found; a convention plugin may add it everywhere)"}
 
 ## Unit tests in these modules (class, then each test's exact name)
 ${testList.join("\n\n") || "(none)"}${testFiles.length > 60 ? `\n\n… ${testFiles.length - 60} more test files under the same folders` : ""}
@@ -365,6 +465,33 @@ ${examples.length ? `\n## Manifests already written in this project, as examples
 }
 
 function manifestPrompt(project: Project, feature: FeatureInfo): string {
+  return feature.group === "platform" ? platformPrompt(project, feature) : featurePrompt(project, feature);
+}
+
+/** Shared code has no user of its own: its rules are the contract it keeps for the code built on it. */
+function platformPrompt(project: Project, feature: FeatureInfo): string {
+  return `You write the Probe manifest for the platform area "${feature.id}" of the project at ${project.root}: shared code that features and other areas build on, not a feature a user sees.
+
+Your working folder holds:
+- manifest.yaml — the file you write. It starts with its id and kind.
+- FORMAT.md — the manifest format and its rules. Read it first.
+- FEATURE.md — the area's modules, its unit command, which areas use it, every unit test in its modules with its exact name, and docs that mention it.
+
+The project is read-only to you. Read its code: the public API the modules expose (interfaces, entry points, the types other modules import) and the tests FEATURE.md lists.
+
+Write manifest.yaml:
+1. id "${feature.id}", kind: platform, a name, a summary of one or two lines saying what it provides to the code that uses it, owner: null.
+2. paths: the folders of its modules. related: only code owned elsewhere whose change can break this area (another platform area it wraps), each with a why; only paths that exist. Do not list the areas that use it: Probe finds those from the build files.
+3. unit.command: the one FEATURE.md gives.
+4. flows: what the code using it does with it (the main calls or services it offers), one line each.
+5. invariants: the contract it must keep — behaviour a unit test can fail on (results, errors, persistence, threading, mapping), not architecture. For each, covered_by with the tests that prove it, written "TestClass :: exact test name" exactly as FEATURE.md lists them. Never invent a test name. A rule no test proves gets covered_by: [] and a gap saying why. Unit tests are the proof here; a device card only for what no unit test can reach (real hardware, the OS).
+6. device_only: usually empty; only checks no unit test can make.
+7. brief: its doc if one exists (FEATURE.md lists docs that mention it); otherwise leave it out.
+
+Prefer fewer, sharper rules that the tests really prove over many vague ones. Finish with two sentences: what the area provides, and what you could not work out.`;
+}
+
+function featurePrompt(project: Project, feature: FeatureInfo): string {
   return `You write the Probe manifest for the feature "${feature.id}" of the project at ${project.root}.
 
 Your working folder holds:
@@ -443,7 +570,7 @@ function draftAgentFile(project: Project, run: InitRun, log: (line: string) => v
     const after = change(before.replace(/\r\n/g, "\n"));
     writeFileSync(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
   };
-  if (!readFileSync(join(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(features)}\n`);
+  if (!readFileSync(join(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}\n`);
   edit("claude.md", (t) => {
       if (/^@AGENTS\.md\s*$/m.test(t)) return t;
       // After the title, when there is one, so the import reads as part of the file's header.
@@ -462,8 +589,10 @@ function draftAgentFile(project: Project, run: InitRun, log: (line: string) => v
   }
 }
 
-function featuresSection(features: string[]): string {
-  return `${featuresGuide.trimEnd()}\n\nFeatures: ${features.join(" · ")}.`;
+function featuresSection(project: Project, ids: string[]): string {
+  const platform = ids.filter((id) => kindOf(project, id) === "platform");
+  const features = ids.filter((id) => !platform.includes(id));
+  return `${featuresGuide.trimEnd()}\n\nFeatures: ${features.join(" · ")}.${platform.length ? `\n\nPlatform areas: ${platform.join(" · ")}.` : ""}`;
 }
 
 /** The pending drafts init made, for review in one place. */

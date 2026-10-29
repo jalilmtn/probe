@@ -11,7 +11,7 @@ export function scan(project: Project): ScanResult {
   const excluded = new Set<string>();
 
   for (const m of modules) {
-    const { id, group } = featureOf(m.id, project.config.features.roots);
+    const { id, group } = m.feature ?? featureOf(m.id, project.config.features.roots);
     if (isExcluded(project.config, id, m.id)) {
       excluded.add(id);
       continue;
@@ -26,7 +26,7 @@ export function scan(project: Project): ScanResult {
     .sort((a, b) => (a.group === b.group ? a.id.localeCompare(b.id) : a.group === "feature" ? -1 : 1));
 
   const result: ScanResult = {
-    project: { root: project.root, name: project.name, adapter: project.adapter.id },
+    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: project.adapter.supportsDevices },
     scannedAt: new Date().toISOString(),
     features,
     excluded: [...excluded].sort(),
