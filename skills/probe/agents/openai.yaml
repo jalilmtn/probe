@@ -1,0 +1,4 @@
+interface:
+  display_name: "Probe"
+  short_description: "Open Probe Studio or test this project"
+  default_prompt: "Open Probe Studio for this project and show me its local URL."

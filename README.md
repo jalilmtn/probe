@@ -45,24 +45,29 @@ codex plugin add probe@probe-tools
 
 In the Codex desktop app, open `/plugins` and install Probe from the **Probe Tools** marketplace
 after adding the repository with the commands above. Open a project in Codex and start a new chat;
-Probe's tools and the `$probe` skill are then available in that project. Codex needs Node.js 20 or
-newer on the machine to launch Probe's local MCP server.
+Probe's tools and skill are then available in that project. To open the GUI, type `$` in the
+composer, select **Probe**, and submit the suggested “Open Probe Studio” prompt. You can also select
+the skill and ask it to open Studio. `/probe` is the Claude Code slash command; Codex invokes skills
+with `$` or the skill picker. Codex needs Node.js 20 or newer on the machine to launch Probe's local
+MCP server.
 
 This connects Codex to Probe's tools. To have Probe start its own background agent tasks through
 Codex CLI as well, set **Agents → Runner** to **Codex CLI** in Probe Studio, or set
 `agents.runner: codex` in `probe/probe.yaml`.
 
 Once installed, open a project in your coding agent and initialize Probe. In Claude Code, run
-`/probe init`; in Codex, invoke `$probe` and ask it to initialize the project. Probe sets up
+`/probe init`; in Codex, type `$`, select **Probe**, and ask it to initialize the project. Probe sets up
 settings, the manifest format, a scan, the features and platform areas (core, common, the app module) to cover, an agent-drafted manifest per
 feature or area (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
 test can prove, and the Features section in `AGENTS.md`: how any coding agent
 finds a feature, works on it and checks it after a change (`CLAUDE.md` imports it for Claude Code). It resumes where it stopped;
 everything it writes into the project's knowledge arrives as a draft to review.
 
-In Claude Code, `/probe` opens Studio. In Codex, invoke `$probe` and ask it to open Studio. Its **Setup** tab lists what is found and what is
-still missing (app, emulator, test account, agent model, cards, branch), each with a button to the
-place that fixes it. A project that cannot be tested yet opens on that tab.
+In Claude Code, `/probe` opens Studio. In Codex, select **Probe** from the `$` skill picker and use
+its suggested prompt, or ask it to open Studio. The agent returns a clickable local URL. Studio's
+**Setup** tab lists what is found and what is still missing (app, emulator, test account, agent model,
+cards, branch), each with a button to the place that fixes it. A project that cannot be tested yet
+opens on that tab.
 
 Claude Code also provides these slash commands:
 

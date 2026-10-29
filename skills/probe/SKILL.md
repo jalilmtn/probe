@@ -1,6 +1,6 @@
 ---
 name: probe
-description: Use Probe to understand and test an app — feature health (what is tested, untested, passing, failing), unit tests and writing missing ones, feature cards, running cards and mapping screens on an emulator, verifying a change end to end, tickets, and the Probe Studio GUI. Use when the user asks about test coverage or app health, running or writing tests, testing a feature on a device, or verifying a change or a ticket.
+description: Open Probe Studio or use Probe to understand and test an app — feature health, unit tests, feature cards, emulator runs, and end-to-end verification. Use when the user asks to open Studio, check app health or test coverage, run or write tests, test a feature on a device, or verify a change or ticket.
 ---
 
 # Probe
@@ -32,6 +32,9 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 | `probe_stale` | Features edited since their last check, and drafts waiting for review |
 | `probe_manifest` | Check `probe/features/<feature>.yaml` against the code |
 | `probe_studio_open` | Open the GUI for the user |
+
+When opening Studio, call `probe_studio_open` and give the user its local URL as a clickable link.
+Only say it opened if the tool call succeeds; otherwise report the tool error and its suggested fix.
 
 Always pass `projectDir` as the current working directory.
 
