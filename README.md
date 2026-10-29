@@ -51,6 +51,15 @@ the skill and ask it to open Studio. `/probe` is the Claude Code slash command; 
 with `$` or the skill picker. Codex needs Node.js 20 or newer on the machine to launch Probe's local
 MCP server.
 
+To update later, refresh the marketplace and reinstall the plugin:
+
+```bash
+codex plugin marketplace upgrade probe-tools
+codex plugin add probe@probe-tools
+```
+
+Start a new Codex chat to load the updated plugin.
+
 This connects Codex to Probe's tools. To have Probe start its own background agent tasks through
 Codex CLI as well, set **Agents → Runner** to **Codex CLI** in Probe Studio, or set
 `agents.runner: codex` in `probe/probe.yaml`.
@@ -91,6 +100,8 @@ Probe is not tied to Claude. Three parts, each usable on its own:
    project, or run it from inside it) and, where the agent supports skills, add
    `skills/probe/SKILL.md`. `probe init` writes the Features section into `AGENTS.md`, which most
    agents read on their own; the manifests and briefs are plain YAML and Markdown.
+   To update a direct checkout, run `git pull` in the Probe directory, then reload its MCP server
+   and skill or restart the client session. Marketplace installs use the client's update command.
 
 2. **The agents Probe starts itself** (drafting cards, device runs, explore, login, writing unit
    tests, fix, init, manifest drafts) run headless on a coding-agent CLI chosen with
