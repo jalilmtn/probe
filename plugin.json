@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "probe",
+  "version": "0.2.0",
+  "description": "Agent-driven project testing: feature health, unit tests, test cards, verification, and a local Studio UI.",
+  "author": { "name": "Jalil" },
+  "repository": "https://github.com/jalilmtn/probe",
+  "license": "MIT",
+  "keywords": ["testing", "android", "unit-tests", "coverage", "agents", "qa"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Probe",
+        "shortDescription": "Check project health and run tests",
+        "longDescription": "Map features, inspect test health, draft behavior cards, verify changes, and open the local Probe Studio GUI."
+      }
+    }
+  }
+}
