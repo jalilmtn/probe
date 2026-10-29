@@ -30,8 +30,8 @@ claude plugin marketplace add jalilmtn/probe
 claude plugin install probe@probe-tools
 ```
 
-To update later: `claude plugin marketplace update probe-tools`, then start a new session. A
-marketplace added from an older address (`claude plugin marketplace list` shows its source) is
+To update later, run `claude plugin update probe@probe-tools` and restart Claude Code to apply it.
+A marketplace added from an older address (`claude plugin marketplace list` shows its source) is
 switched with `claude plugin marketplace remove probe-tools` before adding it again.
 
 ## Install (Codex)
