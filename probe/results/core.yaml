@@ -1,0 +1,15 @@
+# Probe results for "core": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-10-29T09:37:21.920Z
+  run: 20261029-093719
+  commit: d8a09daad0
+  dirty: 20
+  by: Jalil
+  tests: 59
+  failed: 0
+  fingerprint:
+    own:
+      :src:core: e34a1833e350
+    deps: e3b0c44298fc

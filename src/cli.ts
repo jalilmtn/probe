@@ -85,7 +85,7 @@ Usage: probe <command> [options]
                          stale (no files: what changed since the last sweep)
   hook stop              End of an agent turn: report problems a check found, else check what is stale
   hook prompt            Results that arrived since (--session <id> keeps each agent's reports apart)
-                         Claude Code calls these itself (hooks/hooks.json) with JSON on stdin
+                         Claude Code's plugin calls these with JSON on stdin; other agents use the CLI arguments
   hooks install          Add a git pre-commit hook that marks staged files stale and starts a check
                          (never blocks a commit); hooks uninstall | hooks status
   studio                 Open the local GUI

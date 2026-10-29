@@ -173,7 +173,7 @@ ${files.some((f) => f.staged === "brief.md") ? `- brief.md — a copy of ${m.bri
 - FORMAT.md — the manifest and brief formats. Read it first.
 - CHANGE.md — what just changed: files, diff, unit test result, broken test links.
 
-The project itself is at ${project.root}. Read its code there (${m.paths.join(", ")}), and ${m.alsoRead.length ? m.alsoRead.join(", ") : "its CLAUDE.md"} for the rules. You cannot change anything in the project.
+The project itself is at ${project.root}. Read its code there (${m.paths.join(", ")}), and ${m.alsoRead.length ? m.alsoRead.join(", ") : "its AGENTS.md (plus any provider-specific instructions)"} for the rules. You cannot change anything in the project.
 ${glance ? `\nThe brief's At a glance, as it stands:\n${glance}\n` : ""}
 Do this:
 1. Fix every broken \`covered_by\` link in manifest.yaml: point it at the renamed test if you can find it in the code, otherwise remove the entry. If that leaves an invariant with nothing proving it, add a \`gap:\` saying why.

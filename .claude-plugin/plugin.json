@@ -1,9 +1,9 @@
 {
   "name": "probe",
   "version": "0.2.0",
-  "description": "Agent-driven test platform: maps an app into features with health, runs and writes unit tests, drafts feature cards, has agents test cards on an emulator (screenshots, video, performance), verifies a change end to end, fixes what it finds, and shares results through git. Local GUI: Probe Studio.",
+  "description": "Agent-driven project testing: maps features and test health, runs and writes unit tests, drafts behavior cards, verifies changes, and shares results through git. Android projects also support emulator runs. Local GUI: Probe Studio.",
   "author": { "name": "Jalil" },
   "license": "MIT",
   "repository": "https://github.com/jalilmtn/probe",
-  "keywords": ["testing", "android", "e2e", "unit-tests", "coverage", "agents", "emulator", "qa"]
+  "keywords": ["testing", "android", "node", "e2e", "unit-tests", "coverage", "agents", "emulator", "qa"]
 }

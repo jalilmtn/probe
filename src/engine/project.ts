@@ -13,8 +13,8 @@ export interface Project {
 }
 
 /**
- * Finds the project to work on: an explicit path, then PROBE_PROJECT, then the directory
- * Claude Code was opened in, then the working directory. Walks up to the first folder an
+ * Finds the project to work on: an explicit path, then PROBE_PROJECT, then the host-provided
+ * project directory, then the working directory. Walks up to the first folder an
  * adapter recognises, so running from a subfolder works too.
  */
 export function openProject(explicit?: string): Project {

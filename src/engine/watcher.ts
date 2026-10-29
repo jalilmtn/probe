@@ -7,13 +7,13 @@ import { loadWatch, markStale, runningCheck, startCheck } from "./watch.js";
 
 /** Edits settle for this long before they are mapped to features. */
 const SETTLE_MS = 3_000;
-/** Quiet time after edits outside Claude before Studio checks them itself. */
+/** Quiet time after untracked edits before Studio checks them itself. */
 const CHECK_AFTER_MS = 45_000;
-/** Claude edited within this window: its own turn-end hook will check, so Studio does not. */
-const CLAUDE_ACTIVE_MS = 10 * 60_000;
+/** An agent edited within this window: its turn-end hook will check, so Studio does not. */
+const AGENT_ACTIVE_MS = 10 * 60_000;
 
 /**
- * Watches the project while Studio runs, for edits made outside Claude (an IDE, a person).
+ * Watches the project while Studio runs, for edits that did not arrive through an agent hook.
  * A branch switch or pull changes files too; those are dropped rather than marked, since they
  * are not someone's edit and the results ledger already treats them as new code.
  */
@@ -39,15 +39,16 @@ export function startWatcher(project: Project, log: (line: string) => void = () 
     const fresh = files.filter((f) => !known.has(f) && isFile(join(project.root, f)));
     const features = markStale(project, fresh, "editor");
     if (!features.length) return;
-    log(`watch: edits outside Claude made ${features.join(", ")} stale`);
+    log(`watch: untracked edits made ${features.join(", ")} stale`);
     clearTimeout(check);
     check = setTimeout(autoCheck, CHECK_AFTER_MS);
   };
 
   const autoCheck = () => {
     const stale = Object.values(loadWatch(project).stale);
-    const claudeActive = stale.some((e) => (e.sources.includes("claude") || e.sources.includes("agent")) && Date.now() - Date.parse(e.last) < CLAUDE_ACTIVE_MS);
-    if (!stale.length || claudeActive || runningCheck(project)) return;
+    // Include "claude" for watch state written by versions before agent sources were normalized.
+    const agentActive = stale.some((e) => (e.sources.includes("agent") || e.sources.includes("claude")) && Date.now() - Date.parse(e.last) < AGENT_ACTIVE_MS);
+    if (!stale.length || agentActive || runningCheck(project)) return;
     const started = startCheck(project, { trigger: "editor" });
     if (started) log(`watch: checking ${stale.length} stale feature(s) (run ${started.run.id})`);
   };
@@ -64,7 +65,7 @@ export function startWatcher(project: Project, log: (line: string) => void = () 
       settle = setTimeout(flush, SETTLE_MS);
     });
   } catch (e) {
-    log(`watch: cannot watch ${project.root} (${(e as Error).message}); only Claude's edits are tracked`);
+    log(`watch: cannot watch ${project.root} (${(e as Error).message}); filesystem edits cannot be tracked`);
     return () => {};
   }
   return () => {

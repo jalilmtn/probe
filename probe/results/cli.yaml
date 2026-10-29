@@ -1,0 +1,15 @@
+# Probe results for "cli": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-10-29T09:37:19.849Z
+  run: 20261029-093717
+  commit: d8a09daad0
+  dirty: 19
+  by: Jalil
+  tests: 59
+  failed: 0
+  fingerprint:
+    own:
+      :src:cli: 3361c3e443c9
+    deps: e3b0c44298fc

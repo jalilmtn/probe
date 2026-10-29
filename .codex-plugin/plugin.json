@@ -1,0 +1,16 @@
+{
+  "name": "probe",
+  "version": "0.2.0",
+  "description": "Agent-driven project testing: feature health, unit tests, test cards, verification, and a local Studio UI.",
+  "author": { "name": "Jalil" },
+  "repository": "https://github.com/jalilmtn/probe",
+  "license": "MIT",
+  "keywords": ["testing", "android", "unit-tests", "coverage", "agents", "qa"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Probe",
+    "shortDescription": "Check project health and run tests with Probe",
+    "longDescription": "Map project features, inspect unit-test coverage and health, draft behavior cards, verify changes, and use Probe Studio. Probe runs locally and supports Android, Node/TypeScript, and generic Git projects."
+  }
+}

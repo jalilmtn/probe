@@ -89,7 +89,7 @@ export async function runMcpServer(version: string): Promise<void> {
     "probe_stale",
     {
       title: "Edited features",
-      description: "Features edited since their last check, with the files and who edited them (claude, editor). Also lists drafted manifest/brief corrections waiting for review.",
+      description: "Features edited since their last check, with the files and source (agent, editor, commit). Also lists drafted manifest/brief corrections waiting for review.",
       inputSchema: { projectDir },
     },
     async ({ projectDir: dir }) => {

@@ -30,7 +30,7 @@ summary: >-                   # one or two lines, from the user's point of view
 owner: "@someone"             # who approves changes to the authored parts; null until agreed
 brief: docs/features/calling.md
 also_read:                    # other docs an agent should load, with anchors where useful
-  - CLAUDE.md#calling
+  - AGENTS.md#calling
 
 paths:                        # code that belongs to this feature (prefix match, repo relative)
   - feature/call/

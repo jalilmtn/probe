@@ -10,7 +10,8 @@ import { formatReports, isProblem, kickCheck, loadWatch, markStale, runningCheck
  * or runs tests; that happens in a check, in the background.
  *
  * Two callers:
- * - Claude Code hooks (hooks/hooks.json) send the event as JSON on stdin and read JSON back.
+ * - Provider hooks can adapt their input/output here; Claude Code hooks send JSON on stdin and
+ *   expect provider-specific JSON back.
  * - Any other agent, a script or a person runs `probe hook <event> [files…]` and reads plain text.
  *
  * - edit:   after an edit — mark the features the files belong to stale.
@@ -28,7 +29,9 @@ export async function runHook(event: string, options: HookOptions = {}): Promise
     const hook = input ?? {};
     const project = probeProject(hook.cwd ?? options.project);
     if (!project || !project.config.watch.enabled) return 0;
-    const source: ChangeSource = claude ? "claude" : event === "commit" ? "commit" : "agent";
+    // Normalize all coding-agent hooks to one source. The Claude payload/output format stays
+    // isolated in parseClaudeInput and the response branches below.
+    const source: ChangeSource = event === "commit" ? "commit" : "agent";
     const session = hook.session_id ?? options.session ?? "agent";
     const say = (text: string) => process.stdout.write(`${text}\n`);
 
@@ -103,7 +106,7 @@ interface HookInput {
   tool_input?: { file_path?: string; notebook_path?: string };
 }
 
-/** Claude Code's hook payload, or null for anyone else. Claude Code always names the event. */
+/** Claude Code's hook payload adapter. Other agents use the plain CLI arguments. */
 export function parseClaudeInput(stdin: string): HookInput | null {
   if (!stdin.trim().startsWith("{")) return null;
   try {

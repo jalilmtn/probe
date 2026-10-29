@@ -97,7 +97,7 @@ Must be true:\n${card.expect.map((e) => `- ${e.text}`).join("\n")}`);
     ? `4. Call probe_unit_run with feature "${issue.feature}". If it fails, fix and run again, at most three times. Probe re-runs the device check afterwards.`
     : `4. Run the feature's unit tests (\`/probe unit ${issue.feature}\` with Probe, or the module's unit test task) until they pass.${issue.cardId ? ` Then re-run the card on a device (\`/probe run ${issue.feature} ${issue.cardId}\`).` : ""}`;
   parts.push(`## How
-1. Read the project's agent notes first (CLAUDE.md, AGENTS.md, docs/ for this feature) and follow them.
+1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow them.
 2. Find the root cause in the code, then make the smallest change that fixes it. Do not touch unrelated code. Never weaken, skip or delete a test or an expectation to make it pass.
 3. Where the cause can be unit-tested, add or extend a test that fails without the fix.
 ${check}

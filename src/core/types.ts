@@ -306,7 +306,7 @@ export interface CheckFeature {
 /** Runs after code changes: unit tests, manifest links and drafted corrections for the features touched. */
 export interface CheckRun extends BaseRun {
   kind: "check";
-  /** What changed the code: Claude's edits, an editor outside Claude, or a person pressing Check. */
+  /** What caused this check: an agent, commit, editor, or a person pressing Check. */
   trigger: "claude" | "agent" | "commit" | "editor" | "manual";
   features: CheckFeature[];
   /** Stale features left for later: over watch.maxFeatures. */

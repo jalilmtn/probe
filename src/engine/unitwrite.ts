@@ -14,7 +14,7 @@ function prompt(feature: FeatureInfo, targets: { name: string; file: string; kin
 ${targets.map((t, i) => `${i + 1}. ${t.name} (${t.kind}) — ${t.file}`).join("\n")}
 
 ## How
-1. Read the project's agent notes first (CLAUDE.md, AGENTS.md, docs/ for this feature) and follow their testing rules.
+1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow their testing rules.
 2. Read neighbouring tests in the same module to copy their style, libraries, fakes and helpers. Reuse existing test helpers and fakes; do not invent a new framework.
 3. For each class: read it, then write one test class next to the module's existing unit tests (the module's src/test source set), named <ClassName>Test.
    Each test pins one behaviour and must fail if that behaviour broke: real inputs and real assertions, no tests that only check a mock was called.

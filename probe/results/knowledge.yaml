@@ -1,0 +1,15 @@
+# Probe results for "knowledge": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-10-29T09:37:26.102Z
+  run: 20261029-093723
+  commit: d8a09daad0
+  dirty: 22
+  by: Jalil
+  tests: 59
+  failed: 0
+  fingerprint:
+    own:
+      :src:knowledge: e77df171598a
+    deps: e3b0c44298fc

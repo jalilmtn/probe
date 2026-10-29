@@ -5,7 +5,7 @@
     {
       "name": "probe",
       "source": "./",
-      "description": "Agent-driven test platform for Android apps: feature health map, unit tests, feature cards tested on an emulator, verify and fix, with a local GUI (Probe Studio)."
+      "description": "Agent-driven project testing: feature health, unit tests, behavior cards, change verification, and a local GUI for Android, Node/TypeScript, and generic Git projects."
     }
   ]
 }

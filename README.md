@@ -4,7 +4,7 @@ Agent-driven test platform. Maps an app into features and judges each one's heal
 unit-tested, what passes, what works on a device. It runs and writes unit tests, drafts feature
 cards from code, docs, git history or a ticket, and has AI agents use the app on an emulator:
 running cards, mapping screens, measuring performance. `verify` checks a whole change end to
-end. Runs locally; works with Claude Code as a plugin and with any MCP-capable agent.
+end. Runs locally; works with Claude Code and Codex as plugins and with any MCP-capable agent.
 
 Probe is **project-agnostic**. Knowledge about a kind of project lives in an *adapter*
 (`src/adapters/`): Android/Gradle (everything, devices included), Node/TypeScript, and a generic
@@ -34,15 +34,37 @@ To update later: `claude plugin marketplace update probe-tools`, then start a ne
 marketplace added from an older address (`claude plugin marketplace list` shows its source) is
 switched with `claude plugin marketplace remove probe-tools` before adding it again.
 
-Then, inside a project, `/probe init` sets it up: settings, the manifest format, a scan, the features and platform areas (core, common, the app module) to cover, an agent-drafted manifest per
+## Install (Codex)
+
+From Codex CLI, add the GitHub repository as a plugin marketplace and install Probe:
+
+```bash
+codex plugin marketplace add jalilmtn/probe
+codex plugin add probe@probe-tools
+```
+
+In the Codex desktop app, open `/plugins` and install Probe from the **Probe Tools** marketplace
+after adding the repository with the commands above. Open a project in Codex and start a new chat;
+Probe's tools and the `$probe` skill are then available in that project. Codex needs Node.js 20 or
+newer on the machine to launch Probe's local MCP server.
+
+This connects Codex to Probe's tools. To have Probe start its own background agent tasks through
+Codex CLI as well, set **Agents → Runner** to **Codex CLI** in Probe Studio, or set
+`agents.runner: codex` in `probe/probe.yaml`.
+
+Once installed, open a project in your coding agent and initialize Probe. In Claude Code, run
+`/probe init`; in Codex, invoke `$probe` and ask it to initialize the project. Probe sets up
+settings, the manifest format, a scan, the features and platform areas (core, common, the app module) to cover, an agent-drafted manifest per
 feature or area (paths, flows, rules and the exact tests proving them), device cards for the rules no unit
 test can prove, and the Features section in `AGENTS.md`: how any coding agent
-finds a feature, works on it and checks it after a change (`CLAUDE.md` imports it). It resumes where it stopped;
+finds a feature, works on it and checks it after a change (`CLAUDE.md` imports it for Claude Code). It resumes where it stopped;
 everything it writes into the project's knowledge arrives as a draft to review.
 
-`/probe` opens Studio. Its **Setup** tab lists what is found and what is
+In Claude Code, `/probe` opens Studio. In Codex, invoke `$probe` and ask it to open Studio. Its **Setup** tab lists what is found and what is
 still missing (app, emulator, test account, agent model, cards, branch), each with a button to the
 place that fixes it. A project that cannot be tested yet opens on that tab.
+
+Claude Code also provides these slash commands:
 
 ```
 /probe init               set the project up, step by step (resumes)

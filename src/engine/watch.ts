@@ -19,13 +19,13 @@ import { featuresOfFiles } from "./verify.js";
 /**
  * Keeping features current while people code. An edit marks the features it touches stale
  * (instant, no build); a check then runs their unit tests, checks their manifest's test links
- * and has an agent draft corrections for review. Results go back to the Claude session whose
- * edits caused them.
+ * and has an agent draft corrections for review. Results go back to the coding-agent session
+ * whose edits caused them.
  */
 
 /**
- * Who reported an edit: Claude Code's hooks, another coding agent through `probe hook`, a git
- * pre-commit hook, the IDE file watcher, or a person.
+ * Who reported an edit: a coding-agent hook, a git pre-commit hook, the IDE file watcher, or a
+ * person. `claude` remains readable for watch state written by older Probe versions.
  */
 export type ChangeSource = "claude" | "agent" | "commit" | "editor" | "manual";
 
@@ -38,7 +38,7 @@ export interface StaleEntry {
   since: string;
   last: string;
   sources: ChangeSource[];
-  /** Claude sessions whose edits made it stale, so their results go back to them. */
+  /** Agent sessions whose edits made it stale, so their results go back to them. */
   sessions: string[];
 }
 
@@ -420,11 +420,11 @@ export async function kickCheck(project: Project, trigger: ChangeSource): Promis
   return "background";
 }
 
-// ── Reporting back to Claude ─────────────────────────────────────────────────
+// ── Reporting back to the agent session ──────────────────────────────────────
 
 /**
  * Checks this session has not been told about yet: the ones its own edits caused, and the ones
- * edits outside Claude caused. Marks them reported.
+ * edits outside this session caused. Marks them reported.
  */
 export function takeReports(project: Project, session: string, filter: (r: CheckRecord) => boolean = () => true): CheckRecord[] {
   let taken: CheckRecord[] = [];

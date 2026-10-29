@@ -24,7 +24,7 @@ export function throwIfStopped(): void {
   if (runSignal.getStore()?.aborted) throw new StoppedError();
 }
 
-/** Kills a process and everything it started: on Windows the shell's children (gradle, claude) outlive the shell. */
+/** Kills a process and everything it started: on Windows shell children can outlive the shell. */
 function killTree(child: ChildProcess): void {
   if (child.pid === undefined || child.exitCode !== null) return;
   if (isWindows) spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
