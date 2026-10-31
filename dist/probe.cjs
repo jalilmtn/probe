@@ -35300,7 +35300,7 @@ function gitHooks(project, action) {
 }
 
 // src/cli.ts
-var VERSION = "0.2.0";
+var VERSION = "0.3.0";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]

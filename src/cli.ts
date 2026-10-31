@@ -35,7 +35,7 @@ import { checkManifest, loadManifest, summarizeCheck } from "./knowledge/manifes
 import { findRule, ruleProofs, runRuleCards, summarizeRule, summarizeRuleRun, summarizeRules } from "./knowledge/proof.js";
 import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./knowledge/draft.js";
 
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 
 const HELP = `probe ${VERSION} — agent-driven test platform
 

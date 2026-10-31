@@ -1,10 +1,21 @@
 # Probe
 
-Agent-driven test platform. Maps an app into features and judges each one's health: what is
-unit-tested, what passes, what works on a device. It runs and writes unit tests, drafts feature
-cards from code, docs, git history or a ticket, and has AI agents use the app on an emulator:
-running cards, mapping screens, measuring performance. `verify` checks a whole change end to
-end. Runs locally; works with Claude Code and Codex as plugins and with any MCP-capable agent.
+**Know what changed. Prove what still works.** Probe maps a project into features, connects each
+feature to its unit tests and behavior checks, then verifies the affected parts of a change. Its
+local Studio shows coverage gaps, results, and evidence in one place.
+
+Use it from **Claude Code**, **Codex**, or another MCP-capable coding agent. Android projects can
+run behavior checks on an emulator; Node/TypeScript and other Git projects get feature and unit-test
+health checks.
+
+> **Quick start:** install Probe in your coding agent, open a project, and ask it to initialize
+> Probe. The agent opens the local Studio when setup is ready.
+
+Probe builds a feature map, links features to their source areas and existing tests, and tracks
+whether each result still applies to the current code. It can run or write unit tests, draft
+behavior cards from code, docs, git history or a ticket, and use an agent to exercise an Android
+app on an emulator. `verify` checks the affected parts of a change end to end. Everything runs
+locally; use the Claude Code or Codex plugin, or connect another MCP-capable agent.
 
 Probe is **project-agnostic**. Knowledge about a kind of project lives in an *adapter*
 (`src/adapters/`): Android/Gradle (everything, devices included), Node/TypeScript, and a generic

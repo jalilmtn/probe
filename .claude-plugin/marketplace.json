@@ -1,5 +1,6 @@
 {
   "name": "probe-tools",
+  "description": "Plugins for agent-driven software testing and verification.",
   "owner": { "name": "Jalil" },
   "plugins": [
     {
