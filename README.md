@@ -4,6 +4,8 @@
 feature to its unit tests and behavior checks, then verifies the affected parts of a change. Its
 local Studio shows coverage gaps, results, and evidence in one place.
 
+[![skills.sh](https://skills.sh/b/jalilmtn/probe)](https://skills.sh/jalilmtn/probe/probe)
+
 Use it from **Claude Code**, **Codex**, or another MCP-capable coding agent. Android projects can
 run behavior checks on an emulator; Node/TypeScript and other Git projects get feature and unit-test
 health checks.
@@ -101,6 +103,20 @@ Claude Code also provides these slash commands:
 /probe explore comment    map a feature's screens
 /probe ticket PROJ-1234
 ```
+
+## Install the standalone skill
+
+Probe's workflow skill is also listed on [skills.sh](https://skills.sh/jalilmtn/probe/probe). To
+install it for Codex from a terminal:
+
+```bash
+npx skills add jalilmtn/probe --skill probe --agent codex --global
+```
+
+The `probe` skill teaches an agent how to use Probe. By itself, it does **not** install Probe's MCP
+server or tools. For the full experience, install the Claude Code or Codex plugin above; for another
+agent, configure the MCP server as described below. To update a skill installed with the `skills`
+CLI, run `npx skills update`.
 
 ## Other agents
 
