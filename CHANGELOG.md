@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — 2026-11-02
+
+Features for every kind of project, and Kotlin Multiplatform support.
+
+- Features are decided in one place for every project, after the adapter has found the modules. Two new `probe.yaml` settings work with Gradle, Node and plain-folder projects alike:
+  - `features.map` names each feature's files with globs (`money: ["shared/**/money", "web/src/money"]`).
+  - `features.packages` turns the package or folder after a prefix into a feature (`[app.daywise]` makes `app.daywise.money.*` "money"), so one module can hold several features.
+- A module split into several features still runs its unit tests once.
+- Kotlin Multiplatform modules are read: `commonMain`, `androidMain` and `iosMain` are code, `commonTest` and `androidUnitTest` are unit tests, `androidInstrumentedTest` runs on a device. Before, a KMP module showed no classes and no tests.
+
 ## 0.4.0 — 2026-11-02
 
 Studio's Runs tab, rebuilt so a result is always where you look.
