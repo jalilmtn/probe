@@ -12,6 +12,18 @@ import { indexTests, inventory, sourceSetFiles } from "./inventory.js";
 import { readJUnitResults } from "./junit.js";
 import { includedModules, settingsFile } from "./settings.js";
 
+/**
+ * Android or plain JVM, read from the build file's `plugins { }` block. Matching the whole file
+ * called a JVM module Android as soon as a dependency named androidx (`androidx.paging.common.jvm`),
+ * and its `testDebugUnitTest` task does not exist, so Gradle refused the whole unit run.
+ */
+export function modulePlatform(buildFile: string): "android" | "jvm" | "unknown" {
+  const plugins = /plugins\s*\{([^}]*)\}/.exec(buildFile)?.[1] ?? buildFile;
+  if (/android/i.test(plugins)) return "android";
+  if (/jvm|java-library|\bjava\b/.test(plugins)) return "jvm";
+  return "unknown";
+}
+
 export const androidGradleAdapter: ProjectAdapter = {
   id: "android-gradle",
   label: "Android/Gradle",
@@ -31,7 +43,7 @@ export const androidGradleAdapter: ProjectAdapter = {
   scanModules(root, config) {
     return includedModules(root).map(({ id, dir }) => {
       const buildFile = readFileSync(existsSync(join(dir, "build.gradle.kts")) ? join(dir, "build.gradle.kts") : join(dir, "build.gradle"), "utf8");
-      const platform = /android/i.test(buildFile) ? "android" : /jvm|java-library|kotlin\("jvm"\)/.test(buildFile) ? "jvm" : "unknown";
+      const platform = modulePlatform(buildFile);
       const main = sourceSetFiles(dir, "main");
       const test = sourceSetFiles(dir, "test");
       const instrumented = sourceSetFiles(dir, "androidTest");

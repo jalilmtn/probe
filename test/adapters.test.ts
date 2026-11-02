@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { devicesUnsupported, ignoredPathPattern } from "../src/adapters/adapter.js";
-import { androidGradleAdapter } from "../src/adapters/android-gradle/index.js";
+import { androidGradleAdapter, modulePlatform } from "../src/adapters/android-gradle/index.js";
 import { configuredAreas, globRegex } from "../src/adapters/generic/areas.js";
 import { genericAdapter } from "../src/adapters/generic/index.js";
 import { fromOutput, runCommands } from "../src/adapters/generic/unit.js";
@@ -75,6 +75,16 @@ describe("adapter registry", () => {
     assert.ok(node.test("dist/probe.cjs"));
     assert.ok(node.test("packages/a/coverage/lcov.info"));
     assert.ok(!node.test("src/engine/scan.ts"));
+  });
+
+  test("a Gradle module's platform comes from its plugins, not from a dependency named androidx", () => {
+    const jvm = 'plugins {\n    alias(libs.plugins.vero.jvm.library)\n}\n\ndependencies {\n    compileOnly(libs.androidx.paging.common.jvm)\n}\n';
+    assert.equal(modulePlatform(jvm), "jvm");
+    assert.equal(modulePlatform('plugins {\n    alias(libs.plugins.vero.android.feature)\n}\n'), "android");
+    assert.equal(modulePlatform('plugins {\n    id("com.android.library")\n}\n'), "android");
+    assert.equal(modulePlatform('plugins {\n    `java-library`\n}\n'), "jvm");
+    assert.equal(modulePlatform('plugins {\n    kotlin("jvm")\n}\n'), "jvm");
+    assert.equal(modulePlatform("dependencies {}\n"), "unknown");
   });
 });
 

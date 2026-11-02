@@ -14,6 +14,12 @@ export function issuesOf(project: Project, run: Run): RunIssue[] {
   if (run.kind === "verify") {
     return run.features.flatMap((f) => [read(f.unitRun), ...f.cards.map((c) => read(c.runId))].flatMap((r) => (r ? issuesOf(project, r) : [])));
   }
+  if (run.kind === "check") {
+    return run.features.flatMap((f) => {
+      const unit = read(f.unitRun);
+      return unit ? issuesOf(project, unit) : [];
+    });
+  }
   if (run.kind === "unitwrite") {
     const unit = read(run.unitRun);
     return unit ? issuesOf(project, unit) : [];
@@ -32,9 +38,24 @@ export function issuesOf(project: Project, run: Run): RunIssue[] {
   }
   // An error is a broken build or install only when the log says so; a missing device is not the code's fault.
   if (run.status === "error" && run.error && out.length === 0 && /Installing|Build exited|compile|wrote no test reports/i.test(run.error)) {
-    out.push({ kind: "build", title: run.error.slice(0, 140), detail: run.error });
+    const cause = buildFailure((run as Run & { log?: string[] }).log ?? []);
+    out.push({ kind: "build", title: (cause ? `Build failed: ${cause.split("\n")[0]}` : run.error).slice(0, 140), detail: cause ? `${run.error}\n\n${cause}` : run.error });
   }
   return out.map((i, n) => ({ ...i, id: `${run.id}:${n}`, runId: run.id, feature: run.feature, cardId: run.kind === "card" ? run.cardId : undefined }));
+}
+
+/**
+ * Why a build failed, from its log: the compiler's own error lines when there are any, else
+ * Gradle's "What went wrong" block. Null when the log says neither.
+ */
+export function buildFailure(log: string[]): string | null {
+  const compiler = log.filter((l) => /^e: /.test(l)).slice(0, 8);
+  if (compiler.length) return compiler.map((l) => l.slice(3).trim()).join("\n");
+  const start = log.findIndex((l) => /^\* What went wrong:/.test(l));
+  if (start < 0) return null;
+  const end = log.findIndex((l, i) => i > start && /^\* (Try|Exception is|Get more help):/.test(l));
+  const block = log.slice(start + 1, end < 0 ? start + 12 : end).map((l) => l.trim()).filter(Boolean);
+  return block.length ? block.join("\n") : null;
 }
 
 function unitIssues(run: UnitRun): Omit<RunIssue, "id" | "runId" | "feature">[] {

@@ -145,6 +145,24 @@
   .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }
   .box.stale { border-color: var(--warn); }
   .box a { color: var(--accent); font-weight: 600; }
+  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */
+  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }
+  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }
+  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }
+  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .runs-list td.res { overflow-wrap: anywhere; }
+  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }
+  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  .runs-detail .empty { padding: 40px 12px; }
+  @media (max-width: 1100px) {
+    .runs-layout { grid-template-columns: 1fr; }
+    .runs-detail { display: none; }
+    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }
+  }
   @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }
   @media (max-width: 720px) {
     header { flex-wrap: wrap; padding: 12px 16px; }
@@ -211,7 +229,7 @@ async function render() {
 // ── Where the page is, in the address, so a reopened tab comes back to it ──
 
 function saveRoute() {
-  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : null;
+  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : null;
   history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));
 }
 
@@ -225,6 +243,7 @@ function loadRoute() {
 function goTo(route) {
   state.tab = route.tab;
   state.feature = route.tab === "atlas" ? route.feature || null : null;
+  if (route.tab === "runs") runsState().selected = route.feature || null;
   if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };
 }
 
@@ -261,7 +280,8 @@ function routeOf(j) {
   if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };
   if (kind === "backfill" && j.feature === "*") return { tab: "cards" };
   if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };
-  return { tab: "runs" };
+  // The Runs tab opens the run itself beside the list.
+  return { tab: "runs", feature: j.runId };
 }
 
 function onRoute(route) {
@@ -753,7 +773,7 @@ function followRun(runId, el, onDone) {
       rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;
       bindTicket(rr);
       renderIssues(e.run, rr.querySelector("#ri"), el);
-      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); followRun(a.dataset.open, el); }));
+      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));
       // Over at once here, not at the next poll, so a re-render does not mark its button busy again.
       state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);
       onDone && onDone(e.run);
@@ -882,13 +902,29 @@ function resultsTable(run) {
       ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}
       ${run.summary ? `<details open><summary class="muted">Agent's account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;
   }
+  if (run.kind === "check") {
+    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);
+    const features = run.features || [];
+    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits · ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>
+      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>
+      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>
+        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "—"}
+          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">✗ ${esc(x)}</div>`).join("")}
+          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>
+        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` · <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` · ${f.manifest.gaps} unproven` : ""}` : "—"}
+          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">✎ correction drafted · <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}
+      </tbody></table>` : `<p>Nothing was stale.</p>`}
+      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;
+  }
   if (run.kind === "backfill") {
     return err + `<p>${run.written.length} cards written · $${run.costUsd.toFixed(2)}</p>` +
       (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" · ")}</p>` : "");
   }
-  if (!run.results.length) return err;
+  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.
+  const results = run.results || [];
+  if (!results.length) return err;
   return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>
-    ${run.results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>
+    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>
       ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">✗ ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}
   </tbody></table>`;
 }
@@ -1058,29 +1094,92 @@ function bindBackfillAll() {
   });
 }
 
+// ── Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each ──
+
+const RUNS_PAGE = 50;
+const TRIGGER = { claude: "Claude", agent: "an agent's", commit: "commit", editor: "editor", manual: "manual" };
+const PROBLEM = new Set(["failed", "error"]);
+
+function runsState() {
+  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };
+  return state.runs;
+}
+
+function runResult(r) {
+  if (r.kind === "backfill") return `${(r.written || []).length} cards · $${(r.costUsd || 0).toFixed(2)}`;
+  if (r.kind === "card") return `${esc(r.cardId)} · ${(r.timeline || []).length} steps · $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` · <span style="color:var(--warn)">perf ⚠</span>` : ""}`;
+  if (r.kind === "verify") return `vs ${esc(r.base)} · ${r.features.length} features · ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;
+  if (r.kind === "explore") return `${r.screens.length} screens · ${r.issues.length} issues`;
+  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "—";
+  if (r.kind === "unitwrite") return `${r.files.length} files · $${(r.costUsd || 0).toFixed(2)}`;
+  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "—"}</span>${f.draftId ? " ✎" : ""}`).join(" ") || "nothing stale";
+  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files`;
+  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;
+  const results = r.results || [];
+  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);
+  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;
+  return `${t} tests${f ? ` · <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;
+}
+
+function filteredRuns() {
+  const s = runsState();
+  const q = s.q.trim().toLowerCase();
+  return s.data.filter((r) =>
+    (s.kind === "all" || r.kind === s.kind) &&
+    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&
+    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&
+    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));
+}
+
 async function renderRuns() {
+  const s = runsState();
   $view.innerHTML = `<div class="empty">Loading runs…</div>`;
-  const runs = await api("/api/runs");
-  if (!runs.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }
-  $view.innerHTML = `<table><thead><tr><th>Run</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th><th>When</th></tr></thead><tbody>
-    ${runs.map((r) => {
-      let result;
-      if (r.kind === "backfill") result = `${r.written.length} cards · $${r.costUsd.toFixed(2)}`;
-      else if (r.kind === "card") result = `${esc(r.cardId)} · ${r.timeline.length} steps · $${r.costUsd.toFixed(2)}${r.perf?.issues.length ? ` · <span style="color:var(--warn)">perf ⚠</span>` : ""}`;
-      else if (r.kind === "verify") result = `vs ${esc(r.base)} · ${r.features.length} features · ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;
-      else if (r.kind === "explore") result = `${r.screens.length} screens · ${r.issues.length} issues`;
-      else if (r.kind === "login") result = r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "—";
-      else if (r.kind === "unitwrite") result = `${r.files.length} files · $${r.costUsd.toFixed(2)}`;
-      else if (r.kind === "check") result = `${esc(r.trigger)} · ${r.features.map((f) => `${esc(f.feature)} ${f.unitStatus || "—"}${f.draftId ? " ✎" : ""}`).join(", ") || "nothing stale"}`;
-      else if (r.kind === "fix") result = `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files · $${r.costUsd.toFixed(2)}`;
-      else {
-        const t = (r.results || []).reduce((n, x) => n + x.tests, 0), f = (r.results || []).reduce((n, x) => n + x.failed, 0);
-        result = `${t} tests${f ? ` · <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;
-      }
-      return `<tr class="click" data-id="${esc(r.id)}"><td class="mono">${esc(r.id)}</td><td>${esc(r.feature)}</td><td>${r.kind}</td><td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">■ Stop</button>` : ""}</td><td>${result}</td><td class="muted">${ago(r.finishedAt || r.startedAt)}</td></tr>`;
-    }).join("")}</tbody></table><div id="runpanel" style="margin-top:16px"></div>`;
-  document.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => followRun(tr.dataset.id, document.getElementById("runpanel"))));
-  document.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {
+  s.data = await api("/api/runs");
+  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }
+  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();
+  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();
+  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;
+  $view.innerHTML = `<div class="runs-layout">
+    <section class="runs-list">
+      <div class="filters">
+        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>
+        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>
+        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>
+        <input id="fq" type="search" placeholder="Search run, card…" value="${esc(s.q)}">
+      </div>
+      <div id="runrows"></div>
+    </section>
+    <aside class="runs-detail" id="rundetail"></aside>
+  </div>`;
+  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });
+  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");
+  renderRunRows();
+  // Opened from a link: bring its row into view too, showing more of the list if it is further down.
+  if (s.selected) {
+    const at = filteredRuns().findIndex((r) => r.id === s.selected);
+    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }
+    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });
+    showRun(s.selected);
+  }
+  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;
+}
+
+function renderRunRows() {
+  const s = runsState();
+  const all = filteredRuns();
+  const shown = all.slice(0, s.limit);
+  const el = document.getElementById("runrows");
+  if (!el) return;
+  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>
+    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">
+      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>
+      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>
+      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">■ Stop</button>` : ""}</td>
+      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;
+  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);
+  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));
+  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });
+  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {
     e.stopPropagation();
     if (!confirm(`Stop run ${b.dataset.stop}?`)) return;
     b.disabled = true;
@@ -1088,6 +1187,36 @@ async function renderRuns() {
     if (res.error) alert(res.error);
     setTimeout(renderRuns, 1500);
   }));
+}
+
+/** Opens a run beside the list and puts it in the address, so the link reopens it. */
+function selectRun(id) {
+  runsState().selected = id;
+  saveRoute();
+  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));
+  showRun(id);
+}
+
+function closeRun() {
+  closeStream();
+  runsState().selected = null;
+  saveRoute();
+  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));
+  const panel = document.getElementById("rundetail");
+  panel.classList.remove("open");
+  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;
+}
+
+function showRun(id) {
+  const panel = document.getElementById("rundetail");
+  if (!panel) return;
+  panel.classList.add("open");
+  panel.scrollTop = 0;
+  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">⧉ Link</button><button class="btn secondary" id="rclose" title="Close">✕</button></div><div id="rbody"></div>`;
+  panel.querySelector("#rclose").addEventListener("click", closeRun);
+  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));
+  // A run that ends while it is open refreshes the list, so its row shows how it ended.
+  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));
 }
 
 async function renderVerify() {
@@ -1419,6 +1548,12 @@ async function renderSetup() {
   renderDoctor(document.getElementById("docwrap"));
   renderInit(document.getElementById("initwrap"));
 }
+
+// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute's replaceState does not fire this.
+window.addEventListener("hashchange", () => { if (loadRoute()) render(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();
+});
 
 (async () => {
   await Promise.all([checkBranch(), refreshJobs()]);

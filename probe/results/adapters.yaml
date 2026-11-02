@@ -1,0 +1,15 @@
+# Probe results for "adapters": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-10-29T14:45:32.683Z
+  run: 20261029-144530
+  commit: 6048833a49
+  dirty: 2
+  by: Jalil
+  tests: 59
+  failed: 0
+  fingerprint:
+    own:
+      :src:adapters: 5093a500187c
+    deps: e3b0c44298fc
