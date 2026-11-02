@@ -86,6 +86,25 @@ describe("adapter registry", () => {
     assert.equal(modulePlatform('plugins {\n    kotlin("jvm")\n}\n'), "jvm");
     assert.equal(modulePlatform("dependencies {}\n"), "unknown");
   });
+
+  test("a Kotlin Multiplatform module's source sets are scanned, and packages split it into features", () => {
+    const root = fixture({
+      "settings.gradle.kts": 'include(":shared")\n',
+      "probe/probe.yaml": "features:\n  packages: [app.demo]\n",
+      "shared/build.gradle.kts": "plugins {\n    alias(libs.plugins.kotlin.multiplatform)\n    alias(libs.plugins.android.library)\n}\n",
+      "shared/src/commonMain/kotlin/app/demo/money/BudgetCalculator.kt": "package app.demo.money\nclass BudgetCalculator\n",
+      "shared/src/androidMain/kotlin/app/demo/vault/VaultStore.kt": "package app.demo.vault\nclass VaultStore\n",
+      "shared/src/commonMain/kotlin/app/demo/AppParser.kt": "package app.demo\nclass AppParser\n",
+      "shared/src/commonTest/kotlin/app/demo/BudgetCalculatorTest.kt": "class BudgetCalculatorTest\n",
+    });
+    const result = scan(openProject(root));
+    assert.deepEqual(result.features.map((f) => `${f.group}:${f.id}`), ["feature:money", "feature:vault", "platform:shared"]);
+    const money = result.features.find((f) => f.id === "money")!.modules[0]!;
+    assert.equal(money.classes[0]!.test, "direct");
+    assert.equal(money.unitTestTask, ":shared:testDebugUnitTest");
+    assert.ok(androidGradleAdapter.isTestSource("shared/src/commonTest/kotlin/A.kt"));
+    assert.ok(isTestPath("shared/src/androidUnitTest/kotlin/A.kt"));
+  });
 });
 
 describe("test file conventions", () => {
@@ -154,6 +173,22 @@ describe("generic adapter", () => {
     const result = scan(project);
     assert.equal(result.project.devices, false);
     assert.deepEqual(result.features.map((f) => `${f.group}:${f.id}`), ["feature:engine", "platform:scripts", "platform:src"]);
+  });
+
+  test("features.map and features.packages split modules the same way in any project", () => {
+    const files = {
+      ...REPO,
+      "src/engine/billing/invoice.ts": "export class Invoice {}\n",
+      "src/engine/billing/tax.ts": "export class TaxCalculator {}\n",
+      "src/engine/auth/session.ts": "export class SessionStore {}\n",
+    };
+    const byPackage = scan(openProject(fixture({ ...files, "probe/probe.yaml": "features:\n  packages: [engine]\n" })));
+    assert.ok(byPackage.features.some((f) => f.id === "billing" && f.group === "feature"));
+    assert.ok(byPackage.features.some((f) => f.id === "auth"));
+    const byMap = scan(openProject(fixture({ ...files, "probe/probe.yaml": "features:\n  map:\n    money: [src/engine/billing]\n" })));
+    const money = byMap.features.find((f) => f.id === "money")!;
+    assert.deepEqual(money.modules.flatMap((m) => m.classes.map((c) => c.file)).sort(), ["src/engine/billing/invoice.ts", "src/engine/billing/tax.ts"]);
+    assert.ok(!byMap.features.some((f) => f.id === "auth"));
   });
 
   test("device runs say clearly that they are not available", async () => {

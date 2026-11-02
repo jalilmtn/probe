@@ -212,9 +212,9 @@ export function testIndex(root: string): Map<string, string[]> {
   const out = new Map<string, string[]>();
   const listed = capture("git", ["ls-files", "-co", "--exclude-standard"], root) ?? "";
   for (const f of listed.split("\n")) {
-    // Kotlin and Java tests live in Gradle's test source sets; any other language by its own conventions.
+    // Kotlin and Java tests live in Gradle's test source sets (`src/test`, KMP's `src/commonTest`); any other language by its own conventions.
     const jvm = /\.(kt|java)$/.test(f);
-    if (jvm ? !/\/src\/(test|androidTest)[^/]*\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
+    if (jvm ? !/\/src\/((test|androidTest)[^/]*|[a-z]\w*Test)\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
     const cls = stemOf(basename(f));
     out.set(cls, [...(out.get(cls) ?? []), f]);
   }

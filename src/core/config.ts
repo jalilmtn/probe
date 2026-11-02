@@ -11,6 +11,17 @@ export interface ProbeConfig {
   features: {
     /** Top-level module folders whose next segment names a feature (e.g. `feature` → `:feature:chat:*`). */
     roots: string[];
+    /**
+     * Package prefixes whose next segment names a feature, for modules that hold several features
+     * as packages or folders (`app.daywise` → `app.daywise.money.*` is "money"; in other projects
+     * the folders, without src/lib, so `web.billing` → `web/src/billing/invoices/x.ts` is "invoices").
+     */
+    packages?: string[];
+    /**
+     * Feature name to glob(s) over project paths, for any project: `{ money: ["shared/src/commonMain/kotlin/app/demo/money", "web/src/money"] }`.
+     * A class goes to the first entry matching its file or a folder it is in. Wins over `packages`.
+     */
+    map?: Record<string, string | string[]>;
   };
   /** Feature ids or module ids (prefix match) to leave out of scans and runs. */
   exclude: string[];
@@ -142,7 +153,7 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
   const local = readLocal(localDir);
   return {
     name: raw.name,
-    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots },
+    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots, packages: raw.features?.packages, map: raw.features?.map },
     exclude: raw.exclude ?? [],
     areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
@@ -244,6 +255,11 @@ export const CONFIG_TEMPLATE = `# Probe settings for this project. Everything he
 features:
   # Module folders whose next segment is a feature: :feature:chat:impl -> "chat"
   roots: [feature, features]
+  # Packages whose next segment is a feature, when one module holds several (a KMP "shared"):
+  # packages: [com.example.app]   # com.example.app.money.* -> "money"
+  # Or name each feature's files yourself, in any project (wins over packages):
+  # map:
+  #   money: ["shared/**/money", "composeApp/**/MoneyScreens.kt"]
 
 # Leave features or modules out of scans and runs (prefix match).
 exclude: []

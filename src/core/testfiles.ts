@@ -6,7 +6,7 @@
 export const SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb|php|cs|cpp|cc|c|h|hpp|m|mm|scala|dart|ex|exs|lua|vue|svelte)$/;
 
 const TEST_NAME = /(\.(test|spec)\.[^./]+$)|(_(test|spec)\.[^./]+$)|(^test_[^/]*\.py$)|((Test|Tests|Spec)\.(kt|java|swift|cs|scala|php)$)/;
-const TEST_DIR = /(^|\/)(test|tests|__tests__|spec|specs|src\/(test|androidTest|testFixtures|sharedTest)[^/]*)\//;
+const TEST_DIR = /(^|\/)(test|tests|__tests__|spec|specs|src\/((test|androidTest|testFixtures|sharedTest)[^/]*|[a-z]\w*Test))\//;
 
 /** Whether a project-relative path is test code. */
 export function isTestPath(relPath: string): boolean {

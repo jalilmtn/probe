@@ -1,3 +1,4 @@
+import { uniqueModules } from "../core/features.js";
 import { newRunId } from "../core/store.js";
 import type { UnitRun } from "../core/types.js";
 import type { Project } from "./project.js";
@@ -13,7 +14,7 @@ export function startUnitRun(project: Project, featureId: string): { run: UnitRu
   const feature = findFeature(latestScan(project), featureId);
   if (!feature) throw new Error(`Unknown feature "${featureId}". Run a scan or check the name.`);
 
-  const modules = feature.modules.filter((m) => m.unitTestTask);
+  const modules = uniqueModules(feature.modules).filter((m) => m.unitTestTask);
   const run: UnitRun = {
     id: newRunId(),
     kind: "unit",

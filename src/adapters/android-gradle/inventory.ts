@@ -19,10 +19,30 @@ export function sourceFiles(dir: string): string[] {
   return out;
 }
 
-/** Source sets for a source-set kind: `main` → src/main, plus build-type/flavor variants are ignored. */
-export function sourceSetFiles(moduleDir: string, set: "main" | "test" | "androidTest"): string[] {
-  return sourceFiles(join(moduleDir, "src", set));
+export type SourceSetKind = "main" | "test" | "androidTest";
+
+/**
+ * What a folder under `src/` holds. Android: `main`, `test`, `androidTest`. Kotlin Multiplatform:
+ * `commonMain`/`androidMain`/`iosMain` are main, `commonTest`/`androidUnitTest`/`jvmTest` unit tests,
+ * `androidInstrumentedTest`/`androidDeviceTest` instrumented. Build-type and flavor folders
+ * (`debug`, `testDebug`) are ignored.
+ */
+export function sourceSetKind(name: string): SourceSetKind | null {
+  if (name === "main" || /^[a-z]\w*Main$/.test(name)) return "main";
+  if (name === "androidTest" || /^android(Instrumented|Device)Test$/.test(name)) return "androidTest";
+  if (name === "test" || /^[a-z]\w*Test$/.test(name)) return "test";
+  return null;
 }
+
+/** Every file in the module's source sets of one kind. */
+export function sourceSetFiles(moduleDir: string, set: SourceSetKind): string[] {
+  const src = join(moduleDir, "src");
+  if (!existsSync(src)) return [];
+  return readdirSync(src, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && sourceSetKind(e.name) === set)
+    .flatMap((e) => sourceFiles(join(src, e.name)));
+}
+
 
 interface DeclaredClass {
   name: string;

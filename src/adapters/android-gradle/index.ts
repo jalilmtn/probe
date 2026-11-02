@@ -105,7 +105,7 @@ export const androidGradleAdapter: ProjectAdapter = {
   },
 
   isTestSource(relPath) {
-    return /(^|\/)src\/(test|androidTest|testFixtures|sharedTest)[^/]*\//.test(relPath.replace(/\\/g, "/"));
+    return /(^|\/)src\/((test|androidTest|testFixtures|sharedTest)[^/]*|[a-z]\w*Test)\//.test(relPath.replace(/\\/g, "/"));
   },
 
   navigationHints(root, modules, limit) {

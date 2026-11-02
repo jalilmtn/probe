@@ -16,7 +16,7 @@ ${targets.map((t, i) => `${i + 1}. ${t.name} (${t.kind}) — ${t.file}`).join("\
 ## How
 1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow their testing rules.
 2. Read neighbouring tests in the same module to copy their style, libraries, fakes and helpers. Reuse existing test helpers and fakes; do not invent a new framework.
-3. For each class: read it, then write one test class next to the module's existing unit tests (the module's src/test source set), named <ClassName>Test.
+3. For each class: read it, then write one test class next to the module's existing unit tests (the module's src/test source set, or src/commonTest in a Kotlin Multiplatform module), named <ClassName>Test.
    Each test pins one behaviour and must fail if that behaviour broke: real inputs and real assertions, no tests that only check a mock was called.
 4. Only create or edit files under test source sets. Never change production code; if a class cannot be tested without changing it, skip it and say why.
 5. Call probe_unit_run with feature "${feature.id}". If your tests fail to compile or fail, fix the tests (not the production code) and run again, at most three times.

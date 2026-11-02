@@ -1,4 +1,5 @@
 import { isExcluded } from "../core/config.js";
+import { assignFeatures } from "../core/features.js";
 import { isTestable } from "../core/kinds.js";
 import type { FeatureInfo, ModuleInfo, ScanResult } from "../core/types.js";
 import type { Project } from "./project.js";
@@ -6,7 +7,7 @@ import type { Project } from "./project.js";
 const SCAN_FILE = "scan.json";
 
 export function scan(project: Project): ScanResult {
-  const modules = project.adapter.scanModules(project.root, project.config);
+  const modules = assignFeatures(project.adapter.scanModules(project.root, project.config), project.config.features);
   const groups = new Map<string, { group: FeatureInfo["group"]; modules: ModuleInfo[] }>();
   const excluded = new Set<string>();
 

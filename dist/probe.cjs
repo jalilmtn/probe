@@ -15180,7 +15180,7 @@ function loadConfig(root, localDir) {
   const local = readLocal(localDir);
   return {
     name: raw.name,
-    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots },
+    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots, packages: raw.features?.packages, map: raw.features?.map },
     exclude: raw.exclude ?? [],
     areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
@@ -15254,6 +15254,11 @@ var CONFIG_TEMPLATE = `# Probe settings for this project. Everything here is opt
 features:
   # Module folders whose next segment is a feature: :feature:chat:impl -> "chat"
   roots: [feature, features]
+  # Packages whose next segment is a feature, when one module holds several (a KMP "shared"):
+  # packages: [com.example.app]   # com.example.app.money.* -> "money"
+  # Or name each feature's files yourself, in any project (wins over packages):
+  # map:
+  #   money: ["shared/**/money", "composeApp/**/MoneyScreens.kt"]
 
 # Leave features or modules out of scans and runs (prefix match).
 exclude: []
@@ -15341,6 +15346,167 @@ function saveProject(root, patch) {
   (0, import_node_fs4.writeFileSync)(file, doc.toString());
 }
 
+// src/adapters/generic/areas.ts
+var import_node_child_process2 = require("node:child_process");
+var import_node_fs5 = require("node:fs");
+var import_node_path6 = require("node:path");
+
+// src/core/testfiles.ts
+var SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb|php|cs|cpp|cc|c|h|hpp|m|mm|scala|dart|ex|exs|lua|vue|svelte)$/;
+var TEST_NAME = /(\.(test|spec)\.[^./]+$)|(_(test|spec)\.[^./]+$)|(^test_[^/]*\.py$)|((Test|Tests|Spec)\.(kt|java|swift|cs|scala|php)$)/;
+var TEST_DIR = /(^|\/)(test|tests|__tests__|spec|specs|src\/((test|androidTest|testFixtures|sharedTest)[^/]*|[a-z]\w*Test))\//;
+function isTestPath(relPath) {
+  const path = relPath.replace(/\\/g, "/");
+  const name = path.slice(path.lastIndexOf("/") + 1);
+  return TEST_NAME.test(name) || TEST_DIR.test(path);
+}
+var TEST_ONLY_DIRS = /* @__PURE__ */ new Set(["test", "tests", "__tests__", "spec", "specs", "e2e"]);
+function testedName(fileName) {
+  return fileName.replace(/\.[^.]+$/, "").replace(/[._-](test|spec)$/i, "").replace(/^test_/, "").replace(/(Test|Tests|Spec)$/, "");
+}
+function stemOf(fileName) {
+  return fileName.replace(/\.[^.]+$/, "");
+}
+function testNamesIn(text2) {
+  return [
+    ...text2.matchAll(/fun\s+`([^`]+)`/g),
+    ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g),
+    ...text2.matchAll(/\b(?:test|it)(?:\.\w+)?\(\s*(["'`])((?:(?!\1).)+)\1/g),
+    ...text2.matchAll(/\bdef\s+(test_\w+)\s*\(/g),
+    ...text2.matchAll(/\bfunc\s+(Test\w+)\s*\(/g)
+  ].map((m) => m[m.length - 1]);
+}
+
+// src/adapters/generic/areas.ts
+var CONTAINER_DIRS = /* @__PURE__ */ new Set(["src", "lib", "libs", "packages", "apps", "modules", "services", "pkg", "internal", "cmd", "components", "crates", "plugins", "features"]);
+function listProjectFiles(root, ignored) {
+  const git2 = (0, import_node_child_process2.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
+  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored);
+  return listed.filter((f) => !ignored.test(f) && !f.startsWith("probe/"));
+}
+function walk(root, ignored) {
+  const out = [];
+  const visit = (rel) => {
+    for (const entry of (0, import_node_fs5.readdirSync)((0, import_node_path6.join)(root, rel), { withFileTypes: true })) {
+      const path = rel ? `${rel}/${entry.name}` : entry.name;
+      if (ignored.test(path)) continue;
+      if (entry.isDirectory()) visit(path);
+      else if (entry.isFile()) out.push(path);
+    }
+  };
+  visit("");
+  return out;
+}
+function discoverAreas(files) {
+  const areas = /* @__PURE__ */ new Map();
+  const add = (id, group, dir) => {
+    const area = areas.get(id) ?? { id, group, dirs: [] };
+    if (!area.dirs.includes(dir)) area.dirs.push(dir);
+    areas.set(id, area);
+  };
+  for (const file of files) {
+    if (!SOURCE_EXT.test(file) || isTestPath(file)) continue;
+    const parts = file.split("/");
+    if (parts.length < 2) continue;
+    const top = parts[0];
+    if (top.startsWith(".") || TEST_ONLY_DIRS.has(top)) continue;
+    if (CONTAINER_DIRS.has(top) && parts.length >= 3 && !TEST_ONLY_DIRS.has(parts[1])) add(parts[1], "feature", `${top}/${parts[1]}`);
+    else add(top, "platform", top);
+  }
+  return [...areas.values()];
+}
+function configuredAreas(spec, files) {
+  const dirs = allDirs(files);
+  if (Array.isArray(spec)) {
+    const matched = [...new Set(spec.flatMap((g) => dirs.filter((d) => globRegex(g).test(d))))].sort();
+    const last = (d) => d.slice(d.lastIndexOf("/") + 1);
+    const taken = /* @__PURE__ */ new Map();
+    for (const d of matched) taken.set(last(d), (taken.get(last(d)) ?? 0) + 1);
+    return matched.map((d) => ({ id: taken.get(last(d)) > 1 ? d : last(d), group: "feature", dirs: [d] }));
+  }
+  return Object.entries(spec).map(([id, globs]) => {
+    const patterns = (Array.isArray(globs) ? globs : [globs]).map(globRegex);
+    const matched = dirs.filter((d) => patterns.some((p) => p.test(d))).sort();
+    return { id, group: "feature", dirs: matched.filter((d, i) => !matched.slice(0, i).some((o) => d.startsWith(`${o}/`))) };
+  });
+}
+function allDirs(files) {
+  const dirs = /* @__PURE__ */ new Set();
+  for (const f of files) {
+    let i = f.indexOf("/");
+    while (i > 0) {
+      dirs.add(f.slice(0, i));
+      i = f.indexOf("/", i + 1);
+    }
+  }
+  return [...dirs];
+}
+function globRegex(glob) {
+  const g = glob.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+  let out = "";
+  for (let i = 0; i < g.length; i++) {
+    const c = g[i];
+    if (c === "*" && g[i + 1] === "*") {
+      out += ".*";
+      i++;
+      if (g[i + 1] === "/") i++;
+    } else if (c === "*") out += "[^/]*";
+    else if (c === "?") out += "[^/]";
+    else out += c.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  }
+  return new RegExp(`^${out}$`);
+}
+
+// src/core/features.ts
+var SOURCE_ROOTS = /* @__PURE__ */ new Set(["src", "lib", "source", "sources"]);
+function namespaceOf(file) {
+  const jvm = /\/src\/[^/]+\/(?:kotlin|java)\/(.+)\/[^/]+$/.exec("/" + file);
+  if (jvm) return jvm[1].replace(/\//g, ".");
+  return file.split("/").slice(0, -1).filter((d) => !SOURCE_ROOTS.has(d)).join(".");
+}
+function byMap(map) {
+  const entries = Object.entries(map).map(([id, globs]) => ({ id, patterns: (Array.isArray(globs) ? globs : [globs]).map(globRegex) }));
+  return (c) => {
+    const paths = c.file.split("/").map((_, i, parts) => parts.slice(0, i + 1).join("/"));
+    return entries.find((e) => e.patterns.some((p) => paths.some((path) => p.test(path))))?.id ?? null;
+  };
+}
+function byPackage(prefixes) {
+  const sorted = [...prefixes].sort((a, b) => b.length - a.length);
+  return (c) => {
+    const ns = namespaceOf(c.file);
+    const prefix = sorted.find((p) => ns.startsWith(p + "."));
+    return prefix ? ns.slice(prefix.length + 1).split(".")[0] : null;
+  };
+}
+function splitModule(module2, pick2) {
+  const byFeature = /* @__PURE__ */ new Map();
+  const rest = [];
+  for (const c of module2.classes) {
+    const feature = pick2(c);
+    if (feature) byFeature.set(feature, [...byFeature.get(feature) ?? [], c]);
+    else rest.push(c);
+  }
+  if (byFeature.size === 0) return [module2];
+  const files = (cs) => new Set(cs.map((c) => c.file)).size;
+  const out = [...byFeature.entries()].map(([feature, classes]) => ({
+    ...module2,
+    classes,
+    mainFiles: files(classes),
+    feature: { id: feature, group: "feature" }
+  }));
+  if (rest.length > 0) out.push({ ...module2, classes: rest, mainFiles: files(rest) });
+  return out;
+}
+function assignFeatures(modules, features) {
+  const { map, packages } = features;
+  const pick2 = map && Object.keys(map).length > 0 ? byMap(map) : packages?.length ? byPackage(packages) : null;
+  return pick2 ? modules.flatMap((m) => splitModule(m, pick2)) : modules;
+}
+function uniqueModules(modules) {
+  return modules.filter((m, i) => modules.findIndex((o) => o.id === m.id) === i);
+}
+
 // src/core/kinds.ts
 var KIND_WEIGHT = {
   reducer: 5,
@@ -15362,7 +15528,7 @@ function isTestable(c) {
 // src/engine/scan.ts
 var SCAN_FILE = "scan.json";
 function scan(project) {
-  const modules = project.adapter.scanModules(project.root, project.config);
+  const modules = assignFeatures(project.adapter.scanModules(project.root, project.config), project.config.features);
   const groups = /* @__PURE__ */ new Map();
   const excluded = /* @__PURE__ */ new Set();
   for (const m of modules) {
@@ -15413,8 +15579,8 @@ function riskyGaps(feature, limit = 25) {
 }
 
 // src/cards/store.ts
-var import_node_fs5 = require("node:fs");
-var import_node_path6 = require("node:path");
+var import_node_fs6 = require("node:fs");
+var import_node_path7 = require("node:path");
 var import_yaml2 = __toESM(require_dist(), 1);
 
 // node_modules/zod/v3/external.js
@@ -19488,14 +19654,14 @@ var CardInput = external_exports.object({
 
 // src/cards/store.ts
 function cardsDir(root, feature) {
-  const base = (0, import_node_path6.join)(root, CONFIG_DIR, "cards");
-  return feature ? (0, import_node_path6.join)(base, feature.replace(/:/g, "__")) : base;
+  const base = (0, import_node_path7.join)(root, CONFIG_DIR, "cards");
+  return feature ? (0, import_node_path7.join)(base, feature.replace(/:/g, "__")) : base;
 }
 function listCards(root, feature) {
   const base = cardsDir(root);
-  if (!(0, import_node_fs5.existsSync)(base)) return [];
-  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs5.readdirSync)(base).map((d) => (0, import_node_path6.join)(base, d));
-  return folders.filter(import_node_fs5.existsSync).flatMap((dir) => (0, import_node_fs5.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path6.join)(dir, f))).map((file) => (0, import_yaml2.parse)((0, import_node_fs5.readFileSync)(file, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
+  if (!(0, import_node_fs6.existsSync)(base)) return [];
+  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs6.readdirSync)(base).map((d) => (0, import_node_path7.join)(base, d));
+  return folders.filter(import_node_fs6.existsSync).flatMap((dir) => (0, import_node_fs6.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path7.join)(dir, f))).map((file) => (0, import_yaml2.parse)((0, import_node_fs6.readFileSync)(file, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
 }
 function findCard(root, feature, id) {
   return listCards(root, feature).find((c) => c.id === id);
@@ -19504,7 +19670,7 @@ function saveCards(root, feature, inputs, createdBy) {
   const result = { written: [], kept: [], errors: [] };
   const existing = new Map(listCards(root, feature).map((c) => [c.id, c]));
   const dir = cardsDir(root, feature);
-  (0, import_node_fs5.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs6.mkdirSync)(dir, { recursive: true });
   inputs.forEach((raw, i) => {
     const parsed = CardInput.safeParse(raw);
     if (!parsed.success) {
@@ -19556,7 +19722,7 @@ function recordDeviceRun(root, feature, id, runId) {
   writeCard(root, { ...card, confidence: "high", sources, updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
 }
 function writeCard(root, card) {
-  (0, import_node_fs5.writeFileSync)((0, import_node_path6.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml2.stringify)(card, { lineWidth: 100 }));
+  (0, import_node_fs6.writeFileSync)((0, import_node_path7.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml2.stringify)(card, { lineWidth: 100 }));
 }
 function levelOrder(c) {
   return c.level === "feature" ? 0 : c.level === "capability" ? 1 : 2;
@@ -19637,11 +19803,11 @@ function summarizeBackfill(run) {
 }
 
 // src/cards/context.ts
-var import_node_path8 = require("node:path");
+var import_node_path9 = require("node:path");
 
 // src/engine/docs.ts
-var import_node_fs6 = require("node:fs");
-var import_node_path7 = require("node:path");
+var import_node_fs7 = require("node:fs");
+var import_node_path8 = require("node:path");
 function nameVariants(featureId) {
   const last = featureId.split(":").pop();
   const words = last.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").toLowerCase().trim();
@@ -19665,9 +19831,9 @@ function docsAbout(root, featureId, budget = 16e3) {
     used += clipped.length;
   };
   const named = files.filter((f) => variants.some((v) => f.toLowerCase().split("/").pop().includes(v.replace(/ /g, ""))));
-  for (const f of named) add(f, (0, import_node_fs6.readFileSync)((0, import_node_path7.join)(root, f), "utf8"));
+  for (const f of named) add(f, (0, import_node_fs7.readFileSync)((0, import_node_path8.join)(root, f), "utf8"));
   for (const f of files.filter((x) => !named.includes(x))) {
-    for (const section of sections((0, import_node_fs6.readFileSync)((0, import_node_path7.join)(root, f), "utf8"))) {
+    for (const section of sections((0, import_node_fs7.readFileSync)((0, import_node_path8.join)(root, f), "utf8"))) {
       if (mentions(section.heading) > 0) add(`${f}#${section.heading}`, `${section.heading}
 ${section.body}`);
     }
@@ -19710,11 +19876,11 @@ var CARD_RULES = `## How to write cards
 - Cards someone already approved or rejected are kept as they are; don't re-propose them.`;
 function cardContext(project, feature) {
   const root = project.root;
-  const dirs = feature.modules.map((m) => (0, import_node_path8.relative)(root, m.dir).replace(/\\/g, "/"));
+  const dirs = feature.modules.map((m) => (0, import_node_path9.relative)(root, m.dir).replace(/\\/g, "/"));
   const classes = feature.modules.flatMap((m) => m.classes.map((c) => ({ ...c, module: m.id })));
   const out = [`# Feature: ${feature.id} (${project.name})`, ""];
   out.push("## Modules");
-  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path8.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
+  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path9.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
   out.push("", "## Key classes", "Test status: direct = has its own test class, referenced = used by tests, none = untested.");
   for (const kind of KEY_KINDS) {
     const ofKind = classes.filter((c) => c.kind === kind).sort((a, b) => b.lines - a.lines).slice(0, kind === "ui" ? 25 : 15);
@@ -19750,17 +19916,17 @@ function cardContext(project, feature) {
 var import_yaml5 = __toESM(require_dist(), 1);
 
 // src/accounts/accounts.ts
-var import_node_child_process2 = require("node:child_process");
-var import_node_fs7 = require("node:fs");
-var import_node_path9 = require("node:path");
+var import_node_child_process3 = require("node:child_process");
+var import_node_fs8 = require("node:fs");
+var import_node_path10 = require("node:path");
 var import_yaml3 = __toESM(require_dist(), 1);
 function accountsFile(root) {
-  return (0, import_node_path9.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
+  return (0, import_node_path10.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
 }
 function listAccounts(root) {
   const file = accountsFile(root);
-  if (!(0, import_node_fs7.existsSync)(file)) return [];
-  const raw = (0, import_yaml3.parse)((0, import_node_fs7.readFileSync)(file, "utf8")) ?? {};
+  if (!(0, import_node_fs8.existsSync)(file)) return [];
+  const raw = (0, import_yaml3.parse)((0, import_node_fs8.readFileSync)(file, "utf8")) ?? {};
   return (raw.accounts ?? []).filter((a) => a.role && a.username);
 }
 function accountsForPrompt(project) {
@@ -19782,17 +19948,17 @@ function removeAccount(root, role) {
 }
 function writeAccounts(root, accounts) {
   const file = accountsFile(root);
-  (0, import_node_fs7.mkdirSync)((0, import_node_path9.dirname)(file), { recursive: true });
-  (0, import_node_fs7.writeFileSync)(file, `# Test accounts: roles and usernames only. Passwords stay on each machine.
+  (0, import_node_fs8.mkdirSync)((0, import_node_path10.dirname)(file), { recursive: true });
+  (0, import_node_fs8.writeFileSync)(file, `# Test accounts: roles and usernames only. Passwords stay on each machine.
 ${(0, import_yaml3.stringify)({ accounts })}`);
 }
 var Secrets = class {
   file;
   constructor(storeDir) {
-    this.file = (0, import_node_path9.join)(storeDir, "secrets.json");
+    this.file = (0, import_node_path10.join)(storeDir, "secrets.json");
   }
   load() {
-    return (0, import_node_fs7.existsSync)(this.file) ? JSON.parse((0, import_node_fs7.readFileSync)(this.file, "utf8")) : {};
+    return (0, import_node_fs8.existsSync)(this.file) ? JSON.parse((0, import_node_fs8.readFileSync)(this.file, "utf8")) : {};
   }
   has(role, kind) {
     return `${role}.${kind}` in this.load();
@@ -19804,20 +19970,20 @@ var Secrets = class {
   set(role, kind, value) {
     const all = this.load();
     all[`${role}.${kind}`] = seal(value);
-    (0, import_node_fs7.writeFileSync)(this.file, JSON.stringify(all, null, 2));
-    if (!isWindows) (0, import_node_fs7.chmodSync)(this.file, 384);
+    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+    if (!isWindows) (0, import_node_fs8.chmodSync)(this.file, 384);
   }
   /** Forgets every secret of a role. */
   remove(role) {
     const all = this.load();
     for (const kind of ["password", "code"]) delete all[`${role}.${kind}`];
-    (0, import_node_fs7.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
   }
 };
 var PS_PROTECT = "Add-Type -AssemblyName System.Security; [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect([Text.Encoding]::UTF8.GetBytes($env:PROBE_SECRET), $null, 'CurrentUser'))";
 var PS_UNPROTECT = "Add-Type -AssemblyName System.Security; [Text.Encoding]::UTF8.GetString([Security.Cryptography.ProtectedData]::Unprotect([Convert]::FromBase64String($env:PROBE_SECRET), $null, 'CurrentUser'))";
 function powershell(script, input) {
-  const r = (0, import_node_child_process2.spawnSync)("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
+  const r = (0, import_node_child_process3.spawnSync)("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
     encoding: "utf8",
     windowsHide: true,
     env: { ...process.env, PROBE_SECRET: input },
@@ -19835,7 +20001,7 @@ function unseal(sealed) {
 }
 
 // src/devices/harness.ts
-var import_node_path12 = require("node:path");
+var import_node_path13 = require("node:path");
 
 // src/adapters/adapter.ts
 var ALWAYS_IGNORED = [".git", ".idea", "node_modules"];
@@ -19861,27 +20027,27 @@ function resolveApp(project) {
 }
 
 // src/devices/session.ts
-var import_node_fs9 = require("node:fs");
-var import_node_path11 = require("node:path");
+var import_node_fs10 = require("node:fs");
+var import_node_path12 = require("node:path");
 
 // src/devices/adb.ts
-var import_node_child_process3 = require("node:child_process");
-var import_node_fs8 = require("node:fs");
-var import_node_path10 = require("node:path");
+var import_node_child_process4 = require("node:child_process");
+var import_node_fs9 = require("node:fs");
+var import_node_path11 = require("node:path");
 function androidSdk(projectRoot) {
   const env = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT;
-  if (env && (0, import_node_fs8.existsSync)(env)) return env;
+  if (env && (0, import_node_fs9.existsSync)(env)) return env;
   if (!projectRoot) return null;
-  const local = (0, import_node_path10.join)(projectRoot, "local.properties");
-  if (!(0, import_node_fs8.existsSync)(local)) return null;
-  const raw = /^sdk\.dir=(.*)$/m.exec((0, import_node_fs8.readFileSync)(local, "utf8"))?.[1];
+  const local = (0, import_node_path11.join)(projectRoot, "local.properties");
+  if (!(0, import_node_fs9.existsSync)(local)) return null;
+  const raw = /^sdk\.dir=(.*)$/m.exec((0, import_node_fs9.readFileSync)(local, "utf8"))?.[1];
   const dir = raw?.trim().replace(/\\:/g, ":").replace(/\\\\/g, "\\");
-  return dir && (0, import_node_fs8.existsSync)(dir) ? dir : null;
+  return dir && (0, import_node_fs9.existsSync)(dir) ? dir : null;
 }
 function sdkTool(projectRoot, ...path) {
   const sdk = androidSdk(projectRoot);
-  const exe = (0, import_node_path10.join)(...path) + (isWindows ? ".exe" : "");
-  return sdk && (0, import_node_fs8.existsSync)((0, import_node_path10.join)(sdk, exe)) ? (0, import_node_path10.join)(sdk, exe) : path[path.length - 1];
+  const exe = (0, import_node_path11.join)(...path) + (isWindows ? ".exe" : "");
+  return sdk && (0, import_node_fs9.existsSync)((0, import_node_path11.join)(sdk, exe)) ? (0, import_node_path11.join)(sdk, exe) : path[path.length - 1];
 }
 var Adb = class _Adb {
   constructor(bin) {
@@ -19892,16 +20058,16 @@ var Adb = class _Adb {
     return new _Adb(sdkTool(projectRoot, "platform-tools", "adb"));
   }
   run(args, timeoutMs = 3e4) {
-    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { encoding: "utf8", windowsHide: true, timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
+    const r = (0, import_node_child_process4.spawnSync)(this.bin, args, { encoding: "utf8", windowsHide: true, timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
     return { ok: !r.error && r.status === 0, out: r.stdout ?? "", err: r.stderr ?? String(r.error ?? "") };
   }
   binary(args, timeoutMs = 3e4) {
-    const r = (0, import_node_child_process3.spawnSync)(this.bin, args, { windowsHide: true, timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
+    const r = (0, import_node_child_process4.spawnSync)(this.bin, args, { windowsHide: true, timeout: timeoutMs, maxBuffer: 64 * 1024 * 1024 });
     return !r.error && r.status === 0 ? r.stdout : null;
   }
   /** Long-running adb command (e.g. screenrecord); returns the child so it can be stopped. */
   spawn(args) {
-    return (0, import_node_child_process3.spawn)(this.bin, args, { stdio: "ignore", windowsHide: true });
+    return (0, import_node_child_process4.spawn)(this.bin, args, { stdio: "ignore", windowsHide: true });
   }
 };
 function shQuote(s) {
@@ -20123,13 +20289,13 @@ var AndroidDevice = class {
 
 // src/devices/session.ts
 function sessionFile(storeDir, id) {
-  return (0, import_node_path11.join)(storeDir, "sessions", `${id}.json`);
+  return (0, import_node_path12.join)(storeDir, "sessions", `${id}.json`);
 }
 function createSession(storeDir, info) {
-  const session = { ...info, evidenceDir: (0, import_node_path11.join)(storeDir, "runs", info.id) };
-  (0, import_node_fs9.mkdirSync)((0, import_node_path11.join)(storeDir, "sessions"), { recursive: true });
-  (0, import_node_fs9.mkdirSync)(session.evidenceDir, { recursive: true });
-  (0, import_node_fs9.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
+  const session = { ...info, evidenceDir: (0, import_node_path12.join)(storeDir, "runs", info.id) };
+  (0, import_node_fs10.mkdirSync)((0, import_node_path12.join)(storeDir, "sessions"), { recursive: true });
+  (0, import_node_fs10.mkdirSync)(session.evidenceDir, { recursive: true });
+  (0, import_node_fs10.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
   return session;
 }
 var DeviceSession = class _DeviceSession {
@@ -20137,8 +20303,8 @@ var DeviceSession = class _DeviceSession {
     this.info = info;
     this.device = new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
     this.step = this.timeline().length;
-    const tree = (0, import_node_path11.join)(info.evidenceDir, "last-tree.json");
-    if ((0, import_node_fs9.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs9.readFileSync)(tree, "utf8"));
+    const tree = (0, import_node_path12.join)(info.evidenceDir, "last-tree.json");
+    if ((0, import_node_fs10.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs10.readFileSync)(tree, "utf8"));
   }
   info;
   device;
@@ -20149,40 +20315,40 @@ var DeviceSession = class _DeviceSession {
    */
   observe() {
     const elements = this.device.uiTree();
-    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
+    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
     return elements;
   }
   static open(storeDir, id) {
     const file = sessionFile(storeDir, id);
-    if (!(0, import_node_fs9.existsSync)(file)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
-    return new _DeviceSession(JSON.parse((0, import_node_fs9.readFileSync)(file, "utf8")));
+    if (!(0, import_node_fs10.existsSync)(file)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
+    return new _DeviceSession(JSON.parse((0, import_node_fs10.readFileSync)(file, "utf8")));
   }
   /** Saves a screenshot as the next step's evidence and returns it. */
   capture() {
     const png = this.device.screenshot();
     if (!png) return null;
     const name = `step-${String(this.step + 1).padStart(3, "0")}.png`;
-    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, name), png);
+    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, name), png);
     return { png, name };
   }
   record(action, detail, screenshot) {
     this.step++;
     const entry = { at: (/* @__PURE__ */ new Date()).toISOString(), action, detail, screenshot };
-    (0, import_node_fs9.appendFileSync)((0, import_node_path11.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
+    (0, import_node_fs10.appendFileSync)((0, import_node_path12.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
 `);
   }
   timeline() {
-    const file = (0, import_node_path11.join)(this.info.evidenceDir, "timeline.jsonl");
-    if (!(0, import_node_fs9.existsSync)(file)) return [];
-    return (0, import_node_fs9.readFileSync)(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    const file = (0, import_node_path12.join)(this.info.evidenceDir, "timeline.jsonl");
+    if (!(0, import_node_fs10.existsSync)(file)) return [];
+    return (0, import_node_fs10.readFileSync)(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   }
   /** What the agent's report tool handed in (verdict, login state, explored screens). */
   saveReport(name, value) {
-    (0, import_node_fs9.writeFileSync)((0, import_node_path11.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
+    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
   }
   report(name) {
-    const file = (0, import_node_path11.join)(this.info.evidenceDir, `${name}.json`);
-    return (0, import_node_fs9.existsSync)(file) ? JSON.parse((0, import_node_fs9.readFileSync)(file, "utf8")) : null;
+    const file = (0, import_node_path12.join)(this.info.evidenceDir, `${name}.json`);
+    return (0, import_node_fs10.existsSync)(file) ? JSON.parse((0, import_node_fs10.readFileSync)(file, "utf8")) : null;
   }
   saveVerdict(verdict) {
     this.saveReport("verdict", verdict);
@@ -20193,7 +20359,7 @@ var DeviceSession = class _DeviceSession {
 };
 
 // src/devices/select.ts
-var import_node_child_process4 = require("node:child_process");
+var import_node_child_process5 = require("node:child_process");
 async function pickDevice(projectRoot, config2, wanted, log) {
   const adb = Adb.forProject(projectRoot);
   const allowed = (d) => d.emulator || config2.devices.allowReal.includes(d.serial);
@@ -20214,7 +20380,7 @@ async function pickDevice(projectRoot, config2, wanted, log) {
       );
     }
     log(`starting emulator ${avd}${config2.devices.avd ? "" : " (first image on this machine; choose another in Studio \u2192 Settings)"}\u2026`);
-    (0, import_node_child_process4.spawn)(sdkTool(projectRoot, "emulator", "emulator"), ["-avd", avd, "-no-snapshot-save", "-no-boot-anim"], {
+    (0, import_node_child_process5.spawn)(sdkTool(projectRoot, "emulator", "emulator"), ["-avd", avd, "-no-snapshot-save", "-no-boot-anim"], {
       detached: true,
       stdio: "ignore"
     }).unref();
@@ -20239,7 +20405,7 @@ async function waitFor(probe, timeoutMs) {
   return void 0;
 }
 function listAvds(projectRoot) {
-  const r = (0, import_node_child_process4.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15e3 });
+  const r = (0, import_node_child_process5.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15e3 });
   return (r.stdout ?? "").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !/^(INFO|WARNING|ERROR)\b/.test(l));
 }
 
@@ -20297,7 +20463,7 @@ async function runOnDevice(project, run, options, log) {
     run.costUsd += result.costUsd;
     if (!result.ok) log(`agent: ${result.summary.slice(0, 300)}`);
   } finally {
-    if (await stopRecording((0, import_node_path12.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
+    if (await stopRecording((0, import_node_path13.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
   }
   run.timeline = session.timeline();
   run.crashes = device.crashes(pkg);
@@ -20324,16 +20490,16 @@ function crashError(run) {
 }
 
 // src/engine/ledger.ts
-var import_node_fs10 = require("node:fs");
-var import_node_path14 = require("node:path");
+var import_node_fs11 = require("node:fs");
+var import_node_path15 = require("node:path");
 var import_yaml4 = __toESM(require_dist(), 1);
 
 // src/engine/fingerprint.ts
-var import_node_child_process5 = require("node:child_process");
+var import_node_child_process6 = require("node:child_process");
 var import_node_crypto2 = require("node:crypto");
-var import_node_path13 = require("node:path");
+var import_node_path14 = require("node:path");
 function git(root, args, input) {
-  const r = (0, import_node_child_process5.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
+  const r = (0, import_node_child_process6.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
   return r.status === 0 ? r.stdout : "";
 }
 var short = (text2) => (0, import_node_crypto2.createHash)("sha256").update(text2).digest("hex").slice(0, 12);
@@ -20363,7 +20529,7 @@ var ContentIndex = class {
       const hashes = git(root, ["hash-object", "--stdin-paths"], changed.join("\n") + "\n").split("\n");
       changed.forEach((p, n) => hashes[n] && blobs.set(p, hashes[n].trim()));
     }
-    const byDir = new Map(modules.map((m) => [(0, import_node_path13.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
+    const byDir = new Map(modules.map((m) => [(0, import_node_path14.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
     for (const [path, blob] of blobs) {
       if (path.startsWith("probe/")) continue;
       let dir = path;
@@ -20431,16 +20597,16 @@ function cardHash(card) {
 // src/engine/ledger.ts
 var RESULTS_DIR = "results";
 function ledgerFile(root, feature) {
-  return (0, import_node_path14.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
+  return (0, import_node_path15.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
 }
 function readLedger(root, feature) {
   const file = ledgerFile(root, feature);
-  return (0, import_node_fs10.existsSync)(file) ? (0, import_yaml4.parse)((0, import_node_fs10.readFileSync)(file, "utf8")) ?? {} : {};
+  return (0, import_node_fs11.existsSync)(file) ? (0, import_yaml4.parse)((0, import_node_fs11.readFileSync)(file, "utf8")) ?? {} : {};
 }
 function writeLedger(root, feature, ledger) {
-  (0, import_node_fs10.mkdirSync)((0, import_node_path14.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
+  (0, import_node_fs11.mkdirSync)((0, import_node_path15.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
   const cards = ledger.cards ? Object.fromEntries(Object.entries(ledger.cards).sort(([a], [b]) => a.localeCompare(b))) : void 0;
-  (0, import_node_fs10.writeFileSync)(
+  (0, import_node_fs11.writeFileSync)(
     ledgerFile(root, feature),
     `# Probe results for "${feature}": written after each run, committed with the code.
 # A result is up to date while the code and card it ran on are unchanged.
@@ -20505,7 +20671,7 @@ var ResultFreshness = class {
     this.scan = scan2;
     const modules = allModules(scan2);
     this.index = new ContentIndex(project, modules);
-    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path14.relative)(project.root, m.dir).replace(/\\/g, "/")]));
+    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path15.relative)(project.root, m.dir).replace(/\\/g, "/")]));
   }
   project;
   scan;
@@ -20676,36 +20842,8 @@ function formatAtlas(result, health) {
 }
 
 // src/engine/init.ts
-var import_node_fs14 = require("node:fs");
-
-// src/core/testfiles.ts
-var SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb|php|cs|cpp|cc|c|h|hpp|m|mm|scala|dart|ex|exs|lua|vue|svelte)$/;
-var TEST_NAME = /(\.(test|spec)\.[^./]+$)|(_(test|spec)\.[^./]+$)|(^test_[^/]*\.py$)|((Test|Tests|Spec)\.(kt|java|swift|cs|scala|php)$)/;
-var TEST_DIR = /(^|\/)(test|tests|__tests__|spec|specs|src\/(test|androidTest|testFixtures|sharedTest)[^/]*)\//;
-function isTestPath(relPath) {
-  const path = relPath.replace(/\\/g, "/");
-  const name = path.slice(path.lastIndexOf("/") + 1);
-  return TEST_NAME.test(name) || TEST_DIR.test(path);
-}
-var TEST_ONLY_DIRS = /* @__PURE__ */ new Set(["test", "tests", "__tests__", "spec", "specs", "e2e"]);
-function testedName(fileName) {
-  return fileName.replace(/\.[^.]+$/, "").replace(/[._-](test|spec)$/i, "").replace(/^test_/, "").replace(/(Test|Tests|Spec)$/, "");
-}
-function stemOf(fileName) {
-  return fileName.replace(/\.[^.]+$/, "");
-}
-function testNamesIn(text2) {
-  return [
-    ...text2.matchAll(/fun\s+`([^`]+)`/g),
-    ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g),
-    ...text2.matchAll(/\b(?:test|it)(?:\.\w+)?\(\s*(["'`])((?:(?!\1).)+)\1/g),
-    ...text2.matchAll(/\bdef\s+(test_\w+)\s*\(/g),
-    ...text2.matchAll(/\bfunc\s+(Test\w+)\s*\(/g)
-  ].map((m) => m[m.length - 1]);
-}
-
-// src/engine/init.ts
-var import_node_path18 = require("node:path");
+var import_node_fs15 = require("node:fs");
+var import_node_path19 = require("node:path");
 
 // templates/agents-features.md
 var agents_features_default = "## Features\n\nEvery feature has a manifest, `probe/features/<id>.yaml` (format: `probe/features/README.md`):\nwhat it is, where it lives, its user flows, the rules it must keep, and the exact test that proves\neach rule (`covered_by`) or why none does yet (`gap`). Read it before changing a feature. When it\nnames a `brief`, that doc's \"At a glance\" section is the short version; `also_read` lists the rest.\nShared code has manifests of the same shape with `kind: platform` (`core:database` is\n`core__database.yaml`): the contract it keeps for the code built on it, proven by unit tests.\nThe folder is the index: list it rather than relying on memory, and never invent a feature, path\nor test that no manifest, brief or code names.\n\n### Finding the feature\n\n- **What features are there?** Each manifest's `id`, `name` and `summary`.\n- **What is X / where do I start on X?** Match the manifest by `id`, `name` or `summary`; give its\n  summary, brief and the class to open first (the brief's At a glance), then brief yourself on it\n  as below. Nothing matches: say so and name the closest.\n- **Which features does a change touch?** A file under a manifest's `paths` is owned by that\n  feature (by each, when several claim it); one under its `related` only makes it stale, and so\n  does an edit in a platform module it depends on (`probe stale` names it \"depends on \u2026\"). A file\n  nobody claims is unmapped: say so, do not guess. A change owned by more than 3 features (an edit\n  under a shared module) gets unit tests for all of them and the full check below for the 3 with\n  the most owned files.\n\n### Before working on a feature\n\nLoad the manifest, its brief (At a glance first) and every `also_read` entry fresh; read code only\nunder its `paths`. Know, in this order: what it is; the class to open first and the module layout;\nthe main data flow; every invariant (one with a `gap` is unproven by any test); how to test it (the\nunit command, and the rules only device cards prove); the brief's gotchas.\n\n### After changing a feature\n\n1. **Test links.** Every `covered_by` entry `TestClass :: test name` names a test that exists under\n   exactly that name. A renamed test breaks the link: fix the entry or give the rule a `gap`.\n2. **Unit tests.** Run the manifest's `unit.command`; tie each failure to its invariant.\n3. **Rules against the change.** Read the diff. A change that contradicts an invariant, a flow or\n   the brief's At a glance means the code or the rule is wrong: fix one in the same change.\n4. **Missing knowledge.** New behaviour (a signal, state, endpoint, push type, screen or rule) gets\n   an invariant or a flow; a new test proving something no invariant claims gets one.\n5. **Cards.** A rule only a device can prove lists its cards (`probe/cards/<feature>/<id>.yaml`)\n   under `cards:`. `probe rules <feature>` shows each rule's tests and cards and whether a card's\n   last pass still holds; `probe rule <feature/rule> --run` (or `probe_card_run` with `rule`) runs\n   them on an emulator, minutes per card. Name the card-only rules the change touches; never start\n   a card run unasked.\n\nBehaviour goes in `invariants`, architecture stays in the brief. A `covered_by` entry must name a\ntest you have found, never one you expect. With the Probe plugin installed, edits mark their\nfeatures stale, the end of a turn runs their unit tests and a link check, and corrections to\nmanifests and briefs arrive as drafts to approve in Probe Studio.\n";
@@ -20715,8 +20853,8 @@ var features_README_default = '# Feature manifests\n\nOne file per feature, `pro
 
 // src/knowledge/draft.ts
 var import_node_crypto3 = require("node:crypto");
-var import_node_fs12 = require("node:fs");
-var import_node_path16 = require("node:path");
+var import_node_fs13 = require("node:fs");
+var import_node_path17 = require("node:path");
 
 // src/core/diff.ts
 function unifiedDiff(before, after, path, context = 3) {
@@ -20774,8 +20912,8 @@ function lineOps(a, b) {
 }
 
 // src/knowledge/manifest.ts
-var import_node_fs11 = require("node:fs");
-var import_node_path15 = require("node:path");
+var import_node_fs12 = require("node:fs");
+var import_node_path16 = require("node:path");
 var import_yaml6 = __toESM(require_dist(), 1);
 var MANIFEST_KINDS = ["feature", "platform"];
 var FEATURES_DIR = "probe/features";
@@ -20783,19 +20921,19 @@ function manifestFile(id) {
   return `${FEATURES_DIR}/${id.replace(/:/g, "__")}.yaml`;
 }
 function manifestIdOf(fileName) {
-  return (0, import_node_path15.basename)(fileName, ".yaml").replace(/__/g, ":");
+  return (0, import_node_path16.basename)(fileName, ".yaml").replace(/__/g, ":");
 }
 function loadManifest(root, id) {
   const file = manifestFile(id);
-  const abs = (0, import_node_path15.join)(root, file);
-  if (!(0, import_node_fs11.existsSync)(abs)) return null;
-  return normalize((0, import_yaml6.parse)((0, import_node_fs11.readFileSync)(abs, "utf8")) ?? {}, file);
+  const abs = (0, import_node_path16.join)(root, file);
+  if (!(0, import_node_fs12.existsSync)(abs)) return null;
+  return normalize((0, import_yaml6.parse)((0, import_node_fs12.readFileSync)(abs, "utf8")) ?? {}, file);
 }
 function loadManifests(root) {
-  const dir = (0, import_node_path15.join)(root, FEATURES_DIR);
-  if (!(0, import_node_fs11.existsSync)(dir)) return [];
+  const dir = (0, import_node_path16.join)(root, FEATURES_DIR);
+  if (!(0, import_node_fs12.existsSync)(dir)) return [];
   const out = [];
-  for (const name of (0, import_node_fs11.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
+  for (const name of (0, import_node_fs12.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
     try {
       const m = loadManifest(root, manifestIdOf(name));
       if (m) out.push(m);
@@ -20839,7 +20977,7 @@ function checkManifest(root, id, text2) {
   const result = { feature: id, file, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
   let raw;
   try {
-    const source = text2 ?? ((0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, file)) ? (0, import_node_fs11.readFileSync)((0, import_node_path15.join)(root, file), "utf8") : null);
+    const source = text2 ?? ((0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, file)) ? (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(root, file), "utf8") : null);
     raw = source === null ? null : (0, import_yaml6.parse)(source) ?? {};
   } catch (e) {
     result.errors.push(`Does not parse: ${e.message.split("\n")[0]}`);
@@ -20850,11 +20988,11 @@ function checkManifest(root, id, text2) {
     return result;
   }
   const m = normalize(raw, file);
-  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${(0, import_node_path15.basename)(file)}`);
+  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${(0, import_node_path16.basename)(file)}`);
   if (raw.kind !== void 0 && !MANIFEST_KINDS.includes(raw.kind)) result.errors.push(`kind is "${String(raw.kind)}"; it is one of ${MANIFEST_KINDS.join(", ")}.`);
   if (!m.summary) result.errors.push("No summary.");
-  if (m.brief && !(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
-  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, p))) result.missingPaths.push(p);
+  if (m.brief && !(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
+  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, p))) result.missingPaths.push(p);
   const tests = testIndex(root);
   for (const inv of m.invariants) {
     if (!inv.coveredBy.length && !inv.cards.length) {
@@ -20877,7 +21015,7 @@ function checkManifest(root, id, text2) {
         result.broken.push({ invariant: inv.id, entry, problem: "no test class" });
         continue;
       }
-      const names = files.flatMap((f) => testNames((0, import_node_path15.join)(root, f)));
+      const names = files.flatMap((f) => testNames((0, import_node_path16.join)(root, f)));
       if (!names.includes(name ?? "")) result.broken.push({ invariant: inv.id, entry, problem: "no such test", closest: closest(name ?? "", names) });
     }
   }
@@ -20890,15 +21028,15 @@ function testIndex(root) {
   const listed = capture("git", ["ls-files", "-co", "--exclude-standard"], root) ?? "";
   for (const f of listed.split("\n")) {
     const jvm = /\.(kt|java)$/.test(f);
-    if (jvm ? !/\/src\/(test|androidTest)[^/]*\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
-    const cls = stemOf((0, import_node_path15.basename)(f));
+    if (jvm ? !/\/src\/((test|androidTest)[^/]*|[a-z]\w*Test)\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
+    const cls = stemOf((0, import_node_path16.basename)(f));
     out.set(cls, [...out.get(cls) ?? [], f]);
   }
   indexed = { root, at: Date.now(), tests: out };
   return out;
 }
 function testNames(file) {
-  const text2 = (0, import_node_fs11.readFileSync)(file, "utf8");
+  const text2 = (0, import_node_fs12.readFileSync)(file, "utf8");
   if (/\.(kt|java)$/.test(file)) return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
   return testNamesIn(text2);
 }
@@ -20913,8 +21051,8 @@ function closest(name, names) {
   return best && best.score >= 0.5 ? best.n : void 0;
 }
 function briefGlance(root, m) {
-  if (!m.brief || !(0, import_node_fs11.existsSync)((0, import_node_path15.join)(root, m.brief))) return null;
-  const text2 = (0, import_node_fs11.readFileSync)((0, import_node_path15.join)(root, m.brief), "utf8");
+  if (!m.brief || !(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, m.brief))) return null;
+  const text2 = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(root, m.brief), "utf8");
   const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text2);
   return match ? match[1].trim() : null;
 }
@@ -20934,47 +21072,47 @@ function summarizeCheck(c) {
 // src/knowledge/draft.ts
 var DRAFTS = "drafts";
 function draftDir(project, id) {
-  return (0, import_node_path16.join)(project.store.dir, DRAFTS, id);
+  return (0, import_node_path17.join)(project.store.dir, DRAFTS, id);
 }
 var hash = (text2) => (0, import_node_crypto3.createHash)("sha1").update(text2).digest("hex");
 var current = (project, path) => {
-  const abs = (0, import_node_path16.join)(project.root, path);
-  return (0, import_node_fs12.existsSync)(abs) ? (0, import_node_fs12.readFileSync)(abs, "utf8") : "";
+  const abs = (0, import_node_path17.join)(project.root, path);
+  return (0, import_node_fs13.existsSync)(abs) ? (0, import_node_fs13.readFileSync)(abs, "utf8") : "";
 };
 function openDraft(project, feature, files) {
   const id = `${newRunId()}-${feature.replace(/[^\w-]/g, "_")}`;
   const dir = draftDir(project, id);
-  (0, import_node_fs12.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs13.mkdirSync)(dir, { recursive: true });
   const staged = files.map((f) => {
     const text2 = current(project, f.path);
-    (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(dir, f.staged), (0, import_node_fs12.existsSync)((0, import_node_path16.join)(project.root, f.path)) ? text2 : f.initial ?? "");
+    (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(dir, f.staged), (0, import_node_fs13.existsSync)((0, import_node_path17.join)(project.root, f.path)) ? text2 : f.initial ?? "");
     return { path: f.path, base: hash(text2), staged: f.staged };
   });
-  const format = (0, import_node_path16.join)(project.root, FEATURES_DIR, "README.md");
-  if ((0, import_node_fs12.existsSync)(format)) (0, import_node_fs12.copyFileSync)(format, (0, import_node_path16.join)(dir, "FORMAT.md"));
+  const format = (0, import_node_path17.join)(project.root, FEATURES_DIR, "README.md");
+  if ((0, import_node_fs13.existsSync)(format)) (0, import_node_fs13.copyFileSync)(format, (0, import_node_path17.join)(dir, "FORMAT.md"));
   return { id, dir, feature, files: staged };
 }
 function closeDraft(project, work, details) {
   const changed = work.files.filter((f) => {
-    const staged = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(work.dir, f.staged), "utf8");
+    const staged = (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(work.dir, f.staged), "utf8");
     return staged.trim() !== "" && staged !== current(project, f.path);
   });
   if (!changed.length) {
-    (0, import_node_fs12.rmSync)(work.dir, { recursive: true, force: true });
+    (0, import_node_fs13.rmSync)(work.dir, { recursive: true, force: true });
     return null;
   }
   const draft = { id: work.id, feature: work.feature, createdAt: (/* @__PURE__ */ new Date()).toISOString(), status: "pending", ...details, summary: details.summary.slice(0, 4e3), files: changed };
-  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
+  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
   return draft;
 }
 async function draftCorrections(project, input, log) {
   const { manifest } = input;
   const work = openDraft(project, manifest.id, [
     { path: manifest.file, staged: "manifest.yaml" },
-    ...manifest.brief && (0, import_node_fs12.existsSync)((0, import_node_path16.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
+    ...manifest.brief && (0, import_node_fs13.existsSync)((0, import_node_path17.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
   ]);
   const { dir, files } = work;
-  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(dir, "CHANGE.md"), changeContext(project, input));
+  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(dir, "CHANGE.md"), changeContext(project, input));
   const result = await runAgent(
     project,
     {
@@ -21001,7 +21139,7 @@ function changeContext(project, input) {
   const untracked = (capture("git", ["ls-files", "--others", "--exclude-standard", "--", ...files], project.root) ?? "").split("\n").filter(Boolean);
   const added = untracked.map((f) => `### new file ${f}
 \`\`\`
-${(0, import_node_fs12.readFileSync)((0, import_node_path16.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
+${(0, import_node_fs13.readFileSync)((0, import_node_path17.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
 \`\`\``).join("\n\n");
   const diff = `${tracked}
 ${added}`.slice(0, 6e4);
@@ -21048,18 +21186,18 @@ Do this:
 If nothing needs correcting, change no file. Finish with two or three sentences: what you changed and why, or that nothing needed changing.`;
 }
 function listDrafts(project, feature) {
-  const root = (0, import_node_path16.join)(project.store.dir, DRAFTS);
-  if (!(0, import_node_fs12.existsSync)(root)) return [];
-  return (0, import_node_fs12.readdirSync)(root).map((id) => (0, import_node_path16.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs12.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs12.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const root = (0, import_node_path17.join)(project.store.dir, DRAFTS);
+  if (!(0, import_node_fs13.existsSync)(root)) return [];
+  return (0, import_node_fs13.readdirSync)(root).map((id) => (0, import_node_path17.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs13.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs13.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 function findDraft(project, id) {
-  const file = (0, import_node_path16.join)(draftDir(project, id), "draft.json");
-  return (0, import_node_fs12.existsSync)(file) ? JSON.parse((0, import_node_fs12.readFileSync)(file, "utf8")) : null;
+  const file = (0, import_node_path17.join)(draftDir(project, id), "draft.json");
+  return (0, import_node_fs13.existsSync)(file) ? JSON.parse((0, import_node_fs13.readFileSync)(file, "utf8")) : null;
 }
 function draftDiffs(project, draft) {
   return draft.files.map((f) => {
     const now = current(project, f.path);
-    const staged = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(draftDir(project, draft.id), f.staged), "utf8");
+    const staged = (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(draftDir(project, draft.id), f.staged), "utf8");
     return { path: f.path, diff: unifiedDiff(now, staged, f.path), conflict: hash(now) !== f.base };
   });
 }
@@ -21070,9 +21208,9 @@ function approveDraft(project, id) {
   const conflicts = draftDiffs(project, draft).filter((d) => d.conflict);
   if (conflicts.length) return { ok: false, error: `${conflicts.map((c) => c.path).join(", ")} changed after this draft was made. Reject it and check the feature again.` };
   for (const f of draft.files) {
-    const abs = (0, import_node_path16.join)(project.root, f.path);
-    (0, import_node_fs12.mkdirSync)((0, import_node_path16.dirname)(abs), { recursive: true });
-    (0, import_node_fs12.writeFileSync)(abs, (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(draftDir(project, id), f.staged), "utf8"));
+    const abs = (0, import_node_path17.join)(project.root, f.path);
+    (0, import_node_fs13.mkdirSync)((0, import_node_path17.dirname)(abs), { recursive: true });
+    (0, import_node_fs13.writeFileSync)(abs, (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(draftDir(project, id), f.staged), "utf8"));
   }
   setStatus(project, draft, "approved");
   return { ok: true, files: draft.files.map((f) => f.path) };
@@ -21085,11 +21223,11 @@ function rejectDraft(project, id) {
   return { ok: true };
 }
 function setStatus(project, draft, status) {
-  (0, import_node_fs12.writeFileSync)((0, import_node_path16.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
+  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
 }
 
 // src/engine/impact.ts
-var import_node_path17 = require("node:path");
+var import_node_path18 = require("node:path");
 var cached = null;
 function areaGraph(project, result) {
   if (cached && cached.root === project.root && cached.scannedAt === result.scannedAt && Date.now() - cached.at < 5e3) return cached.graph;
@@ -21105,7 +21243,7 @@ function buildGraph(root, result, deps) {
     modulesOf.set(f.id, f.modules.map((m) => m.id));
     for (const m of f.modules) {
       areaOf.set(m.id, f.id);
-      dirs.push({ module: m.id, dir: `${(0, import_node_path17.relative)(root, m.dir).replace(/\\/g, "/")}/` });
+      dirs.push({ module: m.id, dir: `${(0, import_node_path18.relative)(root, m.dir).replace(/\\/g, "/")}/` });
     }
   }
   dirs.sort((a, b) => b.dir.length - a.dir.length);
@@ -21149,7 +21287,7 @@ function uses(graph, area) {
 }
 
 // src/engine/doctor.ts
-var import_node_fs13 = require("node:fs");
+var import_node_fs14 = require("node:fs");
 function doctor(project, error2) {
   const major = Number(process.versions.node.split(".")[0]);
   const checks = [
@@ -21167,7 +21305,7 @@ function doctor(project, error2) {
     return checks;
   }
   checks.push({ id: "project", label: "Project", status: "ok", detail: `${project.name} (${project.adapter.id}) at ${project.root}` });
-  const hasConfig = (0, import_node_fs13.existsSync)(configPath(project.root));
+  const hasConfig = (0, import_node_fs14.existsSync)(configPath(project.root));
   checks.push({
     id: "config",
     label: "probe/probe.yaml",
@@ -21269,14 +21407,14 @@ function chooseFeatures(project, features, mode = "replace") {
   writeState(project, { features: chosen, seen });
   return chosen;
 }
-var hasManifest = (project, id) => (0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, manifestFile(id)));
+var hasManifest = (project, id) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, manifestFile(id)));
 function initStatus(project) {
   const steps = [];
   const add = (id, status, detail) => steps.push({ id, label: INIT_STEPS.find((s) => s.id === id).label, status, detail });
   const failing = doctor(project).filter((c) => c.status === "fail");
   add("doctor", failing.length ? "warn" : "done", failing.length ? `${failing.map((c) => c.label).join(", ")}: see \`probe doctor\`. Only device runs need these.` : "ready");
-  add("config", (0, import_node_fs14.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path18.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
-  const missingKit = KIT.filter((k) => !(0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, k.path))).map((k) => k.path);
+  add("config", (0, import_node_fs15.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path19.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
+  const missingKit = KIT.filter((k) => !(0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, k.path))).map((k) => k.path);
   add("kit", missingKit.length ? "todo" : "done", missingKit.length ? `to write: ${missingKit.join(", ")}` : KIT.map((k) => k.path).join(", "));
   const scanned = project.store.read("scan.json");
   add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform areas` : "not scanned yet");
@@ -21366,7 +21504,7 @@ function needsCards(project, feature) {
   }
 }
 function agentFileDone(project) {
-  const read = (p) => (0, import_node_fs14.existsSync)((0, import_node_path18.join)(project.root, p)) ? (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(project.root, p), "utf8") : "";
+  const read = (p) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, p)) ? (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(project.root, p), "utf8") : "";
   return read("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
 }
 function isInitStep(id) {
@@ -21399,17 +21537,17 @@ function startInit(project, options = {}) {
       const failing = doctor(project).filter((c) => c.status === "fail");
       log(failing.length ? `tools: ${failing.map((c) => `${c.label} (${c.fix ?? c.detail})`).join("; ")} \u2014 device runs need these, the rest of init does not` : "tools: ready");
     }
-    if (wants("config") && !(0, import_node_fs14.existsSync)(configPath(project.root))) {
-      (0, import_node_fs14.mkdirSync)((0, import_node_path18.dirname)(configPath(project.root)), { recursive: true });
-      (0, import_node_fs14.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
-      log(`wrote ${(0, import_node_path18.relative)(project.root, configPath(project.root))}`);
+    if (wants("config") && !(0, import_node_fs15.existsSync)(configPath(project.root))) {
+      (0, import_node_fs15.mkdirSync)((0, import_node_path19.dirname)(configPath(project.root)), { recursive: true });
+      (0, import_node_fs15.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
+      log(`wrote ${(0, import_node_path19.relative)(project.root, configPath(project.root))}`);
     }
     if (wants("kit")) {
       for (const k of KIT) {
-        const abs = (0, import_node_path18.join)(project.root, k.path);
-        if ((0, import_node_fs14.existsSync)(abs)) continue;
-        (0, import_node_fs14.mkdirSync)((0, import_node_path18.dirname)(abs), { recursive: true });
-        (0, import_node_fs14.writeFileSync)(abs, k.text);
+        const abs = (0, import_node_path19.join)(project.root, k.path);
+        if ((0, import_node_fs15.existsSync)(abs)) continue;
+        (0, import_node_fs15.mkdirSync)((0, import_node_path19.dirname)(abs), { recursive: true });
+        (0, import_node_fs15.writeFileSync)(abs, k.text);
         log(`wrote ${k.path}`);
       }
     }
@@ -21469,12 +21607,12 @@ async function draftManifests(project, run, features, model, log) {
     const work = openDraft(project, id, [{ path: file, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md
 id: ${id}
 ${kind}` }]);
-    (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
-    if (!(0, import_node_fs14.existsSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"))) (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"), features_README_default);
+    (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
+    if (!(0, import_node_fs15.existsSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"))) (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"), features_README_default);
     const agent = (prompt6) => runAgent(project, { prompt: prompt6, probeTools: [], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model }, say);
     let result = await agent(manifestPrompt(project, feature));
     run.costUsd += result.costUsd;
-    let check2 = checkManifest(project.root, id, (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "manifest.yaml"), "utf8"));
+    let check2 = checkManifest(project.root, id, (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "manifest.yaml"), "utf8"));
     if (check2.errors.length || check2.broken.length || check2.unexplained.length) {
       say(`mending ${check2.errors.length + check2.broken.length + check2.unexplained.length} problems the link check found`);
       const fix = await agent(`The manifest.yaml you wrote for the feature "${id}" fails Probe's check:
@@ -21483,7 +21621,7 @@ ${summarizeCheck(check2)}
 
 Fix every problem in manifest.yaml: point a broken covered_by entry at the test's exact name (FEATURE.md lists them), or remove it and give the rule a gap. Change nothing else. Finish with one sentence.`);
       run.costUsd += fix.costUsd;
-      check2 = checkManifest(project.root, id, (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "manifest.yaml"), "utf8"));
+      check2 = checkManifest(project.root, id, (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "manifest.yaml"), "utf8"));
       result = { ...result, summary: `${result.summary}
 
 ${fix.summary}` };
@@ -21497,13 +21635,13 @@ ${summarizeCheck(check2)}`, runId: run.id, origin: "init", step: "manifests" });
   });
 }
 function featureContext(project, feature, tests) {
-  const rel = (dir) => (0, import_node_path18.relative)(project.root, dir).replace(/\\/g, "/");
+  const rel = (dir) => (0, import_node_path19.relative)(project.root, dir).replace(/\\/g, "/");
   const dirs = feature.modules.map((m) => `${rel(m.dir)}/`);
   const tasks = feature.modules.map((m) => m.unitTestTask).filter((t) => !!t);
   const command = tasks.length ? project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : [...new Set(tasks)].join(" && ") : null;
   const testFiles = [...tests.values()].flat().filter((f) => dirs.some((d) => f.startsWith(d)));
   const testList = testFiles.slice(0, 60).map((f) => {
-    const names = testNames((0, import_node_path18.join)(project.root, f));
+    const names = testNames((0, import_node_path19.join)(project.root, f));
     return `### ${stemOf(f.split("/").pop())} (${f})
 ${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `
 - \u2026 ${names.length - 80} more` : ""}`;
@@ -21594,7 +21732,7 @@ async function draftCards(project, run, features, model, log) {
     say(`looking for rules only a device can prove (${i + 1}/${features.length})`);
     const before = new Map(listCards(project.root, id).map((c) => [c.id, c.updatedAt]));
     const work = openDraft(project, id, [{ path: manifestFile(id), staged: "manifest.yaml" }]);
-    if (!(0, import_node_fs14.existsSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"))) (0, import_node_fs14.writeFileSync)((0, import_node_path18.join)(work.dir, "FORMAT.md"), features_README_default);
+    if (!(0, import_node_fs15.existsSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"))) (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"), features_README_default);
     const result = await runAgent(
       project,
       { prompt: cardsPrompt(project, id), probeTools: ["probe_cards_context", "probe_cards_save"], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model },
@@ -21636,13 +21774,13 @@ function draftAgentFile(project, run, log) {
     { path: "CLAUDE.md", staged: "claude.md" }
   ]);
   const edit = (staged, change) => {
-    const abs = (0, import_node_path18.join)(work.dir, staged);
-    const before = (0, import_node_fs14.readFileSync)(abs, "utf8");
+    const abs = (0, import_node_path19.join)(work.dir, staged);
+    const before = (0, import_node_fs15.readFileSync)(abs, "utf8");
     const crlf = before.includes("\r\n");
     const after = change(before.replace(/\r\n/g, "\n"));
-    (0, import_node_fs14.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
+    (0, import_node_fs15.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
   };
-  if (!(0, import_node_fs14.readFileSync)((0, import_node_path18.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}
+  if (!(0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}
 `);
   edit("claude.md", (t) => {
     if (/^@AGENTS\.md\s*$/m.test(t)) return t;
@@ -21698,25 +21836,25 @@ function formatInitStatus(steps) {
 var import_node_path30 = require("node:path");
 
 // src/adapters/android-gradle/index.ts
-var import_node_fs20 = require("node:fs");
-var import_node_path24 = require("node:path");
+var import_node_fs21 = require("node:fs");
+var import_node_path25 = require("node:path");
 
 // src/adapters/android-gradle/app.ts
-var import_node_fs16 = require("node:fs");
-var import_node_path20 = require("node:path");
+var import_node_fs17 = require("node:fs");
+var import_node_path21 = require("node:path");
 
 // src/adapters/android-gradle/settings.ts
-var import_node_fs15 = require("node:fs");
-var import_node_path19 = require("node:path");
+var import_node_fs16 = require("node:fs");
+var import_node_path20 = require("node:path");
 var SETTINGS_FILES = ["settings.gradle.kts", "settings.gradle"];
 function settingsFile(root) {
-  const name = SETTINGS_FILES.find((f) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(root, f)));
-  return name ? (0, import_node_path19.join)(root, name) : null;
+  const name = SETTINGS_FILES.find((f) => (0, import_node_fs16.existsSync)((0, import_node_path20.join)(root, f)));
+  return name ? (0, import_node_path20.join)(root, name) : null;
 }
 function includedModules(root) {
   const file = settingsFile(root);
   if (!file) return [];
-  const text2 = stripComments((0, import_node_fs15.readFileSync)(file, "utf8"));
+  const text2 = stripComments((0, import_node_fs16.readFileSync)(file, "utf8"));
   const overrides = /* @__PURE__ */ new Map();
   for (const m of text2.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
     overrides.set(m[1], m[2]);
@@ -21728,7 +21866,7 @@ function includedModules(root) {
       ids.add(raw.startsWith(":") ? raw : `:${raw}`);
     }
   }
-  return [...ids].map((id) => ({ id, dir: (0, import_node_path19.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs15.existsSync)((0, import_node_path19.join)(m.dir, "build.gradle")));
+  return [...ids].map((id) => ({ id, dir: (0, import_node_path20.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs16.existsSync)((0, import_node_path20.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs16.existsSync)((0, import_node_path20.join)(m.dir, "build.gradle")));
 }
 function stripComments(text2) {
   return text2.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -21737,20 +21875,20 @@ function stripComments(text2) {
 // src/adapters/android-gradle/app.ts
 var APPLICATION_PLUGIN = /com\.android\.application|android[.-]application|androidApplication/;
 function buildFileOf(dir) {
-  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs16.existsSync)((0, import_node_path20.join)(dir, name))) return (0, import_node_fs16.readFileSync)((0, import_node_path20.join)(dir, name), "utf8");
+  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs17.existsSync)((0, import_node_path21.join)(dir, name))) return (0, import_node_fs17.readFileSync)((0, import_node_path21.join)(dir, name), "utf8");
   return null;
 }
 function detectAndroidApp(root) {
   const apps = includedModules(root).map((m) => ({ ...m, build: buildFileOf(m.dir) })).filter((m) => m.build && APPLICATION_PLUGIN.test(m.build));
   if (apps.length === 0) return null;
   const app = apps.find((m) => m.id === ":app") ?? apps[0];
-  const apkDir = (0, import_node_path20.join)(app.dir, "build", "outputs", "apk");
+  const apkDir = (0, import_node_path21.join)(app.dir, "build", "outputs", "apk");
   let flavor = "";
-  let metadata = (0, import_node_fs16.existsSync)((0, import_node_path20.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path20.join)(apkDir, "debug", "output-metadata.json") : null;
-  if (!metadata && (0, import_node_fs16.existsSync)(apkDir)) {
-    for (const d of (0, import_node_fs16.readdirSync)(apkDir)) {
-      const file = (0, import_node_path20.join)(apkDir, d, "debug", "output-metadata.json");
-      if ((0, import_node_fs16.existsSync)(file)) {
+  let metadata = (0, import_node_fs17.existsSync)((0, import_node_path21.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path21.join)(apkDir, "debug", "output-metadata.json") : null;
+  if (!metadata && (0, import_node_fs17.existsSync)(apkDir)) {
+    for (const d of (0, import_node_fs17.readdirSync)(apkDir)) {
+      const file = (0, import_node_path21.join)(apkDir, d, "debug", "output-metadata.json");
+      if ((0, import_node_fs17.existsSync)(file)) {
         flavor = d;
         metadata = file;
         break;
@@ -21759,7 +21897,7 @@ function detectAndroidApp(root) {
   }
   const installTask = `${app.id}:install${flavor ? flavor[0].toUpperCase() + flavor.slice(1) : ""}Debug`;
   if (metadata) {
-    const id2 = JSON.parse((0, import_node_fs16.readFileSync)(metadata, "utf8")).applicationId;
+    const id2 = JSON.parse((0, import_node_fs17.readFileSync)(metadata, "utf8")).applicationId;
     if (id2) return { module: app.id, package: id2, installTask, source: "last build" };
   }
   const build = app.build;
@@ -21770,8 +21908,8 @@ function detectAndroidApp(root) {
 }
 
 // src/adapters/android-gradle/deps.ts
-var import_node_fs17 = require("node:fs");
-var import_node_path21 = require("node:path");
+var import_node_fs18 = require("node:fs");
+var import_node_path22 = require("node:path");
 function accessorSegment(segment) {
   return segment.replace(/[-_]+([a-zA-Z0-9])/g, (_, c) => c.toUpperCase());
 }
@@ -21780,9 +21918,9 @@ function moduleDependencies(modules) {
   const ids = new Set(modules.map((m) => m.id));
   const out = /* @__PURE__ */ new Map();
   for (const m of modules) {
-    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path21.join)(m.dir, f)).find(import_node_fs17.existsSync);
+    const file = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path22.join)(m.dir, f)).find(import_node_fs18.existsSync);
     if (!file) continue;
-    const text2 = (0, import_node_fs17.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const text2 = (0, import_node_fs18.readFileSync)(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     const deps = /* @__PURE__ */ new Set();
     for (const x of text2.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
     for (const x of text2.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
@@ -21798,15 +21936,15 @@ function moduleDependencies(modules) {
 }
 
 // src/adapters/android-gradle/inventory.ts
-var import_node_fs18 = require("node:fs");
-var import_node_path22 = require("node:path");
+var import_node_fs19 = require("node:fs");
+var import_node_path23 = require("node:path");
 var SOURCE_EXT2 = /\.(kt|java)$/;
 function sourceFiles(dir) {
-  if (!(0, import_node_fs18.existsSync)(dir)) return [];
+  if (!(0, import_node_fs19.existsSync)(dir)) return [];
   const out = [];
   const walk2 = (d) => {
-    for (const entry of (0, import_node_fs18.readdirSync)(d, { withFileTypes: true })) {
-      const p = (0, import_node_path22.join)(d, entry.name);
+    for (const entry of (0, import_node_fs19.readdirSync)(d, { withFileTypes: true })) {
+      const p = (0, import_node_path23.join)(d, entry.name);
       if (entry.isDirectory()) walk2(p);
       else if (SOURCE_EXT2.test(entry.name)) out.push(p);
     }
@@ -21814,8 +21952,16 @@ function sourceFiles(dir) {
   walk2(dir);
   return out;
 }
+function sourceSetKind(name) {
+  if (name === "main" || /^[a-z]\w*Main$/.test(name)) return "main";
+  if (name === "androidTest" || /^android(Instrumented|Device)Test$/.test(name)) return "androidTest";
+  if (name === "test" || /^[a-z]\w*Test$/.test(name)) return "test";
+  return null;
+}
 function sourceSetFiles(moduleDir, set) {
-  return sourceFiles((0, import_node_path22.join)(moduleDir, "src", set));
+  const src = (0, import_node_path23.join)(moduleDir, "src");
+  if (!(0, import_node_fs19.existsSync)(src)) return [];
+  return (0, import_node_fs19.readdirSync)(src, { withFileTypes: true }).filter((e) => e.isDirectory() && sourceSetKind(e.name) === set).flatMap((e) => sourceFiles((0, import_node_path23.join)(src, e.name)));
 }
 var DECLARATION = /^(?:@\w+(?:\([^)]*\))?\s+)*((?:(?:public|internal|private|protected|abstract|open|final|data|sealed|enum|value|inline|annotation|fun|static)\s+)*)(class|object|interface)\s+([A-Z]\w*)/;
 function declaredClasses(text2) {
@@ -21855,7 +22001,7 @@ function indexTests(testFiles) {
   const bases = /* @__PURE__ */ new Set();
   const identifiers = /* @__PURE__ */ new Set();
   for (const file of testFiles) {
-    const text2 = (0, import_node_fs18.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs19.readFileSync)(file, "utf8");
     for (const c of declaredClasses(text2)) {
       if (!TEST_SUFFIX.test(c.name)) continue;
       let base = c.name.replace(TEST_SUFFIX, "");
@@ -21877,7 +22023,7 @@ function testLink(name, index) {
 function inventory(projectRoot, mainFiles, tests) {
   const out = [];
   for (const file of mainFiles) {
-    const text2 = (0, import_node_fs18.readFileSync)(file, "utf8");
+    const text2 = (0, import_node_fs19.readFileSync)(file, "utf8");
     const declared = declaredClasses(text2).filter((c) => !c.modifiers.includes("private"));
     if (declared.length === 0) continue;
     const lines = Math.max(1, Math.round(text2.split("\n").length / declared.length));
@@ -21887,7 +22033,7 @@ function inventory(projectRoot, mainFiles, tests) {
       const weight = KIND_WEIGHT[kind];
       out.push({
         name: c.name,
-        file: (0, import_node_path22.relative)(projectRoot, file).replace(/\\/g, "/"),
+        file: (0, import_node_path23.relative)(projectRoot, file).replace(/\\/g, "/"),
         kind,
         lines,
         test,
@@ -21899,8 +22045,8 @@ function inventory(projectRoot, mainFiles, tests) {
 }
 
 // src/core/junit.ts
-var import_node_fs19 = require("node:fs");
-var import_node_path23 = require("node:path");
+var import_node_fs20 = require("node:fs");
+var import_node_path24 = require("node:path");
 function addJUnitXml(result, xml) {
   for (const tc of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
     const attrs = tc[1];
@@ -21923,18 +22069,18 @@ function addJUnitXml(result, xml) {
   }
 }
 function readJUnitReports(moduleId, path, sinceMs, filter = (n) => n.endsWith(".xml")) {
-  const files = reportFiles(path, filter).filter((f) => (0, import_node_fs19.statSync)(f).mtimeMs >= sinceMs - 2e3);
+  const files = reportFiles(path, filter).filter((f) => (0, import_node_fs20.statSync)(f).mtimeMs >= sinceMs - 2e3);
   if (files.length === 0) return null;
   const result = { module: moduleId, tests: 0, failed: 0, skipped: 0, durationMs: 0, failures: [] };
-  for (const file of files) addJUnitXml(result, (0, import_node_fs19.readFileSync)(file, "utf8"));
+  for (const file of files) addJUnitXml(result, (0, import_node_fs20.readFileSync)(file, "utf8"));
   return result;
 }
 function reportFiles(path, filter) {
-  if (!(0, import_node_fs19.existsSync)(path)) return [];
-  if ((0, import_node_fs19.statSync)(path).isFile()) return [path];
+  if (!(0, import_node_fs20.existsSync)(path)) return [];
+  if ((0, import_node_fs20.statSync)(path).isFile()) return [path];
   const out = [];
-  for (const entry of (0, import_node_fs19.readdirSync)(path, { withFileTypes: true })) {
-    const p = (0, import_node_path23.join)(path, entry.name);
+  for (const entry of (0, import_node_fs20.readdirSync)(path, { withFileTypes: true })) {
+    const p = (0, import_node_path24.join)(path, entry.name);
     if (entry.isDirectory()) out.push(...reportFiles(p, filter));
     else if (filter(entry.name)) out.push(p);
   }
@@ -21972,12 +22118,12 @@ var androidGradleAdapter = {
   },
   projectName(root) {
     const file = settingsFile(root);
-    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs20.readFileSync)(file, "utf8"))?.[1];
-    return named || (0, import_node_path24.basename)(root);
+    const named = file && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs21.readFileSync)(file, "utf8"))?.[1];
+    return named || (0, import_node_path25.basename)(root);
   },
   scanModules(root, config2) {
     return includedModules(root).map(({ id, dir }) => {
-      const buildFile = (0, import_node_fs20.readFileSync)((0, import_node_fs20.existsSync)((0, import_node_path24.join)(dir, "build.gradle.kts")) ? (0, import_node_path24.join)(dir, "build.gradle.kts") : (0, import_node_path24.join)(dir, "build.gradle"), "utf8");
+      const buildFile = (0, import_node_fs21.readFileSync)((0, import_node_fs21.existsSync)((0, import_node_path25.join)(dir, "build.gradle.kts")) ? (0, import_node_path25.join)(dir, "build.gradle.kts") : (0, import_node_path25.join)(dir, "build.gradle"), "utf8");
       const platform = modulePlatform(buildFile);
       const main2 = sourceSetFiles(dir, "main");
       const test = sourceSetFiles(dir, "test");
@@ -22012,7 +22158,7 @@ var androidGradleAdapter = {
     return modules.filter((m) => m.unitTestTask).map((m) => {
       const taskName = m.unitTestTask.split(":").pop();
       const cached3 = invocation.reused.includes(m.id);
-      const result = readJUnitResults(m.id, (0, import_node_path24.join)(m.dir, "build", "test-results", taskName), cached3 ? 0 : sinceMs);
+      const result = readJUnitResults(m.id, (0, import_node_path25.join)(m.dir, "build", "test-results", taskName), cached3 ? 0 : sinceMs);
       return result && { ...result, cached: cached3 };
     }).filter((r) => r !== null);
   },
@@ -22030,16 +22176,16 @@ var androidGradleAdapter = {
     return moduleDependencies(includedModules(root));
   },
   isTestSource(relPath) {
-    return /(^|\/)src\/(test|androidTest|testFixtures|sharedTest)[^/]*\//.test(relPath.replace(/\\/g, "/"));
+    return /(^|\/)src\/((test|androidTest|testFixtures|sharedTest)[^/]*|[a-z]\w*Test)\//.test(relPath.replace(/\\/g, "/"));
   },
   navigationHints(root, modules, limit) {
     const out = [];
     for (const m of modules) {
       for (const file of sourceSetFiles(m.dir, "main")) {
-        const lines = (0, import_node_fs20.readFileSync)(file, "utf8").split(/\r?\n/);
+        const lines = (0, import_node_fs21.readFileSync)(file, "utf8").split(/\r?\n/);
         lines.forEach((text2, i) => {
           if (out.length < limit && NAV_HINT.test(text2)) {
-            out.push(`${(0, import_node_path24.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+            out.push(`${(0, import_node_path25.relative)(root, file).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
           }
         });
       }
@@ -22048,7 +22194,7 @@ var androidGradleAdapter = {
   },
   doctor(root) {
     const checks = [];
-    const wrapper = (0, import_node_fs20.existsSync)((0, import_node_path24.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
+    const wrapper = (0, import_node_fs21.existsSync)((0, import_node_path25.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
     checks.push({
       id: "gradle-wrapper",
       label: "Gradle wrapper",
@@ -22080,8 +22226,8 @@ var androidGradleAdapter = {
       detail: devices.length > 0 ? devices.map((d) => `${d.serial} (${d.model}, ${d.emulator ? "emulator" : "real phone \u2014 agents need permission"})`).join(", ") : "none (only needed for agent tests)",
       fix: devices.length > 0 ? void 0 : "Start an emulator or connect a phone with USB debugging"
     });
-    const emulator = sdk ? (0, import_node_path24.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
-    const avds = emulator && (0, import_node_fs20.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
+    const emulator = sdk ? (0, import_node_path25.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
+    const avds = emulator && (0, import_node_fs21.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
     checks.push({
       id: "avds",
       label: "Emulator images",
@@ -22093,7 +22239,7 @@ var androidGradleAdapter = {
   }
 };
 function gradlew(root) {
-  const wrapper = (0, import_node_path24.join)(root, isWindows ? "gradlew.bat" : "gradlew");
+  const wrapper = (0, import_node_path25.join)(root, isWindows ? "gradlew.bat" : "gradlew");
   return isWindows ? `"${wrapper}"` : wrapper;
 }
 var NAV_HINT = /\bcomposable<|\bnavigation<|\bNavHost\(|startDestination|deepLinks?\s*[=(]|navDeepLink|uriPattern|@Serializable\s+(data\s+)?(object|class)\s+\w*(Route|Destination|Screen|Graph)\b|\bnavigateTo\w*\(|Intent\(\s*\w+,\s*\w+Activity::class/;
@@ -22101,89 +22247,6 @@ var NAV_HINT = /\bcomposable<|\bnavigation<|\bNavHost\(|startDestination|deepLin
 // src/adapters/generic/index.ts
 var import_node_fs23 = require("node:fs");
 var import_node_path28 = require("node:path");
-
-// src/adapters/generic/areas.ts
-var import_node_child_process6 = require("node:child_process");
-var import_node_fs21 = require("node:fs");
-var import_node_path25 = require("node:path");
-var CONTAINER_DIRS = /* @__PURE__ */ new Set(["src", "lib", "libs", "packages", "apps", "modules", "services", "pkg", "internal", "cmd", "components", "crates", "plugins", "features"]);
-function listProjectFiles(root, ignored) {
-  const git2 = (0, import_node_child_process6.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
-  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored);
-  return listed.filter((f) => !ignored.test(f) && !f.startsWith("probe/"));
-}
-function walk(root, ignored) {
-  const out = [];
-  const visit = (rel) => {
-    for (const entry of (0, import_node_fs21.readdirSync)((0, import_node_path25.join)(root, rel), { withFileTypes: true })) {
-      const path = rel ? `${rel}/${entry.name}` : entry.name;
-      if (ignored.test(path)) continue;
-      if (entry.isDirectory()) visit(path);
-      else if (entry.isFile()) out.push(path);
-    }
-  };
-  visit("");
-  return out;
-}
-function discoverAreas(files) {
-  const areas = /* @__PURE__ */ new Map();
-  const add = (id, group, dir) => {
-    const area = areas.get(id) ?? { id, group, dirs: [] };
-    if (!area.dirs.includes(dir)) area.dirs.push(dir);
-    areas.set(id, area);
-  };
-  for (const file of files) {
-    if (!SOURCE_EXT.test(file) || isTestPath(file)) continue;
-    const parts = file.split("/");
-    if (parts.length < 2) continue;
-    const top = parts[0];
-    if (top.startsWith(".") || TEST_ONLY_DIRS.has(top)) continue;
-    if (CONTAINER_DIRS.has(top) && parts.length >= 3 && !TEST_ONLY_DIRS.has(parts[1])) add(parts[1], "feature", `${top}/${parts[1]}`);
-    else add(top, "platform", top);
-  }
-  return [...areas.values()];
-}
-function configuredAreas(spec, files) {
-  const dirs = allDirs(files);
-  if (Array.isArray(spec)) {
-    const matched = [...new Set(spec.flatMap((g) => dirs.filter((d) => globRegex(g).test(d))))].sort();
-    const last = (d) => d.slice(d.lastIndexOf("/") + 1);
-    const taken = /* @__PURE__ */ new Map();
-    for (const d of matched) taken.set(last(d), (taken.get(last(d)) ?? 0) + 1);
-    return matched.map((d) => ({ id: taken.get(last(d)) > 1 ? d : last(d), group: "feature", dirs: [d] }));
-  }
-  return Object.entries(spec).map(([id, globs]) => {
-    const patterns = (Array.isArray(globs) ? globs : [globs]).map(globRegex);
-    const matched = dirs.filter((d) => patterns.some((p) => p.test(d))).sort();
-    return { id, group: "feature", dirs: matched.filter((d, i) => !matched.slice(0, i).some((o) => d.startsWith(`${o}/`))) };
-  });
-}
-function allDirs(files) {
-  const dirs = /* @__PURE__ */ new Set();
-  for (const f of files) {
-    let i = f.indexOf("/");
-    while (i > 0) {
-      dirs.add(f.slice(0, i));
-      i = f.indexOf("/", i + 1);
-    }
-  }
-  return [...dirs];
-}
-function globRegex(glob) {
-  const g = glob.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
-  let out = "";
-  for (let i = 0; i < g.length; i++) {
-    const c = g[i];
-    if (c === "*" && g[i + 1] === "*") {
-      out += ".*";
-      i++;
-      if (g[i + 1] === "/") i++;
-    } else if (c === "*") out += "[^/]*";
-    else if (c === "?") out += "[^/]";
-    else out += c.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  }
-  return new RegExp(`^${out}$`);
-}
 
 // src/adapters/generic/modules.ts
 var import_node_fs22 = require("node:fs");
@@ -22736,7 +22799,7 @@ Never commit, stage, push or switch branches.`);
 function startUnitRun(project, featureId) {
   const feature = findFeature(latestScan(project), featureId);
   if (!feature) throw new Error(`Unknown feature "${featureId}". Run a scan or check the name.`);
-  const modules = feature.modules.filter((m) => m.unitTestTask);
+  const modules = uniqueModules(feature.modules).filter((m) => m.unitTestTask);
   const run = {
     id: newRunId(),
     kind: "unit",
@@ -33348,7 +33411,7 @@ ${targets.map((t, i) => `${i + 1}. ${t.name} (${t.kind}) \u2014 ${t.file}`).join
 ## How
 1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow their testing rules.
 2. Read neighbouring tests in the same module to copy their style, libraries, fakes and helpers. Reuse existing test helpers and fakes; do not invent a new framework.
-3. For each class: read it, then write one test class next to the module's existing unit tests (the module's src/test source set), named <ClassName>Test.
+3. For each class: read it, then write one test class next to the module's existing unit tests (the module's src/test source set, or src/commonTest in a Kotlin Multiplatform module), named <ClassName>Test.
    Each test pins one behaviour and must fail if that behaviour broke: real inputs and real assertions, no tests that only check a mock was called.
 4. Only create or edit files under test source sets. Never change production code; if a class cannot be tested without changing it, skip it and say why.
 5. Call probe_unit_run with feature "${feature.id}". If your tests fail to compile or fail, fix the tests (not the production code) and run again, at most three times.
