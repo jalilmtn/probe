@@ -175,6 +175,8 @@ Probe is not tied to Claude. Three parts, each usable on its own:
 | Fix | Every problem a run found gets **⧉ Fix prompt** (context to paste into any coding agent) and **✦ Fix** (an agent edits the code, then Probe re-runs the unit tests and the card) | `issues`, `fix-prompt`, `fix`; under every run |
 | Watch | While you code: an edit marks its features as edited, and an edit in a platform module also marks the areas that depend on it (`watch.impactDepth`, from the build files); at the end of an agent's turn, on a commit (or 45s after edits in an IDE, while Studio runs) a check runs their unit tests and manifest test links, and drafts manifest/brief corrections for review. Rules only a device card proves are named, with an offer to run their cards. Results go back to the agent session | `hooks/hooks.json`, `hook edit\|stop\|prompt`, `hooks install`, `check`, `stale`, Studio → feature |
 | Rules | Each manifest rule lists the unit tests and device cards that prove it; ask whether a rule holds, or run its cards on an emulator by rule | `rules`, `rule --run`, `probe_rule`, `probe_card_run { rule }`, Studio → feature |
+| Security | Checks picked by project type (Android, iOS, web, backend, cross-platform mobile, desktop): code rules, vulnerable dependencies (OSV), secrets in git history, built artifacts, a live localhost app or emulator, and an optional agent review. Each finding gets ⧉ Fix prompt, ✦ Fix (re-checked after the edit) and Dismiss with a reason | `security [feature] [--agent] [--layers ...]`, `security-dismiss`, `probe_security`, Studio → Security |
+| Projects | Studio switches between every project Probe has scanned on this machine, or opens another folder | Studio header |
 | Stop | Any running run stops: its build or agent is killed, it is saved as `stopped` and never counts toward health | ■ Stop, Ctrl+C in the CLI |
 
 ## CLI
@@ -199,6 +201,8 @@ node dist/probe.cjs rules <feature> | rule <feature/rule> [--run] [--device <ser
 node dist/probe.cjs drafts [feature] | draft show|approve|reject <id>
 node dist/probe.cjs hook edit [files…] | hook stop | hook prompt [--session <id>]
 node dist/probe.cjs hooks install | uninstall | status
+node dist/probe.cjs security [feature] [--agent] [--layers static,deps,history,artifact,runtime,agent] [--url http://localhost:3000] [--limit n]
+node dist/probe.cjs security-dismiss <issue> <reason>
 ```
 
 Agents run on your own login and plan for the CLI `agents.runner` names (Claude Code by default,
@@ -259,6 +263,27 @@ verify run lists the problems of every run it started. Each has two buttons:
 | ⧉ Fix prompt | A self-contained prompt: the problem, its evidence (expectation and what was seen, the agent's last steps, the crash stack, the test message), the card, the feature's modules, how to check the fix. Copy it into any agent. |
 | ✦ Fix | A background agent fixes it on the current branch: it may edit files, never run commands or touch git. Probe then runs the feature's unit tests and, for a problem seen on a device, the card again from a fresh install. Changes stay uncommitted for review. |
 
+## Security
+
+`probe security` picks its checks from what the project is (an Android app, a web frontend, a
+backend, a desktop app…), so each project only gets the checks that apply to it. The catalog,
+about 400 checks across platforms, lives in [docs/security](docs/security/README.md).
+
+| Layer | What it looks at |
+|---|---|
+| static | Source and config files, matched against the platform rules |
+| deps | Lockfiles of every common ecosystem, checked against OSV |
+| history | Secrets committed in the last `security.historyCommits` commits |
+| artifact | A built APK, IPA or bundle, when one exists |
+| runtime | A running app: localhost web pages only, Android on an emulator only |
+| agent | An agent reviews the code against the platform's catalog (`--agent`) |
+
+Findings appear in Studio → Security and in every run's issue list, grouped by severity and
+feature. A finding is dismissed with a reason (stored per project, undone from Studio); a line
+with `probe-security-ignore <ID>` skips that check there. `security.failOn` (default `high`)
+decides what fails the run, and `security.skip` / `security.ignorePaths` in `probe.yaml` turn
+checks or paths off. ✦ Fix re-runs the check that found the problem after the agent's edit.
+
 ## Branches
 
 Every run records the branch, commit and number of uncommitted files it tested, and Studio's
@@ -266,8 +291,12 @@ header shows the branch the project is on. Studio sends that branch with every a
 project has been switched to another branch meanwhile (in a terminal or the IDE), the server
 refuses the action and Studio asks before continuing on the new one. It also warns when the
 project is on the base branch itself, on a detached HEAD, or behind its upstream. Verify picks
-the base branch from a list. Probe never checks out, commits or pulls: switching branches stays
-with the person.
+the base branch from a list.
+
+The branch in Studio's header is also a picker: it lists the project's branches with a search
+box, and picking one runs `git switch` (a remote branch gets its local tracking branch) and
+rescans. It refuses while there are uncommitted files or runs going, and asks first. Probe never
+commits or pulls.
 
 ## Project types
 
@@ -357,6 +386,7 @@ src/
   accounts/    test accounts, machine-local secrets, login check
   tickets/     ticket context in, ticket drafts out
   mcp/         MCP server (stdio): tools for AI agents
+  security/    security checks: catalog per platform, static, deps, history, artifact, runtime, agent
   studio/      local GUI (single page + small HTTP API)
   cli.ts       command line entry
 .claude-plugin/  plugin + marketplace manifests

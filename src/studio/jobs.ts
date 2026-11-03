@@ -17,6 +17,7 @@ export const jobKeys = {
   card: (feature: string, cardId: string) => `card:${feature}/${cardId}`,
   login: (role?: string) => `login:${role || "check"}`,
   fix: (issueId: string) => `fix:${issueId}`,
+  security: (feature?: string) => `security:${feature || "*"}`,
   init: () => "init",
   check: () => "check",
   verify(o: VerifyOptions): string {

@@ -21,6 +21,7 @@
   header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
   header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }
   header .meta { color: var(--muted); font-size: 12px; }
+  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }
   header .spacer { flex: 1; }
   nav { display: flex; gap: 4px; }
   nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }
@@ -107,8 +108,20 @@
   .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }
   .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
   .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .pill.sev-critical { color: #fff; background: var(--fail); }
+  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
+  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }
   .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }
-  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }
+  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }
+  .bwrap { position: relative; }
+  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }
+  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }
+  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }
+  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .blist button:hover, .blist button.on { background: var(--track); }
+  .blist .cur { font-weight: 600; }
+  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }
   .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
   .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
   .jobs[hidden] { display: none; }
@@ -175,14 +188,17 @@
 <body>
 <header>
   <h1>Probe</h1>
+  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>
   <div class="meta" id="meta">loading…</div>
-  <span class="branch" id="branch" title="Branch this project is on">…</span>
+  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">…</button>
+    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches…" autocomplete="off"><div class="blist" id="blist"></div></div></div>
   <button class="jobs" id="jobs" hidden></button>
   <div class="spacer"></div>
   <nav>
     <button data-tab="atlas" class="active">Atlas</button>
     <button data-tab="cards">Cards</button>
     <button data-tab="verify">Verify</button>
+    <button data-tab="security">Security</button>
     <button data-tab="runs">Runs</button>
     <button data-tab="settings">Settings</button>
     <button data-tab="setup">Setup</button>
@@ -211,6 +227,44 @@ document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click
   state.tab = b.dataset.tab; state.feature = null; render();
 }));
 
+// ── Project: Studio shows one at a time; the picker switches to any project Probe knows ──
+
+const OPEN_OTHER = "__open_folder__";
+
+async function loadProjects() {
+  const data = await api("/api/projects").catch(() => null);
+  if (!data) return;
+  const sel = document.getElementById("proj");
+  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +
+    `<option value="${OPEN_OTHER}">Open another folder…</option>`;
+  sel.dataset.current = data.current.root;
+}
+
+document.getElementById("proj").addEventListener("change", async (e) => {
+  const sel = e.target;
+  let root = sel.value;
+  if (root === OPEN_OTHER) {
+    root = (prompt("Project folder (full path):") || "").trim();
+    if (!root) { sel.value = sel.dataset.current; return; }
+  }
+  const running = state.jobs.length;
+  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }
+  sel.disabled = true;
+  const res = await post("/api/projects/open", { root });
+  sel.disabled = false;
+  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }
+  // Everything on the page belonged to the old project.
+  closeStream();
+  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, jobs: [] });
+  history.replaceState(null, "", "#atlas");
+  document.getElementById("banner").innerHTML = "";
+  await loadProjects();
+  if (typeof checkBranch === "function") checkBranch();
+  render();
+});
+
+loadProjects();
+
 function closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }
 
 async function render() {
@@ -221,6 +275,7 @@ async function render() {
   else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());
   else if (state.tab === "cards") await renderCards();
   else if (state.tab === "verify") await renderVerify();
+  else if (state.tab === "security") await renderSecurity();
   else if (state.tab === "runs") await renderRuns();
   else if (state.tab === "settings") await renderSettings();
   showJobs();
@@ -234,7 +289,7 @@ function saveRoute() {
 }
 
 function loadRoute() {
-  const m = /^#(atlas|cards|verify|runs|settings|setup)(?:\/(.+))?$/.exec(location.hash);
+  const m = /^#(atlas|cards|verify|security|runs|settings|setup)(?:\/(.+))?$/.exec(location.hash);
   if (!m) return false;
   goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });
   return true;
@@ -259,6 +314,7 @@ const jobKey = {
   unitwrite: (f) => `unitwrite:${f}`,
   card: (f, id) => `card:${f}/${id}`,
   login: (role) => `login:${role || "check"}`,
+  security: (f) => `security:${f || "*"}`,
   verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,
   verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,
   verifyBase: (base) => `verify:base:${base || ""}`,
@@ -271,6 +327,7 @@ function routeOf(j) {
   if (kind === "init") return { tab: "setup" };
   if (kind === "login") return { tab: "settings" };
   if (kind === "check") return { tab: "atlas" };
+  if (kind === "security") return { tab: "security" };
   if (kind === "verify") {
     if (arg === "outdated") return { tab: "atlas" };
     if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };
@@ -417,7 +474,8 @@ function outdatedCount(features) {
 async function loadScan(refresh) {
   state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });
   const p = state.scan.project;
-  $meta.textContent = `${p.name} · ${p.adapter} · scanned ${ago(state.scan.scannedAt)}`;
+  $meta.textContent = `${p.adapter} · scanned ${ago(state.scan.scannedAt)}`;
+  document.title = `${p.name} · Probe`;
 }
 
 async function renderAtlas() {
@@ -731,7 +789,8 @@ async function checkBranch() {
   state.branchInfo = b;
   if (b.id && !state.branchSeen) state.branchSeen = b.id;
   const chip = document.getElementById("branch");
-  chip.textContent = b.git ? `⎇ ${b.id}${b.git.dirty ? ` · ${b.git.dirty} uncommitted` : ""}` : "no git";
+  chip.textContent = b.git ? `⎇ ${b.id}${b.git.dirty ? ` · ${b.git.dirty} uncommitted` : ""} ▾` : "no git";
+  chip.disabled = !b.git;
   chip.className = "branch" + (b.warnings.length ? " warn" : "");
   chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\n");
   const banner = document.getElementById("banner");
@@ -745,6 +804,53 @@ async function checkBranch() {
   } else banner.innerHTML = "";
 }
 setInterval(checkBranch, 5000);
+
+// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.
+const $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");
+
+function renderBranchList() {
+  const cur = state.branchInfo?.id;
+  const words = $bq.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const all = state.branchList || [];
+  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);
+  $blist.innerHTML = !state.branchList ? `<div class="none">Loading…</div>`
+    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "✓ " : ""}${esc(x)}</button>`).join("")
+    : `<div class="none">No branch matches.</div>`;
+}
+
+async function openBranchPicker() {
+  $bpop.hidden = false;
+  $bq.value = "";
+  renderBranchList();
+  $bq.focus();
+  const b = await api("/api/branch?branches").catch(() => null);
+  if (b) { state.branchList = b.branches; renderBranchList(); }
+}
+
+async function switchBranch(want) {
+  $bpop.hidden = true;
+  if (!want || want === state.branchInfo?.id) return;
+  if (!confirm(`Switch this project's working tree to ${want}? Studio rescans afterwards.`)) return;
+  const chip = document.getElementById("branch");
+  chip.disabled = true;
+  chip.textContent = `⎇ switching to ${want}…`;
+  const res = await post("/api/branch/switch", { branch: want });
+  chip.disabled = false;
+  if (res.error) { alert(res.error); checkBranch(); return; }
+  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });
+  document.getElementById("banner").innerHTML = "";
+  checkBranch();
+  render();
+}
+
+document.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });
+$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });
+document.addEventListener("click", () => { $bpop.hidden = true; });
+$bq.addEventListener("input", renderBranchList);
+$bq.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") $bpop.hidden = true;
+  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }
+});
 
 function followRun(runId, el, onDone) {
   closeStream();
@@ -783,7 +889,7 @@ function followRun(runId, el, onDone) {
   es.onerror = () => { es.close(); state.eventSource = null; };
 }
 
-const ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };
+const ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };
 
 /** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */
 async function renderIssues(run, el, panel) {
@@ -792,7 +898,8 @@ async function renderIssues(run, el, panel) {
   if (!Array.isArray(issues) || !issues.length) return;
   el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>
     ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">
-      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` · run ${esc(i.runId)}` : ""}</div></div>
+      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` · run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>
+      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}
       <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">⧉ Fix prompt</button>
       <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">✦ Fix</button>
       <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;
@@ -809,6 +916,13 @@ async function renderIssues(run, el, panel) {
         out.querySelector("[data-copied]").textContent = "Copied.";
       });
     });
+    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {
+      const reason = prompt(`Why is this not an issue here?\n\n${row.querySelector("strong").textContent}`);
+      if (!reason || !reason.trim()) return;
+      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });
+      if (res.error) return alert(res.error);
+      row.remove();
+    });
     row.querySelector("[data-fix]").addEventListener("click", async () => {
       const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";
       if (!confirm(`An agent will change the code${branch} to fix:\n\n${row.querySelector("strong").textContent}\n\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;
@@ -817,6 +931,16 @@ async function renderIssues(run, el, panel) {
       followRun(res.runId, panel);
     });
   });
+}
+
+function securityHead(f) {
+  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;
+}
+
+function securityBody(f) {
+  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> · ` : ""}<span class="muted">${esc(f.layer)}</span></div>
+    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}
+    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;
 }
 
 const stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);
@@ -895,10 +1019,17 @@ function resultsTable(run) {
     const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "✅" : e.met === false ? "❌" : "❔"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";
     return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` · part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);
   }
+  if (run.kind === "security") {
+    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);
+    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} · ${run.files} files · platforms: ${run.platforms.map(esc).join(", ") || "—"}${run.costUsd ? ` · $${run.costUsd.toFixed(2)}` : ""}</p>
+      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">· ${run.dismissed} dismissed</span>` : ""}</p>
+      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;
+  }
   if (run.kind === "fix") {
     const link = (id, label) => id ? ` · <a href="#" data-open="${esc(id)}">${label}</a>` : "";
     return err + `<p><strong>${esc(run.issue.title)}</strong></p>
       <p class="muted">${esc(run.feature)} · $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>
+      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}
       ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}
       ${run.summary ? `<details open><summary class="muted">Agent's account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;
   }
@@ -1115,6 +1246,7 @@ function runResult(r) {
   if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "—"}</span>${f.draftId ? " ✎" : ""}`).join(" ") || "nothing stale";
   if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} · ${r.files.length} files`;
   if (r.kind === "init") return `${(r.drafts || []).length} drafts`;
+  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` · <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;
   const results = r.results || [];
   const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);
   if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;
@@ -1217,6 +1349,40 @@ function showRun(id) {
   panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));
   // A run that ends while it is open refreshes the list, so its row shows how it ended.
   followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));
+}
+
+async function renderSecurity() {
+  $view.innerHTML = `<div class="empty">Loading security results…</div>`;
+  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);
+  state.scan = sc;
+  const last = sec.latest;
+  $view.innerHTML = `
+    <div class="box"><h3>Security checks</h3>
+      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>
+      <form class="inline" id="sf">
+        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>
+        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>
+        <label class="check"><input type="checkbox" name="agent"> agent code review</label>
+        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking…">⛨ Run security checks</button>
+      </form>
+    </div>
+    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>
+    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "—")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;
+  const panel = document.getElementById("runpanel");
+  if (last) renderIssues(last, panel.querySelector("#ri"), panel);
+  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));
+  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {
+    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });
+    renderSecurity();
+  }));
+  const sf = document.getElementById("sf");
+  sf.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;
+    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });
+    if (res.error) return alert(res.error);
+    followRun(res.runId, panel, () => {});
+  });
 }
 
 async function renderVerify() {

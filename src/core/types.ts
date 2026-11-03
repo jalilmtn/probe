@@ -265,9 +265,65 @@ export interface RunIssue {
   runId: string;
   feature: string;
   cardId?: string;
-  kind: "test" | "build" | "card" | "expectation" | "crash" | "perf" | "navigation";
+  kind: "test" | "build" | "card" | "expectation" | "crash" | "perf" | "navigation" | "security";
   title: string;
   detail: string;
+  /** The finding behind a security issue. */
+  security?: SecurityFinding;
+}
+
+// ── Security ──────────────────────────────────────────────────────────────────
+// Checks from the catalog in docs/security, run in layers. A finding is one check failing at
+// one place; its fingerprint survives line moves, so a dismissal sticks.
+
+export type Severity = "critical" | "high" | "medium" | "low" | "info";
+
+/**
+ * How a finding was found: rules over source and config, dependency versions against OSV,
+ * git history, the built app, the running app (device or localhost), or an agent reading code.
+ */
+export type SecurityLayer = "static" | "deps" | "history" | "artifact" | "runtime" | "agent";
+
+export interface SecurityFinding {
+  /** Catalog id, e.g. AND-WEB-07. */
+  check: string;
+  title: string;
+  severity: Severity;
+  layer: SecurityLayer;
+  /** Relative path, forward slashes; absent for a finding about the running app as a whole. */
+  file?: string;
+  line?: number;
+  /** The matched code, the vulnerable package, or what the running app showed. Secrets are masked. */
+  evidence: string;
+  /** Why it matters: the attack path in a sentence or two. */
+  why: string;
+  fix: string;
+  refs: string[];
+  feature: string;
+  /** Stable across line moves: check + file + normalised evidence. */
+  fingerprint: string;
+}
+
+export interface SecurityDismissal {
+  fingerprint: string;
+  check: string;
+  file?: string;
+  reason: string;
+  at: string;
+}
+
+/** Security checks over the project, or one feature of it. */
+export interface SecurityRun extends BaseRun {
+  kind: "security";
+  /** Platforms detected, which decide the catalogs that ran (android, ios, web, node…). */
+  platforms: string[];
+  layers: { layer: SecurityLayer; status: "ran" | "skipped" | "error"; note?: string }[];
+  /** Open findings, most severe first. Dismissed ones are counted, not listed. */
+  findings: SecurityFinding[];
+  dismissed: number;
+  /** Files the static layer read. */
+  files: number;
+  costUsd: number;
 }
 
 /** An agent fixes one issue in the code; Probe then checks it (unit tests, the card again). */
@@ -279,6 +335,8 @@ export interface FixRun extends BaseRun {
   unitRun?: string;
   /** The card run again after the fix, for a problem seen on a device. */
   recheckRun?: string;
+  /** For a security issue: whether the same check still finds it after the fix. */
+  securityRecheck?: { stillFound: boolean; note: string };
   summary?: string;
   costUsd: number;
 }
@@ -334,7 +392,7 @@ export interface InitRun extends BaseRun {
   costUsd: number;
 }
 
-export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun | CheckRun | InitRun;
+export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun | CheckRun | InitRun | SecurityRun;
 export type DeviceRun = CardRun | LoginRun | ExploreRun;
 
 // ── Feature cards ─────────────────────────────────────────────────────────────

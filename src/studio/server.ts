@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { createReadStream, existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { join } from "node:path";
@@ -14,17 +15,22 @@ import { startUnitWrite } from "../engine/unitwrite.js";
 import { featuresOfFiles, startVerify, type VerifyOptions } from "../engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "../tickets/tickets.js";
 import { listCards, setCardStatus } from "../cards/store.js";
-import type { CardStatus, Run, ScanResult } from "../core/types.js";
+import type { CardStatus, Run, ScanResult, SecurityRun } from "../core/types.js";
 import { doctor } from "../engine/doctor.js";
 import type { Project } from "../engine/project.js";
 import { liveRun, stopRun, type RunEvent } from "../engine/runs.js";
 import { startFix } from "../engine/fix.js";
+import { openProject } from "../engine/project.js";
+import { knownProjects } from "./projects.js";
+import { dismissIssue, startSecurityRun } from "../security/run.js";
+import { loadDismissals, undismiss } from "../security/findings.js";
+import { RULES } from "../security/catalog/index.js";
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { findFeature, latestScan, riskyGaps, scan } from "../engine/scan.js";
 import { startUnitRun } from "../engine/unit.js";
 import page from "./page.html";
 import { startWatcher } from "../engine/watcher.js";
-import { loadWatch, recordStudio, runningCheck, startCheck, type ChangeSource } from "../engine/watch.js";
+import { clearStudio, loadWatch, recordStudio, runningCheck, startCheck, type ChangeSource } from "../engine/watch.js";
 import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "../knowledge/draft.js";
 import { briefGlance, checkManifest, loadManifest, loadManifests, manifestFile } from "../knowledge/manifest.js";
 import { describeCardProof, ruleProofs } from "../knowledge/proof.js";
@@ -37,34 +43,57 @@ let running: { server: Server; url: string } | null = null;
 /** What the file watcher did lately, for Studio (Studio may run inside the MCP server, so never stdout). */
 const watchLog: string[] = [];
 
+/**
+ * The project Studio shows. A person can switch it from the page; runs already going keep
+ * their own project, and the file watcher and edit hooks follow the switch.
+ */
+interface Current {
+  project: Project;
+  stopWatcher?: () => void;
+}
+
 /** Starts Studio once per process and returns its URL; later calls reuse it. */
 export async function startStudio(project: Project, preferredPort = 7777): Promise<string> {
   if (running) return running.url;
   for (let port = preferredPort; port < preferredPort + 20; port++) {
-    const server = createStudioServer(project);
+    const current: Current = { project };
+    const server = createStudioServer(current);
     const ok = await new Promise<boolean>((resolve) => {
       server.once("error", () => resolve(false));
       server.listen(port, "127.0.0.1", () => resolve(true));
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
-      recordStudio(project, running.url);
-      if (project.config.watch.enabled) startWatcher(project, (line) => watchLog.push(`${new Date().toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
+      attach(current, project);
       return running.url;
     }
   }
   throw new Error(`No free port between ${preferredPort} and ${preferredPort + 19}`);
 }
 
-/** Studio's HTTP server for a project, not yet listening. */
-export function createStudioServer(project: Project): Server {
-  return createServer((req, res) => handle(project, req, res).catch((e) => send(res, 500, { error: String(e) })));
+/** Points Studio at a project: its hooks send checks here, and its files are watched. */
+function attach(current: Current, project: Project): void {
+  current.stopWatcher?.();
+  current.stopWatcher = undefined;
+  // The project left behind runs its edit checks in the background again, not in a Studio showing another project.
+  if (current.project !== project) clearStudio(current.project);
+  current.project = project;
+  watchLog.length = 0;
+  if (running) recordStudio(project, running.url);
+  if (project.config.watch.enabled) current.stopWatcher = startWatcher(project, (line) => watchLog.push(`${new Date().toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
 }
 
-async function handle(project: Project, req: IncomingMessage, res: ServerResponse): Promise<void> {
+/** Studio's HTTP server, not yet listening. A bare project (tests) is shown without switching. */
+export function createStudioServer(target: Project | Current): Server {
+  const current: Current = "store" in target ? { project: target } : target;
+  return createServer((req, res) => handle(current, req, res).catch((e) => send(res, 500, { error: String(e) })));
+}
+
+async function handle(current: Current, req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = new URL(req.url ?? "/", "http://localhost");
   const path = url.pathname;
   const method = req.method ?? "GET";
+  const project = current.project;
 
   // Any web page can send requests to localhost; only Studio's own page may change anything.
   const origin = req.headers.origin;
@@ -81,6 +110,44 @@ async function handle(project: Project, req: IncomingMessage, res: ServerRespons
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : undefined) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
 
+  // Which project Studio shows, the others this machine knows, and switching between them.
+  if (method === "GET" && path === "/api/projects") {
+    const list = knownProjects();
+    const here = { root: project.root, name: project.name, adapter: project.adapter.id };
+    return send(res, 200, { current: here, projects: list.some((p) => p.root.toLowerCase() === project.root.toLowerCase()) ? list : [{ ...here, scannedAt: "" }, ...list] });
+  }
+  if (method === "POST" && path === "/api/projects/open") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { root?: string };
+    if (!body.root?.trim()) return send(res, 400, { error: "Give the project folder." });
+    let next: Project;
+    try {
+      next = openProject(body.root.trim());
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+    if (next.root.toLowerCase() !== project.root.toLowerCase()) {
+      if (!next.store.read("scan.json")) scan(next);
+      attach(current, next);
+    }
+    return send(res, 200, { root: next.root, name: next.name });
+  }
+
+  // Switching branch changes the person's working tree, so it refuses when that could lose work or mix code into a run.
+  if (method === "POST" && path === "/api/branch/switch") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { branch?: string };
+    const want = body.branch?.trim();
+    if (!want || want.startsWith("-")) return send(res, 400, { error: "Give a branch." });
+    const info = branchInfo(project);
+    if (!info.git) return send(res, 400, { error: "Not a git repository." });
+    if (info.git.dirty) return send(res, 409, { error: `${info.git.dirty} uncommitted file(s): commit or stash them before switching.` });
+    if (runningJobs().length) return send(res, 409, { error: "Runs are still going: stop them or wait before switching." });
+    // A remote branch switches to its local tracking branch, which git creates when missing.
+    const local = want.replace(/^origin\//, "");
+    const out = spawnSync("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
+    if (out.status !== 0) return send(res, 400, { error: (out.stderr || out.stdout || "git switch failed").trim() });
+    scan(project);
+    return send(res, 200, branchInfo(project));
+  }
   if (method === "GET" && path === "/api/branch") return send(res, 200, branchInfo(project, url.searchParams.has("branches")));
   if (method === "GET" && path === "/api/setup") return send(res, 200, setupChecklist(project));
   if (method === "GET" && path === "/api/init") {
@@ -351,6 +418,35 @@ async function handle(project: Project, req: IncomingMessage, res: ServerRespons
     const run = project.store.read<Run>(`runs/${m[1]}.json`);
     return run ? send(res, 200, issuesOf(project, run)) : send(res, 404, { error: "unknown run" });
   }
+  // Security: the latest run (whole project first), starting one, and dismissals.
+  if (method === "GET" && path === "/api/security") {
+    const runs = project.store.listRuns<SecurityRun & { log?: string[] }>().filter((r) => r.kind === "security").map(({ log: _log, ...r }) => r);
+    const latest = runs.find((r) => r.feature === "*") ?? runs[0] ?? null;
+    return send(res, 200, { latest, recent: runs.slice(0, 10).map((r) => ({ id: r.id, feature: r.feature, status: r.status, startedAt: r.startedAt, open: r.findings.length })), dismissed: loadDismissals(project), rules: RULES.length, url: project.config.security.url ?? null });
+  }
+  if (method === "POST" && path === "/api/security") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { feature?: string; agent?: boolean; url?: string };
+    try {
+      return send(res, 200, startJob(jobKeys.security(body.feature), () => startSecurityRun(project, { feature: body.feature || undefined, agent: body.agent, url: body.url || undefined })));
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
+  if (method === "POST" && path === "/api/security/undismiss") {
+    const body = JSON.parse((await readBody(req)) || "{}") as { fingerprint?: string };
+    return send(res, 200, { ok: undismiss(project, body.fingerprint ?? "") });
+  }
+
+  m = /^\/api\/issues\/([^/]+)\/dismiss$/.exec(path);
+  if (method === "POST" && m) {
+    const body = JSON.parse((await readBody(req)) || "{}") as { reason?: string };
+    try {
+      return send(res, 200, dismissIssue(project, decodeURIComponent(m[1]!), body.reason ?? ""));
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
+
   m = /^\/api\/issues\/([^/]+)\/(prompt|fix)$/.exec(path);
   if (m) {
     const id = decodeURIComponent(m[1]!);

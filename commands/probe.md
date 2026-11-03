@@ -1,6 +1,6 @@
 ---
 description: Probe — test GUI, app health, unit tests, cards on a device, verify a change
-argument-hint: "[init [status|yes|step <id>] | studio | check [features] | stale | manifest <feature> | rules <feature> | rule <feature/rule> [run] | doctor | scan | feature <id> | unit <feature> | write-tests <feature> | cards [feature] | backfill <feature> | run <feature> <card> | explore <feature> | login [role] | verify [--no-device] | ticket <id>]"
+argument-hint: "[init [status|yes|step <id>] | studio | check [features] | stale | manifest <feature> | rules <feature> | rule <feature/rule> [run] | doctor | scan | feature <id> | unit <feature> | write-tests <feature> | cards [feature] | backfill <feature> | run <feature> <card> | explore <feature> | login [role] | verify [--no-device] | ticket <id> | security [feature] [agent]]"
 ---
 
 Use the Probe MCP tools for this request. Always pass `projectDir` as the current working directory.
@@ -27,6 +27,7 @@ Arguments: `$ARGUMENTS`
 - `manifest <feature>` → call `probe_manifest` and list broken test and card links (with the closest existing name), missing paths and unproven rules.
 - `rules <feature>` → call `probe_rule { feature }` and show each rule with its tests and cards; mark cards whose last pass is missing or out of date.
 - `rule <feature/rule>` → call `probe_rule { rule }`. If the user adds `run`, call `probe_card_run { rule }` and report whether the rule holds, per card.
-- `fix <issue>` → read `probe_fix_prompt`, fix it yourself in this session, then re-run the unit tests (`probe_unit_run`) and the card (`probe_card_run`). Report root cause, files changed and the re-check result.
+- `security [feature] [agent]` → call `probe_security` (with `feature`, and `agent: true` when asked; say first that the agent review runs one agent per feature, minutes each). Report the platforms detected, which layers ran or were skipped and why, then the findings grouped by severity with their issue ids, check ids and file:line. For each critical or high one, give the fix in one line. Offer to fix one (`fix <issue>`) and remind the user that leaked secrets must be rotated, not just removed.
+- `fix <issue>` → read `probe_fix_prompt`, fix it yourself in this session, then re-run the unit tests (`probe_unit_run`) and the card (`probe_card_run`); for a security issue, re-run `probe_security` (with its feature) instead of the card and check the finding is gone. Report root cause, files changed and the re-check result.
 
 Never commit, push or stage anything. Never file a ticket yourself.

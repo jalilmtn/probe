@@ -395,6 +395,11 @@ export function recordStudio(project: Project, url: string): void {
   project.store.write(STUDIO, { url, pid: process.pid });
 }
 
+/** This project has no Studio any more (Studio switched to another): its checks run in the background. */
+export function clearStudio(project: Project): void {
+  project.store.write(STUDIO, null);
+}
+
 /**
  * Starts a check without waiting for it: in Studio when it is running (the log shows live
  * there), otherwise in a detached Probe process that outlives the hook.

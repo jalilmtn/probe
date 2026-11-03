@@ -6,7 +6,9 @@ import { dirtyFiles } from "./history.js";
 import { findIssue, fixPrompt } from "./issues.js";
 import type { Project } from "./project.js";
 import { launchRun } from "./runs.js";
+import { findFeature, latestScan } from "./scan.js";
 import { startUnitRun } from "./unit.js";
+import { recheckFinding } from "../security/run.js";
 
 /**
  * An agent fixes one issue in the project's code, then Probe checks the fix: the feature's
@@ -50,6 +52,11 @@ export function startFix(project: Project, issueId: string, options: { model?: s
       return;
     }
 
+    if (issue.security) {
+      await recheckSecurity(project, run, log);
+      return;
+    }
+
     log("── unit tests");
     const { run: unit, done } = startUnitRun(project, issue.feature);
     run.unitRun = unit.id;
@@ -75,12 +82,43 @@ export function startFix(project: Project, issueId: string, options: { model?: s
   });
 }
 
+/**
+ * After a security fix: the feature's unit tests when it has any (the fix must not break it),
+ * then the same check again on the changed code. Passes only when the finding is gone.
+ */
+async function recheckSecurity(project: Project, run: FixRun, log: (line: string) => void): Promise<void> {
+  const finding = run.issue.security!;
+  const feature = findFeature(latestScan(project), finding.feature);
+  if (feature && feature.stats.testFiles > 0) {
+    log("── unit tests");
+    const { run: unit, done } = startUnitRun(project, feature.id);
+    run.unitRun = unit.id;
+    const unitDone = await done;
+    if (unitDone.status !== "passed") {
+      run.status = unitDone.status === "stopped" ? "stopped" : "failed";
+      run.error = `Unit tests after the fix: ${unitDone.status}${unitDone.error ? ` (${unitDone.error})` : ""}.`;
+      return;
+    }
+  }
+  log(`── ${finding.check} again`);
+  const again = await recheckFinding(project, finding);
+  log(`  ${again.note}`);
+  run.securityRecheck = { stillFound: again.stillFound, note: again.note };
+  if (again.checked && again.stillFound) {
+    run.status = "failed";
+    run.error = `The check still finds it: ${again.note}.`;
+    return;
+  }
+  run.status = "passed";
+}
+
 export function summarizeFix(run: FixRun): string {
   const lines = [`Fix ${run.id} · ${run.feature} · ${run.status.toUpperCase()} · ${run.files.length} files · $${run.costUsd.toFixed(2)}`, `  issue: ${run.issue.title}`];
   if (run.error) lines.push(run.error);
   for (const f of run.files) lines.push(`  ~ ${f}`);
   if (run.unitRun) lines.push(`  unit run: ${run.unitRun}`);
   if (run.recheckRun) lines.push(`  device recheck: ${run.recheckRun}`);
+  if (run.securityRecheck) lines.push(`  ${run.issue.security?.check ?? "security"} recheck: ${run.securityRecheck.stillFound ? "still found" : "gone"} — ${run.securityRecheck.note}`);
   if (run.summary) lines.push("", run.summary);
   return lines.join("\n");
 }

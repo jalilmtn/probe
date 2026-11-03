@@ -34,8 +34,10 @@ import { type ChangeSource, loadWatch, runningCheck, staleLabel, startCheck, sum
 import { checkManifest, loadManifest, summarizeCheck } from "./knowledge/manifest.js";
 import { findRule, ruleProofs, runRuleCards, summarizeRule, summarizeRuleRun, summarizeRules } from "./knowledge/proof.js";
 import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./knowledge/draft.js";
+import { ALL_LAYERS, dismissIssue, startSecurityRun, summarizeSecurity } from "./security/run.js";
+import type { SecurityLayer } from "./core/types.js";
 
-const VERSION = "0.5.0";
+const VERSION = "0.6.0";
 
 const HELP = `probe ${VERSION} — agent-driven test platform
 
@@ -65,6 +67,10 @@ Usage: probe <command> [options]
   issues <run>           Problems a run found, each with an id
   fix-prompt <issue>     A prompt for fixing one issue, for any coding agent
   fix <issue>            An agent fixes the issue in the code, then Probe re-checks it
+  security [feature]     Security checks for the project's platforms (rules, dependencies, history,
+                         the built app, the running app); --agent adds an agent code review,
+                         --layers static,deps,… picks layers, --url http://localhost:3000 checks the running app
+  security-dismiss <issue> <reason>  Not an issue here: hide a security finding, with the reason
   ticket <id>            Commits, features and cards of a ticket
   ticket draft <run>     A ticket draft for a run that did not pass
   ticket file <run>      File it with tickets.fileCommand from probe.yaml
@@ -116,7 +122,9 @@ async function main(argv: string[]): Promise<number> {
   const triggerArg = opt("--trigger");
   const stepArg = opt("--step");
   const sessionArg = opt("--session");
-  const flags = new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
+  const layersArg = opt("--layers");
+  const urlArg = opt("--url");
+  const flags = new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status", "--agent"]);
   const runFlag = argv.includes("--run");
   const noDrafts = argv.includes("--no-drafts");
   const outdated = argv.includes("--outdated");
@@ -251,6 +259,24 @@ async function main(argv: string[]): Promise<number> {
       const finished = await done;
       console.log(`\n${summarizeFix(finished)}`);
       return finished.status === "passed" ? 0 : 1;
+    }
+    case "security": {
+      const layers = layersArg?.split(",").map((l) => l.trim()).filter(Boolean) as SecurityLayer[] | undefined;
+      const bad = layers?.filter((l) => !ALL_LAYERS.includes(l));
+      if (bad?.length) return usage(`probe security [feature] [--agent] [--layers ${ALL_LAYERS.join(",")}] [--url <local url>]  (unknown layer ${bad.join(", ")})`);
+      const { run, done } = startSecurityRun(openProject(projectArg), { feature: arg, layers, agent: argv.includes("--agent"), url: urlArg, model, agentLimit: limitArg ? Number(limitArg) : undefined });
+      follow(run.id);
+      const finished = await done;
+      console.log(`
+${summarizeSecurity(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
+    }
+    case "security-dismiss": {
+      if (!arg || !arg2) return usage('probe security-dismiss <issue> "<why it is not an issue>"');
+      const reason = argv.slice(argv.indexOf(arg2)).join(" ");
+      const d = dismissIssue(openProject(projectArg), arg, reason);
+      console.log(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
+      return 0;
     }
     case "explore": {
       if (!arg) return usage("probe explore <feature> [--device <serial>]");

@@ -104,6 +104,21 @@ export interface ProbeConfig {
      */
     impactDepth: number;
   };
+  /** Security checks: which layers run and where the running app is, for runtime checks. */
+  security: {
+    /** Look dependencies up in the OSV database (api.osv.dev). Sends package names and versions, nothing else. */
+    osv: boolean;
+    /** Scan this many recent commits for secrets removed from the code but still in history. 0: off. */
+    historyCommits: number;
+    /** Local URL of the running web app or API for header, cookie and endpoint checks; localhost only. */
+    url?: string;
+    /** A run fails when an open finding is at least this severe. */
+    failOn: "critical" | "high" | "medium" | "low" | "info";
+    /** Check ids to never report (whole catalog prefixes work too: `IOS-`). */
+    skip: string[];
+    /** Path globs never scanned, on top of build output and vendored folders. */
+    ignorePaths: string[];
+  };
   /** Per machine, from the local settings file — never from the shared probe.yaml. */
   devices: {
     /** Emulator to boot when none is running. */
@@ -139,6 +154,7 @@ const DEFAULTS: ProbeConfig = {
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
   agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
   watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
+  security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
   devices: { allowReal: [] },
 };
 
@@ -163,6 +179,7 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
     agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
+    security: { ...DEFAULTS.security, ...raw.security },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] },
   };
 }

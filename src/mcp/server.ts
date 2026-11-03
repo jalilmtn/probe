@@ -22,6 +22,7 @@ import type { Run } from "../core/types.js";
 import { featureHealth } from "../engine/health.js";
 import { startUnitWrite, summarizeUnitWrite } from "../engine/unitwrite.js";
 import { startFix, summarizeFix } from "../engine/fix.js";
+import { ALL_LAYERS, dismissIssue, startSecurityRun, summarizeSecurity } from "../security/run.js";
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { startVerify, summarizeVerify } from "../engine/verify.js";
 import { ticketDraft, ticketInfo } from "../tickets/tickets.js";
@@ -501,7 +502,7 @@ export async function runMcpServer(version: string): Promise<void> {
     "probe_issues",
     {
       title: "Problems a run found",
-      description: "Lists the fixable problems of a run (failing tests, unmet card expectations, crashes, navigation issues, performance warnings), each with an issue id for probe_fix_prompt / probe_fix. A verify run lists the issues of the runs it started.",
+      description: "Lists the fixable problems of a run (failing tests, unmet card expectations, crashes, navigation issues, performance warnings, security findings), each with an issue id for probe_fix_prompt / probe_fix. A verify run lists the issues of the runs it started.",
       inputSchema: { projectDir, runId: z.string() },
     },
     async ({ projectDir: dir, runId }) => {
@@ -537,6 +538,39 @@ export async function runMcpServer(version: string): Promise<void> {
     async ({ projectDir: dir, issueId }) => {
       const { done } = startFix(openProject(dir), issueId);
       return text(summarizeFix(await done));
+    },
+  );
+
+  server.registerTool(
+    "probe_security",
+    {
+      title: "Security checks",
+      description:
+        "Security checks picked by the project's platforms (Android, iOS, web, Node/Python/JVM/Go/.NET/PHP/Ruby backends, React Native, Flutter, KMP, Electron, Tauri, Docker, CI, IaC): pattern rules from the catalog in docs/security, dependencies against OSV, secrets in git history, the built APK/IPA/web bundle, the running app (a local URL, the installed Android app on an emulator), and with agent: true an agent reviewing the code for authorization and logic flaws. Each finding is an issue for probe_fix_prompt / probe_fix, or probe_security_dismiss. With a feature: only its files. The agent review takes minutes.",
+      inputSchema: {
+        projectDir,
+        feature: z.string().optional().describe("One feature; unset: the whole project"),
+        agent: z.boolean().optional().describe("Also have an agent review the code (costs an agent run per feature)"),
+        layers: z.array(z.enum(ALL_LAYERS as [string, ...string[]])).optional().describe("Layers to run; unset: every layer that can run"),
+        url: z.string().optional().describe("Local URL of the running app for runtime checks (localhost only)"),
+      },
+    },
+    async ({ projectDir: dir, feature, agent, layers, url }) => {
+      const { done } = startSecurityRun(openProject(dir), { feature, agent, layers: layers as typeof ALL_LAYERS | undefined, url });
+      return text(summarizeSecurity(await done));
+    },
+  );
+
+  server.registerTool(
+    "probe_security_dismiss",
+    {
+      title: "Dismiss a security finding",
+      description: "Marks a security issue as not a problem here, with the reason. Later runs count it as dismissed instead of listing it. Only when the user agrees it is not an issue.",
+      inputSchema: { projectDir, issueId: z.string(), reason: z.string().min(3) },
+    },
+    async ({ projectDir: dir, issueId, reason }) => {
+      const d = dismissIssue(openProject(dir), issueId, reason);
+      return text(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
     },
   );
 

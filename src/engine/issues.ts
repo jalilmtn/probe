@@ -1,6 +1,6 @@
 import { relative } from "node:path";
 import { findCard } from "../cards/store.js";
-import type { CardRun, ExploreRun, Run, RunIssue, UnitRun } from "../core/types.js";
+import type { CardRun, ExploreRun, Run, RunIssue, SecurityFinding, SecurityRun, UnitRun } from "../core/types.js";
 import type { Project } from "./project.js";
 import { findFeature, latestScan } from "./scan.js";
 
@@ -24,6 +24,7 @@ export function issuesOf(project: Project, run: Run): RunIssue[] {
     const unit = read(run.unitRun);
     return unit ? issuesOf(project, unit) : [];
   }
+  if (run.kind === "security") return securityIssues(run);
 
   const out: Omit<RunIssue, "id" | "runId" | "feature">[] = [];
   if (run.kind === "unit") out.push(...unitIssues(run));
@@ -58,6 +59,22 @@ export function buildFailure(log: string[]): string | null {
   return block.length ? block.join("\n") : null;
 }
 
+/** One issue per open finding, in the run's order (most severe first), so ids stay stable. */
+function securityIssues(run: SecurityRun): RunIssue[] {
+  return run.findings.map((f, n) => ({
+    id: `${run.id}:${n}`,
+    runId: run.id,
+    feature: f.feature,
+    kind: "security" as const,
+    title: `[${f.severity}] ${f.title}`.slice(0, 160),
+    detail: `${f.check}${f.file ? ` · ${f.file}${f.line ? `:${f.line}` : ""}` : ""} · ${f.layer}
+${f.evidence}
+
+${f.why}`,
+    security: f,
+  }));
+}
+
 function unitIssues(run: UnitRun): Omit<RunIssue, "id" | "runId" | "feature">[] {
   return run.results.flatMap((r) =>
     r.failures.map((t) => ({
@@ -89,6 +106,7 @@ export function findIssue(project: Project, issueId: string): { issue: RunIssue;
  * (its tools); otherwise for a person pasting it into any coding agent.
  */
 export function fixPrompt(project: Project, issue: RunIssue, run: Run, forProbe: boolean): string {
+  if (issue.security) return securityFixPrompt(project, issue.security, run, forProbe);
   const feature = findFeature(latestScan(project), issue.feature);
   const modules = feature?.modules.map((m) => `- ${m.id} — ${relative(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
   const parts = [`Fix one problem that Probe found in the "${issue.feature}" feature of the project in the current directory.`, `## The problem\n${issue.title}\n\n${issue.detail}`];
@@ -124,6 +142,64 @@ Must be true:\n${card.expect.map((e) => `- ${e.text}`).join("\n")}`);
 ${check}
 5. If the problem is not in the app's code (the card's expectation is wrong, the test environment, a flaky device), change nothing and say why.
 6. Finish with: the root cause, the files you changed, and how you checked it.
+
+Never commit, stage, push or switch branches.`);
+  return parts.join("\n\n");
+}
+
+const LAYER_SEEN: Record<SecurityFinding["layer"], string> = {
+  static: "a pattern rule over the source",
+  deps: "the dependency versions in a lockfile, against the OSV vulnerability database",
+  history: "the git history",
+  artifact: "the built app on disk",
+  runtime: "the running app",
+  agent: "an agent reading the code (advisory: confirm it before changing anything)",
+};
+
+/**
+ * The prompt for one security finding: the risk in this code, the evidence, the expected fix,
+ * and the rules that keep a fix honest (no suppressing the check, no weakening it).
+ */
+function securityFixPrompt(project: Project, f: SecurityFinding, run: Run, forProbe: boolean): string {
+  const feature = findFeature(latestScan(project), f.feature);
+  const modules = feature?.modules.map((m) => `- ${m.id} — ${relative(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
+  const parts = [
+    `Fix one security problem that Probe found in the project in the current directory${f.feature !== "project" ? ` (feature "${f.feature}")` : ""}.`,
+    `## The problem
+${f.title}
+- Check: ${f.check} (${f.severity})${f.refs.length ? ` · ${f.refs.join(", ")}` : ""}
+- Where: ${f.file ? `${f.file}${f.line ? `:${f.line}` : ""}` : "the app as a whole"}
+- Found by: ${LAYER_SEEN[f.layer]}
+- Evidence: ${f.evidence}`,
+    `## Why it matters
+${f.why}`,
+    `## The expected fix
+${f.fix}`,
+  ];
+  const seen = [`- Run ${run.id} (security), ${run.finishedAt ?? run.startedAt}`];
+  if (run.git) seen.push(`- Code: ${run.git.branch ?? "detached HEAD"} @ ${run.git.commit}${run.git.dirty ? ` + ${run.git.dirty} uncommitted file(s)` : ""}`);
+  parts.push(`## Where it was seen\n${seen.join("\n")}`);
+  if (modules) parts.push(`## The feature's code (modules)\n${modules}`);
+
+  const special: string[] = [];
+  if (f.layer === "history" || f.check === "COM-SEC-05") special.push("The secret is in git history: changing the code does not remove it. Rotating it (a new key at the provider, the old one revoked) is the fix; say so, and list the history purge (git filter-repo) as a step for a person. Never rewrite history or push yourself.");
+  if (/secret|key|token|password|credential/i.test(f.title) && f.layer !== "deps") special.push("Treat the secret as leaked: the code change must stop shipping it (load it from the environment / a secret store, or move the call to the server), and the summary must say that the old value has to be rotated by a person.");
+  if (f.layer === "deps") special.push("Upgrade to the lowest version that fixes it, update the lockfile the same way the project does (say which command a person must run if you cannot run it), and note a major-version bump and anything it may break.");
+  if (f.layer === "agent") special.push("This finding comes from an agent's reading and may be wrong. First confirm the attack path in the code; if it does not hold (a check exists elsewhere), change nothing and explain why.");
+  if (f.layer === "artifact") special.push("The problem is in the built app; fix the source or build config that put it there. Probe re-checks after the next build.");
+  if (special.length) parts.push(`## Notes for this kind of problem\n${special.map((s) => `- ${s}`).join("\n")}`);
+
+  const check = forProbe
+    ? `5. Probe runs the same check (${f.check}) on the changed code afterwards, and the feature's unit tests when it has any. Call probe_unit_run with feature "${f.feature}" if it has tests, and fix what breaks.`
+    : `5. Run the feature's unit tests if it has any (\`/probe unit ${f.feature}\` with Probe), then re-run the check: \`probe security${f.feature !== "project" ? ` ${f.feature}` : ""}\`.`;
+  parts.push(`## How
+1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow them.
+2. Confirm the problem in the code and find where the unsafe value or setting comes from. Make the smallest change that closes the attack path. Do not touch unrelated code.
+3. Never hide the finding instead of fixing it: no probe-security-ignore comments, no lint or scanner suppressions, no renaming to dodge the pattern, no weakening other checks.
+4. Where the fix can be unit-tested (a sanitiser, an authorization check, a parser), add a test that fails without the fix.
+${check}
+6. If it is not a real problem here (test-only code, a value that is not secret, a protection elsewhere), change nothing and say exactly why, so a person can dismiss it.
+7. Finish with: the root cause, the files you changed, what a person still has to do (rotate a key, run a lockfile update, rebuild), and how you checked it.
 
 Never commit, stage, push or switch branches.`);
   return parts.join("\n\n");

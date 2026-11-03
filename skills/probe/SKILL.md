@@ -31,6 +31,8 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 | `probe_check` | Check edited features: unit tests, manifest test links, a drafted manifest/brief correction |
 | `probe_stale` | Features edited since their last check, and drafts waiting for review |
 | `probe_manifest` | Check `probe/features/<feature>.yaml` against the code |
+| `probe_security` | Security checks for the project's platforms: rules, dependencies (OSV), git history, the built app, the running app; `agent: true` adds a code review |
+| `probe_security_dismiss` | Mark a security finding as not an issue here, with the reason (only when the user agrees) |
 | `probe_studio_open` | Open the GUI for the user |
 
 When opening Studio, call `probe_studio_open` and give the user its local URL as a clickable link.
@@ -115,6 +117,18 @@ outdated or missing results. Tell the user to commit `probe/results/` with their
 `probe_issues` lists a run's problems with ids. To fix one yourself, read `probe_fix_prompt`
 (problem, evidence, card, modules, how to check), fix it, then re-run the unit tests and the
 card. `probe_fix` hands it to a background agent instead; use it only when asked. Never commit.
+
+## Security checks
+
+`probe_security` picks catalogs by what the project is (Android, iOS, web, each backend
+language, React Native, Flutter, KMP, Electron, Tauri, Docker, CI, IaC); the full list of
+checks is in `docs/security/`. Each finding has a check id, severity, file and line, the
+evidence (secrets masked), why it matters and the fix, and is an issue like any other:
+`probe_fix_prompt` to fix it yourself, `probe_fix` for a background agent, which Probe then
+re-checks with the same rule. Never hide a finding with `probe-security-ignore` or a
+suppression to make it pass; if it is not a real problem, explain why and let the user
+dismiss it. A leaked secret is fixed by rotating it, which only a person can do: say so.
+Runtime checks only ever touch localhost and the emulator.
 
 ## Feature cards
 

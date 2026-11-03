@@ -1,0 +1,15 @@
+# Probe results for "agent": written after each run, committed with the code.
+# A result is up to date while the code and card it ran on are unchanged.
+unit:
+  result: passed
+  at: 2026-11-03T10:59:19.191Z
+  run: 20261103-105912
+  commit: 1601d73279
+  dirty: 1
+  by: Jalil
+  tests: 66
+  failed: 0
+  fingerprint:
+    own:
+      :src:agent: d18b1d331df2
+    deps: e3b0c44298fc
