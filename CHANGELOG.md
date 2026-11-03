@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1 — 2026-11-03
+
+Fixes from Probe's own security check.
+
+- zod 3.25.76 → 4.6.7, for GHSA-mrhx-c7xc-m3w5 (memory exhaustion validating oversized collections). MCP tool schemas are unchanged.
+- `.gitignore` ignores `.env*` files (keeps `.env.example`).
+
 ## 0.6.0 — 2026-11-03
 
 Security checks, and switching project and branch from Studio.

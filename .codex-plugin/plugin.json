@@ -1,6 +1,6 @@
 {
   "name": "probe",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Agent-driven project testing: feature health, unit tests, test cards, verification, and a local Studio UI.",
   "author": { "name": "Jalil" },
   "repository": "https://github.com/jalilmtn/probe",
