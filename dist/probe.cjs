@@ -13,9 +13,9 @@ var __commonJS = (cb, mod) => function __require() {
     throw mod = 0, e;
   }
 };
-var __export = (target, all) => {
+var __export = (target2, all) => {
   for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+    __defProp(target2, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -25,12 +25,12 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+var __toESM = (mod, isNodeMode, target2) => (target2 = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
   // If the importer is in node compatibility mode or this is not an ESM
   // file that has been converted to a CommonJS file using a Babel-
   // compatible transform (i.e. "__esModule" has not been set), then set
   // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target2, "default", { value: mod, enumerable: true }) : target2,
   mod
 ));
 
@@ -6412,12 +6412,12 @@ var require_parser = __commonJS({
       }
       return prev.splice(i, prev.length);
     }
-    function arrayPushArray(target, source) {
+    function arrayPushArray(target2, source) {
       if (source.length < 1e5)
-        Array.prototype.push.apply(target, source);
+        Array.prototype.push.apply(target2, source);
       else
         for (let i = 0; i < source.length; ++i)
-          target.push(source[i]);
+          target2.push(source[i]);
     }
     function fixFlowSeqItems(fc) {
       if (fc.start.type === "flow-seq-start") {
@@ -10315,7 +10315,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve9.call(this, root, ref);
+      let _sch = resolve10.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a3 = root.localRefs) === null || _a3 === void 0 ? void 0 : _a3[ref];
         const { schemaId } = this.opts;
@@ -10342,7 +10342,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve9(root, ref) {
+    function resolve10(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -11206,7 +11206,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve9(baseURI, relativeURI, options) {
+    function resolve10(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const {
         parsed: baseParsed,
@@ -11243,58 +11243,58 @@ var require_fast_uri = __commonJS({
       return serialize(resolved, schemelessOptions);
     }
     function resolveComponent(base, relative14, options, skipNormalization) {
-      const target = {};
+      const target2 = {};
       if (!skipNormalization) {
         base = parse9(serialize(base, options), options);
         relative14 = parse9(serialize(relative14, options), options);
       }
       options = options || {};
       if (!options.tolerant && relative14.scheme) {
-        target.scheme = relative14.scheme;
-        target.userinfo = relative14.userinfo;
-        target.host = relative14.host;
-        target.port = relative14.port;
-        target.path = removeDotSegments(relative14.path || "");
-        target.query = relative14.query;
+        target2.scheme = relative14.scheme;
+        target2.userinfo = relative14.userinfo;
+        target2.host = relative14.host;
+        target2.port = relative14.port;
+        target2.path = removeDotSegments(relative14.path || "");
+        target2.query = relative14.query;
       } else {
         if (relative14.userinfo !== void 0 || relative14.host !== void 0 || relative14.port !== void 0) {
-          target.userinfo = relative14.userinfo;
-          target.host = relative14.host;
-          target.port = relative14.port;
-          target.path = removeDotSegments(relative14.path || "");
-          target.query = relative14.query;
+          target2.userinfo = relative14.userinfo;
+          target2.host = relative14.host;
+          target2.port = relative14.port;
+          target2.path = removeDotSegments(relative14.path || "");
+          target2.query = relative14.query;
         } else {
           if (!relative14.path) {
-            target.path = base.path;
+            target2.path = base.path;
             if (relative14.query !== void 0) {
-              target.query = relative14.query;
+              target2.query = relative14.query;
             } else {
-              target.query = base.query;
+              target2.query = base.query;
             }
           } else {
             if (relative14.path[0] === "/") {
-              target.path = removeDotSegments(relative14.path);
+              target2.path = removeDotSegments(relative14.path);
             } else {
               const baseHasAuthority = base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0;
               if (baseHasAuthority && !base.path) {
-                target.path = "/" + relative14.path;
+                target2.path = "/" + relative14.path;
               } else if (!base.path) {
-                target.path = relative14.path;
+                target2.path = relative14.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative14.path;
+                target2.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative14.path;
               }
-              target.path = base.scheme === void 0 && !baseHasAuthority && target.path[0] !== "/" ? removeDotSegmentsRelative(target.path) : removeDotSegments(target.path);
+              target2.path = base.scheme === void 0 && !baseHasAuthority && target2.path[0] !== "/" ? removeDotSegmentsRelative(target2.path) : removeDotSegments(target2.path);
             }
-            target.query = relative14.query;
+            target2.query = relative14.query;
           }
-          target.userinfo = base.userinfo;
-          target.host = base.host;
-          target.port = base.port;
+          target2.userinfo = base.userinfo;
+          target2.host = base.host;
+          target2.port = base.port;
         }
-        target.scheme = base.scheme;
+        target2.scheme = base.scheme;
       }
-      target.fragment = relative14.fragment;
-      return target;
+      target2.fragment = relative14.fragment;
+      return target2;
     }
     function equal(uriA, uriB, options) {
       const normalizedA = normalizeComparableURI(uriA, options);
@@ -11597,7 +11597,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize: normalize3,
-      resolve: resolve9,
+      resolve: resolve10,
       resolveComponent,
       equal,
       serialize,
@@ -14587,7 +14587,7 @@ var require_dist2 = __commonJS({
 });
 
 // src/cli.ts
-var import_node_fs36 = require("node:fs");
+var import_node_fs39 = require("node:fs");
 
 // src/agent/headless.ts
 var import_node_fs2 = require("node:fs");
@@ -15150,6 +15150,7 @@ function launchRun(project, run, work) {
 var import_node_fs4 = require("node:fs");
 var import_node_path5 = require("node:path");
 var import_yaml = __toESM(require_dist(), 1);
+var TRACKERS = ["jira", "linear"];
 var AGENT_RUNNERS = ["claude", "codex"];
 var RUNNER_DEFAULT_MODEL = { claude: "sonnet", codex: "" };
 function isAgentRunner(value) {
@@ -15163,6 +15164,8 @@ var DEFAULTS = {
   exclude: [],
   unit: { androidTask: "testDebugUnitTest", jvmTask: "test" },
   app: {},
+  builds: { playTrack: "internal" },
+  web: {},
   verify: { cards: "approved", maxCards: 10 },
   perf: { maxStartupMs: 4e3, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
@@ -15177,7 +15180,6 @@ function configPath(root) {
 function loadConfig(root, localDir) {
   const file2 = configPath(root);
   const raw = (0, import_node_fs4.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file2, "utf8")) ?? {} : {};
-  const localFile = (0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE);
   const local = readLocal(localDir);
   return {
     name: raw.name,
@@ -15186,9 +15188,12 @@ function loadConfig(root, localDir) {
     areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
     app: { ...raw.app },
+    // Key files and tool paths differ per machine, so they never come from the shared file.
+    builds: { ...DEFAULTS.builds, ...raw.builds, serviceAccount: local.builds?.serviceAccount, bundletool: local.builds?.bundletool },
+    web: { ...raw.web },
     verify: { ...DEFAULTS.verify, ...raw.verify },
     perf: { ...DEFAULTS.perf, ...raw.perf },
-    tickets: { ...DEFAULTS.tickets, ...raw.tickets },
+    tickets: { ...DEFAULTS.tickets, ...raw.tickets, email: local.tickets?.email },
     agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
     security: { ...DEFAULTS.security, ...raw.security },
@@ -15288,6 +15293,18 @@ unit:
 app:
   # package: com.example.app.debug
   # installTask: ":app:installDebug"
+  # releasePackage: com.example.app   # the release build's id, when it differs
+
+# Testing a finished build instead of the working tree (Studio -> Tickets, Verify).
+# The Google service account key file is set per machine in Studio -> Settings.
+# builds:
+#   firebaseApp: "1:1234567890:android:abc123"   # Firebase App Distribution
+#   playTrack: internal                          # Google Play track
+#   tag: "v{build}"                              # git tag of a build number
+
+# The deployed web app agents test in a browser.
+# web:
+#   url: https://staging.example.com
 
 # Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
 # probe/hints/accounts.yaml; passwords stay encrypted on each machine).
@@ -15324,6 +15341,10 @@ tickets:
   # pattern: 'PROJ-\\d+'
   # url: https://jira.example.com/browse/{id}
   # fileCommand: gh issue create --title {title} --body-file {file}
+  # The ticket inbox (Studio -> Tickets). Connect in Studio -> Settings; tokens stay on each machine.
+  # tracker: jira                      # or: linear
+  # site: https://acme.atlassian.net   # Jira only
+  # filter: 'status = "Ready for QA"'  # Jira: JQL. Linear: status names, comma separated
 `;
 function isExcluded(config2, featureId, moduleId) {
   return config2.exclude.some(
@@ -15338,12 +15359,15 @@ function saveProject(root, patch) {
   }
   const doc = (0, import_yaml.parseDocument)((0, import_node_fs4.readFileSync)(file2, "utf8"));
   for (const [section, values] of Object.entries(patch)) {
+    const added = !doc.has(section);
     if (!(0, import_yaml.isMap)(doc.get(section))) doc.set(section, doc.createNode({}));
     for (const [key, value] of Object.entries(values ?? {})) {
       if (value === void 0) continue;
       if (value === null || value === "") doc.deleteIn([section, key]);
       else doc.setIn([section, key], value);
     }
+    const node2 = doc.get(section);
+    if (added && (0, import_yaml.isMap)(node2) && node2.items.length === 0) doc.delete(section);
   }
   (0, import_node_fs4.writeFileSync)(file2, doc.toString());
 }
@@ -15527,6 +15551,33 @@ function isTestable(c) {
   return KIND_WEIGHT[c.kind] >= 1;
 }
 
+// src/adapters/adapter.ts
+var ALWAYS_IGNORED = [".git", ".idea", "node_modules"];
+function ignoredPathPattern(adapter) {
+  const names = [.../* @__PURE__ */ new Set([...ALWAYS_IGNORED, ...adapter.ignoredDirs ?? []])].map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`(^|/)(${names.join("|")})(/|$)`);
+}
+function devicesUnsupported(adapter) {
+  return `Device testing is not available for ${adapter.label} projects yet: unit tests, coverage, manifests and cards work, running the app on a device does not.`;
+}
+
+// src/devices/driver.ts
+function runTargets(project) {
+  const out = [];
+  if (project.adapter.supportsDevices) out.push("android");
+  if (project.config.web?.url) out.push("web");
+  return out;
+}
+function pickTarget(project, wanted) {
+  const targets = runTargets(project);
+  if (wanted) {
+    if (targets.includes(wanted)) return wanted;
+    throw new Error(wanted === "web" ? "No web app address. Set it in Studio \u2192 Settings \u2192 Builds and web." : devicesUnsupported(project.adapter));
+  }
+  if (!targets.length) throw new Error(`${devicesUnsupported(project.adapter)} To test a web app in a browser, set its address in Studio \u2192 Settings \u2192 Builds and web.`);
+  return targets[0];
+}
+
 // src/engine/scan.ts
 var SCAN_FILE = "scan.json";
 function scan(project) {
@@ -15545,7 +15596,7 @@ function scan(project) {
   }
   const features = [...groups.entries()].map(([id, { group, modules: ms }]) => ({ id, group, modules: ms, stats: stats(ms) })).sort((a, b) => a.group === b.group ? a.id.localeCompare(b.id) : a.group === "feature" ? -1 : 1);
   const result = {
-    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: project.adapter.supportsDevices },
+    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: runTargets(project).length > 0 },
     scannedAt: (/* @__PURE__ */ new Date()).toISOString(),
     features,
     excluded: [...excluded].sort()
@@ -16333,8 +16384,8 @@ function defineLazy(object3, key, getter) {
 function objectClone(obj) {
   return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));
 }
-function assignProp(target, prop, value) {
-  Object.defineProperty(target, prop, {
+function assignProp(target2, prop, value) {
+  Object.defineProperty(target2, prop, {
     value,
     writable: true,
     enumerable: true,
@@ -16348,8 +16399,8 @@ function rawShape(def) {
 function sourceShape(schema) {
   return rawShape(schema._zod.def) ?? schema._zod.def.shape;
 }
-function deferProp(target, key, getter) {
-  Object.defineProperty(target, key, {
+function deferProp(target2, key, getter) {
+  Object.defineProperty(target2, key, {
     get() {
       const value = getter();
       assignProp(this, key, value);
@@ -16359,36 +16410,36 @@ function deferProp(target, key, getter) {
     configurable: true
   });
 }
-function putProp(target, key, value) {
-  if (key in target)
-    assignProp(target, key, value);
+function putProp(target2, key, value) {
+  if (key in target2)
+    assignProp(target2, key, value);
   else
-    target[key] = value;
+    target2[key] = value;
 }
-function mirrorShape(target, source, keys2, wrap) {
+function mirrorShape(target2, source, keys2, wrap) {
   const raw = sourceShape(source);
   for (const key of keys2) {
     const desc = Object.getOwnPropertyDescriptor(raw, key);
     if (!desc.enumerable)
       continue;
     if (desc.get) {
-      deferProp(target, key, () => {
+      deferProp(target2, key, () => {
         const value = source._zod.def.shape[key];
         return wrap ? wrap(value, key) : value;
       });
     } else
-      putProp(target, key, wrap ? wrap(desc.value, key) : desc.value);
+      putProp(target2, key, wrap ? wrap(desc.value, key) : desc.value);
   }
 }
-function mirrorProps(target, source) {
+function mirrorProps(target2, source) {
   for (const key of Reflect.ownKeys(source)) {
     const desc = Object.getOwnPropertyDescriptor(source, key);
     if (!desc.enumerable)
       continue;
     if (desc.get)
-      deferProp(target, key, () => source[key]);
+      deferProp(target2, key, () => source[key]);
     else
-      putProp(target, key, desc.value);
+      putProp(target2, key, desc.value);
   }
 }
 function mergeDefs(...defs) {
@@ -16567,35 +16618,35 @@ function normalizeParams(_params) {
   return params;
 }
 function createTransparentProxy(getter) {
-  let target;
+  let target2;
   return new Proxy({}, {
     get(_, prop, receiver) {
-      target ?? (target = getter());
-      return Reflect.get(target, prop, receiver);
+      target2 ?? (target2 = getter());
+      return Reflect.get(target2, prop, receiver);
     },
     set(_, prop, value, receiver) {
-      target ?? (target = getter());
-      return Reflect.set(target, prop, value, receiver);
+      target2 ?? (target2 = getter());
+      return Reflect.set(target2, prop, value, receiver);
     },
     has(_, prop) {
-      target ?? (target = getter());
-      return Reflect.has(target, prop);
+      target2 ?? (target2 = getter());
+      return Reflect.has(target2, prop);
     },
     deleteProperty(_, prop) {
-      target ?? (target = getter());
-      return Reflect.deleteProperty(target, prop);
+      target2 ?? (target2 = getter());
+      return Reflect.deleteProperty(target2, prop);
     },
     ownKeys(_) {
-      target ?? (target = getter());
-      return Reflect.ownKeys(target);
+      target2 ?? (target2 = getter());
+      return Reflect.ownKeys(target2);
     },
     getOwnPropertyDescriptor(_, prop) {
-      target ?? (target = getter());
-      return Reflect.getOwnPropertyDescriptor(target, prop);
+      target2 ?? (target2 = getter());
+      return Reflect.getOwnPropertyDescriptor(target2, prop);
     },
     defineProperty(_, prop, descriptor) {
-      target ?? (target = getter());
-      return Reflect.defineProperty(target, prop, descriptor);
+      target2 ?? (target2 = getter());
+      return Reflect.defineProperty(target2, prop, descriptor);
     }
   });
 }
@@ -16881,8 +16932,8 @@ function uint8ArrayToBase64(bytes) {
   }
   return btoa(binaryString);
 }
-function base64urlToUint8Array(base64url3) {
-  const base643 = base64url3.replace(/-/g, "+").replace(/_/g, "/");
+function base64urlToUint8Array(base64url4) {
+  const base643 = base64url4.replace(/-/g, "+").replace(/_/g, "/");
   const padding = "=".repeat((4 - base643.length % 4) % 4);
   return base64ToUint8Array(base643 + padding);
 }
@@ -17078,10 +17129,10 @@ function $constructor(name, initializer3, proto, params) {
       let up = own2;
       while (up && up !== ctorProto)
         up = Object.getPrototypeOf(up);
-      const target = up ?? own2;
-      if (!initialized.has(target)) {
-        initialized.add(target);
-        members(target, protoMembers);
+      const target2 = up ?? own2;
+      if (!initialized.has(target2)) {
+        initialized.add(target2);
+        members(target2, protoMembers);
       }
     }
     const proto2 = _.prototype;
@@ -20652,7 +20703,7 @@ var recursive = /* @__PURE__ */ new WeakMap();
 var NONE = 0;
 var ASSUMED = 1;
 var PROVEN = 2;
-function isRecursive(inst, stack, resolve9) {
+function isRecursive(inst, stack, resolve10) {
   const cached3 = recursive.get(inst);
   if (cached3 !== void 0)
     return cached3 ? PROVEN : NONE;
@@ -20662,7 +20713,7 @@ function isRecursive(inst, stack, resolve9) {
   let result = NONE;
   const check2 = (child) => {
     if (result !== PROVEN && child?._zod) {
-      const answer = isRecursive(child, stack, resolve9);
+      const answer = isRecursive(child, stack, resolve10);
       if (answer > result)
         result = answer;
     }
@@ -20673,7 +20724,7 @@ function isRecursive(inst, stack, resolve9) {
       const desc = Object.getOwnPropertyDescriptor(sh, key);
       if (spread && !desc.enumerable)
         continue;
-      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve9) : NONE;
+      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve10) : NONE;
       if (child > answer)
         answer = child;
     }
@@ -20737,7 +20788,7 @@ function isRecursive(inst, stack, resolve9) {
       break;
     // `$ZodLazy` caches its inner on the def, so a resolved edge is followed exactly
     case "lazy": {
-      const inner = def._cachedInner ?? (resolve9 ? inst._zod.innerType : void 0);
+      const inner = def._cachedInner ?? (resolve10 ? inst._zod.innerType : void 0);
       merge2(inner ? isRecursive(inner, stack, false) : ASSUMED);
       break;
     }
@@ -28593,8 +28644,8 @@ function withParser(schema, parser) {
     installCompiledUserMethods(clone2, schema, parser);
   return clone2;
 }
-function installCompiledUserMethods(target, source, parser) {
-  const targetAny = target;
+function installCompiledUserMethods(target2, source, parser) {
+  const targetAny = target2;
   const sourceAny = source;
   if (typeof sourceAny.safeParse === "function") {
     const originalSafeParse = sourceAny.safeParse;
@@ -31197,26 +31248,26 @@ function _stringFormat(Class2, format, fnOrRegex, _params = {}) {
 }
 
 // node_modules/zod/v4/core/to-json-schema.js
-function assignProps(target, ...sources) {
+function assignProps(target2, ...sources) {
   for (const source of sources) {
     for (const key of Reflect.ownKeys(source)) {
       if (Object.prototype.propertyIsEnumerable.call(source, key)) {
-        assignProp(target, key, source[key]);
+        assignProp(target2, key, source[key]);
       }
     }
   }
-  return target;
+  return target2;
 }
 function initializeContext(params) {
-  let target = params?.target ?? "draft-2020-12";
-  if (target === "draft-4")
-    target = "draft-04";
-  if (target === "draft-7")
-    target = "draft-07";
+  let target2 = params?.target ?? "draft-2020-12";
+  if (target2 === "draft-4")
+    target2 = "draft-04";
+  if (target2 === "draft-7")
+    target2 = "draft-07";
   return {
     processors: params.processors ?? {},
     metadataRegistry: params?.metadata ?? globalRegistry,
-    target,
+    target: target2,
     unrepresentable: params?.unrepresentable ?? "throw",
     override: params?.override ?? (() => {
     }),
@@ -31719,8 +31770,8 @@ var createToJSONSchemaMethod = (schema, processors = {}) => (params) => {
   return finalize(ctx, schema);
 };
 var createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) => {
-  const { libraryOptions, target } = params ?? {};
-  const ctx = initializeContext({ ...libraryOptions ?? {}, target, io, processors });
+  const { libraryOptions, target: target2 } = params ?? {};
+  const ctx = initializeContext({ ...libraryOptions ?? {}, target: target2, io, processors });
   processSchema(schema, ctx);
   extractDefs(ctx, schema);
   return finalize(ctx, schema);
@@ -32914,8 +32965,8 @@ var ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
   catch(params) {
     return _catch2(this, params);
   },
-  pipe(target) {
-    return pipe(this, target);
+  pipe(target2) {
+    return pipe(this, target2);
   },
   readonly() {
     return readonly(this);
@@ -35087,21 +35138,21 @@ function visit(schema, fnOrHandlers) {
     const h = fnOrHandlers[node2._zod.def.type];
     return h ? h(node2, rewritten) : node2;
   };
-  const cache = /* @__PURE__ */ new Map();
+  const cache2 = /* @__PURE__ */ new Map();
   function run(s) {
-    const cached3 = cache.get(s);
+    const cached3 = cache2.get(s);
     if (cached3 === RESOLVING) {
       return new $ZodLazy({
         type: "lazy",
-        getter: () => cache.get(s)
+        getter: () => cache2.get(s)
       });
     }
     if (cached3 !== void 0)
       return cached3;
-    cache.set(s, RESOLVING);
+    cache2.set(s, RESOLVING);
     const inner = mapInner(s);
     const mapped = fn(inner, inner !== s);
-    cache.set(s, mapped);
+    cache2.set(s, mapped);
     return mapped;
   }
   function mapInner(s) {
@@ -35639,17 +35690,32 @@ var Secrets = class {
     return (0, import_node_fs8.existsSync)(this.file) ? JSON.parse((0, import_node_fs8.readFileSync)(this.file, "utf8")) : {};
   }
   has(role, kind) {
-    return `${role}.${kind}` in this.load();
+    return this.hasKey(`${role}.${kind}`);
   }
   get(role, kind) {
-    const sealed = this.load()[`${role}.${kind}`];
-    return sealed === void 0 ? null : unseal(sealed);
+    return this.getKey(`${role}.${kind}`);
   }
   set(role, kind, value) {
+    this.setKey(`${role}.${kind}`, value);
+  }
+  /** Secrets that are not a test account's, such as a ticket tracker's API token, by name. */
+  hasKey(name) {
+    return name in this.load();
+  }
+  getKey(name) {
+    const sealed = this.load()[name];
+    return sealed === void 0 ? null : unseal(sealed);
+  }
+  setKey(name, value) {
     const all = this.load();
-    all[`${role}.${kind}`] = seal(value);
+    all[name] = seal(value);
     (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
     if (!isWindows) (0, import_node_fs8.chmodSync)(this.file, 384);
+  }
+  removeKey(name) {
+    const all = this.load();
+    delete all[name];
+    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
   }
   /** Forgets every secret of a role. */
   remove(role) {
@@ -35679,17 +35745,7 @@ function unseal(sealed) {
 }
 
 // src/devices/harness.ts
-var import_node_path13 = require("node:path");
-
-// src/adapters/adapter.ts
-var ALWAYS_IGNORED = [".git", ".idea", "node_modules"];
-function ignoredPathPattern(adapter) {
-  const names = [.../* @__PURE__ */ new Set([...ALWAYS_IGNORED, ...adapter.ignoredDirs ?? []])].map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  return new RegExp(`(^|/)(${names.join("|")})(/|$)`);
-}
-function devicesUnsupported(adapter) {
-  return `Device testing is not available for ${adapter.label} projects yet: unit tests, coverage, manifests and cards work, running the app on a device does not.`;
-}
+var import_node_path15 = require("node:path");
 
 // src/engine/app.ts
 function resolveApp(project) {
@@ -35704,7 +35760,9 @@ function resolveApp(project) {
   };
 }
 
-// src/devices/session.ts
+// src/devices/builds.ts
+var import_node_child_process5 = require("node:child_process");
+var import_node_crypto2 = require("node:crypto");
 var import_node_fs10 = require("node:fs");
 var import_node_path12 = require("node:path");
 
@@ -35752,6 +35810,232 @@ function shQuote(s) {
   return `'${s.replace(/'/g, `'\\''`)}'`;
 }
 
+// src/devices/builds.ts
+function parseBuildRef(text2) {
+  const m = /^(file|firebase|play)(?::(.*))?$/s.exec(text2.trim());
+  if (!m) throw new Error(`Build: "firebase", "firebase:<build>", "play", "play:<version code>" or "file:<path to .apk/.aab>", not "${text2}".`);
+  return { source: m[1], value: m[2]?.trim() || void 0 };
+}
+function base64url3(input2) {
+  return Buffer.from(input2).toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+function serviceAccountAssertion(account, scope, nowSeconds = Math.floor(Date.now() / 1e3)) {
+  const aud = account.token_uri ?? "https://oauth2.googleapis.com/token";
+  const unsigned = `${base64url3(JSON.stringify({ alg: "RS256", typ: "JWT" }))}.${base64url3(JSON.stringify({ iss: account.client_email, scope, aud, iat: nowSeconds, exp: nowSeconds + 3e3 }))}`;
+  return `${unsigned}.${base64url3((0, import_node_crypto2.createSign)("RSA-SHA256").update(unsigned).sign(account.private_key))}`;
+}
+function readServiceAccount(config2) {
+  const file2 = config2.builds.serviceAccount;
+  if (!file2) throw new Error("No Google service account key on this machine. Set its JSON file in Studio \u2192 Settings \u2192 Builds.");
+  if (!(0, import_node_fs10.existsSync)(file2)) throw new Error(`The Google service account key file ${file2} does not exist.`);
+  const account = JSON.parse((0, import_node_fs10.readFileSync)(file2, "utf8"));
+  if (!account.client_email || !account.private_key) throw new Error(`${file2} is not a service account key (no client_email / private_key).`);
+  return account;
+}
+async function accessToken(config2, scope, fetcher) {
+  const account = readServiceAccount(config2);
+  const res = await fetcher(account.token_uri ?? "https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: serviceAccountAssertion(account, scope) }).toString(),
+    signal: AbortSignal.timeout(3e4)
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || !body.access_token) throw new Error(`Google did not accept the service account ${account.client_email}: ${body.error_description ?? body.error ?? res.status}.`);
+  return body.access_token;
+}
+async function googleJson(fetcher, token, url2, what, method = "GET") {
+  const res = await fetcher(url2, { method, headers: { authorization: `Bearer ${token}`, accept: "application/json" }, signal: AbortSignal.timeout(6e4) });
+  const text2 = await res.text();
+  if (!res.ok) {
+    let detail = text2.slice(0, 300);
+    try {
+      detail = JSON.parse(text2).error?.message ?? detail;
+    } catch {
+    }
+    throw new Error(`${what} answered ${res.status}: ${detail}`);
+  }
+  return text2 ? JSON.parse(text2) : {};
+}
+async function download(fetcher, url2, file2, headers, what) {
+  const res = await fetcher(url2, { headers, signal: AbortSignal.timeout(10 * 6e4) });
+  if (!res.ok) throw new Error(`Downloading ${what} answered ${res.status}.`);
+  (0, import_node_fs10.writeFileSync)(file2, Buffer.from(await res.arrayBuffer()));
+}
+function buildsDir(project) {
+  const dir = (0, import_node_path12.join)(project.store.dir, "builds");
+  (0, import_node_fs10.mkdirSync)(dir, { recursive: true });
+  return dir;
+}
+var FIREBASE_SCOPE = "https://www.googleapis.com/auth/cloud-platform";
+function firebaseParent(config2) {
+  const app = config2.builds.firebaseApp;
+  if (!app) throw new Error("No Firebase app id. Set it in Studio \u2192 Settings \u2192 Builds (Firebase console \u2192 Project settings \u2192 Your apps \u2192 App ID).");
+  const number4 = /^\d+:(\d+):android:/.exec(app)?.[1];
+  if (!number4) throw new Error(`"${app}" is not an Android Firebase app id (it looks like 1:1234567890:android:abc123).`);
+  return `projects/${number4}/apps/${app}`;
+}
+async function firebaseReleases(config2, fetcher) {
+  const token = await accessToken(config2, FIREBASE_SCOPE, fetcher);
+  const data = await googleJson(fetcher, token, `https://firebaseappdistribution.googleapis.com/v1/${firebaseParent(config2)}/releases?pageSize=50`, "Firebase App Distribution");
+  return (data.releases ?? []).sort((a, b) => (b.createTime ?? "").localeCompare(a.createTime ?? ""));
+}
+var firebaseLabel = (r) => `${r.displayVersion ?? "?"} (${r.buildVersion ?? "?"})`;
+async function resolveFirebase(project, wanted, fetcher, log) {
+  const releases = await firebaseReleases(project.config, fetcher);
+  if (!releases.length) throw new Error("Firebase App Distribution has no releases of this app.");
+  const release = wanted ? releases.find((r) => r.buildVersion === wanted || r.displayVersion === wanted) : releases[0];
+  if (!release) throw new Error(`Firebase App Distribution has no release ${wanted}. Newest: ${releases.slice(0, 5).map(firebaseLabel).join(", ")}.`);
+  if (!release.binaryDownloadUri) throw new Error(`Firebase release ${firebaseLabel(release)} has no download link.`);
+  const base = (0, import_node_path12.join)(buildsDir(project), `firebase-${(release.buildVersion ?? release.name.split("/").pop() ?? "build").replace(/[^\w.-]/g, "_")}`);
+  let file2 = [".apk", ".aab"].map((ext) => base + ext).find(import_node_fs10.existsSync);
+  if (!file2) {
+    log(`downloading Firebase release ${firebaseLabel(release)}\u2026`);
+    const tmp = `${base}.download`;
+    await download(fetcher, release.binaryDownloadUri, tmp, {}, `Firebase release ${firebaseLabel(release)}`);
+    const bytes = (0, import_node_fs10.readFileSync)(tmp);
+    file2 = base + (bytes.includes("BundleConfig.pb") ? ".aab" : ".apk");
+    (0, import_node_fs10.writeFileSync)(file2, bytes);
+  }
+  return { file: file2, tested: { source: "firebase", label: `Firebase ${firebaseLabel(release)}`, versionCode: release.buildVersion, versionName: release.displayVersion } };
+}
+var PLAY_SCOPE = "https://www.googleapis.com/auth/androidpublisher";
+var PLAY = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications";
+function releasePackage(project) {
+  return project.config.app.releasePackage ?? resolveApp(project).package?.replace(/\.(debug|dev|staging)$/, "");
+}
+async function playReleases(project, pkg, token, fetcher) {
+  const track = project.config.builds.playTrack;
+  const edit = await googleJson(fetcher, token, `${PLAY}/${pkg}/edits`, "Google Play", "POST");
+  try {
+    const data = await googleJson(fetcher, token, `${PLAY}/${pkg}/edits/${edit.id}/tracks/${encodeURIComponent(track)}`, `Google Play (${track} track)`);
+    return data.releases ?? [];
+  } finally {
+    await fetcher(`${PLAY}/${pkg}/edits/${edit.id}`, { method: "DELETE", headers: { authorization: `Bearer ${token}` } }).catch(() => void 0);
+  }
+}
+var newestCode = (releases) => releases.flatMap((r) => r.versionCodes ?? []).sort((a, b) => Number(b) - Number(a))[0];
+async function resolvePlay(project, wanted, fetcher, log) {
+  const pkg = releasePackage(project);
+  if (!pkg) throw new Error("Probe does not know the app's id on Google Play. Set the release app id in Studio \u2192 Settings \u2192 Builds.");
+  const token = await accessToken(project.config, PLAY_SCOPE, fetcher);
+  const track = project.config.builds.playTrack;
+  let code = wanted && /^\d+$/.test(wanted) ? wanted : void 0;
+  let name;
+  if (!code) {
+    const releases = await playReleases(project, pkg, token, fetcher);
+    const release = wanted ? releases.find((r) => r.name === wanted) : releases.find((r) => (r.versionCodes ?? []).includes(newestCode(releases) ?? ""));
+    code = wanted ? newestCode(release ? [release] : []) : newestCode(releases);
+    name = release?.name;
+    if (!code) throw new Error(wanted ? `The ${track} track of ${pkg} has no release named ${wanted}.` : `The ${track} track of ${pkg} has no release.`);
+  }
+  const file2 = (0, import_node_path12.join)(buildsDir(project), `play-${pkg}-${code}.apk`);
+  if (!(0, import_node_fs10.existsSync)(file2)) {
+    const generated = await googleJson(fetcher, token, `${PLAY}/${pkg}/generatedApks/${code}`, "Google Play");
+    const id = generated.generatedApks?.map((g) => g.generatedUniversalApk?.downloadId).find(Boolean);
+    if (!id) throw new Error(`Google Play has no installable copy of ${pkg} ${code}: the version must be uploaded as an app bundle and signed by Play.`);
+    log(`downloading ${pkg} ${code} from Google Play\u2026`);
+    await download(fetcher, `${PLAY}/${pkg}/generatedApks/${code}/downloads/${encodeURIComponent(id)}:download?alt=media`, file2, { authorization: `Bearer ${token}` }, `${pkg} ${code}`);
+  }
+  return { file: file2, tested: { source: "play", label: `Google Play ${track}${name ? ` ${name}` : ""} (${code})`, versionCode: code, versionName: name, package: pkg } };
+}
+function resolveFile(project, value) {
+  if (!value) throw new Error("Give the path of the .apk or .aab to test.");
+  const file2 = (0, import_node_path12.isAbsolute)(value) ? value : (0, import_node_path12.resolve)(project.root, value);
+  if (!(0, import_node_fs10.existsSync)(file2) || !(0, import_node_fs10.statSync)(file2).isFile()) throw new Error(`No build file at ${file2}.`);
+  if (![".apk", ".aab", ".apks"].includes((0, import_node_path12.extname)(file2).toLowerCase())) throw new Error(`${file2} is not an .apk, .aab or .apks file.`);
+  return { file: file2, tested: { source: "file", label: file2.split(/[\\/]/).pop() } };
+}
+async function resolveBuild(project, ref, log, fetcher = fetch) {
+  const build2 = ref.source === "file" ? resolveFile(project, ref.value) : ref.source === "firebase" ? await resolveFirebase(project, ref.value, fetcher, log) : await resolvePlay(project, ref.value, fetcher, log);
+  const info = (0, import_node_path12.extname)(build2.file).toLowerCase() === ".apk" ? apkInfo(project.root, build2.file) : null;
+  build2.tested = { ...build2.tested, package: info?.package ?? build2.tested.package, versionCode: info?.versionCode ?? build2.tested.versionCode, versionName: info?.versionName ?? build2.tested.versionName };
+  if (ref.source === "file" && info?.versionName) build2.tested.label += ` \xB7 ${info.versionName} (${info.versionCode})`;
+  return build2;
+}
+async function listBuilds(project, source, fetcher = fetch) {
+  if (source === "firebase") {
+    return (await firebaseReleases(project.config, fetcher)).map((r) => ({ value: r.buildVersion ?? r.displayVersion ?? "", label: firebaseLabel(r), at: r.createTime })).filter((b) => b.value);
+  }
+  if (source === "play") {
+    const pkg = releasePackage(project);
+    if (!pkg) throw new Error("Probe does not know the app's id on Google Play. Set the release app id in Studio \u2192 Settings \u2192 Builds.");
+    const releases = await playReleases(project, pkg, await accessToken(project.config, PLAY_SCOPE, fetcher), fetcher);
+    return releases.flatMap((r) => (r.versionCodes ?? []).map((code) => ({ value: code, label: `${r.name ?? "release"} (${code})${r.status && r.status !== "completed" ? ` \xB7 ${r.status}` : ""}` }))).sort((a, b) => Number(b.value) - Number(a.value));
+  }
+  return [];
+}
+function aapt2(projectRoot) {
+  const sdk = androidSdk(projectRoot);
+  const tools = sdk ? (0, import_node_path12.join)(sdk, "build-tools") : null;
+  if (!tools || !(0, import_node_fs10.existsSync)(tools)) return null;
+  const versions = (0, import_node_fs10.readdirSync)(tools).sort((a, b) => b.localeCompare(a, void 0, { numeric: true }));
+  for (const v of versions) {
+    const exe = (0, import_node_path12.join)(tools, v, isWindows ? "aapt2.exe" : "aapt2");
+    if ((0, import_node_fs10.existsSync)(exe)) return exe;
+  }
+  return null;
+}
+function apkInfo(projectRoot, file2) {
+  const tool = aapt2(projectRoot);
+  if (!tool) return null;
+  const r = (0, import_node_child_process5.spawnSync)(tool, ["dump", "badging", file2], { encoding: "utf8", windowsHide: true, timeout: 6e4, maxBuffer: 32 * 1024 * 1024 });
+  return parseBadging(r.stdout ?? "");
+}
+function parseBadging(out) {
+  const line = /^package:.*$/m.exec(out)?.[0];
+  const pkg = line && /\bname='([^']+)'/.exec(line)?.[1];
+  if (!line || !pkg) return null;
+  return { package: pkg, versionCode: /versionCode='([^']*)'/.exec(line)?.[1] || void 0, versionName: /versionName='([^']*)'/.exec(line)?.[1] || void 0 };
+}
+function bundletool(project, args, timeoutMs) {
+  const jar = project.config.builds.bundletool;
+  if (!jar) throw new Error("Installing an .aab needs bundletool. Download bundletool-all.jar from github.com/google/bundletool/releases and set its path in Studio \u2192 Settings \u2192 Builds, or test the .apk instead.");
+  if (!(0, import_node_fs10.existsSync)(jar)) throw new Error(`bundletool is not at ${jar}.`);
+  const r = (0, import_node_child_process5.spawnSync)("java", ["-jar", jar, ...args], { encoding: "utf8", windowsHide: true, timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024 });
+  if (r.error) throw new Error(`bundletool needs Java on the PATH: ${r.error.message}`);
+  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`.trim() };
+}
+function alreadyInstalled(device, build2) {
+  const t = build2.tested;
+  return !!t.package && !!t.versionCode && device.isInstalled(t.package) && device.versionCode(t.package) === t.versionCode;
+}
+function installBuild(project, device, build2, log) {
+  const before = build2.tested.package ? null : new Set(device.packages());
+  const ext = (0, import_node_path12.extname)(build2.file).toLowerCase();
+  log(`installing ${build2.tested.label}\u2026`);
+  if (ext === ".apk") {
+    let result = device.install(build2.file);
+    const conflict = /INSTALL_FAILED_(UPDATE_INCOMPATIBLE|VERSION_DOWNGRADE)/.exec(result.out)?.[0];
+    const pkg2 = build2.tested.package ?? /Package ([\w.]+) signatures do not match/.exec(result.out)?.[1];
+    if (!result.ok && conflict && pkg2) {
+      log(`${pkg2} on the device is another copy (${conflict.replace("INSTALL_FAILED_", "").toLowerCase().replace(/_/g, " ")}): removing it and its data, then installing the build`);
+      device.uninstall(pkg2);
+      result = device.install(build2.file);
+    }
+    if (!result.ok) throw new Error(`Installing ${build2.tested.label} failed: ${result.out.split("\n").filter(Boolean).pop() ?? "adb install failed"}`);
+  } else {
+    throwIfStopped();
+    let apks = build2.file;
+    if (ext === ".aab") {
+      apks = (0, import_node_path12.join)(buildsDir(project), "bundle.apks");
+      const built = bundletool(project, ["build-apks", `--bundle=${build2.file}`, `--output=${apks}`, "--overwrite", "--connected-device", `--device-id=${device.serial}`, `--adb=${device.adb.bin}`], 10 * 6e4);
+      if (!built.ok) throw new Error(`bundletool could not build APKs from ${build2.tested.label}: ${built.out.split("\n").pop()}`);
+    }
+    const installed = bundletool(project, ["install-apks", `--apks=${apks}`, `--device-id=${device.serial}`, `--adb=${device.adb.bin}`], 10 * 6e4);
+    if (!installed.ok) throw new Error(`Installing ${build2.tested.label} failed: ${installed.out.split("\n").pop()}`);
+  }
+  if (build2.tested.package) return build2.tested.package;
+  const added = device.packages().filter((p) => !before.has(p));
+  const pkg = added.length === 1 ? added[0] : releasePackage(project);
+  if (!pkg || !device.isInstalled(pkg)) throw new Error("The build installed, but Probe cannot tell its app id. Set the release app id in Studio \u2192 Settings \u2192 Builds.");
+  return pkg;
+}
+
+// src/devices/session.ts
+var import_node_fs12 = require("node:fs");
+var import_node_path14 = require("node:path");
+
 // src/devices/uitree.ts
 function parseUiTree(xml) {
   const out = [];
@@ -35790,7 +36074,7 @@ function formatUiTree(elements) {
     const flags = [
       e.clickable && "tap",
       e.scrollable && "scroll",
-      e.cls === "EditText" && "input",
+      (e.cls === "EditText" || e.input) && "input",
       e.focused && "focused",
       e.checked && "checked",
       !e.enabled && "disabled"
@@ -35848,12 +36132,12 @@ var AndroidDevice = class {
     return [];
   }
   /** Taps an element from the last `uiTree()` by its number, or a raw coordinate. */
-  tap(target) {
-    let x = target.x;
-    let y = target.y;
-    if (target.element !== void 0) {
-      const el = this.lastTree.find((e) => e.index === target.element);
-      if (!el) throw new Error(`No element [${target.element}] on the last observed screen; observe again.`);
+  tap(target2) {
+    let x = target2.x;
+    let y = target2.y;
+    if (target2.element !== void 0) {
+      const el = this.lastTree.find((e) => e.index === target2.element);
+      if (!el) throw new Error(`No element [${target2.element}] on the last observed screen; observe again.`);
       [x, y] = el.center;
     }
     if (x === void 0 || y === void 0) throw new Error("tap needs an element number or x and y");
@@ -35881,8 +36165,30 @@ var AndroidDevice = class {
   isInstalled(pkg) {
     return this.shell(`pm path ${pkg}`).out.includes("package:");
   }
+  /** Every installed application id. */
+  packages() {
+    return this.shell("pm list packages", 3e4).out.split("\n").map((l) => l.trim().replace(/^package:/, "")).filter(Boolean);
+  }
+  /** The installed copy's version code, or undefined when the app is not installed. */
+  versionCode(pkg) {
+    return /versionCode=(\d+)/.exec(this.shell(`dumpsys package ${pkg}`, 2e4).out)?.[1];
+  }
+  /** Installs an APK over what is there, allowing an older version. `out` is adb's own message. */
+  install(file2) {
+    const r = this.adb.run(["-s", this.serial, "install", "-r", "-d", file2], 5 * 6e4);
+    const out = `${r.out}
+${r.err}`.trim();
+    return { ok: r.ok && /Success/.test(out), out };
+  }
+  uninstall(pkg) {
+    this.adb.run(["-s", this.serial, "uninstall", pkg], 6e4);
+  }
   launch(pkg) {
     this.shell(`monkey -p ${pkg} -c android.intent.category.LAUNCHER 1`);
+  }
+  relaunch(pkg) {
+    this.stop(pkg);
+    this.launch(pkg);
   }
   /**
    * Cold-starts the launcher activity and returns Android's own start time (TotalTime), or
@@ -35965,24 +36271,309 @@ var AndroidDevice = class {
   }
 };
 
+// src/devices/web.ts
+var import_node_fs11 = require("node:fs");
+var import_node_module = require("node:module");
+var import_node_net = require("node:net");
+var import_node_os3 = require("node:os");
+var import_node_path13 = require("node:path");
+function toolsDir() {
+  return (0, import_node_path13.join)((0, import_node_os3.homedir)(), ".probe", "tools");
+}
+function findPlaywright(projectRoot) {
+  for (const dir of [projectRoot, toolsDir()]) {
+    try {
+      return { pw: (0, import_node_module.createRequire)((0, import_node_path13.join)(dir, "package.json"))("playwright"), dir };
+    } catch {
+    }
+  }
+  return null;
+}
+function playwrightStatus(projectRoot) {
+  const found3 = findPlaywright(projectRoot);
+  if (!found3) return { installed: false, browser: false };
+  let browser = false;
+  try {
+    browser = (0, import_node_fs11.existsSync)(found3.pw.chromium.executablePath());
+  } catch {
+  }
+  return { installed: true, browser, where: found3.dir };
+}
+async function loadPlaywright(projectRoot, log) {
+  let found3 = findPlaywright(projectRoot);
+  if (!found3) {
+    const dir = toolsDir();
+    (0, import_node_fs11.mkdirSync)(dir, { recursive: true });
+    if (!(0, import_node_fs11.existsSync)((0, import_node_path13.join)(dir, "package.json"))) (0, import_node_fs11.writeFileSync)((0, import_node_path13.join)(dir, "package.json"), JSON.stringify({ name: "probe-tools", private: true }, null, 2));
+    log("web testing needs Playwright: installing it once for this machine\u2026");
+    const code = await stream("npm", ["install", "--no-audit", "--no-fund", "playwright"], dir, log);
+    if (code !== 0) throw new Error(`Installing Playwright failed (npm exit ${code}). Run "npm install playwright" in ${dir} to see why.`);
+    found3 = findPlaywright(projectRoot);
+    if (!found3) throw new Error(`Playwright was installed in ${dir} but cannot be loaded.`);
+  }
+  if (!(0, import_node_fs11.existsSync)(found3.pw.chromium.executablePath())) {
+    log("downloading Chromium for Playwright (once, about 150 MB)\u2026");
+    const cli = (0, import_node_path13.join)((0, import_node_path13.dirname)((0, import_node_module.createRequire)((0, import_node_path13.join)(found3.dir, "package.json")).resolve("playwright/package.json")), "cli.js");
+    const code = await stream("node", [cli, "install", "chromium"], found3.dir, log);
+    if (code !== 0 || !(0, import_node_fs11.existsSync)(found3.pw.chromium.executablePath())) throw new Error(`Downloading Chromium failed (exit ${code}). Run "npx playwright install chromium" in ${found3.dir} to see why.`);
+  }
+  return found3.pw;
+}
+function freePort() {
+  return new Promise((resolve10, reject) => {
+    const server = (0, import_node_net.createServer)();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      server.close(() => resolve10(port));
+    });
+  });
+}
+var WEB_VIEWPORT = { width: 1280, height: 800 };
+function webUrl(value) {
+  if (!value?.trim()) throw new Error("No web app address. Set it in Studio \u2192 Settings \u2192 Builds and web.");
+  let url2;
+  try {
+    url2 = new URL(value.trim());
+  } catch {
+    throw new Error(`"${value}" is not a web address (it starts with http:// or https://).`);
+  }
+  if (url2.protocol !== "http:" && url2.protocol !== "https:") throw new Error(`"${value}" is not an http(s) address.`);
+  return url2.toString();
+}
+async function launchWeb(options) {
+  const pw = await loadPlaywright(options.projectRoot, options.log);
+  const port = await freePort();
+  const headed = process.env.PROBE_WEB_HEADED === "1";
+  const context = await pw.chromium.launchPersistentContext((0, import_node_path13.join)(options.storeDir, "web-profile"), {
+    headless: !headed,
+    viewport: WEB_VIEWPORT,
+    args: [`--remote-debugging-port=${port}`],
+    recordVideo: { dir: options.evidenceDir, size: WEB_VIEWPORT }
+  });
+  const errors = [];
+  const note = (line) => errors.length < 200 && errors.push(line.slice(0, 500));
+  const watch2 = (page2) => {
+    page2.on("pageerror", ((e) => note(`page error: ${e.message}`)));
+    page2.on("console", ((m) => m.type() === "error" && note(`console: ${m.text()}`)));
+    page2.on("response", ((r) => r.status() >= 500 && note(`HTTP ${r.status()}: ${r.url()}`)));
+  };
+  context.on("page", watch2);
+  const page = context.pages()[0] ?? await context.newPage();
+  watch2(page);
+  const browser = {
+    endpoint: `http://127.0.0.1:${port}`,
+    label: `Chromium ${WEB_VIEWPORT.width}\xD7${WEB_VIEWPORT.height}${headed ? "" : " (headless)"}`,
+    errors,
+    async close() {
+      const video = page.video();
+      await context.close().catch(() => void 0);
+      const path = await video?.path().catch(() => void 0);
+      if (!path || !(0, import_node_fs11.existsSync)(path)) return void 0;
+      (0, import_node_fs11.renameSync)(path, (0, import_node_path13.join)(options.evidenceDir, "video.webm"));
+      return "video.webm";
+    }
+  };
+  try {
+    const started = Date.now();
+    await page.goto(options.url, { waitUntil: "load", timeout: 6e4 });
+    browser.loadMs = Date.now() - started;
+  } catch (e) {
+    await browser.close();
+    throw new Error(`${options.url} did not open: ${e.message.split("\n")[0]}`);
+  }
+  return browser;
+}
+var UI_TREE_SCRIPT = `(() => {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const ROLES = ["button", "link", "tab", "menuitem", "checkbox", "radio", "switch", "option", "combobox", "textbox", "searchbox"];
+  const out = [];
+  const all = document.querySelectorAll("body *");
+  for (let i = 0; i < all.length && out.length < 220; i++) {
+    const el = all[i];
+    const tag = el.tagName;
+    if (tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT" || tag === "TEMPLATE") continue;
+    const r = el.getBoundingClientRect();
+    if (r.width <= 1 || r.height <= 1 || r.bottom <= 0 || r.right <= 0 || r.top >= vh || r.left >= vw) continue;
+    const style = getComputedStyle(el);
+    if (style.visibility === "hidden" || style.display === "none" || Number(style.opacity) === 0) continue;
+    const role = el.getAttribute("role") || "";
+    const input = (tag === "INPUT" && el.type !== "hidden") || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable || role === "textbox" || role === "searchbox";
+    const typed = input && !(tag === "INPUT" && ["checkbox", "radio", "button", "submit", "reset", "file", "range", "color"].includes(el.type)) && tag !== "SELECT";
+    const click = input || (tag === "A" && el.hasAttribute("href")) || tag === "BUTTON" || tag === "SUMMARY" || ROLES.includes(role) || el.hasAttribute("onclick") || (style.cursor === "pointer" && el.tabIndex >= 0);
+    let own = "";
+    for (const n of el.childNodes) if (n.nodeType === 3) own += n.textContent;
+    own = own.replace(/\\s+/g, " ").trim();
+    if (!click && !own) continue;
+    // Text inside a link or button is already that element's text.
+    if (!click && el.closest("a[href],button,summary,[role=button],[role=link],[role=tab],[role=menuitem]")) continue;
+    const x0 = Math.max(0, r.left), y0 = Math.max(0, r.top), x1 = Math.min(vw, r.right), y1 = Math.min(vh, r.bottom);
+    const cx = Math.round((x0 + x1) / 2), cy = Math.round((y0 + y1) / 2);
+    // Covered by something else (a dialog, a menu): a person could not use it either.
+    const top = document.elementFromPoint(cx, cy);
+    if (!input && top && !el.contains(top) && !top.contains(el)) continue;
+    const password = tag === "INPUT" && el.type === "password";
+    let text = click && !input ? (el.innerText || el.value || "") : input ? (password ? "" : tag === "SELECT" ? (el.selectedOptions[0] ? el.selectedOptions[0].text : "") : (el.value || el.innerText || "")) : own;
+    text = String(text).replace(/\\s+/g, " ").trim();
+    const label = el.labels && el.labels[0] ? el.labels[0].innerText : "";
+    const desc = (el.getAttribute("aria-label") || label || el.getAttribute("placeholder") || el.getAttribute("title") || el.getAttribute("alt") || "").replace(/\\s+/g, " ").trim();
+    out.push({
+      index: 0, text, desc,
+      id: el.getAttribute("data-testid") || el.id || el.getAttribute("name") || "",
+      cls: role || (tag === "INPUT" ? "input:" + el.type : tag.toLowerCase()),
+      clickable: click, input: typed,
+      enabled: !el.disabled && el.getAttribute("aria-disabled") !== "true",
+      focused: document.activeElement === el,
+      checked: el.checked === true || el.getAttribute("aria-checked") === "true" || el.getAttribute("aria-selected") === "true",
+      scrollable: false, password,
+      center: [cx, cy], bounds: [Math.round(x0), Math.round(y0), Math.round(x1), Math.round(y1)],
+    });
+  }
+  out.forEach((e, i) => (e.index = i + 1));
+  return out;
+})()`;
+var KEYS = { enter: "Enter", tab: "Tab", delete: "Backspace" };
+var attached = /* @__PURE__ */ new Map();
+var WebDevice = class {
+  constructor(projectRoot, endpoint, baseUrl) {
+    this.projectRoot = projectRoot;
+    this.endpoint = endpoint;
+    this.baseUrl = baseUrl;
+  }
+  projectRoot;
+  endpoint;
+  baseUrl;
+  lastTree = [];
+  async browser() {
+    let pending = attached.get(this.endpoint);
+    if (pending && !(await pending.catch(() => null))?.isConnected()) pending = void 0;
+    if (!pending) {
+      const found3 = findPlaywright(this.projectRoot);
+      if (!found3) throw new Error("Playwright is not installed on this machine.");
+      pending = found3.pw.chromium.connectOverCDP(this.endpoint, { timeout: 2e4 });
+      attached.set(this.endpoint, pending);
+    }
+    try {
+      return await pending;
+    } catch (e) {
+      attached.delete(this.endpoint);
+      throw new Error(`The run's browser is not reachable (${e.message.split("\n")[0]}).`);
+    }
+  }
+  /** The page the person would be looking at: the newest tab still open. */
+  async page() {
+    const pages = (await this.browser()).contexts().flatMap((c) => c.pages()).filter((p) => !p.isClosed());
+    const page = pages[pages.length - 1];
+    if (!page) throw new Error("The browser has no open page.");
+    return page;
+  }
+  /** Waits for the page to be readable: a document that has finished parsing. */
+  async settle(page) {
+    await page.waitForLoadState("domcontentloaded", { timeout: 8e3 }).catch(() => void 0);
+  }
+  /**
+   * After a click or key that may leave the page: gives a navigation a moment to start, then
+   * waits for the new page. Without the pause the old page still counts as loaded, and the
+   * next action would land in the middle of the move.
+   */
+  async afterAction(page) {
+    await page.waitForEvent("framenavigated", { timeout: 900 }).catch(() => void 0);
+    await this.settle(page);
+  }
+  /** Goes to an address; a move already under way (a click just before) is let finish first, once. */
+  async go(page, url2) {
+    try {
+      await page.goto(url2, { waitUntil: "domcontentloaded", timeout: 45e3 });
+    } catch (e) {
+      if (!/interrupted by another navigation/.test(e.message)) throw new Error(`${url2} did not open: ${e.message.split("\n")[0]}`);
+      await this.settle(page);
+      await page.goto(url2, { waitUntil: "domcontentloaded", timeout: 45e3 });
+    }
+  }
+  async screenshot() {
+    return (await this.page()).screenshot({ type: "png" }).catch(() => null);
+  }
+  async uiTree() {
+    const page = await this.page();
+    await this.settle(page);
+    this.lastTree = await page.evaluate(UI_TREE_SCRIPT).catch(() => []);
+    return this.lastTree;
+  }
+  /** Where the page is, for the top of an observe. */
+  async location() {
+    const page = await this.page();
+    return `${await page.title().catch(() => "")} \xB7 ${page.url()}`;
+  }
+  async tap(target2) {
+    let x = target2.x;
+    let y = target2.y;
+    if (target2.element !== void 0) {
+      const el = this.lastTree.find((e) => e.index === target2.element);
+      if (!el) throw new Error(`No element [${target2.element}] on the last observed page; observe again.`);
+      [x, y] = el.center;
+    }
+    if (x === void 0 || y === void 0) throw new Error("tap needs an element number or x and y");
+    const page = await this.page();
+    await page.mouse.click(x, y);
+    await this.afterAction(page);
+    return `clicked ${x},${y}`;
+  }
+  async longPress(x, y) {
+    await (await this.page()).mouse.click(x, y, { delay: 800 });
+  }
+  async type(text2) {
+    await (await this.page()).keyboard.type(text2);
+  }
+  async key(key) {
+    const page = await this.page();
+    if (key === "back") await page.goBack({ waitUntil: "domcontentloaded", timeout: 15e3 }).catch(() => void 0);
+    else if (key === "home") await this.go(page, this.baseUrl);
+    else if (KEYS[key]) {
+      await page.keyboard.press(KEYS[key]);
+      if (key === "enter") await this.afterAction(page);
+    } else throw new Error(`The ${key} key does nothing in a browser.`);
+    await this.settle(page);
+  }
+  /** Swiping up moves the content up, as on a phone: the page scrolls down. */
+  async swipe(direction) {
+    const page = await this.page();
+    const size = page.viewportSize() ?? WEB_VIEWPORT;
+    await page.mouse.move(size.width / 2, size.height / 2);
+    const far = Math.round(size.height * 0.7);
+    const [dx, dy] = { up: [0, far], down: [0, -far], left: [far, 0], right: [-far, 0] }[direction];
+    await page.mouse.wheel(dx, dy);
+  }
+  async relaunch() {
+    await this.go(await this.page(), this.baseUrl);
+  }
+  /** Goes to a path or address of the site under test; other sites are refused. */
+  async open(url2) {
+    const next = new URL(url2, this.baseUrl);
+    if (next.origin !== new URL(this.baseUrl).origin) throw new Error(`${next.origin} is not the site under test (${new URL(this.baseUrl).origin}).`);
+    await this.go(await this.page(), next.toString());
+    return next.toString();
+  }
+};
+
 // src/devices/session.ts
 function sessionFile(storeDir, id) {
-  return (0, import_node_path12.join)(storeDir, "sessions", `${id}.json`);
+  return (0, import_node_path14.join)(storeDir, "sessions", `${id}.json`);
 }
 function createSession(storeDir, info) {
-  const session = { ...info, evidenceDir: (0, import_node_path12.join)(storeDir, "runs", info.id) };
-  (0, import_node_fs10.mkdirSync)((0, import_node_path12.join)(storeDir, "sessions"), { recursive: true });
-  (0, import_node_fs10.mkdirSync)(session.evidenceDir, { recursive: true });
-  (0, import_node_fs10.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
+  const session = { ...info, evidenceDir: (0, import_node_path14.join)(storeDir, "runs", info.id) };
+  (0, import_node_fs12.mkdirSync)((0, import_node_path14.join)(storeDir, "sessions"), { recursive: true });
+  (0, import_node_fs12.mkdirSync)(session.evidenceDir, { recursive: true });
+  (0, import_node_fs12.writeFileSync)(sessionFile(storeDir, info.id), JSON.stringify(session, null, 2));
   return session;
 }
 var DeviceSession = class _DeviceSession {
   constructor(info) {
     this.info = info;
-    this.device = new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
+    this.device = info.target === "web" ? new WebDevice(info.projectRoot, info.endpoint ?? "", info.appPackage) : new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
     this.step = this.timeline().length;
-    const tree = (0, import_node_path12.join)(info.evidenceDir, "last-tree.json");
-    if ((0, import_node_fs10.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs10.readFileSync)(tree, "utf8"));
+    const tree = (0, import_node_path14.join)(info.evidenceDir, "last-tree.json");
+    if ((0, import_node_fs12.existsSync)(tree)) this.device.lastTree = JSON.parse((0, import_node_fs12.readFileSync)(tree, "utf8"));
   }
   info;
   device;
@@ -35991,42 +36582,42 @@ var DeviceSession = class _DeviceSession {
    * Dumps the screen's elements and keeps them in the run folder: the MCP server handles every
    * tool call on a fresh session, so an element number from observe must survive until act.
    */
-  observe() {
-    const elements = this.device.uiTree();
-    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
+  async observe() {
+    const elements = await this.device.uiTree();
+    (0, import_node_fs12.writeFileSync)((0, import_node_path14.join)(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
     return elements;
   }
   static open(storeDir, id) {
     const file2 = sessionFile(storeDir, id);
-    if (!(0, import_node_fs10.existsSync)(file2)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
-    return new _DeviceSession(JSON.parse((0, import_node_fs10.readFileSync)(file2, "utf8")));
+    if (!(0, import_node_fs12.existsSync)(file2)) throw new Error(`No device session "${id}". Agent device tools only work inside a Probe card run.`);
+    return new _DeviceSession(JSON.parse((0, import_node_fs12.readFileSync)(file2, "utf8")));
   }
   /** Saves a screenshot as the next step's evidence and returns it. */
-  capture() {
-    const png = this.device.screenshot();
+  async capture() {
+    const png = await this.device.screenshot();
     if (!png) return null;
     const name = `step-${String(this.step + 1).padStart(3, "0")}.png`;
-    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, name), png);
+    (0, import_node_fs12.writeFileSync)((0, import_node_path14.join)(this.info.evidenceDir, name), png);
     return { png, name };
   }
   record(action, detail, screenshot) {
     this.step++;
     const entry = { at: (/* @__PURE__ */ new Date()).toISOString(), action, detail, screenshot };
-    (0, import_node_fs10.appendFileSync)((0, import_node_path12.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
+    (0, import_node_fs12.appendFileSync)((0, import_node_path14.join)(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}
 `);
   }
   timeline() {
-    const file2 = (0, import_node_path12.join)(this.info.evidenceDir, "timeline.jsonl");
-    if (!(0, import_node_fs10.existsSync)(file2)) return [];
-    return (0, import_node_fs10.readFileSync)(file2, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    const file2 = (0, import_node_path14.join)(this.info.evidenceDir, "timeline.jsonl");
+    if (!(0, import_node_fs12.existsSync)(file2)) return [];
+    return (0, import_node_fs12.readFileSync)(file2, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   }
   /** What the agent's report tool handed in (verdict, login state, explored screens). */
   saveReport(name, value) {
-    (0, import_node_fs10.writeFileSync)((0, import_node_path12.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
+    (0, import_node_fs12.writeFileSync)((0, import_node_path14.join)(this.info.evidenceDir, `${name}.json`), JSON.stringify(value, null, 2));
   }
   report(name) {
-    const file2 = (0, import_node_path12.join)(this.info.evidenceDir, `${name}.json`);
-    return (0, import_node_fs10.existsSync)(file2) ? JSON.parse((0, import_node_fs10.readFileSync)(file2, "utf8")) : null;
+    const file2 = (0, import_node_path14.join)(this.info.evidenceDir, `${name}.json`);
+    return (0, import_node_fs12.existsSync)(file2) ? JSON.parse((0, import_node_fs12.readFileSync)(file2, "utf8")) : null;
   }
   saveVerdict(verdict) {
     this.saveReport("verdict", verdict);
@@ -36037,7 +36628,7 @@ var DeviceSession = class _DeviceSession {
 };
 
 // src/devices/select.ts
-var import_node_child_process5 = require("node:child_process");
+var import_node_child_process6 = require("node:child_process");
 async function pickDevice(projectRoot, config2, wanted, log) {
   const adb = Adb.forProject(projectRoot);
   const allowed = (d) => d.emulator || config2.devices.allowReal.includes(d.serial);
@@ -36058,7 +36649,7 @@ async function pickDevice(projectRoot, config2, wanted, log) {
       );
     }
     log(`starting emulator ${avd}${config2.devices.avd ? "" : " (first image on this machine; choose another in Studio \u2192 Settings)"}\u2026`);
-    (0, import_node_child_process5.spawn)(sdkTool(projectRoot, "emulator", "emulator"), ["-avd", avd, "-no-snapshot-save", "-no-boot-anim"], {
+    (0, import_node_child_process6.spawn)(sdkTool(projectRoot, "emulator", "emulator"), ["-avd", avd, "-no-snapshot-save", "-no-boot-anim"], {
       detached: true,
       stdio: "ignore"
     }).unref();
@@ -36083,46 +36674,111 @@ async function waitFor(probe, timeoutMs) {
   return void 0;
 }
 function listAvds(projectRoot) {
-  const r = (0, import_node_child_process5.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15e3 });
+  const r = (0, import_node_child_process6.spawnSync)(sdkTool(projectRoot, "emulator", "emulator"), ["-list-avds"], { encoding: "utf8", windowsHide: true, timeout: 15e3 });
   return (r.stdout ?? "").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !/^(INFO|WARNING|ERROR)\b/.test(l));
 }
 
 // src/devices/harness.ts
 var DEVICE_TOOLS = ["probe_device_observe", "probe_device_act", "probe_device_type_secret"];
+var SAFETY = (outside) => `## Safety \u2014 stop and report "blocked" instead of guessing
+- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
+- A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
+- Never buy, pay, change account or privacy settings, or touch anything outside this ${outside}.
+- Only create or delete content with a test account, and only what the task needs.`;
 var DEVICE_HOW_TO = `## How to work
 - Look before you act: call probe_device_observe, which returns a screenshot and a numbered list of on-screen elements. Observe again after every action that changes the screen.
 - Act with probe_device_act: tap an element by its number from the last observe (prefer that over coordinates), type into the focused field, press keys, swipe, wait for loading.
 - To log in: tap the username field and type the username yourself; for the password or a login code, tap the field and call probe_device_type_secret with the account role. You never see passwords.
 - Lists: scroll them a few times (swipe up, then back down). Probe measures frame times, so scrolling and transitions are part of the test.
 
-## Safety \u2014 stop and report "blocked" instead of guessing
-- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
-- A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
-- Never buy, pay, change account or privacy settings, or touch anything outside this app.
-- Only create or delete content with a test account, and only what the task needs.`;
+${SAFETY("app")}`;
+var WEB_HOW_TO = `## How to work
+- Look before you act: call probe_device_observe, which returns a screenshot of the browser window, the page's address, and a numbered list of the elements in view. Observe again after every action that changes the page.
+- Act with probe_device_act: tap clicks an element by its number from the last observe (prefer that over coordinates); type goes into the focused field, so tap the field first; key presses enter, tab or delete, back is the browser's back button and home returns to the app's start page; swipe up scrolls the page down and swipe down scrolls it up; wait for loading.
+- Only what is inside the window is listed: scroll to find the rest of a page.
+- To go straight to a page of this site, use action open with url set to its path, e.g. "/settings". Other sites are refused.
+- To log in: tap the username field and type the username yourself; for the password or a login code, tap the field and call probe_device_type_secret with the account role. You never see passwords.
+
+${SAFETY("site")}`;
+function howTo(target2) {
+  return target2 === "web" ? WEB_HOW_TO : DEVICE_HOW_TO;
+}
+function appOn(target2, device, app) {
+  return target2 === "web" ? `the web app at ${app} in ${device}` : `the Android app ${app} on ${device}`;
+}
 async function runOnDevice(project, run, options, log) {
-  if (!project.adapter.supportsDevices) throw new Error(devicesUnsupported(project.adapter));
+  const target2 = pickTarget(project, options.target);
+  run.target = target2;
+  if (target2 === "web") {
+    if (options.build) throw new Error("A build is an Android build; the web app is tested at its address.");
+    return runInBrowser(project, run, options, log);
+  }
+  return runOnAndroid(project, run, options, log);
+}
+async function runInBrowser(project, run, options, log) {
+  const url2 = webUrl(project.config.web.url);
+  const info = createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: "browser", appPackage: url2, target: "web" });
+  const browser = await launchWeb({ projectRoot: project.root, storeDir: project.store.dir, evidenceDir: info.evidenceDir, url: url2, log });
+  run.device = browser.label;
+  log(`browser: ${run.device}`);
+  log(`web app: ${url2}${browser.loadMs !== void 0 ? ` \xB7 loaded in ${browser.loadMs} ms` : ""}`);
+  const session = new DeviceSession(createSession(project.store.dir, { ...info, endpoint: browser.endpoint }));
+  try {
+    throwIfStopped();
+    const result = await runAgent(
+      project,
+      { prompt: options.prompt(run.device, url2, "web"), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
+      log
+    );
+    run.costUsd += result.costUsd;
+    if (!result.ok) log(`agent: ${result.summary.slice(0, 300)}`);
+  } finally {
+    const video = await browser.close();
+    if (video) run.video = video;
+  }
+  run.timeline = session.timeline();
+  run.webErrors = [...new Set(browser.errors)];
+  if (run.webErrors.length) log(`page errors: ${run.webErrors.length} (shown with the run; they do not fail it on their own)`);
+  return session;
+}
+async function runOnAndroid(project, run, options, log) {
   let app = resolveApp(project);
-  if (!app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio \u2192 Settings \u2192 Project.");
+  if (!options.build && !app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio \u2192 Settings \u2192 Project.");
   const { device, info } = await pickDevice(project.root, project.config, options.device, log);
   run.device = `${info.serial} (${info.model})`;
   log(`device: ${run.device}`);
   const install = options.install ?? "missing";
-  if (install === "always" || !app.package || !device.isInstalled(app.package)) {
-    const task = app.installTask;
-    if (!task) {
-      if (install === "always" && device.isInstalled(app.package)) log(`No install task: testing the ${app.package} already installed, which may not be this code.`);
-      else throw new Error(`${app.package} is not installed on ${info.serial}. Set the install task in Studio \u2192 Settings \u2192 Project.`);
+  let pkg;
+  if (options.build) {
+    const build2 = await resolveBuild(project, options.build, log);
+    run.build = build2.tested;
+    throwIfStopped();
+    if (install !== "always" && alreadyInstalled(device, build2)) {
+      pkg = build2.tested.package;
+      log(`build: ${build2.tested.label}, already on the device`);
     } else {
-      const code = await project.adapter.installApp(project.root, task, info.serial, log);
-      app = resolveApp(project);
-      if (code !== 0) throw new Error(`Installing the app with ${task} failed (exit ${code}).`);
-      if (!app.package) throw new Error(`${task} succeeded but Probe cannot tell the app's id. Set it in Studio \u2192 Settings \u2192 Project.`);
-      if (!device.isInstalled(app.package)) throw new Error(`${task} finished but ${app.package} is not on ${info.serial}.`);
+      pkg = installBuild(project, device, build2, log);
+      run.build = { ...build2.tested, package: pkg, versionCode: build2.tested.versionCode ?? device.versionCode(pkg) };
+      log(`build: ${run.build.label}`);
     }
+    log(`app: ${pkg}`);
+  } else {
+    if (install === "always" || !app.package || !device.isInstalled(app.package)) {
+      const task = app.installTask;
+      if (!task) {
+        if (install === "always" && device.isInstalled(app.package)) log(`No install task: testing the ${app.package} already installed, which may not be this code.`);
+        else throw new Error(`${app.package} is not installed on ${info.serial}. Set the install task in Studio \u2192 Settings \u2192 Project.`);
+      } else {
+        const code = await project.adapter.installApp(project.root, task, info.serial, log);
+        app = resolveApp(project);
+        if (code !== 0) throw new Error(`Installing the app with ${task} failed (exit ${code}).`);
+        if (!app.package) throw new Error(`${task} succeeded but Probe cannot tell the app's id. Set it in Studio \u2192 Settings \u2192 Project.`);
+        if (!device.isInstalled(app.package)) throw new Error(`${task} finished but ${app.package} is not on ${info.serial}.`);
+      }
+    }
+    pkg = app.package;
+    log(`app: ${pkg}${app.packageSource === "probe.yaml" ? "" : ` (detected from the ${app.packageSource})`}`);
   }
-  const pkg = app.package;
-  log(`app: ${pkg}${app.packageSource === "probe.yaml" ? "" : ` (detected from the ${app.packageSource})`}`);
   device.clearLogcat();
   device.stop(pkg);
   const startupMs = device.launchTimed(pkg);
@@ -36130,18 +36786,18 @@ async function runOnDevice(project, run, options, log) {
   await new Promise((r) => setTimeout(r, 2500));
   device.resetFrameStats(pkg);
   throwIfStopped();
-  const session = new DeviceSession(createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: info.serial, appPackage: pkg }));
+  const session = new DeviceSession(createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: info.serial, appPackage: pkg, target: "android" }));
   const stopRecording = device.startRecording();
   try {
     const result = await runAgent(
       project,
-      { prompt: options.prompt(run.device, pkg), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
+      { prompt: options.prompt(run.device, pkg, "android"), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
       log
     );
     run.costUsd += result.costUsd;
     if (!result.ok) log(`agent: ${result.summary.slice(0, 300)}`);
   } finally {
-    if (await stopRecording((0, import_node_path13.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
+    if (await stopRecording((0, import_node_path15.join)(session.info.evidenceDir, "video.mp4"))) run.video = "video.mp4";
   }
   run.timeline = session.timeline();
   run.crashes = device.crashes(pkg);
@@ -36168,19 +36824,19 @@ function crashError(run) {
 }
 
 // src/engine/ledger.ts
-var import_node_fs11 = require("node:fs");
-var import_node_path15 = require("node:path");
+var import_node_fs13 = require("node:fs");
+var import_node_path17 = require("node:path");
 var import_yaml4 = __toESM(require_dist(), 1);
 
 // src/engine/fingerprint.ts
-var import_node_child_process6 = require("node:child_process");
-var import_node_crypto2 = require("node:crypto");
-var import_node_path14 = require("node:path");
+var import_node_child_process7 = require("node:child_process");
+var import_node_crypto3 = require("node:crypto");
+var import_node_path16 = require("node:path");
 function git(root, args, input2) {
-  const r = (0, import_node_child_process6.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input: input2, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
+  const r = (0, import_node_child_process7.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input: input2, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
   return r.status === 0 ? r.stdout : "";
 }
-var short = (text2) => (0, import_node_crypto2.createHash)("sha256").update(text2).digest("hex").slice(0, 12);
+var short = (text2) => (0, import_node_crypto3.createHash)("sha256").update(text2).digest("hex").slice(0, 12);
 var ContentIndex = class {
   constructor(project, modules) {
     this.project = project;
@@ -36207,7 +36863,7 @@ var ContentIndex = class {
       const hashes = git(root, ["hash-object", "--stdin-paths"], changed.join("\n") + "\n").split("\n");
       changed.forEach((p, n) => hashes[n] && blobs.set(p, hashes[n].trim()));
     }
-    const byDir = new Map(modules.map((m) => [(0, import_node_path14.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
+    const byDir = new Map(modules.map((m) => [(0, import_node_path16.relative)(root, m.dir).replace(/\\/g, "/"), m.id]));
     for (const [path, blob] of blobs) {
       if (path.startsWith("probe/")) continue;
       let dir = path;
@@ -36217,10 +36873,10 @@ var ContentIndex = class {
         owner = byDir.get(dir);
       }
       if (!owner) continue;
-      const target = project.adapter.isTestSource(path) ? this.testFiles : this.files;
-      const list = target.get(owner);
+      const target2 = project.adapter.isTestSource(path) ? this.testFiles : this.files;
+      const list = target2.get(owner);
       if (list) list.push(`${path} ${blob}`);
-      else target.set(owner, [`${path} ${blob}`]);
+      else target2.set(owner, [`${path} ${blob}`]);
     }
     for (const list of [...this.files.values(), ...this.testFiles.values()]) list.sort();
     this.deps = project.adapter.moduleDependencies(root);
@@ -36275,16 +36931,16 @@ function cardHash(card) {
 // src/engine/ledger.ts
 var RESULTS_DIR = "results";
 function ledgerFile(root, feature) {
-  return (0, import_node_path15.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
+  return (0, import_node_path17.join)(root, CONFIG_DIR, RESULTS_DIR, `${feature.replace(/:/g, "__")}.yaml`);
 }
 function readLedger(root, feature) {
   const file2 = ledgerFile(root, feature);
-  return (0, import_node_fs11.existsSync)(file2) ? (0, import_yaml4.parse)((0, import_node_fs11.readFileSync)(file2, "utf8")) ?? {} : {};
+  return (0, import_node_fs13.existsSync)(file2) ? (0, import_yaml4.parse)((0, import_node_fs13.readFileSync)(file2, "utf8")) ?? {} : {};
 }
 function writeLedger(root, feature, ledger) {
-  (0, import_node_fs11.mkdirSync)((0, import_node_path15.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
+  (0, import_node_fs13.mkdirSync)((0, import_node_path17.join)(root, CONFIG_DIR, RESULTS_DIR), { recursive: true });
   const cards = ledger.cards ? Object.fromEntries(Object.entries(ledger.cards).sort(([a], [b]) => a.localeCompare(b))) : void 0;
-  (0, import_node_fs11.writeFileSync)(
+  (0, import_node_fs13.writeFileSync)(
     ledgerFile(root, feature),
     `# Probe results for "${feature}": written after each run, committed with the code.
 # A result is up to date while the code and card it ran on are unchanged.
@@ -36349,7 +37005,7 @@ var ResultFreshness = class {
     this.scan = scan2;
     const modules = allModules(scan2);
     this.index = new ContentIndex(project, modules);
-    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path15.relative)(project.root, m.dir).replace(/\\/g, "/")]));
+    this.dirOf = new Map(modules.map((m) => [m.id, (0, import_node_path17.relative)(project.root, m.dir).replace(/\\/g, "/")]));
   }
   project;
   scan;
@@ -36403,8 +37059,8 @@ function resultsOverview(project, scan2) {
 }
 
 // src/cards/run.ts
-function prompt2(project, card, device, pkg) {
-  return `You are a QA tester. Test this feature card on an Android device (${device}) running the app ${pkg}. The app has just been launched.
+function prompt2(project, card, device, app, target2) {
+  return `You are a QA tester. Test this feature card on ${appOn(target2, device, app)}. The app has just been ${target2 === "web" ? "opened" : "launched"}.
 
 ## Card
 \`\`\`yaml
@@ -36413,9 +37069,9 @@ ${(0, import_yaml5.stringify)({ title: card.title, summary: card.summary, reach:
 ## Test accounts
 ${accountsForPrompt(project)}
 
-${DEVICE_HOW_TO}
+${howTo(target2)}
 
-Follow the card's reach, preconditions and steps, then check every expectation on the device.
+Follow the card's reach, preconditions and steps, then check every expectation ${target2 === "web" ? "in the browser" : "on the device"}.
 If the app is logged in with an account that is not a test account, or you cannot log in, the result is blocked.
 
 ## Finish
@@ -36442,7 +37098,8 @@ function startCardRun(project, feature, cardId, options = {}) {
     const session = await runOnDevice(
       project,
       run,
-      { device: options.device, model: options.model, install: options.reinstall ? "always" : "missing", prompt: (d, pkg) => prompt2(project, card, d, pkg), reportTools: ["probe_card_verdict"] },
+      // Two files can carry the same version, so a file is installed again unless a verify already did.
+      { device: options.device, model: options.model, target: options.target, build: options.build, install: options.reinstall || options.build?.source === "file" && !options.parent ? "always" : "missing", prompt: (d, app, target2) => prompt2(project, card, d, app, target2), reportTools: ["probe_card_verdict"] },
       log
     );
     run.verdict = session.verdict() ?? void 0;
@@ -36458,7 +37115,7 @@ function startCardRun(project, feature, cardId, options = {}) {
       if (run.status === "passed") recordDeviceRun(project.root, feature, cardId, run.id);
     }
     log(`verdict: ${run.status}${run.verdict?.notes ? ` \xB7 ${run.verdict.notes}` : ""}`);
-    recordCardResult(project, run, fingerprint2);
+    if (!run.build && run.target !== "web") recordCardResult(project, run, fingerprint2);
   });
 }
 function summarizeCardRun(run) {
@@ -36468,6 +37125,8 @@ function summarizeCardRun(run) {
   if (run.verdict?.notes) lines.push(`  notes: ${run.verdict.notes}`);
   if (run.perf) lines.push(`  perf: ${formatPerf(run.perf)}`);
   for (const issue2 of run.perf?.issues ?? []) lines.push(`  \u26A0 ${issue2}`);
+  if (run.build) lines.push(`  build: ${run.build.label}`);
+  for (const e of (run.webErrors ?? []).slice(0, 10)) lines.push(`  page: ${e}`);
   for (const c of run.crashes) lines.push(`  crash:
 ${c}`);
   return lines.join("\n");
@@ -36520,8 +37179,8 @@ function formatAtlas(result, health) {
 }
 
 // src/engine/init.ts
-var import_node_fs15 = require("node:fs");
-var import_node_path19 = require("node:path");
+var import_node_fs17 = require("node:fs");
+var import_node_path21 = require("node:path");
 
 // templates/agents-features.md
 var agents_features_default = "## Features\n\nEvery feature has a manifest, `probe/features/<id>.yaml` (format: `probe/features/README.md`):\nwhat it is, where it lives, its user flows, the rules it must keep, and the exact test that proves\neach rule (`covered_by`) or why none does yet (`gap`). Read it before changing a feature. When it\nnames a `brief`, that doc's \"At a glance\" section is the short version; `also_read` lists the rest.\nShared code has manifests of the same shape with `kind: platform` (`core:database` is\n`core__database.yaml`): the contract it keeps for the code built on it, proven by unit tests.\nThe folder is the index: list it rather than relying on memory, and never invent a feature, path\nor test that no manifest, brief or code names.\n\n### Finding the feature\n\n- **What features are there?** Each manifest's `id`, `name` and `summary`.\n- **What is X / where do I start on X?** Match the manifest by `id`, `name` or `summary`; give its\n  summary, brief and the class to open first (the brief's At a glance), then brief yourself on it\n  as below. Nothing matches: say so and name the closest.\n- **Which features does a change touch?** A file under a manifest's `paths` is owned by that\n  feature (by each, when several claim it); one under its `related` only makes it stale, and so\n  does an edit in a platform module it depends on (`probe stale` names it \"depends on \u2026\"). A file\n  nobody claims is unmapped: say so, do not guess. A change owned by more than 3 features (an edit\n  under a shared module) gets unit tests for all of them and the full check below for the 3 with\n  the most owned files.\n\n### Before working on a feature\n\nLoad the manifest, its brief (At a glance first) and every `also_read` entry fresh; read code only\nunder its `paths`. Know, in this order: what it is; the class to open first and the module layout;\nthe main data flow; every invariant (one with a `gap` is unproven by any test); how to test it (the\nunit command, and the rules only device cards prove); the brief's gotchas.\n\n### After changing a feature\n\n1. **Test links.** Every `covered_by` entry `TestClass :: test name` names a test that exists under\n   exactly that name. A renamed test breaks the link: fix the entry or give the rule a `gap`.\n2. **Unit tests.** Run the manifest's `unit.command`; tie each failure to its invariant.\n3. **Rules against the change.** Read the diff. A change that contradicts an invariant, a flow or\n   the brief's At a glance means the code or the rule is wrong: fix one in the same change.\n4. **Missing knowledge.** New behaviour (a signal, state, endpoint, push type, screen or rule) gets\n   an invariant or a flow; a new test proving something no invariant claims gets one.\n5. **Cards.** A rule only a device can prove lists its cards (`probe/cards/<feature>/<id>.yaml`)\n   under `cards:`. `probe rules <feature>` shows each rule's tests and cards and whether a card's\n   last pass still holds; `probe rule <feature/rule> --run` (or `probe_card_run` with `rule`) runs\n   them on an emulator, minutes per card. Name the card-only rules the change touches; never start\n   a card run unasked.\n\nBehaviour goes in `invariants`, architecture stays in the brief. A `covered_by` entry must name a\ntest you have found, never one you expect. With the Probe plugin installed, edits mark their\nfeatures stale, the end of a turn runs their unit tests and a link check, and corrections to\nmanifests and briefs arrive as drafts to approve in Probe Studio.\n";
@@ -36530,9 +37189,9 @@ var agents_features_default = "## Features\n\nEvery feature has a manifest, `pro
 var features_README_default = '# Feature manifests\n\nOne file per feature, `probe/features/<id>.yaml`, where `<id>` is the feature id Probe\'s scan\nuses (`call`, `universe`, `chat`, ...). Together they are the feature index: agents list\nthis folder and reads each `summary`, so there is no separate index file to fall out of date.\n\nShared code gets a manifest too. A **platform area** is what the scan groups outside the feature\nfolders (`core:database`, `common:image`, `app`): code features build on rather than a screen a\nuser opens. Its manifest has the same shape with `kind: platform`, and a `:` in its id becomes\n`__` in the file name (`core:database` \u2192 `core__database.yaml`), since Windows allows no `:`.\n\nEach feature has three layers:\n\n| Layer | Where | Answers | Read by |\n|---|---|---|---|\n| Summary | `summary:` in the manifest | What is this, in one line? | agents, Studio, people browsing |\n| Brief | the doc `brief:` points to (`docs/features/<name>.md`) | What it does, how it works, what must never break | people and agents starting work |\n| Manifest | this folder | Which code, tests, cards and rules belong to it | Probe and agents working on the feature |\n\nThe manifest never repeats the brief. It points into it.\n\n## Manifest format\n\n```yaml\nid: call                      # Probe feature id; must match the scan\nkind: feature                 # feature (the default) or platform\nname: Calling                 # display name\nsummary: >-                   # one or two lines, from the user\'s point of view\n  ...\nowner: "@someone"             # who approves changes to the authored parts; null until agreed\nbrief: docs/features/calling.md\nalso_read:                    # other docs an agent should load, with anchors where useful\n  - AGENTS.md#calling\n\npaths:                        # code that belongs to this feature (prefix match, repo relative)\n  - feature/call/\nrelated:                      # code owned elsewhere that this feature depends on; an edit here\n  - path: core/push/impl/     # marks the feature stale but does not make it the owner\n    why: push types and categories that wake a call\n\nunit:                         # how to run this feature\'s unit tests\n  command: ./gradlew :feature:call:impl:testDebugUnitTest\n\nflows:                        # what a user can do, one line each; each becomes a card candidate\n  - id: dial\n    text: Start a call from a chat or a profile\n\ninvariants:                   # rules that must hold, each tied to what proves it\n  - id: own-call-never-rings\n    rule: Reconcile never rings for a call this device placed.\n    covered_by:               # "TestClass :: test name", exactly as written in the test\n      - "CallSignalSourceImplTest :: a reconcile never rings for a call this device placed"\n    cards: []                 # device cards that prove it: "card-id" in probe/cards/<this feature>/,\n                              # or "other-feature/card-id"\n    gap: null                 # why no unit test proves it (needed when covered_by is empty)\n\ndevice_only:                  # checks no unit test can make; candidates for cards\n  - text: Lock screen, incoming call\n```\n\n### Rules for the authored fields\n\n- **`invariants`** are behaviour, not architecture. "The reducer is pure" belongs in the brief;\n  "a declined outgoing call sends no DELETE" belongs here, because a test or a card can fail on it.\n- An invariant with empty `covered_by`, no `cards` and a `gap` is a known hole. One with all three\n  empty is invalid: say why it is not covered.\n- **`cards`** tie a rule to the device cards in `probe/cards/` that show it on a phone. Use them for\n  what a unit test cannot reach (a locked screen, the system ringer, a payment sheet, two devices).\n  A rule may have tests and cards both. A card link that names no card is a broken link, like a\n  renamed test. A card proves its rule only while its last pass still holds for the code; Probe\n  reads that from `probe/results/`. Keep `gap` on a card-only rule to say why no unit test can.\n- To check a rule on a device, ask your agent ("does the locked-phone ring rule still hold?"): it runs\n  `probe_card_run { rule: "call/full-screen-intent-rings" }`. From a shell: `probe rule\n  call/full-screen-intent-rings --run`. `probe rules <feature>` lists every rule with its proof.\n  The older single `card: <id>` still reads as a one-item `cards`.\n- `covered_by` names must match a real test exactly, so a renamed or deleted test shows up as a\n  broken link instead of silently passing.\n- `paths` decide ownership when the edit hook asks "which feature did this file touch?". A file\n  matched by two features\' `paths` belongs to both; `related` only marks a feature stale.\n\n### Platform areas\n\nA `kind: platform` manifest states the contract shared code keeps for the code built on it:\n\n- `summary` says what it provides to that code; `flows` are what that code does with it (the\n  calls or services it offers), not screens.\n- `invariants` are proven by **unit tests**. Cards stay optional: give one only to a rule no unit\n  test can reach (real hardware, the OS). `probe init` drafts cards for a platform area only when\n  you name it (`probe init --step cards --features core:database`).\n- Do not list the areas that use it under `related`. Probe reads the module graph from the build\n  files: an edit in a platform module marks every area that depends on it directly as stale too\n  (`watch.impactDepth` in `probe.yaml`: 2 reaches their dependents as well, 0 turns it off).\n  `related` is still the way to name a dependency the build files do not show.\n\n### Derived fields\n\nModules, classes, test files, coverage and who depends on whom are not written here. Probe\'s scan\nderives them from the code on every run, so they cannot go stale. Do not add them by hand.\n\n## Brief format\n\nThe brief is the feature\'s doc in whatever form the team keeps docs (often `docs/features/<name>.md`).\nIt starts with an **At a glance** section, the part a newcomer reads first:\n\n```\n## 0) At a glance\n- What it is      \u2014 2\u20134 lines, user\'s point of view\n- Where it lives  \u2014 modules, and the one class to open first\n- User flows      \u2014 the main paths\n- Rules           \u2014 pointer to the manifest\'s invariants, plus the gaps that are still open\n- How to test     \u2014 unit command, and what needs a device\n```\n\nThe rest of the doc stays as the team writes it. A feature with no doc yet has no `brief:`.\n\n## Keeping it current\n\nWhen code under a feature\'s `paths` changes, the feature is stale; so is every area that depends\non an edited platform module. Whoever changed it, or Probe\'s\ncheck, then confirms:\n\n1. Every `covered_by` test still exists under that exact name.\n2. The change does not contradict an invariant, a flow or the brief\'s At a glance.\n3. New behaviour (a new signal, endpoint, screen or rule) has an invariant or flow to go with it.\n\nIt drafts the corrections; a person approves them. Nothing here is rewritten without review.\n';
 
 // src/knowledge/draft.ts
-var import_node_crypto3 = require("node:crypto");
-var import_node_fs13 = require("node:fs");
-var import_node_path17 = require("node:path");
+var import_node_crypto4 = require("node:crypto");
+var import_node_fs15 = require("node:fs");
+var import_node_path19 = require("node:path");
 
 // src/core/diff.ts
 function unifiedDiff(before, after, path, context = 3) {
@@ -36590,8 +37249,8 @@ function lineOps(a, b) {
 }
 
 // src/knowledge/manifest.ts
-var import_node_fs12 = require("node:fs");
-var import_node_path16 = require("node:path");
+var import_node_fs14 = require("node:fs");
+var import_node_path18 = require("node:path");
 var import_yaml6 = __toESM(require_dist(), 1);
 var MANIFEST_KINDS = ["feature", "platform"];
 var FEATURES_DIR = "probe/features";
@@ -36599,19 +37258,19 @@ function manifestFile(id) {
   return `${FEATURES_DIR}/${id.replace(/:/g, "__")}.yaml`;
 }
 function manifestIdOf(fileName) {
-  return (0, import_node_path16.basename)(fileName, ".yaml").replace(/__/g, ":");
+  return (0, import_node_path18.basename)(fileName, ".yaml").replace(/__/g, ":");
 }
 function loadManifest(root, id) {
   const file2 = manifestFile(id);
-  const abs = (0, import_node_path16.join)(root, file2);
-  if (!(0, import_node_fs12.existsSync)(abs)) return null;
-  return normalize((0, import_yaml6.parse)((0, import_node_fs12.readFileSync)(abs, "utf8")) ?? {}, file2);
+  const abs = (0, import_node_path18.join)(root, file2);
+  if (!(0, import_node_fs14.existsSync)(abs)) return null;
+  return normalize((0, import_yaml6.parse)((0, import_node_fs14.readFileSync)(abs, "utf8")) ?? {}, file2);
 }
 function loadManifests(root) {
-  const dir = (0, import_node_path16.join)(root, FEATURES_DIR);
-  if (!(0, import_node_fs12.existsSync)(dir)) return [];
+  const dir = (0, import_node_path18.join)(root, FEATURES_DIR);
+  if (!(0, import_node_fs14.existsSync)(dir)) return [];
   const out = [];
-  for (const name of (0, import_node_fs12.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
+  for (const name of (0, import_node_fs14.readdirSync)(dir).filter((n) => n.endsWith(".yaml")).sort()) {
     try {
       const m = loadManifest(root, manifestIdOf(name));
       if (m) out.push(m);
@@ -36655,7 +37314,7 @@ function checkManifest(root, id, text2) {
   const result = { feature: id, file: file2, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
   let raw;
   try {
-    const source = text2 ?? ((0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, file2)) ? (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(root, file2), "utf8") : null);
+    const source = text2 ?? ((0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, file2)) ? (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, file2), "utf8") : null);
     raw = source === null ? null : (0, import_yaml6.parse)(source) ?? {};
   } catch (e) {
     result.errors.push(`Does not parse: ${e.message.split("\n")[0]}`);
@@ -36666,11 +37325,11 @@ function checkManifest(root, id, text2) {
     return result;
   }
   const m = normalize(raw, file2);
-  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${(0, import_node_path16.basename)(file2)}`);
+  if (m.id !== id) result.errors.push(`id is "${m.id}" but the file is ${(0, import_node_path18.basename)(file2)}`);
   if (raw.kind !== void 0 && !MANIFEST_KINDS.includes(raw.kind)) result.errors.push(`kind is "${String(raw.kind)}"; it is one of ${MANIFEST_KINDS.join(", ")}.`);
   if (!m.summary) result.errors.push("No summary.");
-  if (m.brief && !(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
-  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, p))) result.missingPaths.push(p);
+  if (m.brief && !(0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, m.brief))) result.errors.push(`Brief ${m.brief} does not exist.`);
+  for (const p of [...m.paths, ...m.related.map((r) => r.path)]) if (!(0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, p))) result.missingPaths.push(p);
   const tests = testIndex(root);
   for (const inv of m.invariants) {
     if (!inv.coveredBy.length && !inv.cards.length) {
@@ -36679,10 +37338,10 @@ function checkManifest(root, id, text2) {
     }
     for (const ref of inv.cards) {
       result.cardLinks++;
-      const target = cardRef(m.id, ref);
-      const ids = listCards(root, target.feature).map((c) => c.id);
-      if (ids.includes(target.id)) continue;
-      const near = closest(target.id.replace(/-/g, " "), ids.map((i) => i.replace(/-/g, " ")));
+      const target2 = cardRef(m.id, ref);
+      const ids = listCards(root, target2.feature).map((c) => c.id);
+      if (ids.includes(target2.id)) continue;
+      const near = closest(target2.id.replace(/-/g, " "), ids.map((i) => i.replace(/-/g, " ")));
       result.brokenCards.push({ invariant: inv.id, card: ref, closest: near?.replace(/ /g, "-") });
     }
     for (const entry of inv.coveredBy) {
@@ -36693,7 +37352,7 @@ function checkManifest(root, id, text2) {
         result.broken.push({ invariant: inv.id, entry, problem: "no test class" });
         continue;
       }
-      const names = files.flatMap((f) => testNames((0, import_node_path16.join)(root, f)));
+      const names = files.flatMap((f) => testNames((0, import_node_path18.join)(root, f)));
       if (!names.includes(name ?? "")) result.broken.push({ invariant: inv.id, entry, problem: "no such test", closest: closest(name ?? "", names) });
     }
   }
@@ -36707,14 +37366,14 @@ function testIndex(root) {
   for (const f of listed.split("\n")) {
     const jvm = /\.(kt|java)$/.test(f);
     if (jvm ? !/\/src\/((test|androidTest)[^/]*|[a-z]\w*Test)\//.test(f) : !SOURCE_EXT.test(f) || !isTestPath(f)) continue;
-    const cls = stemOf((0, import_node_path16.basename)(f));
+    const cls = stemOf((0, import_node_path18.basename)(f));
     out.set(cls, [...out.get(cls) ?? [], f]);
   }
   indexed = { root, at: Date.now(), tests: out };
   return out;
 }
 function testNames(file2) {
-  const text2 = (0, import_node_fs12.readFileSync)(file2, "utf8");
+  const text2 = (0, import_node_fs14.readFileSync)(file2, "utf8");
   if (/\.(kt|java)$/.test(file2)) return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
   return testNamesIn(text2);
 }
@@ -36729,8 +37388,8 @@ function closest(name, names) {
   return best && best.score >= 0.5 ? best.n : void 0;
 }
 function briefGlance(root, m) {
-  if (!m.brief || !(0, import_node_fs12.existsSync)((0, import_node_path16.join)(root, m.brief))) return null;
-  const text2 = (0, import_node_fs12.readFileSync)((0, import_node_path16.join)(root, m.brief), "utf8");
+  if (!m.brief || !(0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, m.brief))) return null;
+  const text2 = (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, m.brief), "utf8");
   const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text2);
   return match ? match[1].trim() : null;
 }
@@ -36750,47 +37409,47 @@ function summarizeCheck(c) {
 // src/knowledge/draft.ts
 var DRAFTS = "drafts";
 function draftDir(project, id) {
-  return (0, import_node_path17.join)(project.store.dir, DRAFTS, id);
+  return (0, import_node_path19.join)(project.store.dir, DRAFTS, id);
 }
-var hash2 = (text2) => (0, import_node_crypto3.createHash)("sha1").update(text2).digest("hex");
+var hash2 = (text2) => (0, import_node_crypto4.createHash)("sha1").update(text2).digest("hex");
 var current = (project, path) => {
-  const abs = (0, import_node_path17.join)(project.root, path);
-  return (0, import_node_fs13.existsSync)(abs) ? (0, import_node_fs13.readFileSync)(abs, "utf8") : "";
+  const abs = (0, import_node_path19.join)(project.root, path);
+  return (0, import_node_fs15.existsSync)(abs) ? (0, import_node_fs15.readFileSync)(abs, "utf8") : "";
 };
 function openDraft(project, feature, files) {
   const id = `${newRunId()}-${feature.replace(/[^\w-]/g, "_")}`;
   const dir = draftDir(project, id);
-  (0, import_node_fs13.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs15.mkdirSync)(dir, { recursive: true });
   const staged = files.map((f) => {
     const text2 = current(project, f.path);
-    (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(dir, f.staged), (0, import_node_fs13.existsSync)((0, import_node_path17.join)(project.root, f.path)) ? text2 : f.initial ?? "");
+    (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(dir, f.staged), (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, f.path)) ? text2 : f.initial ?? "");
     return { path: f.path, base: hash2(text2), staged: f.staged };
   });
-  const format = (0, import_node_path17.join)(project.root, FEATURES_DIR, "README.md");
-  if ((0, import_node_fs13.existsSync)(format)) (0, import_node_fs13.copyFileSync)(format, (0, import_node_path17.join)(dir, "FORMAT.md"));
+  const format = (0, import_node_path19.join)(project.root, FEATURES_DIR, "README.md");
+  if ((0, import_node_fs15.existsSync)(format)) (0, import_node_fs15.copyFileSync)(format, (0, import_node_path19.join)(dir, "FORMAT.md"));
   return { id, dir, feature, files: staged };
 }
 function closeDraft(project, work, details) {
   const changed = work.files.filter((f) => {
-    const staged = (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(work.dir, f.staged), "utf8");
+    const staged = (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, f.staged), "utf8");
     return staged.trim() !== "" && staged !== current(project, f.path);
   });
   if (!changed.length) {
-    (0, import_node_fs13.rmSync)(work.dir, { recursive: true, force: true });
+    (0, import_node_fs15.rmSync)(work.dir, { recursive: true, force: true });
     return null;
   }
   const draft = { id: work.id, feature: work.feature, createdAt: (/* @__PURE__ */ new Date()).toISOString(), status: "pending", ...details, summary: details.summary.slice(0, 4e3), files: changed };
-  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
+  (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "draft.json"), JSON.stringify(draft, null, 2));
   return draft;
 }
 async function draftCorrections(project, input2, log) {
   const { manifest } = input2;
   const work = openDraft(project, manifest.id, [
     { path: manifest.file, staged: "manifest.yaml" },
-    ...manifest.brief && (0, import_node_fs13.existsSync)((0, import_node_path17.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
+    ...manifest.brief && (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, manifest.brief)) ? [{ path: manifest.brief, staged: "brief.md" }] : []
   ]);
   const { dir, files } = work;
-  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(dir, "CHANGE.md"), changeContext(project, input2));
+  (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(dir, "CHANGE.md"), changeContext(project, input2));
   const result = await runAgent(
     project,
     {
@@ -36817,7 +37476,7 @@ function changeContext(project, input2) {
   const untracked = (capture("git", ["ls-files", "--others", "--exclude-standard", "--", ...files], project.root) ?? "").split("\n").filter(Boolean);
   const added = untracked.map((f) => `### new file ${f}
 \`\`\`
-${(0, import_node_fs13.readFileSync)((0, import_node_path17.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
+${(0, import_node_fs15.readFileSync)((0, import_node_path19.join)(project.root, f), "utf8").split("\n").slice(0, 200).join("\n")}
 \`\`\``).join("\n\n");
   const diff = `${tracked}
 ${added}`.slice(0, 6e4);
@@ -36864,18 +37523,18 @@ Do this:
 If nothing needs correcting, change no file. Finish with two or three sentences: what you changed and why, or that nothing needed changing.`;
 }
 function listDrafts(project, feature) {
-  const root = (0, import_node_path17.join)(project.store.dir, DRAFTS);
-  if (!(0, import_node_fs13.existsSync)(root)) return [];
-  return (0, import_node_fs13.readdirSync)(root).map((id) => (0, import_node_path17.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs13.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs13.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const root = (0, import_node_path19.join)(project.store.dir, DRAFTS);
+  if (!(0, import_node_fs15.existsSync)(root)) return [];
+  return (0, import_node_fs15.readdirSync)(root).map((id) => (0, import_node_path19.join)(root, id, "draft.json")).filter((f) => (0, import_node_fs15.existsSync)(f)).map((f) => JSON.parse((0, import_node_fs15.readFileSync)(f, "utf8"))).filter((d) => !feature || d.feature === feature).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 function findDraft(project, id) {
-  const file2 = (0, import_node_path17.join)(draftDir(project, id), "draft.json");
-  return (0, import_node_fs13.existsSync)(file2) ? JSON.parse((0, import_node_fs13.readFileSync)(file2, "utf8")) : null;
+  const file2 = (0, import_node_path19.join)(draftDir(project, id), "draft.json");
+  return (0, import_node_fs15.existsSync)(file2) ? JSON.parse((0, import_node_fs15.readFileSync)(file2, "utf8")) : null;
 }
 function draftDiffs(project, draft) {
   return draft.files.map((f) => {
     const now = current(project, f.path);
-    const staged = (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(draftDir(project, draft.id), f.staged), "utf8");
+    const staged = (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(draftDir(project, draft.id), f.staged), "utf8");
     return { path: f.path, diff: unifiedDiff(now, staged, f.path), conflict: hash2(now) !== f.base };
   });
 }
@@ -36886,9 +37545,9 @@ function approveDraft(project, id) {
   const conflicts = draftDiffs(project, draft).filter((d) => d.conflict);
   if (conflicts.length) return { ok: false, error: `${conflicts.map((c) => c.path).join(", ")} changed after this draft was made. Reject it and check the feature again.` };
   for (const f of draft.files) {
-    const abs = (0, import_node_path17.join)(project.root, f.path);
-    (0, import_node_fs13.mkdirSync)((0, import_node_path17.dirname)(abs), { recursive: true });
-    (0, import_node_fs13.writeFileSync)(abs, (0, import_node_fs13.readFileSync)((0, import_node_path17.join)(draftDir(project, id), f.staged), "utf8"));
+    const abs = (0, import_node_path19.join)(project.root, f.path);
+    (0, import_node_fs15.mkdirSync)((0, import_node_path19.dirname)(abs), { recursive: true });
+    (0, import_node_fs15.writeFileSync)(abs, (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(draftDir(project, id), f.staged), "utf8"));
   }
   setStatus(project, draft, "approved");
   return { ok: true, files: draft.files.map((f) => f.path) };
@@ -36901,11 +37560,11 @@ function rejectDraft(project, id) {
   return { ok: true };
 }
 function setStatus(project, draft, status) {
-  (0, import_node_fs13.writeFileSync)((0, import_node_path17.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
+  (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(draftDir(project, draft.id), "draft.json"), JSON.stringify({ ...draft, status }, null, 2));
 }
 
 // src/engine/impact.ts
-var import_node_path18 = require("node:path");
+var import_node_path20 = require("node:path");
 var cached2 = null;
 function areaGraph(project, result) {
   if (cached2 && cached2.root === project.root && cached2.scannedAt === result.scannedAt && Date.now() - cached2.at < 5e3) return cached2.graph;
@@ -36921,7 +37580,7 @@ function buildGraph(root, result, deps) {
     modulesOf.set(f.id, f.modules.map((m) => m.id));
     for (const m of f.modules) {
       areaOf.set(m.id, f.id);
-      dirs.push({ module: m.id, dir: `${(0, import_node_path18.relative)(root, m.dir).replace(/\\/g, "/")}/` });
+      dirs.push({ module: m.id, dir: `${(0, import_node_path20.relative)(root, m.dir).replace(/\\/g, "/")}/` });
     }
   }
   dirs.sort((a, b) => b.dir.length - a.dir.length);
@@ -36965,7 +37624,7 @@ function uses(graph, area) {
 }
 
 // src/engine/doctor.ts
-var import_node_fs14 = require("node:fs");
+var import_node_fs16 = require("node:fs");
 function doctor(project, error62) {
   const major = Number(process.versions.node.split(".")[0]);
   const checks = [
@@ -36983,7 +37642,7 @@ function doctor(project, error62) {
     return checks;
   }
   checks.push({ id: "project", label: "Project", status: "ok", detail: `${project.name} (${project.adapter.id}) at ${project.root}` });
-  const hasConfig = (0, import_node_fs14.existsSync)(configPath(project.root));
+  const hasConfig = (0, import_node_fs16.existsSync)(configPath(project.root));
   checks.push({
     id: "config",
     label: "probe/probe.yaml",
@@ -37085,14 +37744,14 @@ function chooseFeatures(project, features, mode = "replace") {
   writeState(project, { features: chosen, seen });
   return chosen;
 }
-var hasManifest = (project, id) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, manifestFile(id)));
+var hasManifest = (project, id) => (0, import_node_fs17.existsSync)((0, import_node_path21.join)(project.root, manifestFile(id)));
 function initStatus(project) {
   const steps = [];
   const add = (id, status, detail) => steps.push({ id, label: INIT_STEPS.find((s) => s.id === id).label, status, detail });
   const failing = doctor(project).filter((c) => c.status === "fail");
   add("doctor", failing.length ? "warn" : "done", failing.length ? `${failing.map((c) => c.label).join(", ")}: see \`probe doctor\`. Only device runs need these.` : "ready");
-  add("config", (0, import_node_fs15.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path19.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
-  const missingKit = KIT.filter((k) => !(0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, k.path))).map((k) => k.path);
+  add("config", (0, import_node_fs17.existsSync)(configPath(project.root)) ? "done" : "todo", (0, import_node_path21.relative)(project.root, configPath(project.root)).replace(/\\/g, "/"));
+  const missingKit = KIT.filter((k) => !(0, import_node_fs17.existsSync)((0, import_node_path21.join)(project.root, k.path))).map((k) => k.path);
   add("kit", missingKit.length ? "todo" : "done", missingKit.length ? `to write: ${missingKit.join(", ")}` : KIT.map((k) => k.path).join(", "));
   const scanned = project.store.read("scan.json");
   add("scan", scanned ? "done" : "todo", scanned ? `${scanned.features.filter((f) => f.group === "feature").length} features, ${scanned.features.filter((f) => f.group !== "feature").length} platform areas` : "not scanned yet");
@@ -37182,7 +37841,7 @@ function needsCards(project, feature) {
   }
 }
 function agentFileDone(project) {
-  const read2 = (p) => (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, p)) ? (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(project.root, p), "utf8") : "";
+  const read2 = (p) => (0, import_node_fs17.existsSync)((0, import_node_path21.join)(project.root, p)) ? (0, import_node_fs17.readFileSync)((0, import_node_path21.join)(project.root, p), "utf8") : "";
   return read2("AGENTS.md").includes(`${FEATURES_DIR}/`) && /^@AGENTS\.md\s*$/m.test(read2("CLAUDE.md"));
 }
 function isInitStep(id) {
@@ -37215,17 +37874,17 @@ function startInit(project, options = {}) {
       const failing = doctor(project).filter((c) => c.status === "fail");
       log(failing.length ? `tools: ${failing.map((c) => `${c.label} (${c.fix ?? c.detail})`).join("; ")} \u2014 device runs need these, the rest of init does not` : "tools: ready");
     }
-    if (wants("config") && !(0, import_node_fs15.existsSync)(configPath(project.root))) {
-      (0, import_node_fs15.mkdirSync)((0, import_node_path19.dirname)(configPath(project.root)), { recursive: true });
-      (0, import_node_fs15.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
-      log(`wrote ${(0, import_node_path19.relative)(project.root, configPath(project.root))}`);
+    if (wants("config") && !(0, import_node_fs17.existsSync)(configPath(project.root))) {
+      (0, import_node_fs17.mkdirSync)((0, import_node_path21.dirname)(configPath(project.root)), { recursive: true });
+      (0, import_node_fs17.writeFileSync)(configPath(project.root), CONFIG_TEMPLATE);
+      log(`wrote ${(0, import_node_path21.relative)(project.root, configPath(project.root))}`);
     }
     if (wants("kit")) {
       for (const k of KIT) {
-        const abs = (0, import_node_path19.join)(project.root, k.path);
-        if ((0, import_node_fs15.existsSync)(abs)) continue;
-        (0, import_node_fs15.mkdirSync)((0, import_node_path19.dirname)(abs), { recursive: true });
-        (0, import_node_fs15.writeFileSync)(abs, k.text);
+        const abs = (0, import_node_path21.join)(project.root, k.path);
+        if ((0, import_node_fs17.existsSync)(abs)) continue;
+        (0, import_node_fs17.mkdirSync)((0, import_node_path21.dirname)(abs), { recursive: true });
+        (0, import_node_fs17.writeFileSync)(abs, k.text);
         log(`wrote ${k.path}`);
       }
     }
@@ -37285,12 +37944,12 @@ async function draftManifests(project, run, features, model, log) {
     const work = openDraft(project, id, [{ path: file2, staged: "manifest.yaml", initial: `# ${id}. Format: ${FEATURES_DIR}/README.md
 id: ${id}
 ${kind}` }]);
-    (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
-    if (!(0, import_node_fs15.existsSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"))) (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"), features_README_default);
+    (0, import_node_fs17.writeFileSync)((0, import_node_path21.join)(work.dir, "FEATURE.md"), featureContext(project, feature, tests));
+    if (!(0, import_node_fs17.existsSync)((0, import_node_path21.join)(work.dir, "FORMAT.md"))) (0, import_node_fs17.writeFileSync)((0, import_node_path21.join)(work.dir, "FORMAT.md"), features_README_default);
     const agent = (prompt6) => runAgent(project, { prompt: prompt6, probeTools: [], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model }, say);
     let result = await agent(manifestPrompt(project, feature));
     run.costUsd += result.costUsd;
-    let check2 = checkManifest(project.root, id, (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "manifest.yaml"), "utf8"));
+    let check2 = checkManifest(project.root, id, (0, import_node_fs17.readFileSync)((0, import_node_path21.join)(work.dir, "manifest.yaml"), "utf8"));
     if (check2.errors.length || check2.broken.length || check2.unexplained.length) {
       say(`mending ${check2.errors.length + check2.broken.length + check2.unexplained.length} problems the link check found`);
       const fix = await agent(`The manifest.yaml you wrote for the feature "${id}" fails Probe's check:
@@ -37299,7 +37958,7 @@ ${summarizeCheck(check2)}
 
 Fix every problem in manifest.yaml: point a broken covered_by entry at the test's exact name (FEATURE.md lists them), or remove it and give the rule a gap. Change nothing else. Finish with one sentence.`);
       run.costUsd += fix.costUsd;
-      check2 = checkManifest(project.root, id, (0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "manifest.yaml"), "utf8"));
+      check2 = checkManifest(project.root, id, (0, import_node_fs17.readFileSync)((0, import_node_path21.join)(work.dir, "manifest.yaml"), "utf8"));
       result = { ...result, summary: `${result.summary}
 
 ${fix.summary}` };
@@ -37313,13 +37972,13 @@ ${summarizeCheck(check2)}`, runId: run.id, origin: "init", step: "manifests" });
   });
 }
 function featureContext(project, feature, tests) {
-  const rel = (dir) => (0, import_node_path19.relative)(project.root, dir).replace(/\\/g, "/");
+  const rel = (dir) => (0, import_node_path21.relative)(project.root, dir).replace(/\\/g, "/");
   const dirs = feature.modules.map((m) => `${rel(m.dir)}/`);
   const tasks = feature.modules.map((m) => m.unitTestTask).filter((t) => !!t);
   const command = tasks.length ? project.adapter.id === "android-gradle" ? `./gradlew ${tasks.join(" ")}` : [...new Set(tasks)].join(" && ") : null;
   const testFiles = [...tests.values()].flat().filter((f) => dirs.some((d) => f.startsWith(d)));
   const testList = testFiles.slice(0, 60).map((f) => {
-    const names = testNames((0, import_node_path19.join)(project.root, f));
+    const names = testNames((0, import_node_path21.join)(project.root, f));
     return `### ${stemOf(f.split("/").pop())} (${f})
 ${names.slice(0, 80).map((n) => `- ${n}`).join("\n")}${names.length > 80 ? `
 - \u2026 ${names.length - 80} more` : ""}`;
@@ -37410,7 +38069,7 @@ async function draftCards(project, run, features, model, log) {
     say(`looking for rules only a device can prove (${i + 1}/${features.length})`);
     const before = new Map(listCards(project.root, id).map((c) => [c.id, c.updatedAt]));
     const work = openDraft(project, id, [{ path: manifestFile(id), staged: "manifest.yaml" }]);
-    if (!(0, import_node_fs15.existsSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"))) (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(work.dir, "FORMAT.md"), features_README_default);
+    if (!(0, import_node_fs17.existsSync)((0, import_node_path21.join)(work.dir, "FORMAT.md"))) (0, import_node_fs17.writeFileSync)((0, import_node_path21.join)(work.dir, "FORMAT.md"), features_README_default);
     const result = await runAgent(
       project,
       { prompt: cardsPrompt(project, id), probeTools: ["probe_cards_context", "probe_cards_save"], cwd: work.dir, addDirs: [project.root], editOnly: ["./manifest.yaml"], model },
@@ -37452,13 +38111,13 @@ function draftAgentFile(project, run, log) {
     { path: "CLAUDE.md", staged: "claude.md" }
   ]);
   const edit = (staged, change) => {
-    const abs = (0, import_node_path19.join)(work.dir, staged);
-    const before = (0, import_node_fs15.readFileSync)(abs, "utf8");
+    const abs = (0, import_node_path21.join)(work.dir, staged);
+    const before = (0, import_node_fs17.readFileSync)(abs, "utf8");
     const crlf = before.includes("\r\n");
     const after = change(before.replace(/\r\n/g, "\n"));
-    (0, import_node_fs15.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
+    (0, import_node_fs17.writeFileSync)(abs, crlf ? after.replace(/\n/g, "\r\n") : after);
   };
-  if (!(0, import_node_fs15.readFileSync)((0, import_node_path19.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}
+  if (!(0, import_node_fs17.readFileSync)((0, import_node_path21.join)(work.dir, "agents.md"), "utf8").includes(`${FEATURES_DIR}/`)) edit("agents.md", (t) => `${t.trimEnd()}${t.trim() ? "\n\n" : ""}${featuresSection(project, features)}
 `);
   edit("claude.md", (t) => {
     if (/^@AGENTS\.md\s*$/m.test(t)) return t;
@@ -37511,28 +38170,28 @@ function formatInitStatus(steps) {
 }
 
 // src/engine/project.ts
-var import_node_path30 = require("node:path");
+var import_node_path32 = require("node:path");
 
 // src/adapters/android-gradle/index.ts
-var import_node_fs21 = require("node:fs");
-var import_node_path25 = require("node:path");
+var import_node_fs23 = require("node:fs");
+var import_node_path27 = require("node:path");
 
 // src/adapters/android-gradle/app.ts
-var import_node_fs17 = require("node:fs");
-var import_node_path21 = require("node:path");
+var import_node_fs19 = require("node:fs");
+var import_node_path23 = require("node:path");
 
 // src/adapters/android-gradle/settings.ts
-var import_node_fs16 = require("node:fs");
-var import_node_path20 = require("node:path");
+var import_node_fs18 = require("node:fs");
+var import_node_path22 = require("node:path");
 var SETTINGS_FILES = ["settings.gradle.kts", "settings.gradle"];
 function settingsFile(root) {
-  const name = SETTINGS_FILES.find((f) => (0, import_node_fs16.existsSync)((0, import_node_path20.join)(root, f)));
-  return name ? (0, import_node_path20.join)(root, name) : null;
+  const name = SETTINGS_FILES.find((f) => (0, import_node_fs18.existsSync)((0, import_node_path22.join)(root, f)));
+  return name ? (0, import_node_path22.join)(root, name) : null;
 }
 function includedModules(root) {
   const file2 = settingsFile(root);
   if (!file2) return [];
-  const text2 = stripComments((0, import_node_fs16.readFileSync)(file2, "utf8"));
+  const text2 = stripComments((0, import_node_fs18.readFileSync)(file2, "utf8"));
   const overrides = /* @__PURE__ */ new Map();
   for (const m of text2.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
     overrides.set(m[1], m[2]);
@@ -37544,7 +38203,7 @@ function includedModules(root) {
       ids.add(raw.startsWith(":") ? raw : `:${raw}`);
     }
   }
-  return [...ids].map((id) => ({ id, dir: (0, import_node_path20.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs16.existsSync)((0, import_node_path20.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs16.existsSync)((0, import_node_path20.join)(m.dir, "build.gradle")));
+  return [...ids].map((id) => ({ id, dir: (0, import_node_path22.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs18.existsSync)((0, import_node_path22.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs18.existsSync)((0, import_node_path22.join)(m.dir, "build.gradle")));
 }
 function stripComments(text2) {
   return text2.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -37553,20 +38212,20 @@ function stripComments(text2) {
 // src/adapters/android-gradle/app.ts
 var APPLICATION_PLUGIN = /com\.android\.application|android[.-]application|androidApplication/;
 function buildFileOf(dir) {
-  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs17.existsSync)((0, import_node_path21.join)(dir, name))) return (0, import_node_fs17.readFileSync)((0, import_node_path21.join)(dir, name), "utf8");
+  for (const name of ["build.gradle.kts", "build.gradle"]) if ((0, import_node_fs19.existsSync)((0, import_node_path23.join)(dir, name))) return (0, import_node_fs19.readFileSync)((0, import_node_path23.join)(dir, name), "utf8");
   return null;
 }
 function detectAndroidApp(root) {
   const apps = includedModules(root).map((m) => ({ ...m, build: buildFileOf(m.dir) })).filter((m) => m.build && APPLICATION_PLUGIN.test(m.build));
   if (apps.length === 0) return null;
   const app = apps.find((m) => m.id === ":app") ?? apps[0];
-  const apkDir = (0, import_node_path21.join)(app.dir, "build", "outputs", "apk");
+  const apkDir = (0, import_node_path23.join)(app.dir, "build", "outputs", "apk");
   let flavor = "";
-  let metadata = (0, import_node_fs17.existsSync)((0, import_node_path21.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path21.join)(apkDir, "debug", "output-metadata.json") : null;
-  if (!metadata && (0, import_node_fs17.existsSync)(apkDir)) {
-    for (const d of (0, import_node_fs17.readdirSync)(apkDir)) {
-      const file2 = (0, import_node_path21.join)(apkDir, d, "debug", "output-metadata.json");
-      if ((0, import_node_fs17.existsSync)(file2)) {
+  let metadata = (0, import_node_fs19.existsSync)((0, import_node_path23.join)(apkDir, "debug", "output-metadata.json")) ? (0, import_node_path23.join)(apkDir, "debug", "output-metadata.json") : null;
+  if (!metadata && (0, import_node_fs19.existsSync)(apkDir)) {
+    for (const d of (0, import_node_fs19.readdirSync)(apkDir)) {
+      const file2 = (0, import_node_path23.join)(apkDir, d, "debug", "output-metadata.json");
+      if ((0, import_node_fs19.existsSync)(file2)) {
         flavor = d;
         metadata = file2;
         break;
@@ -37575,19 +38234,19 @@ function detectAndroidApp(root) {
   }
   const installTask = `${app.id}:install${flavor ? flavor[0].toUpperCase() + flavor.slice(1) : ""}Debug`;
   if (metadata) {
-    const id2 = JSON.parse((0, import_node_fs17.readFileSync)(metadata, "utf8")).applicationId;
+    const id2 = JSON.parse((0, import_node_fs19.readFileSync)(metadata, "utf8")).applicationId;
     if (id2) return { module: app.id, package: id2, installTask, source: "last build" };
   }
-  const build = app.build;
-  const id = /applicationId\s*=?\s*["']([\w.]+)["']/.exec(build)?.[1];
-  const debugBlock = /(?:debug|getByName\(\s*["']debug["']\s*\))\s*\{([^}]*)\}/.exec(build)?.[1] ?? "";
+  const build2 = app.build;
+  const id = /applicationId\s*=?\s*["']([\w.]+)["']/.exec(build2)?.[1];
+  const debugBlock = /(?:debug|getByName\(\s*["']debug["']\s*\))\s*\{([^}]*)\}/.exec(build2)?.[1] ?? "";
   const suffix = /applicationIdSuffix\s*=?\s*["']([\w.]+)["']/.exec(debugBlock)?.[1] ?? "";
   return { module: app.id, package: id ? id + suffix : void 0, installTask, source: id ? "build file" : "none" };
 }
 
 // src/adapters/android-gradle/deps.ts
-var import_node_fs18 = require("node:fs");
-var import_node_path22 = require("node:path");
+var import_node_fs20 = require("node:fs");
+var import_node_path24 = require("node:path");
 function accessorSegment(segment) {
   return segment.replace(/[-_]+([a-zA-Z0-9])/g, (_, c) => c.toUpperCase());
 }
@@ -37596,9 +38255,9 @@ function moduleDependencies(modules) {
   const ids = new Set(modules.map((m) => m.id));
   const out = /* @__PURE__ */ new Map();
   for (const m of modules) {
-    const file2 = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path22.join)(m.dir, f)).find(import_node_fs18.existsSync);
+    const file2 = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path24.join)(m.dir, f)).find(import_node_fs20.existsSync);
     if (!file2) continue;
-    const text2 = (0, import_node_fs18.readFileSync)(file2, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const text2 = (0, import_node_fs20.readFileSync)(file2, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     const deps = /* @__PURE__ */ new Set();
     for (const x of text2.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
     for (const x of text2.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
@@ -37614,15 +38273,15 @@ function moduleDependencies(modules) {
 }
 
 // src/adapters/android-gradle/inventory.ts
-var import_node_fs19 = require("node:fs");
-var import_node_path23 = require("node:path");
+var import_node_fs21 = require("node:fs");
+var import_node_path25 = require("node:path");
 var SOURCE_EXT2 = /\.(kt|java)$/;
 function sourceFiles(dir) {
-  if (!(0, import_node_fs19.existsSync)(dir)) return [];
+  if (!(0, import_node_fs21.existsSync)(dir)) return [];
   const out = [];
   const walk2 = (d) => {
-    for (const entry of (0, import_node_fs19.readdirSync)(d, { withFileTypes: true })) {
-      const p = (0, import_node_path23.join)(d, entry.name);
+    for (const entry of (0, import_node_fs21.readdirSync)(d, { withFileTypes: true })) {
+      const p = (0, import_node_path25.join)(d, entry.name);
       if (entry.isDirectory()) walk2(p);
       else if (SOURCE_EXT2.test(entry.name)) out.push(p);
     }
@@ -37637,9 +38296,9 @@ function sourceSetKind(name) {
   return null;
 }
 function sourceSetFiles(moduleDir, set2) {
-  const src = (0, import_node_path23.join)(moduleDir, "src");
-  if (!(0, import_node_fs19.existsSync)(src)) return [];
-  return (0, import_node_fs19.readdirSync)(src, { withFileTypes: true }).filter((e) => e.isDirectory() && sourceSetKind(e.name) === set2).flatMap((e) => sourceFiles((0, import_node_path23.join)(src, e.name)));
+  const src = (0, import_node_path25.join)(moduleDir, "src");
+  if (!(0, import_node_fs21.existsSync)(src)) return [];
+  return (0, import_node_fs21.readdirSync)(src, { withFileTypes: true }).filter((e) => e.isDirectory() && sourceSetKind(e.name) === set2).flatMap((e) => sourceFiles((0, import_node_path25.join)(src, e.name)));
 }
 var DECLARATION = /^(?:@\w+(?:\([^)]*\))?\s+)*((?:(?:public|internal|private|protected|abstract|open|final|data|sealed|enum|value|inline|annotation|fun|static)\s+)*)(class|object|interface)\s+([A-Z]\w*)/;
 function declaredClasses(text2) {
@@ -37679,7 +38338,7 @@ function indexTests(testFiles) {
   const bases = /* @__PURE__ */ new Set();
   const identifiers = /* @__PURE__ */ new Set();
   for (const file2 of testFiles) {
-    const text2 = (0, import_node_fs19.readFileSync)(file2, "utf8");
+    const text2 = (0, import_node_fs21.readFileSync)(file2, "utf8");
     for (const c of declaredClasses(text2)) {
       if (!TEST_SUFFIX.test(c.name)) continue;
       let base = c.name.replace(TEST_SUFFIX, "");
@@ -37701,7 +38360,7 @@ function testLink(name, index) {
 function inventory(projectRoot, mainFiles, tests) {
   const out = [];
   for (const file2 of mainFiles) {
-    const text2 = (0, import_node_fs19.readFileSync)(file2, "utf8");
+    const text2 = (0, import_node_fs21.readFileSync)(file2, "utf8");
     const declared = declaredClasses(text2).filter((c) => !c.modifiers.includes("private"));
     if (declared.length === 0) continue;
     const lines = Math.max(1, Math.round(text2.split("\n").length / declared.length));
@@ -37711,7 +38370,7 @@ function inventory(projectRoot, mainFiles, tests) {
       const weight = KIND_WEIGHT[kind];
       out.push({
         name: c.name,
-        file: (0, import_node_path23.relative)(projectRoot, file2).replace(/\\/g, "/"),
+        file: (0, import_node_path25.relative)(projectRoot, file2).replace(/\\/g, "/"),
         kind,
         lines,
         test,
@@ -37723,8 +38382,8 @@ function inventory(projectRoot, mainFiles, tests) {
 }
 
 // src/core/junit.ts
-var import_node_fs20 = require("node:fs");
-var import_node_path24 = require("node:path");
+var import_node_fs22 = require("node:fs");
+var import_node_path26 = require("node:path");
 function addJUnitXml(result, xml) {
   for (const tc of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
     const attrs = tc[1];
@@ -37747,18 +38406,18 @@ function addJUnitXml(result, xml) {
   }
 }
 function readJUnitReports(moduleId, path, sinceMs, filter = (n) => n.endsWith(".xml")) {
-  const files = reportFiles(path, filter).filter((f) => (0, import_node_fs20.statSync)(f).mtimeMs >= sinceMs - 2e3);
+  const files = reportFiles(path, filter).filter((f) => (0, import_node_fs22.statSync)(f).mtimeMs >= sinceMs - 2e3);
   if (files.length === 0) return null;
   const result = { module: moduleId, tests: 0, failed: 0, skipped: 0, durationMs: 0, failures: [] };
-  for (const file2 of files) addJUnitXml(result, (0, import_node_fs20.readFileSync)(file2, "utf8"));
+  for (const file2 of files) addJUnitXml(result, (0, import_node_fs22.readFileSync)(file2, "utf8"));
   return result;
 }
 function reportFiles(path, filter) {
-  if (!(0, import_node_fs20.existsSync)(path)) return [];
-  if ((0, import_node_fs20.statSync)(path).isFile()) return [path];
+  if (!(0, import_node_fs22.existsSync)(path)) return [];
+  if ((0, import_node_fs22.statSync)(path).isFile()) return [path];
   const out = [];
-  for (const entry of (0, import_node_fs20.readdirSync)(path, { withFileTypes: true })) {
-    const p = (0, import_node_path24.join)(path, entry.name);
+  for (const entry of (0, import_node_fs22.readdirSync)(path, { withFileTypes: true })) {
+    const p = (0, import_node_path26.join)(path, entry.name);
     if (entry.isDirectory()) out.push(...reportFiles(p, filter));
     else if (filter(entry.name)) out.push(p);
   }
@@ -37796,12 +38455,12 @@ var androidGradleAdapter = {
   },
   projectName(root) {
     const file2 = settingsFile(root);
-    const named = file2 && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs21.readFileSync)(file2, "utf8"))?.[1];
-    return named || (0, import_node_path25.basename)(root);
+    const named = file2 && /rootProject\.name\s*=\s*["']([^"']+)["']/.exec((0, import_node_fs23.readFileSync)(file2, "utf8"))?.[1];
+    return named || (0, import_node_path27.basename)(root);
   },
   scanModules(root, config2) {
     return includedModules(root).map(({ id, dir }) => {
-      const buildFile = (0, import_node_fs21.readFileSync)((0, import_node_fs21.existsSync)((0, import_node_path25.join)(dir, "build.gradle.kts")) ? (0, import_node_path25.join)(dir, "build.gradle.kts") : (0, import_node_path25.join)(dir, "build.gradle"), "utf8");
+      const buildFile = (0, import_node_fs23.readFileSync)((0, import_node_fs23.existsSync)((0, import_node_path27.join)(dir, "build.gradle.kts")) ? (0, import_node_path27.join)(dir, "build.gradle.kts") : (0, import_node_path27.join)(dir, "build.gradle"), "utf8");
       const platform = modulePlatform(buildFile);
       const main2 = sourceSetFiles(dir, "main");
       const test = sourceSetFiles(dir, "test");
@@ -37836,7 +38495,7 @@ var androidGradleAdapter = {
     return modules.filter((m) => m.unitTestTask).map((m) => {
       const taskName = m.unitTestTask.split(":").pop();
       const cached3 = invocation.reused.includes(m.id);
-      const result = readJUnitResults(m.id, (0, import_node_path25.join)(m.dir, "build", "test-results", taskName), cached3 ? 0 : sinceMs);
+      const result = readJUnitResults(m.id, (0, import_node_path27.join)(m.dir, "build", "test-results", taskName), cached3 ? 0 : sinceMs);
       return result && { ...result, cached: cached3 };
     }).filter((r) => r !== null);
   },
@@ -37860,10 +38519,10 @@ var androidGradleAdapter = {
     const out = [];
     for (const m of modules) {
       for (const file2 of sourceSetFiles(m.dir, "main")) {
-        const lines = (0, import_node_fs21.readFileSync)(file2, "utf8").split(/\r?\n/);
+        const lines = (0, import_node_fs23.readFileSync)(file2, "utf8").split(/\r?\n/);
         lines.forEach((text2, i) => {
           if (out.length < limit && NAV_HINT.test(text2)) {
-            out.push(`${(0, import_node_path25.relative)(root, file2).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+            out.push(`${(0, import_node_path27.relative)(root, file2).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
           }
         });
       }
@@ -37872,7 +38531,7 @@ var androidGradleAdapter = {
   },
   doctor(root) {
     const checks = [];
-    const wrapper = (0, import_node_fs21.existsSync)((0, import_node_path25.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
+    const wrapper = (0, import_node_fs23.existsSync)((0, import_node_path27.join)(root, isWindows ? "gradlew.bat" : "gradlew"));
     checks.push({
       id: "gradle-wrapper",
       label: "Gradle wrapper",
@@ -37904,8 +38563,8 @@ var androidGradleAdapter = {
       detail: devices.length > 0 ? devices.map((d) => `${d.serial} (${d.model}, ${d.emulator ? "emulator" : "real phone \u2014 agents need permission"})`).join(", ") : "none (only needed for agent tests)",
       fix: devices.length > 0 ? void 0 : "Start an emulator or connect a phone with USB debugging"
     });
-    const emulator = sdk ? (0, import_node_path25.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
-    const avds = emulator && (0, import_node_fs21.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
+    const emulator = sdk ? (0, import_node_path27.join)(sdk, "emulator", isWindows ? "emulator.exe" : "emulator") : null;
+    const avds = emulator && (0, import_node_fs23.existsSync)(emulator) ? (capture(emulator, ["-list-avds"]) ?? "").split("\n").filter(Boolean) : [];
     checks.push({
       id: "avds",
       label: "Emulator images",
@@ -37917,18 +38576,18 @@ var androidGradleAdapter = {
   }
 };
 function gradlew(root) {
-  const wrapper = (0, import_node_path25.join)(root, isWindows ? "gradlew.bat" : "gradlew");
+  const wrapper = (0, import_node_path27.join)(root, isWindows ? "gradlew.bat" : "gradlew");
   return isWindows ? `"${wrapper}"` : wrapper;
 }
 var NAV_HINT = /\bcomposable<|\bnavigation<|\bNavHost\(|startDestination|deepLinks?\s*[=(]|navDeepLink|uriPattern|@Serializable\s+(data\s+)?(object|class)\s+\w*(Route|Destination|Screen|Graph)\b|\bnavigateTo\w*\(|Intent\(\s*\w+,\s*\w+Activity::class/;
 
 // src/adapters/generic/index.ts
-var import_node_fs23 = require("node:fs");
-var import_node_path28 = require("node:path");
+var import_node_fs25 = require("node:fs");
+var import_node_path30 = require("node:path");
 
 // src/adapters/generic/modules.ts
-var import_node_fs22 = require("node:fs");
-var import_node_path26 = require("node:path");
+var import_node_fs24 = require("node:fs");
+var import_node_path28 = require("node:path");
 function buildModules(root, files, areas, unitCommand) {
   const byDir = /* @__PURE__ */ new Map();
   for (const area of areas) for (const dir of area.dirs) if (!byDir.has(dir)) byDir.set(dir, { area, sources: [], tests: /* @__PURE__ */ new Set() });
@@ -37956,12 +38615,12 @@ function buildModules(root, files, areas, unitCommand) {
   const direct = /* @__PURE__ */ new Set();
   const referenced = /* @__PURE__ */ new Set();
   const readTest = (test, scope) => {
-    const text2 = safeRead((0, import_node_path26.join)(root, test));
+    const text2 = safeRead((0, import_node_path28.join)(root, test));
     const imported = resolveImports(test, text2, sourcesBySansExt);
     for (const f of imported) referenced.add(f);
     const dirsTouched = scope ?? new Set([...imported].map((f) => ownerOf(f)).filter(Boolean));
-    const name = normal(testedName(import_node_path26.posix.basename(test)));
-    const named = [...dirsTouched].flatMap((d) => byDir.get(d).sources.filter((s) => normal(stemOf(import_node_path26.posix.basename(s))) === name));
+    const name = normal(testedName(import_node_path28.posix.basename(test)));
+    const named = [...dirsTouched].flatMap((d) => byDir.get(d).sources.filter((s) => normal(stemOf(import_node_path28.posix.basename(s))) === name));
     for (const f of named) direct.add(f);
     return dirsTouched;
   };
@@ -37969,8 +38628,8 @@ function buildModules(root, files, areas, unitCommand) {
   for (const test of orphanTests) {
     let touched = readTest(test, null);
     if (touched.size === 0) {
-      const name = normal(testedName(import_node_path26.posix.basename(test)));
-      touched = new Set([...byDir].filter(([, m]) => m.sources.some((s) => normal(stemOf(import_node_path26.posix.basename(s))) === name)).map(([d]) => d));
+      const name = normal(testedName(import_node_path28.posix.basename(test)));
+      touched = new Set([...byDir].filter(([, m]) => m.sources.some((s) => normal(stemOf(import_node_path28.posix.basename(s))) === name)).map(([d]) => d));
       readTest(test, touched);
     }
     for (const d of touched) byDir.get(d).tests.add(test);
@@ -37981,7 +38640,7 @@ function buildModules(root, files, areas, unitCommand) {
     const command = unitCommand(m.area, m.tests.size > 0);
     return {
       id: `:${dir.replace(/\//g, ":")}`,
-      dir: (0, import_node_path26.join)(root, dir),
+      dir: (0, import_node_path28.join)(root, dir),
       platform: "unknown",
       mainFiles: sourcesOwned.length,
       testFiles: m.tests.size,
@@ -37994,10 +38653,10 @@ function buildModules(root, files, areas, unitCommand) {
 }
 function resolveImports(file2, text2, sources) {
   const out = /* @__PURE__ */ new Set();
-  const dir = import_node_path26.posix.dirname(file2);
+  const dir = import_node_path28.posix.dirname(file2);
   const lookup = (path) => sources.get(path) ?? sources.get(`${path}/index`) ?? sources.get(`${path}/__init__`);
   for (const m of text2.matchAll(/(?:\bfrom\s+|\bimport\s*\(?\s*|\brequire\(\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
-    const found3 = lookup(import_node_path26.posix.normalize(import_node_path26.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
+    const found3 = lookup(import_node_path28.posix.normalize(import_node_path28.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
     if (found3) out.add(found3);
   }
   if (file2.endsWith(".py")) {
@@ -38010,11 +38669,11 @@ function resolveImports(file2, text2, sources) {
   return out;
 }
 function fileUnit(root, file2, test) {
-  const base = import_node_path26.posix.basename(file2);
+  const base = import_node_path28.posix.basename(file2);
   const stem = stemOf(base);
   const generic = /^(index|main|mod|__init__|lib)$/.test(stem);
-  const name = generic ? `${import_node_path26.posix.basename(import_node_path26.posix.dirname(file2))}/${stem}` : stem;
-  const lines = Math.max(1, safeRead((0, import_node_path26.join)(root, file2)).split("\n").length);
+  const name = generic ? `${import_node_path28.posix.basename(import_node_path28.posix.dirname(file2))}/${stem}` : stem;
+  const lines = Math.max(1, safeRead((0, import_node_path28.join)(root, file2)).split("\n").length);
   const kind = classifyFile(stem, base);
   return { name, file: file2, kind, lines, test, risk: Math.round(KIND_WEIGHT[kind] * Math.log2(lines + 1) * 10) / 10 };
 }
@@ -38034,7 +38693,7 @@ function normal(name) {
 }
 function safeRead(path) {
   try {
-    return (0, import_node_fs22.readFileSync)(path, "utf8");
+    return (0, import_node_fs24.readFileSync)(path, "utf8");
   } catch {
     return "";
   }
@@ -38044,7 +38703,7 @@ function routeHints(root, modules, limit) {
   for (const m of modules) {
     for (const c of m.classes) {
       if (out.length >= limit) return out;
-      safeRead((0, import_node_path26.join)(root, c.file)).split(/\r?\n/).forEach((text2, i) => {
+      safeRead((0, import_node_path28.join)(root, c.file)).split(/\r?\n/).forEach((text2, i) => {
         if (out.length < limit && ROUTE_HINT.test(text2)) out.push(`${c.file}:${i + 1}: ${text2.trim().slice(0, 160)}`);
       });
     }
@@ -38054,7 +38713,7 @@ function routeHints(root, modules, limit) {
 var ROUTE_HINT = /<Route\b|createBrowserRouter|\bpath:\s*["'`]\/|\b(app|router|server)\.(get|post|put|patch|delete|use|route)\(\s*["'`]\/|@(Get|Post|Put|Patch|Delete|Request)Mapping|@app\.(get|post|route)\(|\burlpatterns\b|\bpath\(\s*["']|HandleFunc\(\s*["']\/|\bdefineRoutes?\b/;
 
 // src/adapters/generic/unit.ts
-var import_node_path27 = require("node:path");
+var import_node_path29 = require("node:path");
 var TAIL = 400;
 async function runCommands(root, modules, onLine, config2) {
   const groups = /* @__PURE__ */ new Map();
@@ -38072,7 +38731,7 @@ async function runCommands(root, modules, onLine, config2) {
       onLine(line);
     });
     if (code !== 0 && exitCode === 0) exitCode = code;
-    const junit = config2.unit.junit ? readJUnitReports(label, (0, import_node_path27.resolve)(root, config2.unit.junit), since) : null;
+    const junit = config2.unit.junit ? readJUnitReports(label, (0, import_node_path29.resolve)(root, config2.unit.junit), since) : null;
     results.push(junit ?? fromOutput(label, tail) ?? fromExitCode(label, command, code, tail));
   }
   return { command: [...groups.keys()].join(" && "), exitCode, reused: [], results };
@@ -38182,10 +38841,10 @@ var genericAdapter = {
   ignoredDirs: GENERIC_IGNORED,
   supportsDevices: false,
   detect(root) {
-    return (0, import_node_fs23.existsSync)((0, import_node_path28.join)(root, ".git")) || (0, import_node_fs23.existsSync)(configPath(root));
+    return (0, import_node_fs25.existsSync)((0, import_node_path30.join)(root, ".git")) || (0, import_node_fs25.existsSync)(configPath(root));
   },
   projectName(root) {
-    return (0, import_node_path28.basename)(root);
+    return (0, import_node_path30.basename)(root);
   },
   scanModules(root, config2) {
     return areaModules(root, config2, genericAdapter);
@@ -38217,8 +38876,8 @@ var genericAdapter = {
 };
 
 // src/adapters/node/index.ts
-var import_node_fs24 = require("node:fs");
-var import_node_path29 = require("node:path");
+var import_node_fs26 = require("node:fs");
+var import_node_path31 = require("node:path");
 var import_yaml7 = __toESM(require_dist(), 1);
 var nodeAdapter = {
   id: "node",
@@ -38226,10 +38885,10 @@ var nodeAdapter = {
   ignoredDirs: [...GENERIC_IGNORED, ".svelte-kit", ".nuxt", ".parcel-cache", ".yarn", ".pnpm-store"],
   supportsDevices: false,
   detect(root) {
-    return (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "package.json"));
+    return (0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "package.json"));
   },
   projectName(root) {
-    return readPackage(root)?.name ?? (0, import_node_path29.basename)(root);
+    return readPackage(root)?.name ?? (0, import_node_path31.basename)(root);
   },
   scanModules(root, config2) {
     const pm = packageManager(root);
@@ -38279,7 +38938,7 @@ var nodeAdapter = {
   doctor(root, config2) {
     const pkg = readPackage(root);
     const pm = packageManager(root);
-    const installed = (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "node_modules"));
+    const installed = (0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "node_modules"));
     return [
       {
         id: "node-modules",
@@ -38294,7 +38953,7 @@ var nodeAdapter = {
 };
 function readPackage(dir) {
   try {
-    return JSON.parse((0, import_node_fs24.readFileSync)((0, import_node_path29.join)(dir, "package.json"), "utf8"));
+    return JSON.parse((0, import_node_fs26.readFileSync)((0, import_node_path31.join)(dir, "package.json"), "utf8"));
   } catch {
     return null;
   }
@@ -38304,9 +38963,9 @@ function hasTestScript(pkg) {
   return !!test && !/no test specified/.test(test);
 }
 function packageManager(root) {
-  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "pnpm-lock.yaml"))) return "pnpm";
-  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "yarn.lock"))) return "yarn";
-  if ((0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "bun.lockb")) || (0, import_node_fs24.existsSync)((0, import_node_path29.join)(root, "bun.lock"))) return "bun";
+  if ((0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "pnpm-lock.yaml"))) return "pnpm";
+  if ((0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "yarn.lock"))) return "yarn";
+  if ((0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "bun.lockb")) || (0, import_node_fs26.existsSync)((0, import_node_path31.join)(root, "bun.lock"))) return "bun";
   return "npm";
 }
 function workspaceTest(pm, w) {
@@ -38325,13 +38984,13 @@ function workspaceTest(pm, w) {
 function workspaces(root, files) {
   const pkg = readPackage(root);
   let globs = Array.isArray(pkg?.workspaces) ? pkg.workspaces : pkg?.workspaces?.packages ?? [];
-  const pnpm = (0, import_node_path29.join)(root, "pnpm-workspace.yaml");
-  if (!globs.length && (0, import_node_fs24.existsSync)(pnpm)) globs = ((0, import_yaml7.parse)((0, import_node_fs24.readFileSync)(pnpm, "utf8")) ?? {}).packages ?? [];
+  const pnpm = (0, import_node_path31.join)(root, "pnpm-workspace.yaml");
+  if (!globs.length && (0, import_node_fs26.existsSync)(pnpm)) globs = ((0, import_yaml7.parse)((0, import_node_fs26.readFileSync)(pnpm, "utf8")) ?? {}).packages ?? [];
   const include = globs.filter((g) => !g.startsWith("!")).map(globRegex);
   const exclude = globs.filter((g) => g.startsWith("!")).map((g) => globRegex(g.slice(1)));
   const dirs = files.filter((f) => f.endsWith("/package.json")).map((f) => f.slice(0, -"/package.json".length)).filter((d) => include.some((r) => r.test(d)) && !exclude.some((r) => r.test(d))).sort();
-  const named = dirs.map((dir) => ({ dir, pkg: readPackage((0, import_node_path29.join)(root, dir)) ?? {} }));
-  const short2 = (w) => (w.pkg.name ?? (0, import_node_path29.basename)(w.dir)).replace(/^@[^/]+\//, "");
+  const named = dirs.map((dir) => ({ dir, pkg: readPackage((0, import_node_path31.join)(root, dir)) ?? {} }));
+  const short2 = (w) => (w.pkg.name ?? (0, import_node_path31.basename)(w.dir)).replace(/^@[^/]+\//, "");
   const counts = /* @__PURE__ */ new Map();
   for (const w of named) counts.set(short2(w), (counts.get(short2(w)) ?? 0) + 1);
   return named.map((w) => ({ ...w, area: { id: counts.get(short2(w)) > 1 ? w.pkg.name ?? w.dir : short2(w), group: "feature", dirs: [w.dir] } }));
@@ -38345,7 +39004,7 @@ function detectAdapter(root) {
 
 // src/engine/project.ts
 function openProject(explicit) {
-  const start = (0, import_node_path30.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
+  const start = (0, import_node_path32.resolve)(explicit ?? process.env.PROBE_PROJECT ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
   let dir = start;
   for (; ; ) {
     const adapter = detectAdapter(dir);
@@ -38354,14 +39013,14 @@ function openProject(explicit) {
       const config2 = loadConfig(dir, store.dir);
       return { root: dir, name: config2.name ?? adapter.projectName(dir), adapter, config: config2, store };
     }
-    const parent = (0, import_node_path30.dirname)(dir);
+    const parent = (0, import_node_path32.dirname)(dir);
     if (parent === dir) throw new Error(`No supported project found at or above ${start}. Probe works on a git repository or a folder with probe/probe.yaml (adapters: ${ADAPTERS.map((a) => a.label).join(", ")}).`);
     dir = parent;
   }
 }
 
 // src/engine/issues.ts
-var import_node_path31 = require("node:path");
+var import_node_path33 = require("node:path");
 function issuesOf(project, run) {
   const read2 = (id) => id ? project.store.read(`runs/${id}.json`) : null;
   if (run.kind === "verify") {
@@ -38447,7 +39106,7 @@ function findIssue(project, issueId) {
 function fixPrompt(project, issue2, run, forProbe) {
   if (issue2.security) return securityFixPrompt(project, issue2.security, run, forProbe);
   const feature = findFeature(latestScan(project), issue2.feature);
-  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path31.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
+  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path33.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n") ?? "- (unknown)";
   const parts = [`Fix one problem that Probe found in the "${issue2.feature}" feature of the project in the current directory.`, `## The problem
 ${issue2.title}
 
@@ -38498,7 +39157,7 @@ var LAYER_SEEN = {
 };
 function securityFixPrompt(project, f, run, forProbe) {
   const feature = findFeature(latestScan(project), f.feature);
-  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path31.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
+  const modules = feature?.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path33.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
   const parts = [
     `Fix one security problem that Probe found in the project in the current directory${f.feature !== "project" ? ` (feature "${f.feature}")` : ""}.`,
     `## The problem
@@ -38587,15 +39246,15 @@ function summarizeRun(run) {
 }
 
 // src/security/run.ts
-var import_node_fs28 = require("node:fs");
-var import_node_path38 = require("node:path");
+var import_node_fs30 = require("node:fs");
+var import_node_path40 = require("node:path");
 
 // src/security/agent.ts
-var import_node_path34 = require("node:path");
+var import_node_path36 = require("node:path");
 
 // src/security/findings.ts
-var import_node_crypto4 = require("node:crypto");
-var import_node_path32 = require("node:path");
+var import_node_crypto5 = require("node:crypto");
+var import_node_path34 = require("node:path");
 var SEVERITY_ORDER = ["critical", "high", "medium", "low", "info"];
 var severityRank = (s) => SEVERITY_ORDER.indexOf(s);
 var IGNORED = /(^|\/)(node_modules|bower_components|vendor|Pods|Carthage|\.git|\.gradle|\.idea|\.vscode|build|dist|out|target|\.next|\.nuxt|\.svelte-kit|\.output|coverage|\.turbo|\.cache|DerivedData|\.dart_tool|__pycache__|\.venv|venv|\.tox|bin|obj)\//;
@@ -38609,7 +39268,7 @@ function globToRegex(glob) {
   return `^${glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*\/?/g, "\0").replace(/\*/g, "[^/]*").replace(/\?/g, "[^/]").replace(/\u0000/g, ".*")}`;
 }
 function featureOwner(project, scan2) {
-  const dirs = (scan2?.features ?? []).flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: (0, import_node_path32.relative)(project.root, (0, import_node_path32.resolve)(project.root, m.dir)).replace(/\\/g, "/") }))).filter((d) => d.dir && !d.dir.startsWith("..")).sort((a, b) => b.dir.length - a.dir.length);
+  const dirs = (scan2?.features ?? []).flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: (0, import_node_path34.relative)(project.root, (0, import_node_path34.resolve)(project.root, m.dir)).replace(/\\/g, "/") }))).filter((d) => d.dir && !d.dir.startsWith("..")).sort((a, b) => b.dir.length - a.dir.length);
   return (file2) => dirs.find((d) => file2 === d.dir || file2.startsWith(`${d.dir}/`))?.feature ?? "project";
 }
 function mask(text2) {
@@ -38617,7 +39276,7 @@ function mask(text2) {
 }
 function fingerprint(check2, file2, evidence) {
   const norm = evidence.replace(/\s+/g, " ").trim().toLowerCase();
-  return (0, import_node_crypto4.createHash)("sha1").update(`${check2}\0${file2 ?? ""}\0${norm}`).digest("hex").slice(0, 16);
+  return (0, import_node_crypto5.createHash)("sha1").update(`${check2}\0${file2 ?? ""}\0${norm}`).digest("hex").slice(0, 16);
 }
 function makeFinding(f) {
   return { ...f, evidence: f.evidence.slice(0, 400), fingerprint: fingerprint(f.check, f.file, f.evidence) };
@@ -38652,8 +39311,8 @@ function dedupe(list) {
 }
 
 // src/security/platforms.ts
-var import_node_fs25 = require("node:fs");
-var import_node_path33 = require("node:path");
+var import_node_fs27 = require("node:fs");
+var import_node_path35 = require("node:path");
 function detectPlatforms(root, files) {
   const found3 = /* @__PURE__ */ new Set();
   const has = (re) => files.some((f) => re.test(f));
@@ -38694,9 +39353,9 @@ function packageDeps(root, files) {
   return out;
 }
 function read(root, file2) {
-  const path = (0, import_node_path33.join)(root, file2);
+  const path = (0, import_node_path35.join)(root, file2);
   try {
-    return (0, import_node_fs25.existsSync)(path) ? (0, import_node_fs25.readFileSync)(path, "utf8") : "";
+    return (0, import_node_fs27.existsSync)(path) ? (0, import_node_fs27.readFileSync)(path, "utf8") : "";
   } catch {
     return "";
   }
@@ -38766,7 +39425,7 @@ async function agentFindings(project, feature, platforms, known, log, model) {
 }
 function reviewPrompt(project, feature, platforms, known) {
   const docs = [...new Set(["common", ...platforms].map((p) => PLATFORM_DOCS[p]))].map((d) => DOCS[d]).filter(Boolean);
-  const modules = feature.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path34.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
+  const modules = feature.modules.map((m) => `- ${m.id} \u2014 ${(0, import_node_path36.relative)(project.root, m.dir).replace(/\\/g, "/") || "."}`).join("\n");
   const already = known.filter((f) => f.feature === feature.id).slice(0, 40).map((f) => `- ${f.check} ${f.file ?? ""}${f.line ? `:${f.line}` : ""} \u2014 ${f.title}`).join("\n");
   return `You are a security reviewer. Review the "${feature.id}" feature of the project in the current directory for security problems.
 
@@ -38826,8 +39485,8 @@ function parseAgentFindings(text2, feature) {
 }
 
 // src/security/artifact.ts
-var import_node_fs26 = require("node:fs");
-var import_node_path35 = require("node:path");
+var import_node_fs28 = require("node:fs");
+var import_node_path37 = require("node:path");
 var import_node_zlib = require("node:zlib");
 function findArtifacts(root) {
   const apps = [];
@@ -38836,18 +39495,18 @@ function findArtifacts(root) {
     if (depth > 8) return;
     let entries;
     try {
-      entries = (0, import_node_fs26.readdirSync)(dir, { withFileTypes: true });
+      entries = (0, import_node_fs28.readdirSync)(dir, { withFileTypes: true });
     } catch {
       return;
     }
     for (const e of entries) {
       if (e.name === "node_modules" || e.name === ".git" || e.name === ".gradle" || e.name === "Pods" || e.name === "intermediates" || e.name === "tmp") continue;
-      const path = (0, import_node_path35.join)(dir, e.name);
+      const path = (0, import_node_path37.join)(dir, e.name);
       if (e.isDirectory()) {
         if (/^(dist|build|out|\.next)$/.test(e.name) && depth <= 3) collectWeb(path, web);
         visit2(path, depth + 1);
       } else if (/\.(apk|aab|ipa)$/.test(e.name)) {
-        apps.push({ path, mtime: (0, import_node_fs26.statSync)(path).mtimeMs });
+        apps.push({ path, mtime: (0, import_node_fs28.statSync)(path).mtimeMs });
       }
     }
   };
@@ -38860,12 +39519,12 @@ function collectWeb(dir, out) {
     if (depth > 5 || out.length > 400) return;
     let entries;
     try {
-      entries = (0, import_node_fs26.readdirSync)(d, { withFileTypes: true });
+      entries = (0, import_node_fs28.readdirSync)(d, { withFileTypes: true });
     } catch {
       return;
     }
     for (const e of entries) {
-      const p = (0, import_node_path35.join)(d, e.name);
+      const p = (0, import_node_path37.join)(d, e.name);
       if (e.isDirectory() && e.name !== "node_modules" && e.name !== "server" && e.name !== "cache") visit2(p, depth + 1);
       else if (/\.(js|mjs|map)$/.test(e.name) && !/[\\/](outputs|intermediates|generated|tmp|kotlin|classes)[\\/]/.test(p)) out.push(p);
     }
@@ -38877,10 +39536,10 @@ function artifactFindings(root, rules, owner) {
   const secretRules = rules.filter((r) => r.secret && r.match && !r.when && !r.absent && r.platform === "common");
   const out = [];
   for (const path of apps) {
-    const rel = (0, import_node_path35.relative)(root, path).replace(/\\/g, "/");
+    const rel = (0, import_node_path37.relative)(root, path).replace(/\\/g, "/");
     let entries;
     try {
-      entries = readZip((0, import_node_fs26.readFileSync)(path));
+      entries = readZip((0, import_node_fs28.readFileSync)(path));
     } catch {
       continue;
     }
@@ -38888,24 +39547,24 @@ function artifactFindings(root, rules, owner) {
   }
   const maps = web.filter((p) => p.endsWith(".map"));
   if (maps.length) {
-    const rel = (0, import_node_path35.relative)(root, maps[0]).replace(/\\/g, "/");
+    const rel = (0, import_node_path37.relative)(root, maps[0]).replace(/\\/g, "/");
     out.push(artifact("WEB-SEC-02", "low", rel, `${maps.length} source map(s), e.g. ${rel}`, "Source maps in the web build", "If these are deployed, anyone can read your original source code and comments.", "Do not deploy .map files (hidden-source-map + upload to your error tracker).", ["CWE-540"], owner(rel)));
   }
   for (const path of web.filter((p) => !p.endsWith(".map"))) {
     let text2;
     try {
-      if ((0, import_node_fs26.statSync)(path).size > 8 * 1024 * 1024) continue;
-      text2 = (0, import_node_fs26.readFileSync)(path, "utf8");
+      if ((0, import_node_fs28.statSync)(path).size > 8 * 1024 * 1024) continue;
+      text2 = (0, import_node_fs28.readFileSync)(path, "utf8");
     } catch {
       continue;
     }
-    const rel = (0, import_node_path35.relative)(root, path).replace(/\\/g, "/");
+    const rel = (0, import_node_path37.relative)(root, path).replace(/\\/g, "/");
     for (const r of secretRules) {
       const m = r.match.exec(text2);
       if (m) out.push(artifact(r.id, r.severity, rel, mask(m[0]), `${r.title} \u2014 in the shipped web bundle`, `${r.why} The browser downloads this file, so every visitor has it.`, r.fix, [...r.refs, "WEB-SEC-01"], owner(rel)));
     }
   }
-  return { findings: out, scanned: [...apps, ...web.length ? [`${web.length} web build file(s)`] : []].map((p) => p.includes(root) ? (0, import_node_path35.relative)(root, p).replace(/\\/g, "/") : p) };
+  return { findings: out, scanned: [...apps, ...web.length ? [`${web.length} web build file(s)`] : []].map((p) => p.includes(root) ? (0, import_node_path37.relative)(root, p).replace(/\\/g, "/") : p) };
 }
 function packageFindings(rel, entries, secretRules, feature) {
   const out = [];
@@ -39502,12 +40161,12 @@ function rulesFor(platforms) {
 }
 
 // src/security/deps.ts
-var import_node_path37 = require("node:path");
+var import_node_path39 = require("node:path");
 var import_yaml8 = __toESM(require_dist(), 1);
 
 // src/security/static.ts
-var import_node_fs27 = require("node:fs");
-var import_node_path36 = require("node:path");
+var import_node_fs29 = require("node:fs");
+var import_node_path38 = require("node:path");
 var MAX_BYTES = 1024 * 1024;
 var IGNORE = /probe-security-ignore[:\s]+([A-Z]{2,4}-[\w-]+(?:\s*,\s*[A-Z]{2,4}-[\w-]+)*)/;
 function runStatic(root, files, rules, options) {
@@ -39521,7 +40180,7 @@ function runStatic(root, files, rules, options) {
     for (const r of presence) out.push(finding(r, file2, void 0, file2, options.owner(file2)));
     const readers = mine.filter((r) => !r.fileOnly && (r.tests || !test));
     if (!readers.length) continue;
-    const text2 = readText((0, import_node_path36.join)(root, file2));
+    const text2 = readText((0, import_node_path38.join)(root, file2));
     if (text2 === null) continue;
     for (const r of readers) out.push(...matchRule(r, file2, text2, options.owner(file2)));
   }
@@ -39571,8 +40230,8 @@ function finding(r, file2, line, evidence, feature) {
 }
 function readText(path) {
   try {
-    if ((0, import_node_fs27.statSync)(path).size > MAX_BYTES) return null;
-    const buf = (0, import_node_fs27.readFileSync)(path);
+    if ((0, import_node_fs29.statSync)(path).size > MAX_BYTES) return null;
+    const buf = (0, import_node_fs29.readFileSync)(path);
     if (buf.subarray(0, 8e3).includes(0)) return null;
     return buf.toString("utf8");
   } catch {
@@ -39616,7 +40275,7 @@ function readDependencies(root, files) {
     const base = file2.split("/").pop();
     const reader = READERS[base] ?? (/\.versions\.toml$/.test(base) ? READERS["libs.versions.toml"] : /\.csproj$/.test(base) ? READERS[".csproj"] : void 0);
     if (!reader) continue;
-    const text2 = readText((0, import_node_path37.join)(root, file2));
+    const text2 = readText((0, import_node_path39.join)(root, file2));
     if (text2 === null) continue;
     try {
       reader(text2, (e, n, v) => add(e, n, v, file2), file2, unpinned);
@@ -39825,12 +40484,12 @@ async function fetchJson(url2, body) {
 }
 
 // src/security/history.ts
-var import_node_child_process7 = require("node:child_process");
+var import_node_child_process8 = require("node:child_process");
 function historyFindings(root, rules, commits, owner) {
   const secretRules = rules.filter((r) => r.secret && r.match && !r.absent && !r.fileOnly && !r.when && r.platform === "common");
   const keyFiles = rules.filter((r) => r.fileOnly && r.id === "COM-SEC-02");
   if (!secretRules.length || commits <= 0) return [];
-  const git2 = (0, import_node_child_process7.spawnSync)("git", ["log", "--all", `--max-count=${commits}`, "-p", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=AM", "--format=@@@commit %h %ad", "--date=short"], {
+  const git2 = (0, import_node_child_process8.spawnSync)("git", ["log", "--all", `--max-count=${commits}`, "-p", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=AM", "--format=@@@commit %h %ad", "--date=short"], {
     cwd: root,
     encoding: "utf8",
     windowsHide: true,
@@ -40082,7 +40741,7 @@ function startSecurityRun(project, options = {}) {
         log(`  last ${cfg.historyCommits} commits: ${fresh.length} secret(s) only in history`);
         return `last ${cfg.historyCommits} commits`;
       },
-      !projectWide ? "project-wide; run without a feature" : cfg.historyCommits <= 0 ? "security.historyCommits is 0" : !(0, import_node_fs28.existsSync)((0, import_node_path38.join)(project.root, ".git")) ? "not a git repository" : void 0
+      !projectWide ? "project-wide; run without a feature" : cfg.historyCommits <= 0 ? "security.historyCommits is 0" : !(0, import_node_fs30.existsSync)((0, import_node_path40.join)(project.root, ".git")) ? "not a git repository" : void 0
     );
     await layer(
       "artifact",
@@ -40161,10 +40820,10 @@ async function recheckFinding(project, finding2) {
     const rules = RULES.filter((r) => r.id === finding2.check && r.files.test(finding2.file));
     if (!rules.length) return { checked: false, stillFound: false, count: 0, note: `no rule ${finding2.check} for ${finding2.file}` };
     if (rules.some((r) => r.fileOnly)) {
-      const there = (0, import_node_fs28.existsSync)((0, import_node_path38.join)(project.root, finding2.file));
+      const there = (0, import_node_fs30.existsSync)((0, import_node_path40.join)(project.root, finding2.file));
       return { checked: true, stillFound: there, count: there ? 1 : 0, note: there ? `${finding2.file} is still in the project` : `${finding2.file} is gone` };
     }
-    const text2 = readText((0, import_node_path38.join)(project.root, finding2.file));
+    const text2 = readText((0, import_node_path40.join)(project.root, finding2.file));
     if (text2 === null) return { checked: true, stillFound: false, count: 0, note: `${finding2.file} no longer exists` };
     const hits = rules.flatMap((r) => matchRule(r, finding2.file, text2, finding2.feature));
     const same = hits.some((h) => h.fingerprint === finding2.fingerprint);
@@ -41113,8 +41772,8 @@ var ZodType2 = class {
       description
     });
   }
-  pipe(target) {
-    return ZodPipeline.create(this, target);
+  pipe(target2) {
+    return ZodPipeline.create(this, target2);
   }
   readonly() {
     return ZodReadonly2.create(this);
@@ -47798,7 +48457,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
+        await new Promise((resolve10) => setTimeout(resolve10, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error62) {
@@ -47815,7 +48474,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve9, reject) => {
+    return new Promise((resolve10, reject) => {
       const earlyReject = (error62) => {
         reject(error62);
       };
@@ -47893,7 +48552,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve9(parseResult.data);
+            resolve10(parseResult.data);
           }
         } catch (error62) {
           reject(error62);
@@ -48155,12 +48814,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve9, reject) => {
+    return new Promise((resolve10, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve9, interval);
+      const timeoutId = setTimeout(resolve10, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -49300,7 +49959,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
+      await new Promise((resolve10) => setTimeout(resolve10, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -49964,27 +50623,27 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve9) => {
+    return new Promise((resolve10) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve9();
+        resolve10();
       } else {
-        this._stdout.once("drain", resolve9);
+        this._stdout.once("drain", resolve10);
       }
     });
   }
 };
 
 // src/studio/server.ts
-var import_node_child_process10 = require("node:child_process");
-var import_node_fs34 = require("node:fs");
+var import_node_child_process12 = require("node:child_process");
+var import_node_fs37 = require("node:fs");
 var import_node_http = require("node:http");
-var import_node_path44 = require("node:path");
+var import_node_path46 = require("node:path");
 
 // src/accounts/login.ts
-function prompt3(project, wanted, device, pkg) {
+function prompt3(project, wanted, device, app, target2) {
   const task = wanted ? `Make sure the app is logged in with the test account "${wanted}". If it is logged in with another account, log out first (only through the app's own logout). If it is logged out, log in as ${wanted}.` : "Find out whether the app is logged in and with which account. Do not log in or out: only look (open the profile or settings screen if you need to see who is logged in).";
-  return `You are checking the login state of the Android app ${pkg} on ${device}. The app has just been launched.
+  return `You are checking the login state of ${appOn(target2, device, app)}. The app has just been ${target2 === "web" ? "opened" : "launched"}.
 
 ## Task
 ${task}
@@ -49992,7 +50651,7 @@ ${task}
 ## Test accounts
 ${accountsForPrompt(project)}
 
-${DEVICE_HOW_TO}
+${howTo(target2)}
 
 ## Finish
 Call probe_login_report exactly once: state (logged_in / logged_out / unknown), role (the test account role if the app shows one of the test accounts \u2014 by username or by its "shown in the app as" name \u2014 null otherwise), seenAs (the name or handle the app shows), and notes. Then stop.`;
@@ -50012,7 +50671,7 @@ function startLoginRun(project, wanted, options = {}) {
     costUsd: 0
   };
   return launchRun(project, run, async (log) => {
-    const session = await runOnDevice(project, run, { ...options, prompt: (d, pkg) => prompt3(project, wanted, d, pkg), reportTools: ["probe_login_report"] }, log);
+    const session = await runOnDevice(project, run, { ...options, prompt: (d, app, target2) => prompt3(project, wanted, d, app, target2), reportTools: ["probe_login_report"] }, log);
     run.login = session.report("login") ?? void 0;
     const crashed = crashError(run);
     if (crashed) {
@@ -50042,9 +50701,9 @@ function lastLogin(project) {
 // src/cards/explore.ts
 var import_yaml9 = __toESM(require_dist(), 1);
 var NAVMAP_FILE = "navmap.json";
-function prompt4(project, feature, device, pkg) {
+function prompt4(project, feature, device, app, target2) {
   const cards = listCards(project.root, feature).map((c) => ({ title: c.title, reach: c.reach }));
-  return `You are mapping the "${feature}" feature of the Android app ${pkg} on ${device}. The app has just been launched.
+  return `You are mapping the "${feature}" feature of ${appOn(target2, device, app)}. The app has just been ${target2 === "web" ? "opened" : "launched"}.
 
 ## Task
 Reach every screen, sheet and dialog of this feature you can, the way a user would. For each: how you got there (one hop per step, using visible labels), and whether it worked. Go back with the back key or the app's own navigation and check that back returns where it should.
@@ -50058,7 +50717,7 @@ ${cards.length ? (0, import_yaml9.stringify)(cards) : "none yet\n"}\`\`\`
 ## Test accounts
 ${accountsForPrompt(project)}
 
-${DEVICE_HOW_TO}
+${howTo(target2)}
 
 ## Finish
 Call probe_explore_report exactly once with every screen you reached (name, reach path, the step screenshot file name from observe if you know it, notes) and every issue you saw. Then stop.`;
@@ -50080,7 +50739,7 @@ function startExploreRun(project, featureId, options = {}) {
     costUsd: 0
   };
   return launchRun(project, run, async (log) => {
-    const session = await runOnDevice(project, run, { ...options, prompt: (d, pkg) => prompt4(project, feature.id, d, pkg), reportTools: ["probe_explore_report"] }, log);
+    const session = await runOnDevice(project, run, { ...options, prompt: (d, app, target2) => prompt4(project, feature.id, d, app, target2), reportTools: ["probe_explore_report"] }, log);
     const report = session.report("explore");
     run.screens = report?.screens ?? [];
     run.issues = report?.issues ?? [];
@@ -50275,9 +50934,12 @@ function summarizeUnitWrite(run) {
 }
 
 // src/engine/verify.ts
-var import_node_path39 = require("node:path");
+var import_node_path41 = require("node:path");
+function testsOtherCode(project, options) {
+  return !!options.build || (options.target ?? runTargets(project)[0]) === "web";
+}
 function featuresOfFiles(project, result, files) {
-  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path39.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
+  const dirs = result.features.flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: `${(0, import_node_path41.relative)(project.root, m.dir).replace(/\\/g, "/")}/` }))).sort((a, b) => b.dir.length - a.dir.length);
   const byFeature = /* @__PURE__ */ new Map();
   const unowned = [];
   for (const file2 of files) {
@@ -50297,12 +50959,17 @@ function pickCards(cards, which, ticket) {
 function startVerify(project, options = {}) {
   const base = options.base ?? defaultBase(project.root, project.config.verify.base);
   if (!base && !options.features?.length && !options.ticket && !options.outdated) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
-  const noDevice = options.noDevice || !project.adapter.supportsDevices;
+  const noDevice = options.noDevice || runTargets(project).length === 0;
+  if (options.build && noDevice) throw new Error("Testing a build needs a device: this project has none to run it on.");
+  const otherCode = !noDevice && testsOtherCode(project, options);
+  const noUnit = !!options.build || !!options.noUnit;
+  if (noUnit && noDevice) throw new Error("Nothing to run: no unit tests asked for, and nothing to run cards on.");
   const run = {
     id: newRunId(),
     kind: "verify",
     feature: "*",
     base: options.outdated ? "outdated results" : options.ticket ? `ticket ${options.ticket}` : options.features?.length ? "selected features" : base,
+    ticket: options.ticket,
     startedAt: (/* @__PURE__ */ new Date()).toISOString(),
     status: "running",
     changed: [],
@@ -50330,17 +50997,20 @@ function startVerify(project, options = {}) {
       run.changed = options.ticket ? [...new Set(commitsForTicket(project.root, options.ticket).flatMap((c) => filesOfCommit(project.root, c.hash)))] : changedFiles(project.root, base);
       const owned = featuresOfFiles(project, result, run.changed);
       targets = owned.byFeature;
+      if (options.ticket) {
+        for (const c of listCards(project.root)) if (c.tickets.includes(options.ticket) && !targets.has(c.feature)) targets.set(c.feature, []);
+      }
       run.unowned = owned.unowned;
       log(`${run.changed.length} changed files${options.ticket ? ` in commits of ${options.ticket}` : ` since ${base}`} \u2192 ${targets.size} features${run.unowned.length ? `, ${run.unowned.length} files outside any module` : ""}`);
     }
     if (targets.size === 0) {
       if (options.outdated) log("every result is up to date");
-      else run.error = "The change touches no feature's code.";
+      else run.error = options.ticket ? `No commit names ${options.ticket} and no card was drafted from it. Draft its cards first.` : "The change touches no feature's code.";
       return;
     }
     const known = new Set(result.features.map((f) => f.id));
     run.features = [...targets.entries()].filter(([id]) => known.has(id)).map(([feature, files]) => ({ feature, files, cards: [] }));
-    for (const f of run.features) {
+    for (const f of noUnit ? [] : run.features) {
       throwIfStopped();
       if (options.outdated && overview.unit.get(f.feature)?.state === "fresh") {
         const e = overview.unit.get(f.feature).entry;
@@ -50374,7 +51044,7 @@ function startVerify(project, options = {}) {
         for (const card of cards) {
           throwIfStopped();
           const known2 = overview.cards.get(`${f.feature}/${card.id}`);
-          if (known2?.state === "fresh" && !options.rerunFresh) {
+          if (known2?.state === "fresh" && !options.rerunFresh && !otherCode) {
             const e = known2.entry;
             f.cards.push({ cardId: card.id, runId: e.run, status: e.result === "passed" ? "skipped" : e.result, note: `${e.result} on this same code (${e.by ?? "run"} ${e.at.slice(0, 10)}); not re-run` });
             log(`${f.feature}/${card.id}: ${e.result}, up to date \u2014 skipped`);
@@ -50386,17 +51056,23 @@ function startVerify(project, options = {}) {
           }
           budget--;
           log(`\u2500\u2500 device: ${f.feature}/${card.id}`);
-          const { run: child, done } = startCardRun(project, f.feature, card.id, { device: options.device, model: options.model, reinstall: first, parent: run.id });
+          const { run: child, done } = startCardRun(project, f.feature, card.id, { device: options.device, model: options.model, target: options.target, build: options.build, reinstall: first, parent: run.id });
           first = false;
           const finished = await done;
           run.costUsd += finished.costUsd;
+          run.target = finished.target ?? run.target;
+          run.build = finished.build ?? run.build;
           f.cards.push({ cardId: card.id, runId: child.id, status: finished.status, note: finished.error ?? finished.verdict?.notes?.slice(0, 200) });
           log(`${f.feature}/${card.id}: ${finished.status}`);
-          if (finished.status === "error" && /Installing/.test(finished.error ?? "")) budget = 0;
+          if (finished.status === "error" && /Installing|did not open/.test(finished.error ?? "")) budget = 0;
         }
       }
     }
     run.status = overall(run.features);
+    if (noUnit && !run.features.some((f) => f.cards.some((c) => c.runId))) {
+      run.status = "blocked";
+      run.error = `No card ran: ${which === "approved" ? "these features have no approved cards" : "these features have no cards"}. Draft ${which === "approved" ? "and approve " : ""}cards first.`;
+    }
   });
 }
 function overall(features) {
@@ -50408,6 +51084,8 @@ function overall(features) {
 }
 function summarizeVerify(run) {
   const lines = [`Verify ${run.id} \xB7 vs ${run.base} \xB7 ${run.status.toUpperCase()} \xB7 ${run.features.length} features \xB7 ${run.changed.length} changed files \xB7 $${run.costUsd.toFixed(2)}`];
+  if (run.build) lines.push(`  build: ${run.build.label}`);
+  else if (run.target === "web") lines.push("  cards ran on the web app");
   if (run.error) lines.push(run.error);
   for (const f of run.features) {
     lines.push(`  ${f.feature}: unit ${f.unitStatus ?? "\u2014"}${f.unitRun ? ` (${f.unitRun})` : ""} \xB7 ${f.files.length} files`);
@@ -50418,9 +51096,9 @@ function summarizeVerify(run) {
 }
 
 // src/tickets/tickets.ts
-var import_node_child_process8 = require("node:child_process");
-var import_node_fs29 = require("node:fs");
-var import_node_path40 = require("node:path");
+var import_node_child_process9 = require("node:child_process");
+var import_node_fs31 = require("node:fs");
+var import_node_path42 = require("node:path");
 function ticketUrl(project, id) {
   return project.config.tickets.url?.replace("{id}", encodeURIComponent(id));
 }
@@ -50432,7 +51110,7 @@ function ticketInfo(project, id) {
   return { id, url: ticketUrl(project, id), commits, features: [...byFeature.keys()], cards: cards.map((c) => `${c.feature}/${c.id}`) };
 }
 function ticketDraft(project, run) {
-  const evidence = (0, import_node_path40.join)(project.store.dir, "runs", run.id);
+  const evidence = (0, import_node_path42.join)(project.store.dir, "runs", run.id);
   const lines = [];
   let title = `[Probe] ${run.feature}: ${run.kind} ${run.status}`;
   switch (run.kind) {
@@ -50478,30 +51156,30 @@ function ticketDraft(project, run) {
 function fileTicket(project, run, draft = ticketDraft(project, run)) {
   const template = project.config.tickets.fileCommand;
   if (!template) throw new Error("No tickets.fileCommand in probe/probe.yaml; copy the draft instead.");
-  const dir = (0, import_node_path40.join)(project.store.dir, "tickets");
-  (0, import_node_fs29.mkdirSync)(dir, { recursive: true });
-  const file2 = (0, import_node_path40.join)(dir, `${run.id}.md`);
-  (0, import_node_fs29.writeFileSync)(file2, draft.body);
+  const dir = (0, import_node_path42.join)(project.store.dir, "tickets");
+  (0, import_node_fs31.mkdirSync)(dir, { recursive: true });
+  const file2 = (0, import_node_path42.join)(dir, `${run.id}.md`);
+  (0, import_node_fs31.writeFileSync)(file2, draft.body);
   const quote = (s) => `"${s.replace(/"/g, "'")}"`;
   const command = template.replace(/\{title\}/g, quote(draft.title)).replace(/\{file\}/g, quote(file2));
-  const r = (0, import_node_child_process8.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
+  const r = (0, import_node_child_process9.spawnSync)(command, { cwd: project.root, windowsHide: true, shell: isWindows ? "cmd.exe" : "/bin/sh", encoding: "utf8", timeout: 6e4 });
   if (r.status !== 0) throw new Error(`Filing failed (${r.status}): ${(r.stderr || r.stdout).trim().slice(0, 500)}`);
   return r.stdout.trim();
 }
 
 // src/studio/projects.ts
-var import_node_fs30 = require("node:fs");
-var import_node_os3 = require("node:os");
-var import_node_path41 = require("node:path");
+var import_node_fs32 = require("node:fs");
+var import_node_os4 = require("node:os");
+var import_node_path43 = require("node:path");
 function knownProjects() {
-  const dir = (0, import_node_path41.join)((0, import_node_os3.homedir)(), ".probe", "projects");
-  if (!(0, import_node_fs30.existsSync)(dir)) return [];
+  const dir = (0, import_node_path43.join)((0, import_node_os4.homedir)(), ".probe", "projects");
+  if (!(0, import_node_fs32.existsSync)(dir)) return [];
   const out = [];
-  for (const entry of (0, import_node_fs30.readdirSync)(dir, { withFileTypes: true })) {
+  for (const entry of (0, import_node_fs32.readdirSync)(dir, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     try {
-      const scan2 = JSON.parse((0, import_node_fs30.readFileSync)((0, import_node_path41.join)(dir, entry.name, "scan.json"), "utf8"));
-      if (scan2.project?.root && (0, import_node_fs30.existsSync)(scan2.project.root) && !(0, import_node_path41.resolve)(scan2.project.root).toLowerCase().startsWith((0, import_node_path41.resolve)((0, import_node_os3.tmpdir)()).toLowerCase())) out.push({ root: (0, import_node_path41.resolve)(scan2.project.root), name: scan2.project.name, adapter: scan2.project.adapter, scannedAt: scan2.scannedAt });
+      const scan2 = JSON.parse((0, import_node_fs32.readFileSync)((0, import_node_path43.join)(dir, entry.name, "scan.json"), "utf8"));
+      if (scan2.project?.root && (0, import_node_fs32.existsSync)(scan2.project.root) && !(0, import_node_path43.resolve)(scan2.project.root).toLowerCase().startsWith((0, import_node_path43.resolve)((0, import_node_os4.tmpdir)()).toLowerCase())) out.push({ root: (0, import_node_path43.resolve)(scan2.project.root), name: scan2.project.name, adapter: scan2.project.adapter, scannedAt: scan2.scannedAt });
     } catch {
     }
   }
@@ -50510,16 +51188,16 @@ function knownProjects() {
 }
 
 // src/studio/page.html
-var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-critical { color: #fff; background: var(--fail); }\n  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }\n  .bwrap { position: relative; }\n  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }\n  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }\n  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }\n  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .blist button:hover, .blist button.on { background: var(--track); }\n  .blist .cur { font-weight: 600; }\n  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\n  .runs-list td.res { overflow-wrap: anywhere; }\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\n  .runs-detail .empty { padding: 40px 12px; }\n  @media (max-width: 1100px) {\n    .runs-layout { grid-template-columns: 1fr; }\n    .runs-detail { display: none; }\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\n  }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>\n  <div class="meta" id="meta">loading\u2026</div>\n  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">\u2026</button>\n    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches\u2026" autocomplete="off"><div class="blist" id="blist"></div></div></div>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="security">Security</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\n// \u2500\u2500 Project: Studio shows one at a time; the picker switches to any project Probe knows \u2500\u2500\n\nconst OPEN_OTHER = "__open_folder__";\n\nasync function loadProjects() {\n  const data = await api("/api/projects").catch(() => null);\n  if (!data) return;\n  const sel = document.getElementById("proj");\n  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +\n    `<option value="${OPEN_OTHER}">Open another folder\u2026</option>`;\n  sel.dataset.current = data.current.root;\n}\n\ndocument.getElementById("proj").addEventListener("change", async (e) => {\n  const sel = e.target;\n  let root = sel.value;\n  if (root === OPEN_OTHER) {\n    root = (prompt("Project folder (full path):") || "").trim();\n    if (!root) { sel.value = sel.dataset.current; return; }\n  }\n  const running = state.jobs.length;\n  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }\n  sel.disabled = true;\n  const res = await post("/api/projects/open", { root });\n  sel.disabled = false;\n  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }\n  // Everything on the page belonged to the old project.\n  closeStream();\n  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, jobs: [] });\n  history.replaceState(null, "", "#atlas");\n  document.getElementById("banner").innerHTML = "";\n  await loadProjects();\n  if (typeof checkBranch === "function") checkBranch();\n  render();\n});\n\nloadProjects();\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "security") await renderSecurity();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|security|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "runs") runsState().selected = route.feature || null;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  security: (f) => `security:${f || "*"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "security") return { tab: "security" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  // The Runs tab opens the run itself beside the list.\n  return { tab: "runs", feature: j.runId };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n  document.title = `${p.name} \xB7 Probe`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""} \u25BE` : "no git";\n  chip.disabled = !b.git;\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\n// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.\nconst $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");\n\nfunction renderBranchList() {\n  const cur = state.branchInfo?.id;\n  const words = $bq.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);\n  const all = state.branchList || [];\n  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);\n  $blist.innerHTML = !state.branchList ? `<div class="none">Loading\u2026</div>`\n    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "\u2713 " : ""}${esc(x)}</button>`).join("")\n    : `<div class="none">No branch matches.</div>`;\n}\n\nasync function openBranchPicker() {\n  $bpop.hidden = false;\n  $bq.value = "";\n  renderBranchList();\n  $bq.focus();\n  const b = await api("/api/branch?branches").catch(() => null);\n  if (b) { state.branchList = b.branches; renderBranchList(); }\n}\n\nasync function switchBranch(want) {\n  $bpop.hidden = true;\n  if (!want || want === state.branchInfo?.id) return;\n  if (!confirm(`Switch this project\'s working tree to ${want}? Studio rescans afterwards.`)) return;\n  const chip = document.getElementById("branch");\n  chip.disabled = true;\n  chip.textContent = `\u2387 switching to ${want}\u2026`;\n  const res = await post("/api/branch/switch", { branch: want });\n  chip.disabled = false;\n  if (res.error) { alert(res.error); checkBranch(); return; }\n  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });\n  document.getElementById("banner").innerHTML = "";\n  checkBranch();\n  render();\n}\n\ndocument.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });\n$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });\ndocument.addEventListener("click", () => { $bpop.hidden = true; });\n$bq.addEventListener("input", renderBranchList);\n$bq.addEventListener("keydown", (e) => {\n  if (e.key === "Escape") $bpop.hidden = true;\n  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }\n});\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>\n      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {\n      const reason = prompt(`Why is this not an issue here?\\n\\n${row.querySelector("strong").textContent}`);\n      if (!reason || !reason.trim()) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });\n      if (res.error) return alert(res.error);\n      row.remove();\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nfunction securityHead(f) {\n  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;\n}\n\nfunction securityBody(f) {\n  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> \xB7 ` : ""}<span class="muted">${esc(f.layer)}</span></div>\n    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}\n    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  return `<p>${esc(run.device)} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${run.device ? "unit + device" : "unit only"} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "security") {\n    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);\n    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} \xB7 ${run.files} files \xB7 platforms: ${run.platforms.map(esc).join(", ") || "\u2014"}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</p>\n      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">\xB7 ${run.dismissed} dismissed</span>` : ""}</p>\n      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "check") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    const features = run.features || [];\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\n  const results = run.results || [];\n  if (!results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\n\nconst RUNS_PAGE = 50;\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\nconst PROBLEM = new Set(["failed", "error"]);\n\nfunction runsState() {\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\n  return state.runs;\n}\n\nfunction runResult(r) {\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\n  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` \xB7 <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;\n  const results = r.results || [];\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n}\n\nfunction filteredRuns() {\n  const s = runsState();\n  const q = s.q.trim().toLowerCase();\n  return s.data.filter((r) =>\n    (s.kind === "all" || r.kind === s.kind) &&\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\n}\n\nasync function renderRuns() {\n  const s = runsState();\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  s.data = await api("/api/runs");\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\n  $view.innerHTML = `<div class="runs-layout">\n    <section class="runs-list">\n      <div class="filters">\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\n      </div>\n      <div id="runrows"></div>\n    </section>\n    <aside class="runs-detail" id="rundetail"></aside>\n  </div>`;\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\n  renderRunRows();\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\n  if (s.selected) {\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\n    showRun(s.selected);\n  }\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction renderRunRows() {\n  const s = runsState();\n  const all = filteredRuns();\n  const shown = all.slice(0, s.limit);\n  const el = document.getElementById("runrows");\n  if (!el) return;\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\nfunction selectRun(id) {\n  runsState().selected = id;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\n  showRun(id);\n}\n\nfunction closeRun() {\n  closeStream();\n  runsState().selected = null;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\n  const panel = document.getElementById("rundetail");\n  panel.classList.remove("open");\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction showRun(id) {\n  const panel = document.getElementById("rundetail");\n  if (!panel) return;\n  panel.classList.add("open");\n  panel.scrollTop = 0;\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\n}\n\nasync function renderSecurity() {\n  $view.innerHTML = `<div class="empty">Loading security results\u2026</div>`;\n  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);\n  state.scan = sc;\n  const last = sec.latest;\n  $view.innerHTML = `\n    <div class="box"><h3>Security checks</h3>\n      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>\n      <form class="inline" id="sf">\n        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>\n        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>\n        <label class="check"><input type="checkbox" name="agent"> agent code review</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking\u2026">\u26E8 Run security checks</button>\n      </form>\n    </div>\n    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>\n    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "\u2014")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;\n  const panel = document.getElementById("runpanel");\n  if (last) renderIssues(last, panel.querySelector("#ri"), panel);\n  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));\n  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {\n    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });\n    renderSecurity();\n  }));\n  const sf = document.getElementById("sf");\n  sf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;\n    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, () => {});\n  });\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\ndocument.addEventListener("keydown", (e) => {\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\n});\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
+var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .desc { white-space: pre-wrap; max-height: 280px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0; }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-critical { color: #fff; background: var(--fail); }\n  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }\n  .bwrap { position: relative; }\n  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }\n  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }\n  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }\n  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .blist button:hover, .blist button.on { background: var(--track); }\n  .blist .cur { font-weight: 600; }\n  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\n  .runs-list td.res { overflow-wrap: anywhere; }\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\n  .runs-detail .empty { padding: 40px 12px; }\n  @media (max-width: 1100px) {\n    .runs-layout { grid-template-columns: 1fr; }\n    .runs-detail { display: none; }\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\n  }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>\n  <div class="meta" id="meta">loading\u2026</div>\n  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">\u2026</button>\n    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches\u2026" autocomplete="off"><div class="blist" id="blist"></div></div></div>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="tickets">Tickets</button>\n    <button data-tab="security">Security</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\n// \u2500\u2500 Project: Studio shows one at a time; the picker switches to any project Probe knows \u2500\u2500\n\nconst OPEN_OTHER = "__open_folder__";\n\nasync function loadProjects() {\n  const data = await api("/api/projects").catch(() => null);\n  if (!data) return;\n  const sel = document.getElementById("proj");\n  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +\n    `<option value="${OPEN_OTHER}">Open another folder\u2026</option>`;\n  sel.dataset.current = data.current.root;\n}\n\ndocument.getElementById("proj").addEventListener("change", async (e) => {\n  const sel = e.target;\n  let root = sel.value;\n  if (root === OPEN_OTHER) {\n    root = (prompt("Project folder (full path):") || "").trim();\n    if (!root) { sel.value = sel.dataset.current; return; }\n  }\n  const running = state.jobs.length;\n  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }\n  sel.disabled = true;\n  const res = await post("/api/projects/open", { root });\n  sel.disabled = false;\n  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }\n  // Everything on the page belonged to the old project.\n  closeStream();\n  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, tickets: null, jobs: [] });\n  history.replaceState(null, "", "#atlas");\n  document.getElementById("banner").innerHTML = "";\n  await loadProjects();\n  if (typeof checkBranch === "function") checkBranch();\n  render();\n});\n\nloadProjects();\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "tickets") await renderTickets();\n  else if (state.tab === "security") await renderSecurity();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : state.tab === "tickets" ? state.tickets?.selected : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|tickets|security|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "runs") runsState().selected = route.feature || null;\n  if (route.tab === "tickets" && route.feature) ticketsState().selected = route.feature;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  security: (f) => `security:${f || "*"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "security") return { tab: "security" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    // A ticket\'s test has a button on Verify and one on its ticket in Tickets.\n    if (arg.startsWith("ticket:") && state.tab !== "verify") return { tab: "tickets", feature: arg.slice(7) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return state.tab === "verify" ? { tab: "verify" } : { tab: "tickets", feature: arg.slice(7) };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  // The Runs tab opens the run itself beside the list.\n  return { tab: "runs", feature: j.runId };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  if (route.tab === "tickets") return !route.feature || route.feature === state.tickets?.selected;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n  document.title = `${p.name} \xB7 Probe`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""} \u25BE` : "no git";\n  chip.disabled = !b.git;\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\n// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.\nconst $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");\n\nfunction renderBranchList() {\n  const cur = state.branchInfo?.id;\n  const words = $bq.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);\n  const all = state.branchList || [];\n  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);\n  $blist.innerHTML = !state.branchList ? `<div class="none">Loading\u2026</div>`\n    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "\u2713 " : ""}${esc(x)}</button>`).join("")\n    : `<div class="none">No branch matches.</div>`;\n}\n\nasync function openBranchPicker() {\n  $bpop.hidden = false;\n  $bq.value = "";\n  renderBranchList();\n  $bq.focus();\n  const b = await api("/api/branch?branches").catch(() => null);\n  if (b) { state.branchList = b.branches; renderBranchList(); }\n}\n\nasync function switchBranch(want) {\n  $bpop.hidden = true;\n  if (!want || want === state.branchInfo?.id) return;\n  if (!confirm(`Switch this project\'s working tree to ${want}? Studio rescans afterwards.`)) return;\n  const chip = document.getElementById("branch");\n  chip.disabled = true;\n  chip.textContent = `\u2387 switching to ${want}\u2026`;\n  const res = await post("/api/branch/switch", { branch: want });\n  chip.disabled = false;\n  if (res.error) { alert(res.error); checkBranch(); return; }\n  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });\n  document.getElementById("banner").innerHTML = "";\n  checkBranch();\n  render();\n}\n\ndocument.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });\n$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });\ndocument.addEventListener("click", () => { $bpop.hidden = true; });\n$bq.addEventListener("input", renderBranchList);\n$bq.addEventListener("keydown", (e) => {\n  if (e.key === "Escape") $bpop.hidden = true;\n  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }\n});\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>\n      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {\n      const reason = prompt(`Why is this not an issue here?\\n\\n${row.querySelector("strong").textContent}`);\n      if (!reason || !reason.trim()) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });\n      if (res.error) return alert(res.error);\n      row.remove();\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nfunction securityHead(f) {\n  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;\n}\n\nfunction securityBody(f) {\n  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> \xB7 ` : ""}<span class="muted">${esc(f.layer)}</span></div>\n    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}\n    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  const pageErrors = run.webErrors || [];\n  return `<p>${esc(run.device)}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : ""} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    (pageErrors.length ? `<details style="margin:8px 0"><summary style="color:var(--warn)">${pageErrors.length} page error${pageErrors.length === 1 ? "" : "s"} during the run (console, failed requests)</summary><pre class="log">${pageErrors.map(esc).join("\\n")}</pre></details>` : "") +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${!run.device ? "unit only" : run.features.some((f) => f.unitStatus) ? "unit + device" : "cards only"}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : run.target === "web" ? " \xB7 cards on the web app" : ""} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "security") {\n    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);\n    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} \xB7 ${run.files} files \xB7 platforms: ${run.platforms.map(esc).join(", ") || "\u2014"}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</p>\n      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">\xB7 ${run.dismissed} dismissed</span>` : ""}</p>\n      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "check") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    const features = run.features || [];\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\n  const results = run.results || [];\n  if (!results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\n\nconst RUNS_PAGE = 50;\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\nconst PROBLEM = new Set(["failed", "error"]);\n\nfunction runsState() {\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\n  return state.runs;\n}\n\nfunction runResult(r) {\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\n  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` \xB7 <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;\n  const results = r.results || [];\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n}\n\nfunction filteredRuns() {\n  const s = runsState();\n  const q = s.q.trim().toLowerCase();\n  return s.data.filter((r) =>\n    (s.kind === "all" || r.kind === s.kind) &&\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\n}\n\nasync function renderRuns() {\n  const s = runsState();\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  s.data = await api("/api/runs");\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\n  $view.innerHTML = `<div class="runs-layout">\n    <section class="runs-list">\n      <div class="filters">\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\n      </div>\n      <div id="runrows"></div>\n    </section>\n    <aside class="runs-detail" id="rundetail"></aside>\n  </div>`;\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\n  renderRunRows();\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\n  if (s.selected) {\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\n    showRun(s.selected);\n  }\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction renderRunRows() {\n  const s = runsState();\n  const all = filteredRuns();\n  const shown = all.slice(0, s.limit);\n  const el = document.getElementById("runrows");\n  if (!el) return;\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\nfunction selectRun(id) {\n  runsState().selected = id;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\n  showRun(id);\n}\n\nfunction closeRun() {\n  closeStream();\n  runsState().selected = null;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\n  const panel = document.getElementById("rundetail");\n  panel.classList.remove("open");\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction showRun(id) {\n  const panel = document.getElementById("rundetail");\n  if (!panel) return;\n  panel.classList.add("open");\n  panel.scrollTop = 0;\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\n}\n\nasync function renderSecurity() {\n  $view.innerHTML = `<div class="empty">Loading security results\u2026</div>`;\n  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);\n  state.scan = sc;\n  const last = sec.latest;\n  $view.innerHTML = `\n    <div class="box"><h3>Security checks</h3>\n      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>\n      <form class="inline" id="sf">\n        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>\n        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>\n        <label class="check"><input type="checkbox" name="agent"> agent code review</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking\u2026">\u26E8 Run security checks</button>\n      </form>\n    </div>\n    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>\n    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "\u2014")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;\n  const panel = document.getElementById("runpanel");\n  if (last) renderIssues(last, panel.querySelector("#ri"), panel);\n  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));\n  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {\n    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });\n    renderSecurity();\n  }));\n  const sf = document.getElementById("sf");\n  sf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;\n    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, () => {});\n  });\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br, options] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches"), api("/api/test-options")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        ${options.length > 1 ? targetPicker(options, state.verify.against) : ""}\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  bindTargetPicker(vf, options, (v) => { state.verify.against = v; });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const against = vf.noDevice.checked ? {} : readTarget(vf, options);\n    if (against.error) return alert(against.error);\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined, ...against });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\n// \u2500\u2500 What a test runs against: this code, a finished build, or the web app \u2500\u2500\n\n/** The picker\'s fields, for a form.inline. `options` comes from /api/test-options. */\nfunction targetPicker(options, chosen, build) {\n  if (!options.length) return `<span class="muted" style="flex:1 1 100%">Nothing to run cards on yet: this project builds no Android app. To test a web app, set its address in Settings \u2192 Builds and web.</span>`;\n  const pick = options.find((o) => o.id === chosen && !o.missing) || options.find((o) => !o.missing);\n  return `<label>Test against<select name="against">${options.map((o) => `<option value="${esc(o.id)}" ${o.missing ? "disabled" : ""} ${pick && o.id === pick.id ? "selected" : ""}>${esc(o.label)}${o.missing ? " \u2014 " + esc(o.missing) : ""}</option>`).join("")}</select></label>\n    <label class="buildwrap" style="display:none">Build<input name="build" list="buildlist" value="${esc(build || "")}" autocomplete="off" style="width:240px"><datalist id="buildlist"></datalist></label>`;\n}\n\nfunction bindTargetPicker(form, options, onChange) {\n  if (!form.against) return;\n  const sync = async () => {\n    const o = options.find((x) => x.id === form.against.value);\n    form.querySelector(".buildwrap").style.display = o && o.source ? "" : "none";\n    form.build.placeholder = o && o.source === "file" ? "path to the .apk or .aab" : "newest, or a build number";\n    const list = form.querySelector("datalist");\n    list.innerHTML = "";\n    if (o && (o.source === "firebase" || o.source === "play")) {\n      const builds = await api("/api/builds?source=" + o.source).catch(() => null);\n      if (Array.isArray(builds)) list.innerHTML = builds.map((b) => `<option value="${esc(b.value)}">${esc(b.label)}</option>`).join("");\n      else if (builds && builds.error) form.build.title = builds.error;\n    }\n  };\n  form.against.addEventListener("change", () => { onChange && onChange(form.against.value); sync(); });\n  sync();\n}\n\n/** What the picker says, as a run\'s options. An error string when a build file is needed and none is given. */\nfunction readTarget(form, options) {\n  const o = form.against && options.find((x) => x.id === form.against.value);\n  if (!o) return {};\n  const value = form.build.value.trim();\n  if (o.source === "file" && !value) return { error: "Give the path of the .apk or .aab to test." };\n  return { target: o.target, build: o.source ? { source: o.source, value: value || undefined } : undefined };\n}\n\n// \u2500\u2500 Tickets: the tracker\'s tickets waiting for a test \u2500\u2500\n\nfunction ticketsState() {\n  return state.tickets || (state.tickets = { selected: null, against: null, refresh: false, q: "" });\n}\n\nconst BUILD_STATE = {\n  included: ["passed", "contains the ticket\'s commits"],\n  missing: ["failed", "does not contain the ticket\'s commits"],\n  unknown: ["unknown", "cannot tell: no git tag for this build, or no commit names the ticket"],\n};\n\nfunction ticketDetail(t, options, st) {\n  const bs = t.build && t.buildState ? BUILD_STATE[t.buildState] : null;\n  const canTest = t.cards.length > 0;\n  return `<h2 style="margin-top:0"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>\n    <p class="muted" style="margin-top:0">${esc(t.status)}${t.author ? ` \xB7 written by ${esc(t.author)}` : ""}${t.assignee ? ` \xB7 assigned to ${esc(t.assignee)}` : ""} \xB7 updated ${ago(t.updatedAt)}${t.labels.length ? ` \xB7 ${t.labels.map(esc).join(", ")}` : ""}</p>\n    <p>${t.build ? `Build <strong class="mono">${esc(t.build)}</strong> ${bs ? `<span class="pill ${bs[0]}" title="${t.buildTag ? "git tag " + esc(t.buildTag) : ""}">${bs[1]}</span>` : ""}` : `<span class="muted">The ticket names no build.</span>`}</p>\n    <div class="desc">${esc(t.description) || `<span class="muted">No description.</span>`}</div>\n    <p>${t.commits} commit${t.commits === 1 ? "" : "s"} name it \xB7 features: ${t.features.map(esc).join(", ") || `<span class="muted">none yet</span>`} \xB7 cards: ${t.cards.map((c) => `<span class="mono">${esc(c)}</span>`).join(", ") || `<span class="muted">none yet</span>`}</p>\n    <form class="inline" id="tkf">\n      ${targetPicker(options, st.against, t.build)}\n      <button class="btn" type="submit" data-job="verify:ticket:${esc(t.id)}" data-busy="Testing\u2026" ${canTest && options.length ? "" : "disabled"} title="${canTest ? "An agent runs this ticket\'s cards, then the cards of the features it touched" : "Draft cards from the ticket first"}">\u25B6 Test this ticket</button>\n      ${t.features.length ? "" : `<label>Feature it belongs to<input name="features" placeholder="checkout" style="width:160px" title="No commit names the ticket yet, so Probe cannot tell which feature it is about"></label>`}\n      <button class="btn secondary" type="button" id="tkcards" data-job="backfill:ticket:${esc(t.id)}" data-busy="Drafting\u2026" title="An agent reads the ticket and the code, and drafts the cards that check it">\u2726 Draft cards from the ticket</button>\n    </form>\n    ${t.lastRun ? `<div class="row" style="margin-top:12px;flex-wrap:wrap">Last test <span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span> <span class="muted">${ago(t.lastRun.at)}</span>\n      <button class="btn secondary" type="button" id="tkshow">Show</button>\n      <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}\n    <div id="tkpostpanel"></div>\n    <div id="runpanel" style="margin-top:12px"></div>`;\n}\n\nasync function renderTickets() {\n  const st = ticketsState();\n  $view.innerHTML = `<div class="empty">Reading tickets\u2026</div>`;\n  const [box, options] = await Promise.all([api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options")]);\n  st.refresh = false;\n  if (!box.connected) {\n    $view.innerHTML = `<div class="box"><h3>Tickets to test</h3>\n      <p style="margin-top:0">Connect Jira or Linear, and the tickets waiting for a test show up here: who wrote each one, the build it names, and a button to test it.</p>\n      <p class="muted">${esc(box.missing)}</p>\n      <button class="btn" id="tkconnect">Connect a ticket tracker</button></div>`;\n    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.scrollTo = "trackerbox"; render(); });\n    return;\n  }\n  const tickets = box.tickets;\n  if (!tickets.some((t) => t.id === st.selected)) st.selected = tickets[0] ? tickets[0].id : null;\n  const sel = tickets.find((t) => t.id === st.selected);\n  const name = box.tracker === "jira" ? "Jira" : "Linear";\n  $view.innerHTML = `\n    <div class="box"><div class="row" style="flex-wrap:wrap"><strong>Tickets to test</strong>\n      <span class="muted">${name} \xB7 ${box.filter ? esc(box.filter) : "default filter"} \xB7 ${tickets.length} ticket${tickets.length === 1 ? "" : "s"}</span><span style="flex:1"></span>\n      <button class="btn secondary" id="tkrefresh">Refresh</button></div>\n      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}</div>\n    ${tickets.length ? `<div class="split">\n      <div class="side"><div class="head"><input type="search" id="tkq" placeholder="Find a ticket\u2026" value="${esc(st.q)}"></div>\n        <ul id="tklist">${tickets.map((t) => `<li data-t="${esc(t.id)}" class="${t.id === st.selected ? "active" : ""}" title="${esc(t.title)}"><span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>${t.lastRun ? `<span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span>` : t.cards.length ? `<span class="n">${t.cards.length} card${t.cards.length === 1 ? "" : "s"}</span>` : ""}</li>`).join("")}</ul></div>\n      <div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : ""}</div></div>`\n      : box.error ? "" : `<div class="empty">No ticket matches the filter. Change it in Settings \u2192 Ticket tracker.</div>`}`;\n  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; renderTickets(); });\n  if (!tickets.length) return;\n  const filterList = () => {\n    const v = st.q.toLowerCase();\n    document.querySelectorAll("#tklist li").forEach((li) => { li.style.display = !v || (li.dataset.t + " " + li.title).toLowerCase().includes(v) ? "" : "none"; });\n  };\n  document.getElementById("tkq").addEventListener("input", (e) => { st.q = e.target.value; filterList(); });\n  filterList();\n  document.querySelectorAll("#tklist li").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; render(); }));\n  if (!sel) return;\n\n  const form = document.getElementById("tkf");\n  const panel = document.getElementById("runpanel");\n  const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };\n  bindTargetPicker(form, options, (v) => { st.against = v; });\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const against = readTarget(form, options);\n    if (against.error) return alert(against.error);\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test`, against);\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, done);\n  });\n  document.getElementById("tkcards").addEventListener("click", async () => {\n    const features = form.features ? form.features.value.split(",").map((x) => x.trim()).filter(Boolean) : [];\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards`, { features });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, done);\n  });\n  const show = document.getElementById("tkshow");\n  if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));\n  const postBtn = document.getElementById("tkpost");\n  if (postBtn) postBtn.addEventListener("click", async () => {\n    const out = document.getElementById("tkpostpanel");\n    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment?run=${encodeURIComponent(sel.lastRun.id)}`);\n    if (preview.error) { out.innerHTML = `<p style="color:var(--fail)">${esc(preview.error)}</p>`; return; }\n    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${name}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>\n      <div class="row" style="margin-top:8px"><button class="btn" id="tkpostgo">Post comment</button><button class="btn secondary" id="tkpostno">Cancel</button><span id="tkpostout"></span></div></div>`;\n    document.getElementById("tkpostno").addEventListener("click", () => { out.innerHTML = ""; });\n    document.getElementById("tkpostgo").addEventListener("click", async (ev) => {\n      ev.target.disabled = true;\n      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment`, { run: sel.lastRun.id });\n      document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;\n      if (res.error) ev.target.disabled = false;\n    });\n  });\n}\n\n// \u2500\u2500 Settings: the tracker connection, and finished builds and the web app \u2500\u2500\n\nfunction trackerBox(t) {\n  const opt = (v, label) => `<option value="${v}" ${(t.tracker || "") === v ? "selected" : ""}>${label}</option>`;\n  return `<div class="box" id="trackerbox"><h3>Ticket tracker</h3>\n    <p class="muted" style="margin-top:0">Connect Jira or Linear, and the Tickets tab lists what is waiting for a test. Which tracker, the site and the filter are saved to <span class="mono">probe/probe.yaml</span> for the team. Your API token is encrypted on this machine only and is never shown again; Probe uses it to read tickets, and to post a result as a comment when you press Post.</p>\n    <form class="inline" id="trf" autocomplete="off">\n      <label>Tracker<select name="tracker">${opt("", "None")}${t.trackers.map((x) => opt(x.id, x.label)).join("")}</select></label>\n      <label data-for="jira">Site<input name="site" value="${esc(t.site || "")}" placeholder="https://acme.atlassian.net" style="width:260px"></label>\n      <label data-for="jira">Account email <span class="src">this machine</span><input name="email" value="${esc(t.email || "")}" placeholder="you@example.com" style="width:220px" title="The Jira account the API token belongs to. Leave empty for a Jira Data Center personal access token."></label>\n      <label data-for="jira linear">API token <span class="src">${t.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${t.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>\n      <label data-for="linear">Team key<input name="team" value="${esc(t.team || "")}" placeholder="ENG" style="width:90px" title="Only this team\'s tickets: the prefix of its ticket ids"></label>\n      <label data-for="jira">Build field<input name="buildField" value="${esc(t.buildField || "")}" placeholder="Fix version" style="width:150px" title="The Jira field that holds the build to test. Empty: a build written in the description, else the fix version."></label>\n      <label data-for="jira" style="flex:1 1 100%">Tickets to list (JQL)<input name="filterJira" value="${t.tracker === "jira" ? esc(t.filter || "") : ""}" placeholder=\'status = "Ready for QA" ORDER BY updated DESC   (empty: ${esc(t.defaultFilter)})\' class="mono"></label>\n      <label data-for="linear" style="flex:1 1 100%">Tickets to list (status names, comma separated)<input name="filterLinear" value="${t.tracker === "linear" ? esc(t.filter || "") : ""}" placeholder="Ready for QA, In Review   (empty: everything started or to do)"></label>\n      <button class="btn" type="submit">Save and test the connection</button>\n      ${t.hasToken ? `<button class="btn secondary" type="button" id="trdisc" title="Forgets the token on this machine">Disconnect</button>` : ""}\n    </form>\n    <p id="trout" style="margin-bottom:0"></p>\n    <p class="muted" style="margin-bottom:0" data-for="jira">A Jira API token: id.atlassian.com \u2192 Security \u2192 API tokens.</p>\n    <p class="muted" style="margin-bottom:0" data-for="linear">A Linear API key: Linear \u2192 Settings \u2192 Security &amp; access \u2192 Personal API keys. Linear has no build field: write "Build: 142" in the ticket, or give it a label like <span class="mono">build:142</span>.</p>\n  </div>`;\n}\n\nfunction bindTracker() {\n  const f = document.getElementById("trf");\n  const box = document.getElementById("trackerbox");\n  const out = document.getElementById("trout");\n  const sync = () => box.querySelectorAll("[data-for]").forEach((el) => { el.style.display = el.dataset.for.split(" ").includes(f.tracker.value) ? "" : "none"; });\n  f.tracker.addEventListener("change", sync);\n  sync();\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const tracker = f.tracker.value || null;\n    const saved = await post("/api/tracker", { tracker, site: f.site.value, email: f.email.value, token: f.token.value, team: f.team.value, buildField: f.buildField.value, filter: tracker === "linear" ? f.filterLinear.value : f.filterJira.value });\n    if (saved.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(saved.error)}`; return; }\n    if (!tracker) return renderSettings();\n    if (saved.missing) { out.innerHTML = `<span class="pill warn">saved</span> ${esc(saved.missing)}`; return; }\n    out.innerHTML = `<span class="muted">Saved. Asking ${tracker === "jira" ? "Jira" : "Linear"}\u2026</span>`;\n    const test = await post("/api/tracker/test");\n    out.innerHTML = test.ok ? `<span class="pill passed">connected</span> as <strong>${esc(test.message)}</strong>. The Tickets tab now lists your tickets.` : `<span class="pill failed">saved, but not connected</span> ${esc(test.message)}`;\n    f.token.value = "";\n    state.tickets = null;\n  });\n  const disc = document.getElementById("trdisc");\n  if (disc) disc.addEventListener("click", async () => {\n    if (!confirm("Forget the API token on this machine?")) return;\n    await api("/api/tracker", { method: "DELETE" });\n    state.tickets = null;\n    renderSettings();\n  });\n}\n\nfunction buildsBox(b) {\n  const pw = b.playwright;\n  return `<div class="box" id="buildsbox"><h3>Builds and web</h3>\n    <p class="muted" style="margin-top:0">What a test can run against besides this code: the deployed web app in a browser${b.android ? ", or a finished Android build (a release file, Firebase App Distribution, Google Play)" : ""}. Shared values are saved to <span class="mono">probe/probe.yaml</span>; key files and tools only for this machine.</p>\n    <form class="inline" id="bf" autocomplete="off">\n      <label>Web app address<input name="webUrl" value="${esc(b.webUrl || "")}" placeholder="https://staging.example.com" style="width:300px" title="A staging or preview address, or a local dev server. Agents open it in Chromium."></label>\n      ${b.android ? `<label>Release app id <span class="src">${b.releasePackageFound ? "using " + esc(b.releasePackageFound) : "not found"}</span><input name="releasePackage" value="${esc(b.releasePackage || "")}" placeholder="${esc(b.releasePackageFound || "com.example.app")}" style="width:240px" title="The app\'s id on Google Play, when it differs from the debug build\'s"></label>\n      <label>Firebase app id<input name="firebaseApp" value="${esc(b.firebaseApp || "")}" placeholder="1:1234567890:android:abc123" style="width:280px" title="Firebase console \u2192 Project settings \u2192 Your apps \u2192 App ID"></label>\n      <label>Play track<input name="playTrack" value="${esc(b.playTrack)}" style="width:110px"></label>\n      <label>Google service account key file <span class="src">this machine</span><input name="serviceAccount" value="${esc(b.serviceAccount || "")}" placeholder="C:\\\\keys\\\\probe-builds.json" style="width:300px" title="A JSON key of a service account that may read Firebase App Distribution releases and the app in the Play Console"></label>\n      <label>bundletool jar <span class="src">this machine \xB7 only for .aab files</span><input name="bundletool" value="${esc(b.bundletool || "")}" placeholder="C:\\\\tools\\\\bundletool-all.jar" style="width:280px"></label>` : ""}\n      <label>Git tag of a build<input name="tag" value="${esc(b.tag || "")}" placeholder="v{build}" style="width:130px" class="mono" title="How a build number is tagged in git, so Probe can tell whether a build contains a ticket\'s commits. Empty: tries 142, v142, build-142, release-142."></label>\n      <button class="btn" type="submit">Save</button>\n    </form>\n    <p id="bout" style="margin-bottom:0"></p>\n    <p class="muted" style="margin-bottom:0">Web tests drive Chromium through Playwright: ${pw.installed && pw.browser ? "installed on this machine." : "not on this machine yet. The first web test installs it once (a few minutes, about 150 MB)."}</p>\n  </div>`;\n}\n\nfunction bindBuilds() {\n  const f = document.getElementById("bf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const v = (name) => (f[name] ? f[name].value : undefined);\n    const res = await post("/api/builds/settings", { webUrl: v("webUrl"), releasePackage: v("releasePackage"), firebaseApp: v("firebaseApp"), playTrack: v("playTrack"), serviceAccount: v("serviceAccount"), bundletool: v("bundletool"), tag: v("tag") });\n    document.getElementById("bout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    // Whether cards can run at all may have changed with the web address.\n    if (!res.error) { state.scan = null; setTimeout(renderSettings, 700); }\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available yet: this project builds no Android app. To run cards on a web app in a browser, set its address in Settings \u2192 Builds and web." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br, tracker, builds] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches"), api("/api/tracker"), api("/api/builds/settings")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + trackerBox(tracker) + buildsBox(builds) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  bindTracker();\n  bindBuilds();\n  if (state.scrollTo) { document.getElementById(state.scrollTo)?.scrollIntoView({ block: "start" }); state.scrollTo = null; }\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\ndocument.addEventListener("keydown", (e) => {\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\n});\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
 
 // src/engine/watcher.ts
-var import_node_fs32 = require("node:fs");
-var import_node_path43 = require("node:path");
+var import_node_fs34 = require("node:fs");
+var import_node_path45 = require("node:path");
 
 // src/engine/watch.ts
-var import_node_child_process9 = require("node:child_process");
-var import_node_fs31 = require("node:fs");
-var import_node_path42 = require("node:path");
+var import_node_child_process10 = require("node:child_process");
+var import_node_fs33 = require("node:fs");
+var import_node_path44 = require("node:path");
 
 // src/knowledge/proof.ts
 function findRule(project, ref) {
@@ -50606,10 +51284,10 @@ function loadWatch(project) {
   return { stale: {}, checks: [], ...project.store.read(STATE3) ?? {} };
 }
 function saveWatch(project, state) {
-  const file2 = (0, import_node_path42.join)(project.store.dir, STATE3);
+  const file2 = (0, import_node_path44.join)(project.store.dir, STATE3);
   const tmp = `${file2}.${process.pid}.tmp`;
-  (0, import_node_fs31.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
-  (0, import_node_fs31.renameSync)(tmp, file2);
+  (0, import_node_fs33.writeFileSync)(tmp, JSON.stringify({ ...state, checks: state.checks.slice(-100) }, null, 2));
+  (0, import_node_fs33.renameSync)(tmp, file2);
 }
 function update(project, change) {
   const state = loadWatch(project);
@@ -50619,7 +51297,7 @@ function update(project, change) {
 }
 function projectFiles(project, files) {
   const ignored2 = ignoredPathPattern(project.adapter);
-  return files.map((f) => (0, import_node_path42.relative)(project.root, (0, import_node_path42.isAbsolute)(f) ? f : (0, import_node_path42.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !ignored2.test(f) && !f.startsWith("probe/"));
+  return files.map((f) => (0, import_node_path44.relative)(project.root, (0, import_node_path44.isAbsolute)(f) ? f : (0, import_node_path44.resolve)(project.root, f)).replace(/\\/g, "/")).filter((f) => f && !f.startsWith("..") && !ignored2.test(f) && !f.startsWith("probe/"));
 }
 function featuresForFiles(project, files, result = latestScan(project)) {
   const out = /* @__PURE__ */ new Map();
@@ -50678,7 +51356,7 @@ function sweepDirty(project, source, session) {
   if (since === null) return [];
   const recent = [...dirtyFiles(project.root).keys()].filter((f) => {
     try {
-      return (0, import_node_fs31.statSync)((0, import_node_path42.join)(project.root, f)).mtimeMs > since;
+      return (0, import_node_fs33.statSync)((0, import_node_path44.join)(project.root, f)).mtimeMs > since;
     } catch {
       return false;
     }
@@ -50731,7 +51409,7 @@ function startCheck(project, options = {}) {
       if (run.status === "error") run.error = `The build failed before the tests ran: ${run.features.filter((f) => f.unitStatus === "error").map((f) => f.feature).join(", ")}.`;
       if (!run.features.length) log("nothing stale to check");
     } finally {
-      (0, import_node_fs31.rmSync)((0, import_node_path42.join)(project.store.dir, LOCK), { force: true });
+      (0, import_node_fs33.rmSync)((0, import_node_path44.join)(project.store.dir, LOCK), { force: true });
     }
   });
   return started;
@@ -50747,14 +51425,14 @@ function pickTargets(project, options, run, round) {
   if (round === 0) run.skipped = entries.slice(budget).map(([id]) => id);
   return entries.slice(0, budget).map(([feature, e]) => ({ feature, files: e.files, owned: e.owned, dependsOn: e.dependsOn, sessions: e.sessions }));
 }
-async function checkFeature(project, run, target, options, log) {
-  const f = { feature: target.feature, files: target.files, owned: target.owned, ...target.dependsOn?.length && !target.owned ? { dependsOn: target.dependsOn } : {}, failures: [] };
+async function checkFeature(project, run, target2, options, log) {
+  const f = { feature: target2.feature, files: target2.files, owned: target2.owned, ...target2.dependsOn?.length && !target2.owned ? { dependsOn: target2.dependsOn } : {}, failures: [] };
   run.features.push(f);
-  const scanned = findFeature(latestScan(project), target.feature);
+  const scanned = findFeature(latestScan(project), target2.feature);
   if (scanned?.modules.some((m) => m.unitTestTask)) {
     const { run: unit, done } = startUnitRun(project, scanned.id);
     f.unitRun = unit.id;
-    log(`${target.feature}: unit tests (run ${unit.id})`);
+    log(`${target2.feature}: unit tests (run ${unit.id})`);
     const finished = await done;
     f.unitStatus = finished.status;
     f.failures = finished.results.flatMap((r) => r.failures.map((x) => `${x.className.split(".").pop()}.${x.name}: ${(x.message ?? "").split("\n")[0].slice(0, 200)}`)).slice(0, 8);
@@ -50763,46 +51441,46 @@ async function checkFeature(project, run, target, options, log) {
       f.failures = compile2.length ? compile2.slice(0, 5) : [finished.error ?? "build failed"];
     }
     const total = finished.results.reduce((n, r) => n + r.tests, 0);
-    log(`${target.feature}: unit ${finished.status}, ${total} tests${f.failures.length ? `, ${f.failures.length} failing` : ""}`);
+    log(`${target2.feature}: unit ${finished.status}, ${total} tests${f.failures.length ? `, ${f.failures.length} failing` : ""}`);
   } else {
     f.unitStatus = "skipped";
     f.note = scanned ? "no unit tests" : "not a module feature; only its manifest is checked";
   }
   const manifest = (() => {
     try {
-      return loadManifest(project.root, target.feature);
+      return loadManifest(project.root, target2.feature);
     } catch {
       return null;
     }
   })();
-  const check2 = (0, import_node_fs31.existsSync)((0, import_node_path42.join)(project.root, manifestFile(target.feature))) ? checkManifest(project.root, target.feature) : null;
+  const check2 = (0, import_node_fs33.existsSync)((0, import_node_path44.join)(project.root, manifestFile(target2.feature))) ? checkManifest(project.root, target2.feature) : null;
   if (check2) {
     const broken = check2.broken.length + check2.brokenCards.length;
     f.manifest = { links: check2.links + check2.cardLinks, broken, gaps: check2.gaps.length, errors: check2.errors.length };
-    log(`${target.feature}: manifest ${check2.links} test links, ${check2.cardLinks} card links, ${broken} broken, ${check2.gaps.length} unproven`);
+    log(`${target2.feature}: manifest ${check2.links} test links, ${check2.cardLinks} card links, ${broken} broken, ${check2.gaps.length} unproven`);
   }
-  if (manifest && target.owned && target.files.length) {
+  if (manifest && target2.owned && target2.files.length) {
     try {
       const rules = ruleProofs(project, manifest).filter((p) => !p.invariant.coveredBy.length && p.cards.length).filter((p) => !p.cards.every((c) => c.result === "passed" && c.freshness === "fresh")).map((p) => `${p.feature}/${p.invariant.id} (${p.cards.map(describeCardProof).join("; ")})`);
       if (rules.length) {
         f.deviceRules = rules;
-        log(`${target.feature}: ${rules.length} rule(s) only a device card proves`);
+        log(`${target2.feature}: ${rules.length} rule(s) only a device card proves`);
       }
     } catch (e) {
-      log(`${target.feature}: could not read card results (${e.message})`);
+      log(`${target2.feature}: could not read card results (${e.message})`);
     }
   }
   const drafts = options.drafts ?? project.config.watch.drafts;
-  const hasPending = listDrafts(project, target.feature).some((d) => d.status === "pending");
-  if (manifest && check2 && drafts && target.owned && target.files.length && !hasPending) {
+  const hasPending = listDrafts(project, target2.feature).some((d) => d.status === "pending");
+  if (manifest && check2 && drafts && target2.owned && target2.files.length && !hasPending) {
     throwIfStopped();
     const unit = f.unitStatus === "skipped" ? `not run (${f.note})` : `${f.unitStatus}${f.failures.length ? `
 ${f.failures.map((x) => `- ${x}`).join("\n")}` : ""}`;
-    const { draft, costUsd } = await draftCorrections(project, { manifest, check: check2, files: target.files, unit, runId: run.id, model: options.model }, log);
+    const { draft, costUsd } = await draftCorrections(project, { manifest, check: check2, files: target2.files, unit, runId: run.id, model: options.model }, log);
     run.costUsd += costUsd;
     if (draft) f.draftId = draft.id;
   } else if (hasPending) {
-    log(`${target.feature}: a draft is already waiting for review; not drafting another`);
+    log(`${target2.feature}: a draft is already waiting for review; not drafting another`);
   }
   update(
     project,
@@ -50817,7 +51495,7 @@ ${f.failures.map((x) => `- ${x}`).join("\n")}` : ""}`;
       draftId: f.draftId,
       deviceRules: f.deviceRules,
       note: f.note,
-      sessions: target.sessions,
+      sessions: target2.sessions,
       reportedTo: []
     })
   );
@@ -50859,7 +51537,7 @@ async function kickCheck(project, trigger) {
     } catch {
     }
   }
-  const child = (0, import_node_child_process9.spawn)(process.execPath, [(0, import_node_path42.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
+  const child = (0, import_node_child_process10.spawn)(process.execPath, [(0, import_node_path44.resolve)(process.argv[1]), "check", "--trigger", trigger, "--project", project.root], {
     cwd: project.root,
     detached: true,
     stdio: "ignore",
@@ -50922,7 +51600,7 @@ function startWatcher(project, log = () => {
       return;
     }
     const known = new Set(Object.values(loadWatch(project).stale).flatMap((e) => e.files));
-    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path43.join)(project.root, f)));
+    const fresh = files.filter((f) => !known.has(f) && isFile((0, import_node_path45.join)(project.root, f)));
     const features = markStale(project, fresh, "editor");
     if (!features.length) return;
     log(`watch: untracked edits made ${features.join(", ")} stale`);
@@ -50939,7 +51617,7 @@ function startWatcher(project, log = () => {
   const ignored2 = ignoredPathPattern(project.adapter);
   let watcher;
   try {
-    watcher = (0, import_node_fs32.watch)(project.root, { recursive: true }, (_event, name) => {
+    watcher = (0, import_node_fs34.watch)(project.root, { recursive: true }, (_event, name) => {
       if (!name) return;
       const file2 = name.toString().replace(/\\/g, "/");
       if (ignored2.test(file2)) return;
@@ -50960,7 +51638,7 @@ function startWatcher(project, log = () => {
 }
 function isFile(path) {
   try {
-    return (0, import_node_fs32.statSync)(path).isFile();
+    return (0, import_node_fs34.statSync)(path).isFile();
   } catch {
     return false;
   }
@@ -51022,13 +51700,13 @@ function startJob(key, start) {
 }
 
 // src/studio/project.ts
-var import_node_fs33 = require("node:fs");
+var import_node_fs35 = require("node:fs");
 function projectSettings(project) {
   const c = project.config;
   const supported = project.adapter.supportsDevices;
   const devices = supported ? listDevices(Adb.forProject(project.root)) : [];
   return {
-    configFile: (0, import_node_fs33.existsSync)(configPath(project.root)),
+    configFile: (0, import_node_fs35.existsSync)(configPath(project.root)),
     app: resolveApp(project),
     appSet: c.app,
     devices: {
@@ -51088,11 +51766,16 @@ function saveProjectSettings(project, body) {
   return null;
 }
 function setupChecklist(project) {
-  const items = project.adapter.supportsDevices ? appAndDevice(project) : [{ id: "device", label: "Device testing", status: "warn", detail: devicesUnsupported(project.adapter) }];
+  const web = project.config.web.url;
+  const items = project.adapter.supportsDevices ? appAndDevice(project) : web ? [] : [{ id: "device", label: "Device testing", status: "warn", detail: `${devicesUnsupported(project.adapter)} To test a web app in a browser, set its address.`, action: { label: "Builds and web", tab: "settings" } }];
+  if (web) {
+    const pw = playwrightStatus(project.root);
+    items.push({ id: "web", label: "Web app", status: "ok", detail: `${web} \xB7 tested in Chromium${pw.installed && pw.browser ? "" : " (the first web run installs Playwright, about 150 MB)"}`, action: { label: "Builds and web", tab: "settings" } });
+  }
   const secrets = new Secrets(project.store.dir);
   const accounts = listAccounts(project.root);
   const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
-  if (project.adapter.supportsDevices) items.push({
+  if (project.adapter.supportsDevices || web) items.push({
     id: "accounts",
     label: "Test account",
     status: withPassword.length ? "ok" : "warn",
@@ -51174,6 +51857,415 @@ function pickableBranches(root, keep) {
   return [...new Set(wanted)];
 }
 
+// src/studio/qa.ts
+var import_node_fs36 = require("node:fs");
+
+// src/tickets/inbox.ts
+var import_node_child_process11 = require("node:child_process");
+
+// src/tickets/tracker.ts
+var tokenKey = (tracker) => `tracker.${tracker}.token`;
+var TRACKER_LABEL = { jira: "Jira", linear: "Linear" };
+function trackerMissing(config2, hasToken) {
+  if (!config2.tracker) return "No ticket tracker chosen.";
+  if (config2.tracker === "jira" && !config2.site) return "Jira needs the site address, e.g. https://acme.atlassian.net.";
+  if (!hasToken) return `No ${TRACKER_LABEL[config2.tracker]} API token on this machine.`;
+  return null;
+}
+function openTracker(project, fetcher = fetch) {
+  const config2 = project.config.tickets;
+  const token = config2.tracker ? new Secrets(project.store.dir).getKey(tokenKey(config2.tracker)) : null;
+  const missing = trackerMissing(config2, token !== null);
+  if (missing) throw new Error(`${missing} Connect it in Studio \u2192 Settings \u2192 Ticket tracker.`);
+  return config2.tracker === "jira" ? new Jira(config2, token, fetcher) : new Linear(config2, token, fetcher);
+}
+function buildInText(text2) {
+  return /\bbuild(?:\s+(?:number|no\.?|version))?\s*[:#=]?\s*v?(\d[\w.+-]{0,30})/i.exec(text2)?.[1]?.replace(/[.,;]+$/, "");
+}
+async function readJson(res, what) {
+  const body = await res.text();
+  if (!res.ok) {
+    let detail = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body);
+      detail = parsed.errorMessages?.join("; ") || parsed.message || (parsed.errors ? JSON.stringify(parsed.errors).slice(0, 300) : detail);
+    } catch {
+    }
+    const hint = res.status === 401 || res.status === 403 ? " Check the token (and, for Jira, the email it belongs to)." : "";
+    throw new Error(`${what} answered ${res.status}: ${detail || res.statusText}.${hint}`);
+  }
+  return body ? JSON.parse(body) : {};
+}
+var TIMEOUT_MS = 25e3;
+var JIRA_DEFAULT_FILTER = "statusCategory != Done ORDER BY updated DESC";
+var Jira = class {
+  constructor(config2, token, fetcher) {
+    this.config = config2;
+    this.token = token;
+    this.fetcher = fetcher;
+    this.site = (config2.site ?? "").replace(/\/+$/, "");
+  }
+  config;
+  token;
+  fetcher;
+  id = "jira";
+  site;
+  buildFieldId;
+  async call(path, init = {}) {
+    const auth = this.config.email ? `Basic ${Buffer.from(`${this.config.email}:${this.token}`).toString("base64")}` : `Bearer ${this.token}`;
+    return this.fetcher(`${this.site}${path}`, {
+      method: init.method ?? "GET",
+      headers: { authorization: auth, accept: "application/json", ...init.body ? { "content-type": "application/json" } : {} },
+      body: init.body ? JSON.stringify(init.body) : void 0,
+      signal: AbortSignal.timeout(TIMEOUT_MS)
+    });
+  }
+  async me() {
+    const who = await readJson(await this.call("/rest/api/2/myself"), "Jira");
+    return who.displayName ?? who.emailAddress ?? who.name ?? "connected";
+  }
+  /** The id of the configured build field: given as an id, or found by its name. Null when there is none. */
+  async buildField() {
+    if (this.buildFieldId !== void 0) return this.buildFieldId;
+    const wanted = this.config.buildField?.trim();
+    if (!wanted) return this.buildFieldId = null;
+    if (/^customfield_\d+$/.test(wanted)) return this.buildFieldId = wanted;
+    const fields = await readJson(await this.call("/rest/api/2/field"), "Jira");
+    const found3 = fields.find((f) => f.name.toLowerCase() === wanted.toLowerCase() || f.id === wanted);
+    if (!found3) throw new Error(`Jira has no field named "${wanted}". Fix the build field in Studio \u2192 Settings \u2192 Ticket tracker.`);
+    return this.buildFieldId = found3.id;
+  }
+  async fields() {
+    const build2 = await this.buildField();
+    return ["summary", "description", "status", "reporter", "assignee", "updated", "labels", "fixVersions", ...build2 ? [build2] : []];
+  }
+  ticket(issue2, buildField) {
+    const f = issue2.fields;
+    const description = jiraText(f.description);
+    return {
+      id: issue2.key,
+      title: f.summary ?? "",
+      description,
+      status: f.status?.name ?? "",
+      author: f.reporter?.displayName,
+      assignee: f.assignee?.displayName,
+      url: `${this.site}/browse/${issue2.key}`,
+      updatedAt: f.updated ?? "",
+      labels: f.labels ?? [],
+      build: (buildField ? fieldText(f[buildField]) : void 0) || buildInText(description) || f.fixVersions?.[0]?.name || void 0
+    };
+  }
+  async list(limit = 50) {
+    const body = { jql: this.config.filter?.trim() || JIRA_DEFAULT_FILTER, maxResults: limit, fields: await this.fields() };
+    let res = await this.call("/rest/api/2/search/jql", { method: "POST", body });
+    if (res.status === 404 || res.status === 405) res = await this.call("/rest/api/2/search", { method: "POST", body });
+    const found3 = await readJson(res, "Jira");
+    const build2 = await this.buildField();
+    return (found3.issues ?? []).map((i) => this.ticket(i, build2));
+  }
+  async get(id) {
+    const fields = (await this.fields()).join(",");
+    const issue2 = await readJson(await this.call(`/rest/api/2/issue/${encodeURIComponent(id)}?fields=${fields}`), "Jira");
+    return this.ticket(issue2, await this.buildField());
+  }
+  async comment(id, body) {
+    await readJson(await this.call(`/rest/api/2/issue/${encodeURIComponent(id)}/comment`, { method: "POST", body: { body } }), "Jira");
+  }
+  bold(text2) {
+    return `*${text2}*`;
+  }
+};
+function fieldText(value) {
+  if (value === null || value === void 0) return void 0;
+  if (typeof value === "string" || typeof value === "number") return String(value).trim() || void 0;
+  if (Array.isArray(value)) return value.map(fieldText).filter(Boolean).join(", ") || void 0;
+  const o = value;
+  return fieldText(o.name ?? o.value);
+}
+function jiraText(value) {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return "";
+  const node2 = value;
+  const inner = (node2.content ?? []).map(jiraText).join("");
+  return (node2.text ?? "") + inner + (["paragraph", "heading", "listItem", "hardBreak"].includes(node2.type ?? "") ? "\n" : "");
+}
+var LINEAR_FIELDS = "id identifier title description url updatedAt state { name } creator { name } assignee { name } labels { nodes { name } }";
+var Linear = class {
+  constructor(config2, token, fetcher) {
+    this.config = config2;
+    this.token = token;
+    this.fetcher = fetcher;
+  }
+  config;
+  token;
+  fetcher;
+  id = "linear";
+  async query(query, variables = {}) {
+    const res = await this.fetcher("https://api.linear.app/graphql", {
+      method: "POST",
+      headers: { authorization: this.token, "content-type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(TIMEOUT_MS)
+    });
+    const body = await readJson(res, "Linear");
+    if (body.errors?.length) throw new Error(`Linear: ${body.errors.map((e) => e.message).join("; ")}`);
+    return body.data;
+  }
+  async me() {
+    const data = await this.query("{ viewer { name email } }");
+    return data.viewer.name ?? data.viewer.email ?? "connected";
+  }
+  ticket(issue2) {
+    const labels = issue2.labels?.nodes?.map((l) => l.name) ?? [];
+    const description = issue2.description ?? "";
+    return {
+      id: issue2.identifier,
+      title: issue2.title,
+      description,
+      status: issue2.state?.name ?? "",
+      author: issue2.creator?.name,
+      assignee: issue2.assignee?.name,
+      url: issue2.url,
+      updatedAt: issue2.updatedAt,
+      labels,
+      // Linear has no custom fields: the build comes from a "build:142" label or the text.
+      build: labels.map((l) => /^build[:\s-]+v?(\S+)$/i.exec(l)?.[1]).find(Boolean) ?? buildInText(description)
+    };
+  }
+  async list(limit = 50) {
+    const states = (this.config.filter ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    const filter = { state: states.length ? { name: { in: states } } : { type: { in: ["started", "unstarted"] } } };
+    if (this.config.team?.trim()) filter.team = { key: { eq: this.config.team.trim() } };
+    const data = await this.query(
+      `query Inbox($filter: IssueFilter, $first: Int) { issues(filter: $filter, first: $first, orderBy: updatedAt) { nodes { ${LINEAR_FIELDS} } } }`,
+      { filter, first: limit }
+    );
+    return data.issues.nodes.map((i) => this.ticket(i));
+  }
+  async issue(id) {
+    const data = await this.query(`query Ticket($id: String!) { issue(id: $id) { ${LINEAR_FIELDS} } }`, { id });
+    if (!data.issue) throw new Error(`Linear has no ticket ${id}.`);
+    return data.issue;
+  }
+  async get(id) {
+    return this.ticket(await this.issue(id));
+  }
+  async comment(id, body) {
+    const issue2 = await this.issue(id);
+    const data = await this.query(
+      "mutation Comment($issueId: String!, $body: String!) { commentCreate(input: { issueId: $issueId, body: $body }) { success } }",
+      { issueId: issue2.id, body }
+    );
+    if (!data.commentCreate.success) throw new Error(`Linear did not accept the comment on ${id}.`);
+  }
+  bold(text2) {
+    return `**${text2}**`;
+  }
+};
+
+// src/tickets/inbox.ts
+var CACHE_MS = 6e4;
+var cache = /* @__PURE__ */ new Map();
+async function inbox(project, options = {}) {
+  const key = project.root.toLowerCase();
+  const hit = cache.get(key);
+  if (hit && !options.refresh && Date.now() - hit.at < CACHE_MS) return hit.tickets;
+  const tracker = openTracker(project, options.fetcher);
+  const runs = ticketRuns(project);
+  const tickets = (await tracker.list()).map((t) => enrich(project, t, runs));
+  cache.set(key, { at: Date.now(), tickets });
+  return tickets;
+}
+async function inboxTicket(project, id, fetcher) {
+  return enrich(project, await openTracker(project, fetcher).get(id), ticketRuns(project));
+}
+function clearInbox(project) {
+  cache.delete(project.root.toLowerCase());
+}
+function enrich(project, ticket, runs) {
+  const info = ticketInfo(project, ticket.id);
+  const build2 = ticket.build ? buildState(project, ticket.build, info.commits.map((c) => c.hash)) : void 0;
+  return { ...ticket, commits: info.commits.length, features: info.features, cards: info.cards, buildState: build2?.state, buildTag: build2?.tag, lastRun: runs.get(ticket.id) };
+}
+function ticketRuns(project) {
+  const out = /* @__PURE__ */ new Map();
+  for (const run of project.store.listRuns()) {
+    if (run.kind !== "verify" || !run.ticket || out.has(run.ticket)) continue;
+    out.set(run.ticket, { id: run.id, status: run.status, at: run.finishedAt ?? run.startedAt });
+  }
+  return out;
+}
+function buildTags(pattern, build2) {
+  const names = pattern ? [pattern.replace(/\{build\}/g, build2)] : [build2, `v${build2}`, `build-${build2}`, `release-${build2}`];
+  return [...new Set(names)];
+}
+function buildState(project, build2, commits) {
+  const git2 = (...args) => (0, import_node_child_process11.spawnSync)("git", args, { cwd: project.root, encoding: "utf8", windowsHide: true, timeout: 15e3 });
+  const tag = buildTags(project.config.builds.tag, build2).find((t) => /^[\w./+-]+$/.test(t) && git2("rev-parse", "--verify", "--quiet", `refs/tags/${t}`).status === 0);
+  if (!tag || commits.length === 0) return { state: "unknown", tag };
+  const all = commits.every((hash3) => git2("merge-base", "--is-ancestor", hash3, `refs/tags/${tag}`).status === 0);
+  return { state: all ? "included" : "missing", tag };
+}
+function testedLine(project, run) {
+  const parts = [];
+  if (run.build) parts.push(`Build: ${run.build.label}`);
+  else if (run.target === "web") parts.push(`Web app${project.config.web?.url ? `: ${project.config.web.url}` : ""}`);
+  else if (run.git) parts.push(`Code: ${run.git.branch ?? "detached"} @ ${run.git.commit}${run.git.dirty ? ` + ${run.git.dirty} uncommitted file(s)` : ""}`);
+  if (run.kind === "card" && run.device) parts.push(`On: ${run.device}`);
+  return parts.join(" \xB7 ");
+}
+function resultComment(project, tracker, run) {
+  if (run.kind !== "verify" && run.kind !== "card") throw new Error("Only a card run or a verify run can be posted to a ticket.");
+  if (run.status === "running") throw new Error("The run is still going.");
+  const titles = new Map(listCards(project.root).map((c) => [`${c.feature}/${c.id}`, c.title]));
+  const lines = [tracker.bold(`Probe test: ${run.status.toUpperCase()}`), testedLine(project, run), ""];
+  const cardLine = (feature, cardId, status, note) => `- ${status === "passed" ? "\u2713" : status === "skipped" ? "\u2013" : status === "blocked" ? "?" : "\u2717"} ${titles.get(`${feature}/${cardId}`) ?? cardId} (${status})${note && status !== "passed" ? `: ${note.split("\n")[0].slice(0, 240)}` : ""}`;
+  if (run.kind === "card") {
+    lines.push(cardLine(run.feature, run.cardId, run.status, run.error ?? run.verdict?.notes));
+    for (const e of run.verdict?.expectations ?? []) lines.push(`  - ${e.met === true ? "\u2713" : e.met === false ? "\u2717" : "?"} ${e.text}${e.met === true ? "" : ` \u2014 ${e.evidence}`}`);
+    if (run.crashes.length) lines.push("", "The app crashed during the test.");
+  } else {
+    if (run.error) lines.push(run.error, "");
+    for (const f of run.features) {
+      if (f.unitStatus) lines.push(`- ${f.unitStatus === "passed" ? "\u2713" : "\u2717"} ${f.feature}: unit tests ${f.unitStatus}`);
+      for (const c of f.cards) if (c.cardId !== "\u2014") lines.push(cardLine(f.feature, c.cardId, c.status, c.note));
+    }
+  }
+  lines.push("", `Probe run ${run.id}. Screenshots and video are on the tester's machine.`);
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+async function postResult(project, ticketId, run, fetcher) {
+  const tracker = openTracker(project, fetcher);
+  const body = resultComment(project, tracker, run);
+  await tracker.comment(ticketId, body);
+  return body;
+}
+
+// src/studio/qa.ts
+function trackerSettings(project) {
+  const t = project.config.tickets;
+  const hasToken = !!t.tracker && new Secrets(project.store.dir).hasKey(tokenKey(t.tracker));
+  return {
+    tracker: t.tracker ?? null,
+    site: t.site ?? null,
+    email: t.email ?? null,
+    filter: t.filter ?? null,
+    team: t.team ?? null,
+    buildField: t.buildField ?? null,
+    hasToken,
+    /** What is still needed before the inbox can load; null when connected. */
+    missing: trackerMissing(t, hasToken),
+    defaultFilter: JIRA_DEFAULT_FILTER,
+    trackers: TRACKERS.map((id) => ({ id, label: TRACKER_LABEL[id] }))
+  };
+}
+function saveTracker(project, body) {
+  const tracker = body.tracker?.trim() || null;
+  if (tracker && !TRACKERS.includes(tracker)) return `Tracker: one of ${TRACKERS.join(", ")}`;
+  let site = body.site?.trim().replace(/\/+$/, "") || null;
+  if (tracker === "jira") {
+    if (!site) return "Jira needs the site address, e.g. https://acme.atlassian.net";
+    if (!/^https?:\/\//i.test(site)) site = `https://${site}`;
+    try {
+      const url2 = new URL(site);
+      if (url2.username || url2.password || url2.search || url2.hash) return "Site: only the address, e.g. https://acme.atlassian.net";
+      site = url2.origin + url2.pathname.replace(/\/+$/, "");
+    } catch {
+      return "Site: a web address, e.g. https://acme.atlassian.net";
+    }
+  }
+  const email3 = body.email?.trim() || void 0;
+  if (email3 && !/^\S+@\S+$/.test(email3)) return "Email: the address of the Jira account the token belongs to";
+  saveProject(project.root, {
+    tickets: {
+      tracker,
+      site: tracker === "jira" ? site : null,
+      filter: body.filter?.trim() || null,
+      team: tracker === "linear" ? body.team?.trim() || null : null,
+      buildField: tracker === "jira" ? body.buildField?.trim() || null : null,
+      // A link for ticket ids elsewhere in Studio, when nobody set one.
+      ...tracker === "jira" && site && !project.config.tickets.url ? { url: `${site}/browse/{id}` } : {}
+    }
+  });
+  saveLocal(project.store.dir, { tickets: tracker === "jira" && email3 ? { email: email3 } : void 0 });
+  if (tracker && body.token?.trim()) new Secrets(project.store.dir).setKey(tokenKey(tracker), body.token.trim());
+  project.config = loadConfig(project.root, project.store.dir);
+  clearInbox(project);
+  return null;
+}
+function disconnectTracker(project) {
+  const tracker = project.config.tickets.tracker;
+  if (tracker) new Secrets(project.store.dir).removeKey(tokenKey(tracker));
+  clearInbox(project);
+}
+async function testTracker(project) {
+  try {
+    return { ok: true, message: await openTracker(project).me() };
+  } catch (e) {
+    return { ok: false, message: e.message };
+  }
+}
+function buildSettings(project) {
+  const c = project.config;
+  return {
+    releasePackage: c.app.releasePackage ?? null,
+    /** What Probe would use when none is set. */
+    releasePackageFound: releasePackage(project) ?? null,
+    firebaseApp: c.builds.firebaseApp ?? null,
+    playTrack: c.builds.playTrack,
+    tag: c.builds.tag ?? null,
+    serviceAccount: c.builds.serviceAccount ?? null,
+    bundletool: c.builds.bundletool ?? null,
+    webUrl: c.web.url ?? null,
+    android: project.adapter.supportsDevices,
+    playwright: playwrightStatus(project.root)
+  };
+}
+var PACKAGE2 = /^[a-zA-Z][\w]*(\.[a-zA-Z_][\w]*)+$/;
+function saveBuildSettings(project, body) {
+  const clean = (v) => v?.trim() || null;
+  const pkg = clean(body.releasePackage);
+  if (pkg && !PACKAGE2.test(pkg)) return "Release app id: an application id such as com.example.app";
+  const firebase = clean(body.firebaseApp);
+  if (firebase && !/^\d+:\d+:android:[0-9a-f]+$/i.test(firebase)) return "Firebase app id: it looks like 1:1234567890:android:abc123 (Firebase console \u2192 Project settings \u2192 Your apps)";
+  const track = clean(body.playTrack);
+  if (track && !/^[\w:.-]+$/.test(track)) return "Play track: internal, alpha, beta, production or a custom track's name";
+  const tag = clean(body.tag);
+  if (tag && !tag.includes("{build}")) return "Build tag: a tag name with {build} in it, e.g. v{build}";
+  const key = clean(body.serviceAccount);
+  if (key && !(0, import_node_fs36.existsSync)(key)) return `Service account key: no file at ${key}`;
+  const jar = clean(body.bundletool);
+  if (jar && !(0, import_node_fs36.existsSync)(jar)) return `bundletool: no file at ${jar}`;
+  let web = clean(body.webUrl);
+  if (web) {
+    try {
+      web = webUrl(/^[a-z][\w+.-]*:\/\//i.test(web) ? web : `${/^(localhost|127\.0\.0\.1)(:|\/|$)/i.test(web) ? "http" : "https"}://${web}`);
+    } catch (e) {
+      return `Web app address: ${e.message}`;
+    }
+  }
+  saveProject(project.root, { app: { releasePackage: pkg }, builds: { firebaseApp: firebase, playTrack: track === "internal" ? null : track, tag }, web: { url: web } });
+  saveLocal(project.store.dir, { builds: key || jar ? { serviceAccount: key ?? void 0, bundletool: jar ?? void 0 } : void 0 });
+  project.config = loadConfig(project.root, project.store.dir);
+  return null;
+}
+function testOptions(project) {
+  const c = project.config;
+  const out = [];
+  const targets = runTargets(project);
+  if (targets.includes("android")) {
+    const key = c.builds.serviceAccount ? void 0 : "set the Google service account key file in Settings \u2192 Builds and web";
+    out.push(
+      { id: "android", label: "Android \xB7 this code (builds and installs it)", target: "android" },
+      { id: "android:firebase", label: "Android \xB7 Firebase App Distribution build", target: "android", source: "firebase", missing: c.builds.firebaseApp ? key : "set the Firebase app id in Settings \u2192 Builds and web" },
+      { id: "android:play", label: `Android \xB7 Google Play build (${c.builds.playTrack})`, target: "android", source: "play", missing: releasePackage(project) ? key : "set the release app id in Settings \u2192 Builds and web" },
+      { id: "android:file", label: "Android \xB7 a build file (.apk / .aab)", target: "android", source: "file" }
+    );
+  }
+  if (targets.includes("web")) out.push({ id: "web", label: `Web \xB7 ${c.web.url}`, target: "web" });
+  return out;
+}
+
 // src/studio/server.ts
 var running = null;
 var watchLog = [];
@@ -51182,9 +52274,9 @@ async function startStudio(project, preferredPort = 7777) {
   for (let port = preferredPort; port < preferredPort + 20; port++) {
     const current3 = { project };
     const server = createStudioServer(current3);
-    const ok = await new Promise((resolve9) => {
-      server.once("error", () => resolve9(false));
-      server.listen(port, "127.0.0.1", () => resolve9(true));
+    const ok = await new Promise((resolve10) => {
+      server.once("error", () => resolve10(false));
+      server.listen(port, "127.0.0.1", () => resolve10(true));
     });
     if (ok) {
       running = { server, url: `http://localhost:${port}` };
@@ -51203,8 +52295,8 @@ function attach(current3, project) {
   if (running) recordStudio(project, running.url);
   if (project.config.watch.enabled) current3.stopWatcher = startWatcher(project, (line) => watchLog.push(`${(/* @__PURE__ */ new Date()).toISOString().slice(11, 19)} ${line}`) > 50 && watchLog.shift());
 }
-function createStudioServer(target) {
-  const current3 = "store" in target ? { project: target } : target;
+function createStudioServer(target2) {
+  const current3 = "store" in target2 ? { project: target2 } : target2;
   return (0, import_node_http.createServer)((req, res) => handle(current3, req, res).catch((e) => send(res, 500, { error: String(e) })));
 }
 async function handle(current3, req, res) {
@@ -51219,7 +52311,7 @@ async function handle(current3, req, res) {
     res.end(page_default);
     return;
   }
-  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
+  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : void 0) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
@@ -51252,7 +52344,7 @@ async function handle(current3, req, res) {
     if (info.git.dirty) return send(res, 409, { error: `${info.git.dirty} uncommitted file(s): commit or stash them before switching.` });
     if (runningJobs().length) return send(res, 409, { error: "Runs are still going: stop them or wait before switching." });
     const local = want.replace(/^origin\//, "");
-    const out = (0, import_node_child_process10.spawnSync)("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
+    const out = (0, import_node_child_process12.spawnSync)("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
     if (out.status !== 0) return send(res, 400, { error: (out.stderr || out.stdout || "git switch failed").trim() });
     scan(project);
     return send(res, 200, branchInfo(project));
@@ -51339,7 +52431,7 @@ async function handle(current3, req, res) {
       manifest = loadManifest(project.root, id);
     } catch {
     }
-    const exists = (0, import_node_fs34.existsSync)((0, import_node_path44.join)(project.root, manifestFile(id)));
+    const exists = (0, import_node_fs37.existsSync)((0, import_node_path46.join)(project.root, manifestFile(id)));
     return send(res, 200, {
       file: manifestFile(id),
       manifest,
@@ -51377,7 +52469,11 @@ async function handle(current3, req, res) {
   }
   if (method === "POST" && path === "/api/verify") {
     const options = JSON.parse(await readBody(req));
-    return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+    try {
+      return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
   }
   m = /^\/api\/unitwrite\/([^/]+)$/.exec(path);
   if (method === "POST" && m) {
@@ -51408,6 +52504,71 @@ async function handle(current3, req, res) {
     if (!features.length) return send(res, 400, { error: `No commits mention ${ticket}; choose the feature it belongs to.` });
     return send(res, 200, startJob(jobKeys.ticketCards(ticket), () => startBackfill(project, features, { ticket: { id: ticket, text: body.text?.trim() || void 0 } })));
   }
+  if (method === "GET" && path === "/api/tracker") return send(res, 200, trackerSettings(project));
+  if (method === "POST" && path === "/api/tracker") {
+    const error62 = saveTracker(project, JSON.parse(await readBody(req)));
+    return error62 ? send(res, 400, { error: error62 }) : send(res, 200, trackerSettings(project));
+  }
+  if (method === "POST" && path === "/api/tracker/test") return send(res, 200, await testTracker(project));
+  if (method === "DELETE" && path === "/api/tracker") {
+    disconnectTracker(project);
+    return send(res, 200, trackerSettings(project));
+  }
+  if (method === "GET" && path === "/api/builds/settings") return send(res, 200, buildSettings(project));
+  if (method === "POST" && path === "/api/builds/settings") {
+    const error62 = saveBuildSettings(project, JSON.parse(await readBody(req)));
+    return error62 ? send(res, 400, { error: error62 }) : send(res, 200, buildSettings(project));
+  }
+  if (method === "GET" && path === "/api/test-options") return send(res, 200, testOptions(project));
+  if (method === "GET" && path === "/api/builds") {
+    const source = url2.searchParams.get("source");
+    if (source !== "firebase" && source !== "play") return send(res, 400, { error: "source: firebase or play" });
+    try {
+      return send(res, 200, await listBuilds(project, source));
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
+  if (method === "GET" && path === "/api/inbox") {
+    const settings = trackerSettings(project);
+    if (settings.missing) return send(res, 200, { connected: false, missing: settings.missing, tracker: settings.tracker, tickets: [] });
+    try {
+      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: await inbox(project, { refresh: url2.searchParams.has("refresh") }) });
+    } catch (e) {
+      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: [], error: e.message });
+    }
+  }
+  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment))?$/.exec(path);
+  if (m) {
+    const id = decodeURIComponent(m[1]);
+    try {
+      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id));
+      if (method === "POST" && m[2] === "cards") {
+        const body = JSON.parse(await readBody(req));
+        const ticket = await inboxTicket(project, id);
+        const features = body.features?.length ? body.features : ticket.features;
+        if (!features.length) return send(res, 400, { error: `No commit names ${id} yet: choose the feature it belongs to.` });
+        const text2 = `${ticket.title}
+
+${ticket.description}`.trim();
+        return send(res, 200, startJob(jobKeys.ticketCards(id), () => startBackfill(project, features, { ticket: { id, text: text2 } })));
+      }
+      if (method === "POST" && m[2] === "test") {
+        const body = JSON.parse(await readBody(req));
+        const options = { ticket: id, cards: "all", noUnit: true, target: body.target, build: body.build, maxCards: body.maxCards };
+        return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+      }
+      if (m[2] === "comment") {
+        const runId = method === "GET" ? url2.searchParams.get("run") : JSON.parse(await readBody(req)).run;
+        const run = runId && /^[\w-]+$/.test(runId) ? project.store.read(`runs/${runId}.json`) : null;
+        if (!run) return send(res, 404, { error: "unknown run" });
+        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project), run) });
+        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run) });
+      }
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
   m = /^\/api\/runs\/([^/]+)\/ticket(\/file)?$/.exec(path);
   if (m) {
     const run = project.store.read(`runs/${m[1]}.json`);
@@ -51425,12 +52586,12 @@ async function handle(current3, req, res) {
     const [feature, cardId] = [decodeURIComponent(m[1]), decodeURIComponent(m[2])];
     return send(res, 200, startJob(jobKeys.card(feature, cardId), () => startCardRun(project, feature, cardId)));
   }
-  m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4))$/.exec(path);
+  m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4|webm))$/.exec(path);
   if (method === "GET" && m) {
-    const file2 = (0, import_node_path44.join)(project.store.dir, "runs", m[1], m[2]);
-    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs34.existsSync)(file2)) return send(res, 404, { error: "no such file" });
-    res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : "video/mp4", "cache-control": "max-age=3600" });
-    (0, import_node_fs34.createReadStream)(file2).pipe(res);
+    const file2 = (0, import_node_path46.join)(project.store.dir, "runs", m[1], m[2]);
+    if (!/^[\w-]+$/.test(m[1]) || !(0, import_node_fs37.existsSync)(file2)) return send(res, 404, { error: "no such file" });
+    res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : `video/${m[3]}`, "cache-control": "max-age=3600" });
+    (0, import_node_fs37.createReadStream)(file2).pipe(res);
     return;
   }
   m = /^\/api\/cards\/([^/]+)\/([^/]+)\/status$/.exec(path);
@@ -51573,7 +52734,8 @@ function summary(result, project) {
   const manifests = new Map(loadManifests(project.root).map((m) => [m.id, m]));
   const graph = safeGraph(project, result);
   return {
-    project: result.project,
+    // Whether cards can run follows the settings (a web address set since the scan), not the scan.
+    project: { ...result.project, devices: runTargets(project).length > 0 },
     scannedAt: result.scannedAt,
     excluded: result.excluded,
     features: result.features.map((f) => {
@@ -51610,10 +52772,10 @@ function proposedAreaRows(project) {
   return proposedAreas(project).map((a) => ({ ...a, chosen: chosen.has(a.id), undecided: undecided.has(a.id), manifest: written.has(a.id) }));
 }
 function readBody(req) {
-  return new Promise((resolve9, reject) => {
+  return new Promise((resolve10, reject) => {
     let body = "";
     req.on("data", (chunk) => body += chunk.toString());
-    req.on("end", () => resolve9(body || "{}"));
+    req.on("end", () => resolve10(body || "{}"));
     req.on("error", reject);
   });
 }
@@ -51624,6 +52786,8 @@ function send(res, status, body) {
 
 // src/mcp/server.ts
 var projectDir = external_exports.string().optional().describe("Project root. Defaults to the directory the session was opened in.");
+var target = external_exports.enum(["android", "web"]).optional().describe("Where the cards run: the Android app or the web app in a browser. Default: the project's first.");
+var build = external_exports.string().optional().describe('A finished Android build to test instead of the working tree: "firebase" or "play" (the newest), "firebase:<build number>", "play:<version code>", or "file:<path to .apk/.aab>".');
 var text = (t) => ({ content: [{ type: "text", text: t }] });
 async function runMcpServer(version2) {
   const server = new McpServer({ name: "probe", version: version2 });
@@ -51842,10 +53006,12 @@ ${r.errors.join("\n")}` : ""
     },
     async ({ screenshot }) => {
       const s = session();
-      const tree = formatUiTree(s.observe());
-      const shot = screenshot === false ? null : s.capture();
+      const tree = formatUiTree(await s.observe());
+      const shot = screenshot === false ? null : await s.capture();
       s.record("observe", `${tree.split("\n").length} elements`, shot?.name);
-      const content = [{ type: "text", text: tree }];
+      const where = s.device instanceof WebDevice ? `Page: ${await s.device.location()}
+` : "";
+      const content = [{ type: "text", text: where + tree }];
       if (shot) content.push({ type: "image", data: shot.png.toString("base64"), mimeType: "image/png" });
       return { content };
     }
@@ -51854,9 +53020,10 @@ ${r.errors.join("\n")}` : ""
     "probe_device_act",
     {
       title: "Act on device",
-      description: "One action on the device: tap (element number from the last observe, or x/y), long_press, type (into the focused field), key (back/home/enter/tab/delete), swipe (up/down/left/right scrolls content), wait (ms, for loading), relaunch (restart the app).",
+      description: "One action on the device or browser page: tap (element number from the last observe, or x/y), long_press, type (into the focused field), key (back/home/enter/tab/delete), swipe (up/down/left/right scrolls content), wait (ms, for loading), relaunch (restart the app), open (web only: go to a path of the site under test, in url).",
       inputSchema: {
-        action: external_exports.enum(["tap", "long_press", "type", "key", "swipe", "wait", "relaunch"]),
+        action: external_exports.enum(["tap", "long_press", "type", "key", "swipe", "wait", "relaunch", "open"]),
+        url: external_exports.string().optional().describe("For open: a path of the site under test, e.g. /settings."),
         element: external_exports.number().int().optional(),
         x: external_exports.number().optional(),
         y: external_exports.number().optional(),
@@ -51872,27 +53039,27 @@ ${r.errors.join("\n")}` : ""
       let detail;
       switch (a.action) {
         case "tap":
-          detail = d.tap({ element: a.element, x: a.x, y: a.y }) + (a.element ? ` (element ${a.element})` : "");
+          detail = await d.tap({ element: a.element, x: a.x, y: a.y }) + (a.element ? ` (element ${a.element})` : "");
           break;
         case "long_press": {
           if (a.x === void 0 || a.y === void 0) return text("long_press needs x and y (use an element's centre from observe).");
-          d.longPress(a.x, a.y);
+          await d.longPress(a.x, a.y);
           detail = `long-pressed ${a.x},${a.y}`;
           break;
         }
         case "type":
           if (!a.text) return text("type needs text.");
-          d.type(a.text);
+          await d.type(a.text);
           detail = `typed "${a.text}"`;
           break;
         case "key":
           if (!a.key) return text("key needs key.");
-          d.key(a.key);
+          await d.key(a.key);
           detail = `pressed ${a.key}`;
           break;
         case "swipe":
           if (!a.direction) return text("swipe needs direction.");
-          d.swipe(a.direction);
+          await d.swipe(a.direction);
           detail = `swiped ${a.direction}`;
           break;
         case "wait":
@@ -51900,10 +53067,14 @@ ${r.errors.join("\n")}` : ""
           detail = `waited ${a.ms ?? 1500}ms`;
           break;
         case "relaunch":
-          d.stop(s.info.appPackage);
-          d.launch(s.info.appPackage);
+          await d.relaunch(s.info.appPackage);
           await new Promise((r) => setTimeout(r, 3e3));
           detail = "relaunched the app";
+          break;
+        case "open":
+          if (!d.open) return text("open only works in a web run; on a device, navigate through the app.");
+          if (!a.url) return text("open needs url, a path of the site under test.");
+          detail = `opened ${await d.open(a.url)}`;
           break;
       }
       if (a.action !== "wait") await new Promise((r) => setTimeout(r, 700));
@@ -51924,7 +53095,7 @@ ${r.errors.join("\n")}` : ""
       if (!listAccounts(project.root).some((a) => a.role === role)) return text(`No test account with role "${role}".`);
       const value = new Secrets(project.store.dir).get(role, secret);
       if (value === null) return text(`No ${secret} stored for ${role}. Report blocked: it is added in Probe Studio -> Accounts.`);
-      s.device.type(value);
+      await s.device.type(value);
       s.record("type_secret", `typed ${role}'s ${secret}`);
       return text(`Typed ${role}'s ${secret}. Observe to see the result.`);
     }
@@ -51942,7 +53113,7 @@ ${r.errors.join("\n")}` : ""
     },
     async (verdict) => {
       const s = session();
-      const shot = s.capture();
+      const shot = await s.capture();
       s.record("verdict", `${verdict.result}${verdict.notes ? `: ${verdict.notes}` : ""}`, shot?.name);
       s.saveVerdict(verdict);
       return text(`Verdict recorded: ${verdict.result}. You are done.`);
@@ -51962,7 +53133,7 @@ ${r.errors.join("\n")}` : ""
     },
     async (login) => {
       const s = session();
-      const shot = s.capture();
+      const shot = await s.capture();
       s.record("report", `login: ${login.state}${login.role ? ` as ${login.role}` : ""}`, shot?.name);
       s.saveReport("login", login);
       return text("Login state recorded. You are done.");
@@ -51989,20 +53160,22 @@ ${r.errors.join("\n")}` : ""
     "probe_card_run",
     {
       title: "Run a card on a device",
-      description: "Runs a feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. Takes minutes per card.",
+      description: "Runs a feature card on an emulator (or an allowed phone), or on the web app in a browser, with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. With build, the card runs on that finished Android build instead of the working tree. Takes minutes per card.",
       inputSchema: {
         projectDir,
         feature: external_exports.string().optional(),
         card: external_exports.string().optional().describe("Card id"),
         rule: external_exports.string().optional().describe("Run the cards behind this rule instead: feature/rule-id."),
-        device: external_exports.string().optional().describe("Device serial")
+        device: external_exports.string().optional().describe("Device serial"),
+        target,
+        build
       }
     },
-    async ({ projectDir: dir, feature, card, rule: rule2, device }) => {
+    async ({ projectDir: dir, feature, card, rule: rule2, device, target: target2, build: build2 }) => {
       const project = openProject(dir);
       if (rule2) return text(summarizeRuleRun(await runRuleCards(project, rule2, { device })));
       if (!feature || !card) return text("Give feature and card, or a rule.");
-      const { done } = startCardRun(project, feature, card, { device });
+      const { done } = startCardRun(project, feature, card, { device, target: target2, build: build2 ? parseBuildRef(build2) : void 0 });
       return text(summarizeCardRun(await done));
     }
   );
@@ -52010,7 +53183,7 @@ ${r.errors.join("\n")}` : ""
     "probe_verify",
     {
       title: "Verify a change",
-      description: "Checks the current change end to end: maps files changed since the base branch (plus uncommitted work) to features, runs their unit tests, then reinstalls the app and runs their cards on an emulator. Waits; can take a long time. noDevice = unit tests only.",
+      description: "Checks the current change end to end: maps files changed since the base branch (plus uncommitted work) to features, runs their unit tests, then reinstalls the app and runs their cards on an emulator (or on the web app, target web). With build, the cards run on that finished Android build instead and unit tests are skipped; with ticket and build, that is a tester's check of a ticket on a build. Waits; can take a long time. noDevice = unit tests only.",
       inputSchema: {
         projectDir,
         base: external_exports.string().optional().describe("Branch to compare with; default verify.base or develop/main."),
@@ -52020,12 +53193,35 @@ ${r.errors.join("\n")}` : ""
         cards: external_exports.enum(["approved", "all"]).optional().describe("Which cards run on the device (default approved)."),
         maxCards: external_exports.number().int().min(0).max(50).optional(),
         outdated: external_exports.boolean().optional().describe("Instead of a diff: re-run only results (unit and cards) that are outdated or missing for this checkout."),
-        rerunFresh: external_exports.boolean().optional().describe("Also re-run cards whose recorded result still holds for this code (normally skipped).")
+        rerunFresh: external_exports.boolean().optional().describe("Also re-run cards whose recorded result still holds for this code (normally skipped)."),
+        target,
+        build
       }
     },
-    async ({ projectDir: dir, ...options }) => {
-      const { done } = startVerify(openProject(dir), options);
+    async ({ projectDir: dir, build: build2, ...options }) => {
+      const { done } = startVerify(openProject(dir), { ...options, build: build2 ? parseBuildRef(build2) : void 0 });
       return text(summarizeVerify(await done));
+    }
+  );
+  server.registerTool(
+    "probe_inbox",
+    {
+      title: "Tickets waiting for a test",
+      description: "Lists the tickets from the project's tracker (Jira or Linear, connected in Studio \u2192 Settings) that match its inbox filter: id, title, status, who wrote it, the build it names and whether that build contains the ticket's commits, and the cards drafted from it. With ticket: that one ticket with its full text. Test one with probe_verify { ticket, build }.",
+      inputSchema: { projectDir, ticket: external_exports.string().optional().describe("One ticket id, for its full text."), refresh: external_exports.boolean().optional() }
+    },
+    async ({ projectDir: dir, ticket, refresh }) => {
+      const project = openProject(dir);
+      const line = (t) => `${t.id} \xB7 ${t.status} \xB7 ${t.title}${t.author ? ` \xB7 by ${t.author}` : ""}${t.build ? ` \xB7 build ${t.build}${t.buildState ? ` (${t.buildState === "included" ? "contains the ticket's commits" : t.buildState === "missing" ? "does NOT contain the ticket's commits" : "no tag for it in this repository"})` : ""}` : ""} \xB7 ${t.commits} commits \xB7 cards: ${t.cards.join(", ") || "none"}${t.lastRun ? ` \xB7 last test ${t.lastRun.status}` : ""}`;
+      if (ticket) {
+        const t = await inboxTicket(project, ticket);
+        return text(`${line(t)}
+${t.url}
+
+${t.description || "(no description)"}`);
+      }
+      const tickets = await inbox(project, { refresh });
+      return text(tickets.length ? tickets.map(line).join("\n") : "No tickets match the inbox filter.");
     }
   );
   server.registerTool(
@@ -52178,8 +53374,8 @@ ${d.body}`);
 }
 
 // src/cli/hook.ts
-var import_node_fs35 = require("node:fs");
-var import_node_path45 = require("node:path");
+var import_node_fs38 = require("node:fs");
+var import_node_path47 = require("node:path");
 async function runHook(event, options = {}) {
   try {
     const stdin = options.files?.length ? "" : await readStdin();
@@ -52194,7 +53390,7 @@ async function runHook(event, options = {}) {
 `);
     if (event === "edit") {
       const file2 = hook.tool_input?.file_path ?? hook.tool_input?.notebook_path;
-      const files = claude ? file2 ? [file2] : [] : (options.files ?? []).map((f) => (0, import_node_path45.isAbsolute)(f) ? f : (0, import_node_path45.resolve)(process.cwd(), f));
+      const files = claude ? file2 ? [file2] : [] : (options.files ?? []).map((f) => (0, import_node_path47.isAbsolute)(f) ? f : (0, import_node_path47.resolve)(process.cwd(), f));
       const touched = files.length ? markStale(project, files, source, session) : claude ? [] : sweepDirty(project, source, session);
       if (!claude && touched.length) say(`Probe: ${touched.join(", ")} stale`);
       return 0;
@@ -52229,7 +53425,7 @@ async function runHook(event, options = {}) {
     }
     if (event === "commit") {
       const staged = capture("git", ["diff", "--cached", "--name-only", "--diff-filter=ACMR"], project.root);
-      const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => (0, import_node_path45.join)(project.root, f));
+      const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => (0, import_node_path47.join)(project.root, f));
       if (files.length && markStale(project, files, "commit", session).length) await kickCheck(project, "commit");
       return 0;
     }
@@ -52251,19 +53447,19 @@ function parseClaudeInput(stdin) {
 function probeProject(cwd) {
   try {
     const project = openProject(cwd);
-    return (0, import_node_fs35.existsSync)((0, import_node_path45.join)(project.root, "probe")) ? project : null;
+    return (0, import_node_fs38.existsSync)((0, import_node_path47.join)(project.root, "probe")) ? project : null;
   } catch {
     return null;
   }
 }
 function readStdin() {
-  return new Promise((resolve9) => {
-    if (process.stdin.isTTY) return resolve9("");
+  return new Promise((resolve10) => {
+    if (process.stdin.isTTY) return resolve10("");
     let data = "";
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", (c) => data += c);
-    process.stdin.on("end", () => resolve9(data));
-    process.stdin.on("error", () => resolve9(data));
+    process.stdin.on("end", () => resolve10(data));
+    process.stdin.on("error", () => resolve10(data));
   });
 }
 var BEGIN = "# >>> probe (probe hooks install)";
@@ -52299,24 +53495,24 @@ function withoutPreCommitBlock(text2) {
 function gitHooks(project, action) {
   const dir = capture("git", ["rev-parse", "--git-path", "hooks"], project.root);
   if (!dir) throw new Error("Not a git repository: the pre-commit hook needs git.");
-  const file2 = (0, import_node_path45.resolve)(project.root, dir, "pre-commit");
-  const existing = (0, import_node_fs35.existsSync)(file2) ? (0, import_node_fs35.readFileSync)(file2, "utf8") : null;
+  const file2 = (0, import_node_path47.resolve)(project.root, dir, "pre-commit");
+  const existing = (0, import_node_fs38.existsSync)(file2) ? (0, import_node_fs38.readFileSync)(file2, "utf8") : null;
   const installed = existing?.includes(BEGIN) ?? false;
   if (action === "install") {
-    (0, import_node_fs35.mkdirSync)((0, import_node_path45.dirname)(file2), { recursive: true });
-    (0, import_node_fs35.writeFileSync)(file2, withPreCommitBlock(existing, preCommitBlock((0, import_node_path45.resolve)(process.argv[1]))), { mode: 493 });
+    (0, import_node_fs38.mkdirSync)((0, import_node_path47.dirname)(file2), { recursive: true });
+    (0, import_node_fs38.writeFileSync)(file2, withPreCommitBlock(existing, preCommitBlock((0, import_node_path47.resolve)(process.argv[1]))), { mode: 493 });
     return `${installed ? "Updated" : "Installed"} Probe's block in ${file2}. Each commit now marks the staged files' features stale and starts a check in the background.`;
   }
   if (action === "uninstall") {
     if (!installed) return `No Probe block in ${file2}.`;
-    (0, import_node_fs35.writeFileSync)(file2, withoutPreCommitBlock(existing));
+    (0, import_node_fs38.writeFileSync)(file2, withoutPreCommitBlock(existing));
     return `Removed Probe's block from ${file2}.`;
   }
   return installed ? `Installed in ${file2}.` : `Not installed (probe hooks install adds it to ${file2}).`;
 }
 
 // src/cli.ts
-var VERSION = "0.6.1";
+var VERSION = "0.7.0";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]
@@ -52336,10 +53532,12 @@ Usage: probe <command> [options]
   backfill <feature|*>   Draft cards with a headless agent (* = all without cards)
                          --ticket <id> [--ticket-text <file>]: the cards a ticket needs
   run <feature> <card>   Run a card on a device with an agent (--device <serial>)
+                         --target web: in a browser, on the web app; --build: on a finished build (see below)
   explore <feature>      An agent maps a feature's screens and navigation on a device
   verify                 Check a change: affected features' unit tests, then cards on a device
                          --base <branch> --features a,b --ticket <id> --no-device --all-cards --max-cards n
                          --outdated: re-run only results that are outdated or missing; --rerun-fresh: up-to-date ones too
+                         --target web: cards run on the web app; --build: cards run on a finished build, no unit tests
   results [feature]      Recorded results (probe/results, shared via git) and whether they still hold
   login [role]           Check which account the app is logged in with, or log in as role
   issues <run>           Problems a run found, each with an id
@@ -52380,7 +53578,10 @@ Options:
   --port <n>             Studio port (default 7777)
   --no-open              Don't open the browser for studio
   --model <name>         Model for agent tasks (default: agents.model, else the runner's default)
-  --device <serial>      Device for run (default: a running emulator)`;
+  --device <serial>      Device for run (default: a running emulator)
+  --target <android|web> Where cards run (default: the project's first; web needs web.url)
+  --build <source>       A finished Android build instead of this code: firebase, firebase:<build number>,
+                         play, play:<version code>, or file:<path to .apk/.aab>`;
 async function main(argv) {
   const opt = (name) => {
     const i = argv.indexOf(name);
@@ -52390,6 +53591,8 @@ async function main(argv) {
   const port = Number(opt("--port") ?? 7777);
   const model = opt("--model");
   const deviceArg = opt("--device");
+  const targetArg = opt("--target");
+  const buildArg = opt("--build");
   const baseArg = opt("--base");
   const featuresArg = opt("--features");
   const ticketArg = opt("--ticket");
@@ -52581,7 +53784,9 @@ ${summarizeExplore(finished)}`);
         device: deviceArg,
         model,
         outdated,
-        rerunFresh
+        rerunFresh,
+        target: runTarget(targetArg),
+        build: buildArg ? parseBuildRef(buildArg) : void 0
       });
       follow(run.id);
       const finished = await done;
@@ -52627,7 +53832,7 @@ Cards: ${info.cards.join(", ") || "none"}`);
       const project = openProject(projectArg);
       const targets = arg ?? (ticketArg ? ticketInfo(project, ticketArg).features : void 0);
       if (!targets || Array.isArray(targets) && targets.length === 0) return usage("probe backfill <feature|*> [--ticket <id> [--ticket-text <file>]]");
-      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs36.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
+      const ticket = ticketArg ? { id: ticketArg, text: ticketTextArg ? (0, import_node_fs39.readFileSync)(ticketTextArg, "utf8") : void 0 } : void 0;
       const { run, done } = startBackfill(project, targets, { model, ticket });
       follow(run.id);
       const finished = await done;
@@ -52637,7 +53842,7 @@ ${summarizeBackfill(finished)}`);
     }
     case "run": {
       if (!arg || !arg2) return usage("probe run <feature> <card> [--device <serial>]");
-      const { run, done } = startCardRun(openProject(projectArg), arg, arg2, { device: deviceArg, model });
+      const { run, done } = startCardRun(openProject(projectArg), arg, arg2, { device: deviceArg, model, target: runTarget(targetArg), build: buildArg ? parseBuildRef(buildArg) : void 0 });
       follow(run.id);
       const finished = await done;
       console.log(`
@@ -52823,7 +54028,7 @@ async function readSecret(promptText) {
   process.stdout.write(promptText);
   stdin.setRawMode(true);
   stdin.resume();
-  return new Promise((resolve9) => {
+  return new Promise((resolve10) => {
     let value = "";
     const onData = (buf) => {
       for (const ch of buf.toString("utf8")) {
@@ -52832,7 +54037,7 @@ async function readSecret(promptText) {
           stdin.pause();
           stdin.off("data", onData);
           process.stdout.write("\n");
-          resolve9(value);
+          resolve10(value);
           return;
         }
         if (ch === "") process.exit(130);
@@ -52864,3 +54069,8 @@ main(process.argv.slice(2)).then(
     process.exit(1);
   }
 );
+function runTarget(value) {
+  if (value === void 0) return void 0;
+  if (value !== "android" && value !== "web") throw new Error(`--target: android or web, not "${value}".`);
+  return value;
+}

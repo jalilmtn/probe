@@ -2,14 +2,14 @@
 # A result is up to date while the code and card it ran on are unchanged.
 unit:
   result: passed
-  at: 2026-11-03T11:58:41.312Z
-  run: 20261103-115839
-  commit: 7a97e6a679
-  dirty: 6
+  at: 2026-11-10T13:11:18.483Z
+  run: 20261110-131110-2
+  commit: 8a26a29e43
+  dirty: 35
   by: Jalil
-  tests: 83
+  tests: 111
   failed: 0
   fingerprint:
     own:
-      :src:devices: 9c19d73aa4fd
+      :src:devices: 11afa4ea94d7
     deps: e3b0c44298fc

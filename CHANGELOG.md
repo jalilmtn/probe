@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 — 2026-11-10
+
+A tester's inbox, finished builds, and web apps.
+
+- Studio → Tickets lists the tickets waiting for a test from Jira or Linear: who wrote each one, its text, the build it names, its commits and cards. Draft cards from a ticket's own text, test it, and post the result to the ticket as a comment (shown first, posted only when you press Post).
+- Connect the tracker in Studio → Settings → Ticket tracker. The tracker, site and filter go to `probe.yaml` (`tickets.tracker`, `site`, `filter`, `team`, `buildField`); the API token is encrypted on each machine.
+- Cards can run on a finished Android build instead of the working tree: a build file (`.apk`, or `.aab` with bundletool), a Firebase App Distribution release, or the copy Google Play signed for a track. New settings: `app.releasePackage`, `builds.firebaseApp`, `builds.playTrack`, `builds.tag`, and per machine a Google service account key file.
+- Cards can run on a web app in Chromium (`web.url`), in any kind of project. The first web run installs Playwright into `~/.probe/tools`.
+- A ticket that names a build shows whether that build's git tag contains the ticket's commits.
+- `verify` and `run` take `--target web` and `--build <source>`; MCP tools `probe_verify` and `probe_card_run` take `target` and `build`; new MCP tool `probe_inbox`.
+- A run on a build or on the web app records which, and is kept out of the shared results.
+
 ## 0.6.1 — 2026-11-03
 
 Fixes from Probe's own security check.
