@@ -2,6 +2,7 @@ import { isExcluded } from "../core/config.js";
 import { assignFeatures } from "../core/features.js";
 import { isTestable } from "../core/kinds.js";
 import type { FeatureInfo, ModuleInfo, ScanResult } from "../core/types.js";
+import { runTargets } from "../devices/driver.js";
 import type { Project } from "./project.js";
 
 const SCAN_FILE = "scan.json";
@@ -27,7 +28,7 @@ export function scan(project: Project): ScanResult {
     .sort((a, b) => (a.group === b.group ? a.id.localeCompare(b.id) : a.group === "feature" ? -1 : 1));
 
   const result: ScanResult = {
-    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: project.adapter.supportsDevices },
+    project: { root: project.root, name: project.name, adapter: project.adapter.id, devices: runTargets(project).length > 0 },
     scannedAt: new Date().toISOString(),
     features,
     excluded: [...excluded].sort(),

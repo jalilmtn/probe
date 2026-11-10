@@ -1,71 +1,154 @@
 import { join } from "node:path";
-import { devicesUnsupported } from "../adapters/adapter.js";
 import { runAgent } from "../agent/headless.js";
 import { throwIfStopped } from "../core/proc.js";
 import type { ProbeConfig } from "../core/config.js";
-import type { DeviceRun, PerfReport } from "../core/types.js";
+import type { BuildRef, DeviceRun, PerfReport, RunTarget } from "../core/types.js";
 import { resolveApp } from "../engine/app.js";
 import type { Project } from "../engine/project.js";
+import { alreadyInstalled, installBuild, resolveBuild } from "./builds.js";
+import { pickTarget } from "./driver.js";
 import { createSession, DeviceSession } from "./session.js";
 import { pickDevice } from "./select.js";
+import { launchWeb, webUrl } from "./web.js";
 
 /** Tools every device agent gets; each run kind adds the one it reports through. */
 export const DEVICE_TOOLS = ["probe_device_observe", "probe_device_act", "probe_device_type_secret"];
 
-/** How an agent drives the screen. Shared by every device prompt. */
+const SAFETY = (outside: string) => `## Safety — stop and report "blocked" instead of guessing
+- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
+- A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
+- Never buy, pay, change account or privacy settings, or touch anything outside this ${outside}.
+- Only create or delete content with a test account, and only what the task needs.`;
+
+/** How an agent drives the screen of an Android device. */
 export const DEVICE_HOW_TO = `## How to work
 - Look before you act: call probe_device_observe, which returns a screenshot and a numbered list of on-screen elements. Observe again after every action that changes the screen.
 - Act with probe_device_act: tap an element by its number from the last observe (prefer that over coordinates), type into the focused field, press keys, swipe, wait for loading.
 - To log in: tap the username field and type the username yourself; for the password or a login code, tap the field and call probe_device_type_secret with the account role. You never see passwords.
 - Lists: scroll them a few times (swipe up, then back down). Probe measures frame times, so scrolling and transitions are part of the test.
 
-## Safety — stop and report "blocked" instead of guessing
-- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
-- A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
-- Never buy, pay, change account or privacy settings, or touch anything outside this app.
-- Only create or delete content with a test account, and only what the task needs.`;
+${SAFETY("app")}`;
+
+/** How an agent drives the web app in a browser window, with the same tools. */
+export const WEB_HOW_TO = `## How to work
+- Look before you act: call probe_device_observe, which returns a screenshot of the browser window, the page's address, and a numbered list of the elements in view. Observe again after every action that changes the page.
+- Act with probe_device_act: tap clicks an element by its number from the last observe (prefer that over coordinates); type goes into the focused field, so tap the field first; key presses enter, tab or delete, back is the browser's back button and home returns to the app's start page; swipe up scrolls the page down and swipe down scrolls it up; wait for loading.
+- Only what is inside the window is listed: scroll to find the rest of a page.
+- To go straight to a page of this site, use action open with url set to its path, e.g. "/settings". Other sites are refused.
+- To log in: tap the username field and type the username yourself; for the password or a login code, tap the field and call probe_device_type_secret with the account role. You never see passwords.
+
+${SAFETY("site")}`;
+
+/** The working instructions for a target. */
+export function howTo(target: RunTarget): string {
+  return target === "web" ? WEB_HOW_TO : DEVICE_HOW_TO;
+}
+
+/** "the Android app com.x on emulator-5554 (Pixel)" or "the web app at https://… in Chromium", for a prompt's first line. */
+export function appOn(target: RunTarget, device: string, app: string): string {
+  return target === "web" ? `the web app at ${app} in ${device}` : `the Android app ${app} on ${device}`;
+}
 
 export interface HarnessOptions {
   device?: string;
   model?: string;
+  /** Android or web; unset means the project's first target. */
+  target?: RunTarget;
+  /** A finished build to test instead of the working tree (Android). */
+  build?: BuildRef;
   /** "always" reinstalls from the current code (verify); "missing" only when not installed. */
   install?: "missing" | "always";
-  prompt: (deviceLabel: string, appPackage: string) => string;
+  prompt: (deviceLabel: string, app: string, target: RunTarget) => string;
   /** Report tool(s) of this run kind, on top of DEVICE_TOOLS. */
   reportTools: string[];
 }
 
 /**
- * Runs one agent against the app on a device and fills the fields every device run shares:
- * device, timeline, screenshots, recording, crashes, performance and cost. Returns the
- * session so the caller can read what its report tool saved.
+ * Runs one agent against the app and fills the fields every such run shares: device, timeline,
+ * screenshots, recording, crashes, performance and cost. On Android the app runs on an
+ * emulator or phone; on web, in a browser. Returns the session so the caller can read what its
+ * report tool saved.
  */
 export async function runOnDevice(project: Project, run: DeviceRun, options: HarnessOptions, log: (line: string) => void): Promise<DeviceSession> {
-  if (!project.adapter.supportsDevices) throw new Error(devicesUnsupported(project.adapter));
+  const target = pickTarget(project, options.target);
+  run.target = target;
+  if (target === "web") {
+    if (options.build) throw new Error("A build is an Android build; the web app is tested at its address.");
+    return runInBrowser(project, run, options, log);
+  }
+  return runOnAndroid(project, run, options, log);
+}
+
+async function runInBrowser(project: Project, run: DeviceRun, options: HarnessOptions, log: (line: string) => void): Promise<DeviceSession> {
+  const url = webUrl(project.config.web.url);
+  const info = createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: "browser", appPackage: url, target: "web" });
+  const browser = await launchWeb({ projectRoot: project.root, storeDir: project.store.dir, evidenceDir: info.evidenceDir, url, log });
+  run.device = browser.label;
+  log(`browser: ${run.device}`);
+  log(`web app: ${url}${browser.loadMs !== undefined ? ` · loaded in ${browser.loadMs} ms` : ""}`);
+  // The agent's tools run in another process: they find the browser through the session file.
+  const session = new DeviceSession(createSession(project.store.dir, { ...info, endpoint: browser.endpoint }));
+  try {
+    throwIfStopped();
+    const result = await runAgent(
+      project,
+      { prompt: options.prompt(run.device, url, "web"), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
+      log,
+    );
+    run.costUsd += result.costUsd;
+    if (!result.ok) log(`agent: ${result.summary.slice(0, 300)}`);
+  } finally {
+    const video = await browser.close();
+    if (video) run.video = video;
+  }
+  run.timeline = session.timeline();
+  run.webErrors = [...new Set(browser.errors)];
+  if (run.webErrors.length) log(`page errors: ${run.webErrors.length} (shown with the run; they do not fail it on their own)`);
+  return session;
+}
+
+async function runOnAndroid(project: Project, run: DeviceRun, options: HarnessOptions, log: (line: string) => void): Promise<DeviceSession> {
   let app = resolveApp(project);
-  if (!app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio → Settings → Project.");
+  if (!options.build && !app.package && !app.installTask) throw new Error("Probe could not find the app this project builds. Set it in Studio → Settings → Project.");
 
   const { device, info } = await pickDevice(project.root, project.config, options.device, log);
   run.device = `${info.serial} (${info.model})`;
   log(`device: ${run.device}`);
 
-  // An unknown package (id from secrets, never built) becomes known once the build has run.
   const install = options.install ?? "missing";
-  if (install === "always" || !app.package || !device.isInstalled(app.package)) {
-    const task = app.installTask;
-    if (!task) {
-      if (install === "always" && device.isInstalled(app.package!)) log(`No install task: testing the ${app.package} already installed, which may not be this code.`);
-      else throw new Error(`${app.package} is not installed on ${info.serial}. Set the install task in Studio → Settings → Project.`);
+  let pkg: string;
+  if (options.build) {
+    // A finished build: what is on the device must be exactly it, whatever the working tree holds.
+    const build = await resolveBuild(project, options.build, log);
+    run.build = build.tested;
+    throwIfStopped();
+    if (install !== "always" && alreadyInstalled(device, build)) {
+      pkg = build.tested.package!;
+      log(`build: ${build.tested.label}, already on the device`);
     } else {
-      const code = await project.adapter.installApp(project.root, task, info.serial, log);
-      app = resolveApp(project);
-      if (code !== 0) throw new Error(`Installing the app with ${task} failed (exit ${code}).`);
-      if (!app.package) throw new Error(`${task} succeeded but Probe cannot tell the app's id. Set it in Studio → Settings → Project.`);
-      if (!device.isInstalled(app.package)) throw new Error(`${task} finished but ${app.package} is not on ${info.serial}.`);
+      pkg = installBuild(project, device, build, log);
+      run.build = { ...build.tested, package: pkg, versionCode: build.tested.versionCode ?? device.versionCode(pkg) };
+      log(`build: ${run.build.label}`);
     }
+    log(`app: ${pkg}`);
+  } else {
+    // An unknown package (id from secrets, never built) becomes known once the build has run.
+    if (install === "always" || !app.package || !device.isInstalled(app.package)) {
+      const task = app.installTask;
+      if (!task) {
+        if (install === "always" && device.isInstalled(app.package!)) log(`No install task: testing the ${app.package} already installed, which may not be this code.`);
+        else throw new Error(`${app.package} is not installed on ${info.serial}. Set the install task in Studio → Settings → Project.`);
+      } else {
+        const code = await project.adapter.installApp(project.root, task, info.serial, log);
+        app = resolveApp(project);
+        if (code !== 0) throw new Error(`Installing the app with ${task} failed (exit ${code}).`);
+        if (!app.package) throw new Error(`${task} succeeded but Probe cannot tell the app's id. Set it in Studio → Settings → Project.`);
+        if (!device.isInstalled(app.package)) throw new Error(`${task} finished but ${app.package} is not on ${info.serial}.`);
+      }
+    }
+    pkg = app.package!;
+    log(`app: ${pkg}${app.packageSource === "probe.yaml" ? "" : ` (detected from the ${app.packageSource})`}`);
   }
-  const pkg = app.package!;
-  log(`app: ${pkg}${app.packageSource === "probe.yaml" ? "" : ` (detected from the ${app.packageSource})`}`);
 
   device.clearLogcat();
   device.stop(pkg);
@@ -75,12 +158,12 @@ export async function runOnDevice(project: Project, run: DeviceRun, options: Har
   device.resetFrameStats(pkg);
   throwIfStopped();
 
-  const session = new DeviceSession(createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: info.serial, appPackage: pkg }));
+  const session = new DeviceSession(createSession(project.store.dir, { id: run.id, projectRoot: project.root, serial: info.serial, appPackage: pkg, target: "android" }));
   const stopRecording = device.startRecording();
   try {
     const result = await runAgent(
       project,
-      { prompt: options.prompt(run.device, pkg), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
+      { prompt: options.prompt(run.device, pkg, "android"), probeTools: [...DEVICE_TOOLS, ...options.reportTools], builtinTools: [], model: options.model, mcpEnv: { PROBE_SESSION: run.id } },
       log,
     );
     run.costUsd += result.costUsd;

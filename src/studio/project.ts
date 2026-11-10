@@ -10,6 +10,7 @@ import { resolveApp } from "../engine/app.js";
 import { defaultBase, gitState, listBranches } from "../engine/history.js";
 import type { Project } from "../engine/project.js";
 import { existsSync } from "node:fs";
+import { playwrightStatus } from "../devices/web.js";
 
 /** Everything Studio's Project settings show: what Probe found, what is set, and where each value came from. */
 export function projectSettings(project: Project) {
@@ -100,15 +101,22 @@ export interface SetupItem {
 
 /** What a new project still needs before agents can test it, each with where to fix it. */
 export function setupChecklist(project: Project): SetupItem[] {
+  const web = project.config.web.url;
   const items: SetupItem[] = project.adapter.supportsDevices
     ? appAndDevice(project)
-    : [{ id: "device", label: "Device testing", status: "warn", detail: devicesUnsupported(project.adapter) }];
+    : web
+      ? []
+      : [{ id: "device", label: "Device testing", status: "warn", detail: `${devicesUnsupported(project.adapter)} To test a web app in a browser, set its address.`, action: { label: "Builds and web", tab: "settings" } }];
+  if (web) {
+    const pw = playwrightStatus(project.root);
+    items.push({ id: "web", label: "Web app", status: "ok", detail: `${web} · tested in Chromium${pw.installed && pw.browser ? "" : " (the first web run installs Playwright, about 150 MB)"}`, action: { label: "Builds and web", tab: "settings" } });
+  }
 
   // Test accounts are for agents logging into the app on a device.
   const secrets = new Secrets(project.store.dir);
   const accounts = listAccounts(project.root);
   const withPassword = accounts.filter((a) => secrets.has(a.role, "password"));
-  if (project.adapter.supportsDevices) items.push({
+  if (project.adapter.supportsDevices || web) items.push({
     id: "accounts",
     label: "Test account",
     status: withPassword.length ? "ok" : "warn",

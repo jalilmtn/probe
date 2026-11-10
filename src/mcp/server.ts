@@ -15,6 +15,7 @@ import { listCards, saveCards } from "../cards/store.js";
 import { listAccounts, Secrets } from "../accounts/accounts.js";
 import { startCardRun, summarizeCardRun } from "../cards/run.js";
 import { DeviceSession } from "../devices/session.js";
+import { WebDevice } from "../devices/web.js";
 import { formatUiTree } from "../devices/uitree.js";
 import { describeLogin, startLoginRun } from "../accounts/login.js";
 import { startExploreRun, summarizeExplore } from "../cards/explore.js";
@@ -26,6 +27,8 @@ import { ALL_LAYERS, dismissIssue, startSecurityRun, summarizeSecurity } from ".
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
 import { startVerify, summarizeVerify } from "../engine/verify.js";
 import { ticketDraft, ticketInfo } from "../tickets/tickets.js";
+import { inbox, inboxTicket, type InboxTicket } from "../tickets/inbox.js";
+import { parseBuildRef } from "../devices/builds.js";
 import { loadWatch, runningCheck, staleLabel, startCheck, summarizeCheckRun } from "../engine/watch.js";
 import { listDrafts } from "../knowledge/draft.js";
 import { checkManifest, loadManifest, summarizeCheck } from "../knowledge/manifest.js";
@@ -36,6 +39,12 @@ const projectDir = z
   .string()
   .optional()
   .describe("Project root. Defaults to the directory the session was opened in.");
+
+const target = z.enum(["android", "web"]).optional().describe("Where the cards run: the Android app or the web app in a browser. Default: the project's first.");
+const build = z
+  .string()
+  .optional()
+  .describe('A finished Android build to test instead of the working tree: "firebase" or "play" (the newest), "firebase:<build number>", "play:<version code>", or "file:<path to .apk/.aab>".');
 
 const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
 
@@ -286,10 +295,12 @@ export async function runMcpServer(version: string): Promise<void> {
     },
     async ({ screenshot }) => {
       const s = session();
-      const tree = formatUiTree(s.observe());
-      const shot = screenshot === false ? null : s.capture();
+      const tree = formatUiTree(await s.observe());
+      const shot = screenshot === false ? null : await s.capture();
       s.record("observe", `${tree.split("\n").length} elements`, shot?.name);
-      const content: ({ type: "text"; text: string } | { type: "image"; data: string; mimeType: string })[] = [{ type: "text", text: tree }];
+      // A web page says where it is: the address is part of what a person sees.
+      const where = s.device instanceof WebDevice ? `Page: ${await s.device.location()}\n` : "";
+      const content: ({ type: "text"; text: string } | { type: "image"; data: string; mimeType: string })[] = [{ type: "text", text: where + tree }];
       if (shot) content.push({ type: "image", data: shot.png.toString("base64"), mimeType: "image/png" });
       return { content };
     },
@@ -300,9 +311,10 @@ export async function runMcpServer(version: string): Promise<void> {
     {
       title: "Act on device",
       description:
-        "One action on the device: tap (element number from the last observe, or x/y), long_press, type (into the focused field), key (back/home/enter/tab/delete), swipe (up/down/left/right scrolls content), wait (ms, for loading), relaunch (restart the app).",
+        "One action on the device or browser page: tap (element number from the last observe, or x/y), long_press, type (into the focused field), key (back/home/enter/tab/delete), swipe (up/down/left/right scrolls content), wait (ms, for loading), relaunch (restart the app), open (web only: go to a path of the site under test, in url).",
       inputSchema: {
-        action: z.enum(["tap", "long_press", "type", "key", "swipe", "wait", "relaunch"]),
+        action: z.enum(["tap", "long_press", "type", "key", "swipe", "wait", "relaunch", "open"]),
+        url: z.string().optional().describe("For open: a path of the site under test, e.g. /settings."),
         element: z.number().int().optional(),
         x: z.number().optional(),
         y: z.number().optional(),
@@ -318,27 +330,27 @@ export async function runMcpServer(version: string): Promise<void> {
       let detail: string;
       switch (a.action) {
         case "tap":
-          detail = d.tap({ element: a.element, x: a.x, y: a.y }) + (a.element ? ` (element ${a.element})` : "");
+          detail = (await d.tap({ element: a.element, x: a.x, y: a.y })) + (a.element ? ` (element ${a.element})` : "");
           break;
         case "long_press": {
           if (a.x === undefined || a.y === undefined) return text("long_press needs x and y (use an element's centre from observe).");
-          d.longPress(a.x, a.y);
+          await d.longPress(a.x, a.y);
           detail = `long-pressed ${a.x},${a.y}`;
           break;
         }
         case "type":
           if (!a.text) return text("type needs text.");
-          d.type(a.text);
+          await d.type(a.text);
           detail = `typed "${a.text}"`;
           break;
         case "key":
           if (!a.key) return text("key needs key.");
-          d.key(a.key);
+          await d.key(a.key);
           detail = `pressed ${a.key}`;
           break;
         case "swipe":
           if (!a.direction) return text("swipe needs direction.");
-          d.swipe(a.direction);
+          await d.swipe(a.direction);
           detail = `swiped ${a.direction}`;
           break;
         case "wait":
@@ -346,10 +358,14 @@ export async function runMcpServer(version: string): Promise<void> {
           detail = `waited ${a.ms ?? 1_500}ms`;
           break;
         case "relaunch":
-          d.stop(s.info.appPackage);
-          d.launch(s.info.appPackage);
+          await d.relaunch(s.info.appPackage);
           await new Promise((r) => setTimeout(r, 3_000));
           detail = "relaunched the app";
+          break;
+        case "open":
+          if (!d.open) return text("open only works in a web run; on a device, navigate through the app.");
+          if (!a.url) return text("open needs url, a path of the site under test.");
+          detail = `opened ${await d.open(a.url)}`;
           break;
       }
       // Let the screen settle so the next observe sees the result.
@@ -372,7 +388,7 @@ export async function runMcpServer(version: string): Promise<void> {
       if (!listAccounts(project.root).some((a) => a.role === role)) return text(`No test account with role "${role}".`);
       const value = new Secrets(project.store.dir).get(role, secret);
       if (value === null) return text(`No ${secret} stored for ${role}. Report blocked: it is added in Probe Studio -> Accounts.`);
-      s.device.type(value);
+      await s.device.type(value);
       s.record("type_secret", `typed ${role}'s ${secret}`);
       return text(`Typed ${role}'s ${secret}. Observe to see the result.`);
     },
@@ -391,7 +407,7 @@ export async function runMcpServer(version: string): Promise<void> {
     },
     async (verdict) => {
       const s = session();
-      const shot = s.capture();
+      const shot = await s.capture();
       s.record("verdict", `${verdict.result}${verdict.notes ? `: ${verdict.notes}` : ""}`, shot?.name);
       s.saveVerdict(verdict);
       return text(`Verdict recorded: ${verdict.result}. You are done.`);
@@ -412,7 +428,7 @@ export async function runMcpServer(version: string): Promise<void> {
     },
     async (login) => {
       const s = session();
-      const shot = s.capture();
+      const shot = await s.capture();
       s.record("report", `login: ${login.state}${login.role ? ` as ${login.role}` : ""}`, shot?.name);
       s.saveReport("login", login);
       return text("Login state recorded. You are done.");
@@ -442,20 +458,22 @@ export async function runMcpServer(version: string): Promise<void> {
     {
       title: "Run a card on a device",
       description:
-        "Runs a feature card on an emulator (or an allowed phone) with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. Takes minutes per card.",
+        "Runs a feature card on an emulator (or an allowed phone), or on the web app in a browser, with a separate headless agent and waits: screenshots, timeline, screen recording and a verdict. Give feature + card for one card, or rule (feature/rule-id) to run every card that proves that rule and say whether it holds. With build, the card runs on that finished Android build instead of the working tree. Takes minutes per card.",
       inputSchema: {
         projectDir,
         feature: z.string().optional(),
         card: z.string().optional().describe("Card id"),
         rule: z.string().optional().describe("Run the cards behind this rule instead: feature/rule-id."),
         device: z.string().optional().describe("Device serial"),
+        target,
+        build,
       },
     },
-    async ({ projectDir: dir, feature, card, rule, device }) => {
+    async ({ projectDir: dir, feature, card, rule, device, target, build }) => {
       const project = openProject(dir);
       if (rule) return text(summarizeRuleRun(await runRuleCards(project, rule, { device })));
       if (!feature || !card) return text("Give feature and card, or a rule.");
-      const { done } = startCardRun(project, feature, card, { device });
+      const { done } = startCardRun(project, feature, card, { device, target, build: build ? parseBuildRef(build) : undefined });
       return text(summarizeCardRun(await done));
     },
   );
@@ -465,7 +483,7 @@ export async function runMcpServer(version: string): Promise<void> {
     {
       title: "Verify a change",
       description:
-        "Checks the current change end to end: maps files changed since the base branch (plus uncommitted work) to features, runs their unit tests, then reinstalls the app and runs their cards on an emulator. Waits; can take a long time. noDevice = unit tests only.",
+        "Checks the current change end to end: maps files changed since the base branch (plus uncommitted work) to features, runs their unit tests, then reinstalls the app and runs their cards on an emulator (or on the web app, target web). With build, the cards run on that finished Android build instead and unit tests are skipped; with ticket and build, that is a tester's check of a ticket on a build. Waits; can take a long time. noDevice = unit tests only.",
       inputSchema: {
         projectDir,
         base: z.string().optional().describe("Branch to compare with; default verify.base or develop/main."),
@@ -476,11 +494,34 @@ export async function runMcpServer(version: string): Promise<void> {
         maxCards: z.number().int().min(0).max(50).optional(),
         outdated: z.boolean().optional().describe("Instead of a diff: re-run only results (unit and cards) that are outdated or missing for this checkout."),
         rerunFresh: z.boolean().optional().describe("Also re-run cards whose recorded result still holds for this code (normally skipped)."),
+        target,
+        build,
       },
     },
-    async ({ projectDir: dir, ...options }) => {
-      const { done } = startVerify(openProject(dir), options);
+    async ({ projectDir: dir, build, ...options }) => {
+      const { done } = startVerify(openProject(dir), { ...options, build: build ? parseBuildRef(build) : undefined });
       return text(summarizeVerify(await done));
+    },
+  );
+
+  server.registerTool(
+    "probe_inbox",
+    {
+      title: "Tickets waiting for a test",
+      description:
+        "Lists the tickets from the project's tracker (Jira or Linear, connected in Studio → Settings) that match its inbox filter: id, title, status, who wrote it, the build it names and whether that build contains the ticket's commits, and the cards drafted from it. With ticket: that one ticket with its full text. Test one with probe_verify { ticket, build }.",
+      inputSchema: { projectDir, ticket: z.string().optional().describe("One ticket id, for its full text."), refresh: z.boolean().optional() },
+    },
+    async ({ projectDir: dir, ticket, refresh }) => {
+      const project = openProject(dir);
+      const line = (t: InboxTicket) =>
+        `${t.id} · ${t.status} · ${t.title}${t.author ? ` · by ${t.author}` : ""}${t.build ? ` · build ${t.build}${t.buildState ? ` (${t.buildState === "included" ? "contains the ticket's commits" : t.buildState === "missing" ? "does NOT contain the ticket's commits" : "no tag for it in this repository"})` : ""}` : ""} · ${t.commits} commits · cards: ${t.cards.join(", ") || "none"}${t.lastRun ? ` · last test ${t.lastRun.status}` : ""}`;
+      if (ticket) {
+        const t = await inboxTicket(project, ticket);
+        return text(`${line(t)}\n${t.url}\n\n${t.description || "(no description)"}`);
+      }
+      const tickets = await inbox(project, { refresh });
+      return text(tickets.length ? tickets.map(line).join("\n") : "No tickets match the inbox filter.");
     },
   );
 

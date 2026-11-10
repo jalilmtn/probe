@@ -1,9 +1,11 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { CardVerdict, TimelineEntry } from "../core/types.js";
+import type { CardVerdict, RunTarget, TimelineEntry } from "../core/types.js";
 import { Adb } from "./adb.js";
 import { AndroidDevice } from "./android.js";
+import type { Driver } from "./driver.js";
 import type { UiElement } from "./uitree.js";
+import { WebDevice } from "./web.js";
 
 /**
  * One agent's hold on one device for one run. The engine creates it; the MCP server (a
@@ -13,9 +15,15 @@ import type { UiElement } from "./uitree.js";
 export interface SessionInfo {
   id: string;
   projectRoot: string;
+  /** Android: the device's serial. Web: the browser's name. */
   serial: string;
+  /** Android: the application id. Web: the address the app runs at. */
   appPackage: string;
   evidenceDir: string;
+  /** Absent in sessions from before web testing: those are Android. */
+  target?: RunTarget;
+  /** Web: where the run's browser listens for the device tools. */
+  endpoint?: string;
 }
 
 export function sessionFile(storeDir: string, id: string): string {
@@ -31,11 +39,11 @@ export function createSession(storeDir: string, info: Omit<SessionInfo, "evidenc
 }
 
 export class DeviceSession {
-  readonly device: AndroidDevice;
+  readonly device: Driver;
   private step = 0;
 
   constructor(readonly info: SessionInfo) {
-    this.device = new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
+    this.device = info.target === "web" ? new WebDevice(info.projectRoot, info.endpoint ?? "", info.appPackage) : new AndroidDevice(Adb.forProject(info.projectRoot), info.serial);
     this.step = this.timeline().length;
     const tree = join(info.evidenceDir, "last-tree.json");
     if (existsSync(tree)) this.device.lastTree = JSON.parse(readFileSync(tree, "utf8")) as UiElement[];
@@ -45,8 +53,8 @@ export class DeviceSession {
    * Dumps the screen's elements and keeps them in the run folder: the MCP server handles every
    * tool call on a fresh session, so an element number from observe must survive until act.
    */
-  observe(): UiElement[] {
-    const elements = this.device.uiTree();
+  async observe(): Promise<UiElement[]> {
+    const elements = await this.device.uiTree();
     writeFileSync(join(this.info.evidenceDir, "last-tree.json"), JSON.stringify(elements));
     return elements;
   }
@@ -58,8 +66,8 @@ export class DeviceSession {
   }
 
   /** Saves a screenshot as the next step's evidence and returns it. */
-  capture(): { png: Buffer; name: string } | null {
-    const png = this.device.screenshot();
+  async capture(): Promise<{ png: Buffer; name: string } | null> {
+    const png = await this.device.screenshot();
     if (!png) return null;
     const name = `step-${String(this.step + 1).padStart(3, "0")}.png`;
     writeFileSync(join(this.info.evidenceDir, name), png);

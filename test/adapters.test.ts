@@ -197,7 +197,8 @@ describe("generic adapter", () => {
     const run = { id: "r", kind: "card", feature: "engine", startedAt: "", status: "running", cardId: "c", device: "", crashes: [], timeline: [], costUsd: 0 } as DeviceRun;
     await assert.rejects(
       runOnDevice(project, run, { prompt: () => "", reportTools: [] }, () => {}),
-      (e: Error) => e.message === devicesUnsupported(genericAdapter),
+      // The message now also says how to test a web app instead.
+      (e: Error) => e.message.startsWith(devicesUnsupported(genericAdapter)) && /web app/.test(e.message),
     );
     await assert.rejects(genericAdapter.installApp(root, "x", "y", () => {}), /not available/);
     assert.equal(genericAdapter.detectApp(root), null);

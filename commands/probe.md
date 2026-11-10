@@ -1,6 +1,6 @@
 ---
 description: Probe — test GUI, app health, unit tests, cards on a device, verify a change
-argument-hint: "[init [status|yes|step <id>] | studio | check [features] | stale | manifest <feature> | rules <feature> | rule <feature/rule> [run] | doctor | scan | feature <id> | unit <feature> | write-tests <feature> | cards [feature] | backfill <feature> | run <feature> <card> | explore <feature> | login [role] | verify [--no-device] | ticket <id> | security [feature] [agent]]"
+argument-hint: "[init [status|yes|step <id>] | studio | check [features] | stale | manifest <feature> | rules <feature> | rule <feature/rule> [run] | doctor | scan | feature <id> | unit <feature> | write-tests <feature> | cards [feature] | backfill <feature> | run <feature> <card> | explore <feature> | login [role] | verify [--no-device] | ticket <id> | inbox | security [feature] [agent]]"
 ---
 
 Use the Probe MCP tools for this request. Always pass `projectDir` as the current working directory.
@@ -21,6 +21,7 @@ Arguments: `$ARGUMENTS`
 - `login [role]` → call `probe_login_check` and say who the app is logged in as.
 - `verify [--no-device] [--base <branch>]` → call `probe_verify`, then report per feature: unit result and each card's verdict, perf warnings, features with no approved cards (not checked on a device), and run ids.
 - `ticket <id>` → call `probe_ticket` with the ticket, then offer `probe_verify` with that ticket.
+- `inbox` → call `probe_inbox`, and list the tickets waiting for a test with their build and cards. To test one on a build: `probe_verify` with `ticket` and `build`.
 - `issues <run>` → call `probe_issues` and list the problems with their ids.
 - `check [features]` → call `probe_check` (features as a list when given), then report per feature: unit result with failing tests, broken manifest links, and any drafted correction (tell the user to review it in Studio).
 - `stale` → call `probe_stale` and list the edited features, their files and the drafts waiting for review.

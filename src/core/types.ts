@@ -171,9 +171,38 @@ export interface PerfReport {
   issues: string[];
 }
 
+/** What an agent drives: the Android app on an emulator or phone, or the web app in a browser. */
+export type RunTarget = "android" | "web";
+
+/** Where a finished build comes from, when a run tests one instead of the working tree. */
+export type BuildSource = "file" | "firebase" | "play";
+
+/** The build a run was asked to test. */
+export interface BuildRef {
+  source: BuildSource;
+  /** `file`: the .apk or .aab path. `firebase` and `play`: a build number or version; empty means the newest. */
+  value?: string;
+}
+
+/** The build a run did test, as found: which one, and where it came from. */
+export interface TestedBuild {
+  source: BuildSource;
+  /** One line a person recognises it by: "Firebase 1.4.2 (142)". */
+  label: string;
+  versionCode?: string;
+  versionName?: string;
+  package?: string;
+}
+
 /** What every agent-on-device run records, whatever it was asked to do. */
 interface DeviceRunFields {
   device: string;
+  /** Absent on runs from before web testing: those were Android. */
+  target?: RunTarget;
+  /** The finished build the run tested; absent when it tested the working tree. */
+  build?: TestedBuild;
+  /** Web runs: uncaught page errors, console errors and failed requests seen during the run. */
+  webErrors?: string[];
   crashes: string[];
   timeline: TimelineEntry[];
   /** Screen recording file name inside the evidence folder, when one was captured. */
@@ -256,6 +285,11 @@ export interface VerifyRun extends BaseRun {
   unowned: string[];
   features: VerifyFeature[];
   device: boolean;
+  /** The ticket this verify was for. */
+  ticket?: string;
+  target?: RunTarget;
+  /** The finished build its cards ran on; absent when they ran on the working tree. */
+  build?: TestedBuild;
   costUsd: number;
 }
 

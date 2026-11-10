@@ -1,4 +1,5 @@
 import { Adb, shQuote } from "./adb.js";
+import type { Driver } from "./driver.js";
 import { parseUiTree, type UiElement } from "./uitree.js";
 
 export interface DeviceInfo {
@@ -34,7 +35,7 @@ export function listDevices(adb: Adb): DeviceInfo[] {
 }
 
 /** Everything Probe does to one Android device. Stateless apart from the last UI dump. */
-export class AndroidDevice {
+export class AndroidDevice implements Driver {
   /** What element numbers in tap refer to. A session restores it, since each tool call is a new device. */
   lastTree: UiElement[] = [];
 
@@ -104,8 +105,37 @@ export class AndroidDevice {
     return this.shell(`pm path ${pkg}`).out.includes("package:");
   }
 
+  /** Every installed application id. */
+  packages(): string[] {
+    return this.shell("pm list packages", 30_000)
+      .out.split("\n")
+      .map((l) => l.trim().replace(/^package:/, ""))
+      .filter(Boolean);
+  }
+
+  /** The installed copy's version code, or undefined when the app is not installed. */
+  versionCode(pkg: string): string | undefined {
+    return /versionCode=(\d+)/.exec(this.shell(`dumpsys package ${pkg}`, 20_000).out)?.[1];
+  }
+
+  /** Installs an APK over what is there, allowing an older version. `out` is adb's own message. */
+  install(file: string): { ok: boolean; out: string } {
+    const r = this.adb.run(["-s", this.serial, "install", "-r", "-d", file], 5 * 60_000);
+    const out = `${r.out}\n${r.err}`.trim();
+    return { ok: r.ok && /Success/.test(out), out };
+  }
+
+  uninstall(pkg: string): void {
+    this.adb.run(["-s", this.serial, "uninstall", pkg], 60_000);
+  }
+
   launch(pkg: string): void {
     this.shell(`monkey -p ${pkg} -c android.intent.category.LAUNCHER 1`);
+  }
+
+  relaunch(pkg: string): void {
+    this.stop(pkg);
+    this.launch(pkg);
   }
 
   /**

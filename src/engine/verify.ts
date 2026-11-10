@@ -3,7 +3,8 @@ import { startCardRun } from "../cards/run.js";
 import { listCards } from "../cards/store.js";
 import { throwIfStopped } from "../core/proc.js";
 import { newRunId } from "../core/store.js";
-import type { Card, RunStatus, ScanResult, VerifyFeature, VerifyRun } from "../core/types.js";
+import type { BuildRef, Card, RunStatus, RunTarget, ScanResult, VerifyFeature, VerifyRun } from "../core/types.js";
+import { runTargets } from "../devices/driver.js";
 import { changedFiles, commitsForTicket, defaultBase, filesOfCommit } from "./history.js";
 import { resultsOverview } from "./ledger.js";
 import type { Project } from "./project.js";
@@ -19,6 +20,8 @@ export interface VerifyOptions {
   ticket?: string;
   /** Unit tests only. */
   noDevice?: boolean;
+  /** Cards only: a tester checking the product, not the code. */
+  noUnit?: boolean;
   cards?: "approved" | "all";
   maxCards?: number;
   device?: string;
@@ -30,6 +33,18 @@ export interface VerifyOptions {
   outdated?: boolean;
   /** Also re-run cards whose result still holds for this code (normally skipped). */
   rerunFresh?: boolean;
+  /** Where cards run: the Android app or the web app. Unset: the project's first target. */
+  target?: RunTarget;
+  /**
+   * Run the cards on this finished build instead of the working tree (Android). Unit tests are
+   * skipped: they test the working tree, which is not what the build holds.
+   */
+  build?: BuildRef;
+}
+
+/** Whether a verify's cards test something other than the working tree: a finished build or the deployed site. */
+function testsOtherCode(project: Project, options: VerifyOptions): boolean {
+  return !!options.build || (options.target ?? runTargets(project)[0]) === "web";
 }
 
 /** Which feature owns each file: the module whose folder is the longest prefix of it. */
@@ -68,13 +83,20 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
   const base = options.base ?? defaultBase(project.root, project.config.verify.base);
   if (!base && !options.features?.length && !options.ticket && !options.outdated) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
 
-  // A project whose app cannot run on a device is verified by its unit tests alone.
-  const noDevice = options.noDevice || !project.adapter.supportsDevices;
+  // A project whose app cannot run on a device or in a browser is verified by its unit tests alone.
+  const noDevice = options.noDevice || runTargets(project).length === 0;
+  if (options.build && noDevice) throw new Error("Testing a build needs a device: this project has none to run it on.");
+  // A finished build or the deployed site is not the working tree: its unit tests and the
+  // results already recorded for this code say nothing about it.
+  const otherCode = !noDevice && testsOtherCode(project, options);
+  const noUnit = !!options.build || !!options.noUnit;
+  if (noUnit && noDevice) throw new Error("Nothing to run: no unit tests asked for, and nothing to run cards on.");
   const run: VerifyRun = {
     id: newRunId(),
     kind: "verify",
     feature: "*",
     base: options.outdated ? "outdated results" : options.ticket ? `ticket ${options.ticket}` : options.features?.length ? "selected features" : base!,
+    ticket: options.ticket,
     startedAt: new Date().toISOString(),
     status: "running",
     changed: [],
@@ -106,18 +128,20 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
         : changedFiles(project.root, base!);
       const owned = featuresOfFiles(project, result, run.changed);
       targets = owned.byFeature;
+      // A ticket nobody has committed for yet still has the cards drafted from it.
+      if (options.ticket) for (const c of listCards(project.root)) if (c.tickets.includes(options.ticket) && !targets.has(c.feature)) targets.set(c.feature, []);
       run.unowned = owned.unowned;
       log(`${run.changed.length} changed files${options.ticket ? ` in commits of ${options.ticket}` : ` since ${base}`} → ${targets.size} features${run.unowned.length ? `, ${run.unowned.length} files outside any module` : ""}`);
     }
     if (targets.size === 0) {
       if (options.outdated) log("every result is up to date");
-      else run.error = "The change touches no feature's code.";
+      else run.error = options.ticket ? `No commit names ${options.ticket} and no card was drafted from it. Draft its cards first.` : "The change touches no feature's code.";
       return;
     }
     const known = new Set(result.features.map((f) => f.id));
     run.features = [...targets.entries()].filter(([id]) => known.has(id)).map(([feature, files]) => ({ feature, files, cards: [] }));
 
-    for (const f of run.features) {
+    for (const f of noUnit ? [] : run.features) {
       throwIfStopped();
       if (options.outdated && overview.unit.get(f.feature)?.state === "fresh") {
         const e = overview.unit.get(f.feature)!.entry!;
@@ -153,7 +177,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
           throwIfStopped();
           // A result on exactly this code and card would only repeat itself.
           const known = overview.cards.get(`${f.feature}/${card.id}`);
-          if (known?.state === "fresh" && !options.rerunFresh) {
+          if (known?.state === "fresh" && !options.rerunFresh && !otherCode) {
             const e = known.entry!;
             f.cards.push({ cardId: card.id, runId: e.run, status: e.result === "passed" ? "skipped" : e.result, note: `${e.result} on this same code (${e.by ?? "run"} ${e.at.slice(0, 10)}); not re-run` });
             log(`${f.feature}/${card.id}: ${e.result}, up to date — skipped`);
@@ -166,19 +190,26 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
           budget--;
           log(`── device: ${f.feature}/${card.id}`);
           // The first card reinstalls from this code; the rest test the same build.
-          const { run: child, done } = startCardRun(project, f.feature, card.id, { device: options.device, model: options.model, reinstall: first, parent: run.id });
+          const { run: child, done } = startCardRun(project, f.feature, card.id, { device: options.device, model: options.model, target: options.target, build: options.build, reinstall: first, parent: run.id });
           first = false;
           const finished = await done;
           run.costUsd += finished.costUsd;
+          run.target = finished.target ?? run.target;
+          run.build = finished.build ?? run.build;
           f.cards.push({ cardId: card.id, runId: child.id, status: finished.status, note: finished.error ?? finished.verdict?.notes?.slice(0, 200) });
           log(`${f.feature}/${card.id}: ${finished.status}`);
           // A build that does not install will not install for the next card either.
-          if (finished.status === "error" && /Installing/.test(finished.error ?? "")) budget = 0;
+          if (finished.status === "error" && /Installing|did not open/.test(finished.error ?? "")) budget = 0;
         }
       }
     }
 
     run.status = overall(run.features);
+    // Without unit tests, a verify in which no card ran has checked nothing.
+    if (noUnit && !run.features.some((f) => f.cards.some((c) => c.runId))) {
+      run.status = "blocked";
+      run.error = `No card ran: ${which === "approved" ? "these features have no approved cards" : "these features have no cards"}. Draft ${which === "approved" ? "and approve " : ""}cards first.`;
+    }
   });
 }
 
@@ -192,6 +223,8 @@ function overall(features: VerifyFeature[]): RunStatus {
 
 export function summarizeVerify(run: VerifyRun): string {
   const lines = [`Verify ${run.id} · vs ${run.base} · ${run.status.toUpperCase()} · ${run.features.length} features · ${run.changed.length} changed files · $${run.costUsd.toFixed(2)}`];
+  if (run.build) lines.push(`  build: ${run.build.label}`);
+  else if (run.target === "web") lines.push("  cards ran on the web app");
   if (run.error) lines.push(run.error);
   for (const f of run.features) {
     lines.push(`  ${f.feature}: unit ${f.unitStatus ?? "—"}${f.unitRun ? ` (${f.unitRun})` : ""} · ${f.files.length} files`);

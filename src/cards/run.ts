@@ -1,16 +1,16 @@
 import { stringify } from "yaml";
 import { accountsForPrompt } from "../accounts/accounts.js";
 import { newRunId } from "../core/store.js";
-import type { Card, CardRun } from "../core/types.js";
-import { crashError, DEVICE_HOW_TO, runOnDevice } from "../devices/harness.js";
+import type { BuildRef, Card, CardRun, RunTarget } from "../core/types.js";
+import { appOn, crashError, howTo, runOnDevice } from "../devices/harness.js";
 import type { Project } from "../engine/project.js";
 import { cardFingerprint, recordCardResult } from "../engine/ledger.js";
 import { launchRun } from "../engine/runs.js";
 import { latestScan } from "../engine/scan.js";
 import { listCards, recordDeviceRun } from "./store.js";
 
-function prompt(project: Project, card: Card, device: string, pkg: string): string {
-  return `You are a QA tester. Test this feature card on an Android device (${device}) running the app ${pkg}. The app has just been launched.
+function prompt(project: Project, card: Card, device: string, app: string, target: RunTarget): string {
+  return `You are a QA tester. Test this feature card on ${appOn(target, device, app)}. The app has just been ${target === "web" ? "opened" : "launched"}.
 
 ## Card
 \`\`\`yaml
@@ -19,9 +19,9 @@ ${stringify({ title: card.title, summary: card.summary, reach: card.reach, preco
 ## Test accounts
 ${accountsForPrompt(project)}
 
-${DEVICE_HOW_TO}
+${howTo(target)}
 
-Follow the card's reach, preconditions and steps, then check every expectation on the device.
+Follow the card's reach, preconditions and steps, then check every expectation ${target === "web" ? "in the browser" : "on the device"}.
 If the app is logged in with an account that is not a test account, or you cannot log in, the result is blocked.
 
 ## Finish
@@ -31,6 +31,10 @@ Call probe_card_verdict exactly once: result passed (every expectation met), fai
 export interface CardRunOptions {
   device?: string;
   model?: string;
+  /** Android or web; unset means the project's first target. */
+  target?: RunTarget;
+  /** A finished build to test instead of the working tree (Android). */
+  build?: BuildRef;
   /** Reinstall from the current code first (verify does this for its first card). */
   reinstall?: boolean;
   /** The verify run this card run belongs to. */
@@ -65,7 +69,8 @@ export function startCardRun(project: Project, feature: string, cardId: string, 
     const session = await runOnDevice(
       project,
       run,
-      { device: options.device, model: options.model, install: options.reinstall ? "always" : "missing", prompt: (d, pkg) => prompt(project, card, d, pkg), reportTools: ["probe_card_verdict"] },
+      // Two files can carry the same version, so a file is installed again unless a verify already did.
+      { device: options.device, model: options.model, target: options.target, build: options.build, install: options.reinstall || (options.build?.source === "file" && !options.parent) ? "always" : "missing", prompt: (d, app, target) => prompt(project, card, d, app, target), reportTools: ["probe_card_verdict"] },
       log,
     );
     run.verdict = session.verdict() ?? undefined;
@@ -82,7 +87,9 @@ export function startCardRun(project: Project, feature: string, cardId: string, 
       if (run.status === "passed") recordDeviceRun(project.root, feature, cardId, run.id);
     }
     log(`verdict: ${run.status}${run.verdict?.notes ? ` · ${run.verdict.notes}` : ""}`);
-    recordCardResult(project, run, fingerprint);
+    // The ledger says what holds for the code in the working tree. A finished build or a deployed
+    // site is other code, so its result stays with the run (and the ticket), not in the ledger.
+    if (!run.build && run.target !== "web") recordCardResult(project, run, fingerprint);
   });
 }
 
@@ -93,6 +100,8 @@ export function summarizeCardRun(run: CardRun): string {
   if (run.verdict?.notes) lines.push(`  notes: ${run.verdict.notes}`);
   if (run.perf) lines.push(`  perf: ${formatPerf(run.perf)}`);
   for (const issue of run.perf?.issues ?? []) lines.push(`  ⚠ ${issue}`);
+  if (run.build) lines.push(`  build: ${run.build.label}`);
+  for (const e of (run.webErrors ?? []).slice(0, 10)) lines.push(`  page: ${e}`);
   for (const c of run.crashes) lines.push(`  crash:\n${c}`);
   return lines.join("\n");
 }

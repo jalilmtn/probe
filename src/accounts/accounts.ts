@@ -73,19 +73,38 @@ export class Secrets {
   }
 
   has(role: string, kind: SecretKind): boolean {
-    return `${role}.${kind}` in this.load();
+    return this.hasKey(`${role}.${kind}`);
   }
 
   get(role: string, kind: SecretKind): string | null {
-    const sealed = this.load()[`${role}.${kind}`];
-    return sealed === undefined ? null : unseal(sealed);
+    return this.getKey(`${role}.${kind}`);
   }
 
   set(role: string, kind: SecretKind, value: string): void {
+    this.setKey(`${role}.${kind}`, value);
+  }
+
+  /** Secrets that are not a test account's, such as a ticket tracker's API token, by name. */
+  hasKey(name: string): boolean {
+    return name in this.load();
+  }
+
+  getKey(name: string): string | null {
+    const sealed = this.load()[name];
+    return sealed === undefined ? null : unseal(sealed);
+  }
+
+  setKey(name: string, value: string): void {
     const all = this.load();
-    all[`${role}.${kind}`] = seal(value);
+    all[name] = seal(value);
     writeFileSync(this.file, JSON.stringify(all, null, 2));
     if (!isWindows) chmodSync(this.file, 0o600);
+  }
+
+  removeKey(name: string): void {
+    const all = this.load();
+    delete all[name];
+    writeFileSync(this.file, JSON.stringify(all, null, 2));
   }
 
   /** Forgets every secret of a role. */

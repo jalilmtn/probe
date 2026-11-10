@@ -86,6 +86,7 @@
   .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
   .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
   .empty { padding: 30px; text-align: center; color: var(--muted); }
+  .desc { white-space: pre-wrap; max-height: 280px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
   .row { display: flex; gap: 12px; align-items: center; }
   .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }
   .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }
@@ -198,6 +199,7 @@
     <button data-tab="atlas" class="active">Atlas</button>
     <button data-tab="cards">Cards</button>
     <button data-tab="verify">Verify</button>
+    <button data-tab="tickets">Tickets</button>
     <button data-tab="security">Security</button>
     <button data-tab="runs">Runs</button>
     <button data-tab="settings">Settings</button>
@@ -255,7 +257,7 @@ document.getElementById("proj").addEventListener("change", async (e) => {
   if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }
   // Everything on the page belonged to the old project.
   closeStream();
-  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, jobs: [] });
+  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, tickets: null, jobs: [] });
   history.replaceState(null, "", "#atlas");
   document.getElementById("banner").innerHTML = "";
   await loadProjects();
@@ -275,6 +277,7 @@ async function render() {
   else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());
   else if (state.tab === "cards") await renderCards();
   else if (state.tab === "verify") await renderVerify();
+  else if (state.tab === "tickets") await renderTickets();
   else if (state.tab === "security") await renderSecurity();
   else if (state.tab === "runs") await renderRuns();
   else if (state.tab === "settings") await renderSettings();
@@ -284,12 +287,12 @@ async function render() {
 // ── Where the page is, in the address, so a reopened tab comes back to it ──
 
 function saveRoute() {
-  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : null;
+  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : state.tab === "tickets" ? state.tickets?.selected : null;
   history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));
 }
 
 function loadRoute() {
-  const m = /^#(atlas|cards|verify|security|runs|settings|setup)(?:\/(.+))?$/.exec(location.hash);
+  const m = /^#(atlas|cards|verify|tickets|security|runs|settings|setup)(?:\/(.+))?$/.exec(location.hash);
   if (!m) return false;
   goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });
   return true;
@@ -299,6 +302,7 @@ function goTo(route) {
   state.tab = route.tab;
   state.feature = route.tab === "atlas" ? route.feature || null : null;
   if (route.tab === "runs") runsState().selected = route.feature || null;
+  if (route.tab === "tickets" && route.feature) ticketsState().selected = route.feature;
   if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };
 }
 
@@ -332,9 +336,11 @@ function routeOf(j) {
     if (arg === "outdated") return { tab: "atlas" };
     if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };
     if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };
+    // A ticket's test has a button on Verify and one on its ticket in Tickets.
+    if (arg.startsWith("ticket:") && state.tab !== "verify") return { tab: "tickets", feature: arg.slice(7) };
     return { tab: "verify" };
   }
-  if (kind === "backfill" && arg.startsWith("ticket:")) return { tab: "verify" };
+  if (kind === "backfill" && arg.startsWith("ticket:")) return state.tab === "verify" ? { tab: "verify" } : { tab: "tickets", feature: arg.slice(7) };
   if (kind === "backfill" && j.feature === "*") return { tab: "cards" };
   if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };
   // The Runs tab opens the run itself beside the list.
@@ -345,6 +351,7 @@ function onRoute(route) {
   if (route.tab !== state.tab) return false;
   if (route.tab === "atlas") return (route.feature || null) === state.feature;
   if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;
+  if (route.tab === "tickets") return !route.feature || route.feature === state.tickets?.selected;
   return true;
 }
 
@@ -955,7 +962,9 @@ function perfBlock(p) {
 function evidence(run) {
   const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;
   const shots = run.timeline.filter((t) => t.screenshot);
-  return `<p>${esc(run.device)} · ${run.timeline.length} steps · $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +
+  const pageErrors = run.webErrors || [];
+  return `<p>${esc(run.device)}${run.build ? ` · build <strong>${esc(run.build.label)}</strong>` : ""} · ${run.timeline.length} steps · $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +
+    (pageErrors.length ? `<details style="margin:8px 0"><summary style="color:var(--warn)">${pageErrors.length} page error${pageErrors.length === 1 ? "" : "s"} during the run (console, failed requests)</summary><pre class="log">${pageErrors.map(esc).join("\n")}</pre></details>` : "") +
     run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +
     (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +
     (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} · ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +
@@ -990,7 +999,7 @@ function resultsTable(run) {
   const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";
   if (run.kind === "verify") {
     const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);
-    return err + `<p>vs <strong>${esc(run.base)}</strong> · ${run.changed.length} changed files · ${run.features.length} features · ${run.device ? "unit + device" : "unit only"} · $${run.costUsd.toFixed(2)}</p>
+    return err + `<p>vs <strong>${esc(run.base)}</strong> · ${run.changed.length} changed files · ${run.features.length} features · ${!run.device ? "unit only" : run.features.some((f) => f.unitStatus) ? "unit + device" : "cards only"}${run.build ? ` · build <strong>${esc(run.build.label)}</strong>` : run.target === "web" ? " · cards on the web app" : ""} · $${run.costUsd.toFixed(2)}</p>
       <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>
       ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>
         <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "—"}</td>
@@ -1388,7 +1397,7 @@ async function renderSecurity() {
 async function renderVerify() {
   if (!state.verify) state.verify = { base: "" };
   $view.innerHTML = `<div class="empty">Reading the change…</div>`;
-  const [ch, br] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches")]);
+  const [ch, br, options] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches"), api("/api/test-options")]);
   const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";
   $view.innerHTML = `
     <div class="box"><h3>Verify this change</h3>
@@ -1400,6 +1409,7 @@ async function renderVerify() {
         <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>
         <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>
         <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>
+        ${options.length > 1 ? targetPicker(options, state.verify.against) : ""}
         <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying…" ${ch.features.length ? "" : "disabled"}>✓ Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>
         <button class="btn secondary" type="button" id="vrefresh">Refresh</button>
       </form>
@@ -1424,9 +1434,12 @@ async function renderVerify() {
   const vf = document.getElementById("vf");
   document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });
   vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });
+  bindTargetPicker(vf, options, (v) => { state.verify.against = v; });
   vf.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined });
+    const against = vf.noDevice.checked ? {} : readTarget(vf, options);
+    if (against.error) return alert(against.error);
+    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined, ...against });
     if (res.error) return alert(res.error);
     followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
   });
@@ -1451,6 +1464,235 @@ async function renderVerify() {
     const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });
     if (res.error) return alert(res.error);
     followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });
+  });
+}
+
+// ── What a test runs against: this code, a finished build, or the web app ──
+
+/** The picker's fields, for a form.inline. `options` comes from /api/test-options. */
+function targetPicker(options, chosen, build) {
+  if (!options.length) return `<span class="muted" style="flex:1 1 100%">Nothing to run cards on yet: this project builds no Android app. To test a web app, set its address in Settings → Builds and web.</span>`;
+  const pick = options.find((o) => o.id === chosen && !o.missing) || options.find((o) => !o.missing);
+  return `<label>Test against<select name="against">${options.map((o) => `<option value="${esc(o.id)}" ${o.missing ? "disabled" : ""} ${pick && o.id === pick.id ? "selected" : ""}>${esc(o.label)}${o.missing ? " — " + esc(o.missing) : ""}</option>`).join("")}</select></label>
+    <label class="buildwrap" style="display:none">Build<input name="build" list="buildlist" value="${esc(build || "")}" autocomplete="off" style="width:240px"><datalist id="buildlist"></datalist></label>`;
+}
+
+function bindTargetPicker(form, options, onChange) {
+  if (!form.against) return;
+  const sync = async () => {
+    const o = options.find((x) => x.id === form.against.value);
+    form.querySelector(".buildwrap").style.display = o && o.source ? "" : "none";
+    form.build.placeholder = o && o.source === "file" ? "path to the .apk or .aab" : "newest, or a build number";
+    const list = form.querySelector("datalist");
+    list.innerHTML = "";
+    if (o && (o.source === "firebase" || o.source === "play")) {
+      const builds = await api("/api/builds?source=" + o.source).catch(() => null);
+      if (Array.isArray(builds)) list.innerHTML = builds.map((b) => `<option value="${esc(b.value)}">${esc(b.label)}</option>`).join("");
+      else if (builds && builds.error) form.build.title = builds.error;
+    }
+  };
+  form.against.addEventListener("change", () => { onChange && onChange(form.against.value); sync(); });
+  sync();
+}
+
+/** What the picker says, as a run's options. An error string when a build file is needed and none is given. */
+function readTarget(form, options) {
+  const o = form.against && options.find((x) => x.id === form.against.value);
+  if (!o) return {};
+  const value = form.build.value.trim();
+  if (o.source === "file" && !value) return { error: "Give the path of the .apk or .aab to test." };
+  return { target: o.target, build: o.source ? { source: o.source, value: value || undefined } : undefined };
+}
+
+// ── Tickets: the tracker's tickets waiting for a test ──
+
+function ticketsState() {
+  return state.tickets || (state.tickets = { selected: null, against: null, refresh: false, q: "" });
+}
+
+const BUILD_STATE = {
+  included: ["passed", "contains the ticket's commits"],
+  missing: ["failed", "does not contain the ticket's commits"],
+  unknown: ["unknown", "cannot tell: no git tag for this build, or no commit names the ticket"],
+};
+
+function ticketDetail(t, options, st) {
+  const bs = t.build && t.buildState ? BUILD_STATE[t.buildState] : null;
+  const canTest = t.cards.length > 0;
+  return `<h2 style="margin-top:0"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>
+    <p class="muted" style="margin-top:0">${esc(t.status)}${t.author ? ` · written by ${esc(t.author)}` : ""}${t.assignee ? ` · assigned to ${esc(t.assignee)}` : ""} · updated ${ago(t.updatedAt)}${t.labels.length ? ` · ${t.labels.map(esc).join(", ")}` : ""}</p>
+    <p>${t.build ? `Build <strong class="mono">${esc(t.build)}</strong> ${bs ? `<span class="pill ${bs[0]}" title="${t.buildTag ? "git tag " + esc(t.buildTag) : ""}">${bs[1]}</span>` : ""}` : `<span class="muted">The ticket names no build.</span>`}</p>
+    <div class="desc">${esc(t.description) || `<span class="muted">No description.</span>`}</div>
+    <p>${t.commits} commit${t.commits === 1 ? "" : "s"} name it · features: ${t.features.map(esc).join(", ") || `<span class="muted">none yet</span>`} · cards: ${t.cards.map((c) => `<span class="mono">${esc(c)}</span>`).join(", ") || `<span class="muted">none yet</span>`}</p>
+    <form class="inline" id="tkf">
+      ${targetPicker(options, st.against, t.build)}
+      <button class="btn" type="submit" data-job="verify:ticket:${esc(t.id)}" data-busy="Testing…" ${canTest && options.length ? "" : "disabled"} title="${canTest ? "An agent runs this ticket's cards, then the cards of the features it touched" : "Draft cards from the ticket first"}">▶ Test this ticket</button>
+      ${t.features.length ? "" : `<label>Feature it belongs to<input name="features" placeholder="checkout" style="width:160px" title="No commit names the ticket yet, so Probe cannot tell which feature it is about"></label>`}
+      <button class="btn secondary" type="button" id="tkcards" data-job="backfill:ticket:${esc(t.id)}" data-busy="Drafting…" title="An agent reads the ticket and the code, and drafts the cards that check it">✦ Draft cards from the ticket</button>
+    </form>
+    ${t.lastRun ? `<div class="row" style="margin-top:12px;flex-wrap:wrap">Last test <span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span> <span class="muted">${ago(t.lastRun.at)}</span>
+      <button class="btn secondary" type="button" id="tkshow">Show</button>
+      <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}
+    <div id="tkpostpanel"></div>
+    <div id="runpanel" style="margin-top:12px"></div>`;
+}
+
+async function renderTickets() {
+  const st = ticketsState();
+  $view.innerHTML = `<div class="empty">Reading tickets…</div>`;
+  const [box, options] = await Promise.all([api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options")]);
+  st.refresh = false;
+  if (!box.connected) {
+    $view.innerHTML = `<div class="box"><h3>Tickets to test</h3>
+      <p style="margin-top:0">Connect Jira or Linear, and the tickets waiting for a test show up here: who wrote each one, the build it names, and a button to test it.</p>
+      <p class="muted">${esc(box.missing)}</p>
+      <button class="btn" id="tkconnect">Connect a ticket tracker</button></div>`;
+    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.scrollTo = "trackerbox"; render(); });
+    return;
+  }
+  const tickets = box.tickets;
+  if (!tickets.some((t) => t.id === st.selected)) st.selected = tickets[0] ? tickets[0].id : null;
+  const sel = tickets.find((t) => t.id === st.selected);
+  const name = box.tracker === "jira" ? "Jira" : "Linear";
+  $view.innerHTML = `
+    <div class="box"><div class="row" style="flex-wrap:wrap"><strong>Tickets to test</strong>
+      <span class="muted">${name} · ${box.filter ? esc(box.filter) : "default filter"} · ${tickets.length} ticket${tickets.length === 1 ? "" : "s"}</span><span style="flex:1"></span>
+      <button class="btn secondary" id="tkrefresh">Refresh</button></div>
+      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}</div>
+    ${tickets.length ? `<div class="split">
+      <div class="side"><div class="head"><input type="search" id="tkq" placeholder="Find a ticket…" value="${esc(st.q)}"></div>
+        <ul id="tklist">${tickets.map((t) => `<li data-t="${esc(t.id)}" class="${t.id === st.selected ? "active" : ""}" title="${esc(t.title)}"><span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>${t.lastRun ? `<span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span>` : t.cards.length ? `<span class="n">${t.cards.length} card${t.cards.length === 1 ? "" : "s"}</span>` : ""}</li>`).join("")}</ul></div>
+      <div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : ""}</div></div>`
+      : box.error ? "" : `<div class="empty">No ticket matches the filter. Change it in Settings → Ticket tracker.</div>`}`;
+  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; renderTickets(); });
+  if (!tickets.length) return;
+  const filterList = () => {
+    const v = st.q.toLowerCase();
+    document.querySelectorAll("#tklist li").forEach((li) => { li.style.display = !v || (li.dataset.t + " " + li.title).toLowerCase().includes(v) ? "" : "none"; });
+  };
+  document.getElementById("tkq").addEventListener("input", (e) => { st.q = e.target.value; filterList(); });
+  filterList();
+  document.querySelectorAll("#tklist li").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; render(); }));
+  if (!sel) return;
+
+  const form = document.getElementById("tkf");
+  const panel = document.getElementById("runpanel");
+  const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };
+  bindTargetPicker(form, options, (v) => { st.against = v; });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const against = readTarget(form, options);
+    if (against.error) return alert(against.error);
+    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test`, against);
+    if (res.error) return alert(res.error);
+    followRun(res.runId, panel, done);
+  });
+  document.getElementById("tkcards").addEventListener("click", async () => {
+    const features = form.features ? form.features.value.split(",").map((x) => x.trim()).filter(Boolean) : [];
+    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards`, { features });
+    if (res.error) return alert(res.error);
+    followRun(res.runId, panel, done);
+  });
+  const show = document.getElementById("tkshow");
+  if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));
+  const postBtn = document.getElementById("tkpost");
+  if (postBtn) postBtn.addEventListener("click", async () => {
+    const out = document.getElementById("tkpostpanel");
+    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment?run=${encodeURIComponent(sel.lastRun.id)}`);
+    if (preview.error) { out.innerHTML = `<p style="color:var(--fail)">${esc(preview.error)}</p>`; return; }
+    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${name}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>
+      <div class="row" style="margin-top:8px"><button class="btn" id="tkpostgo">Post comment</button><button class="btn secondary" id="tkpostno">Cancel</button><span id="tkpostout"></span></div></div>`;
+    document.getElementById("tkpostno").addEventListener("click", () => { out.innerHTML = ""; });
+    document.getElementById("tkpostgo").addEventListener("click", async (ev) => {
+      ev.target.disabled = true;
+      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment`, { run: sel.lastRun.id });
+      document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;
+      if (res.error) ev.target.disabled = false;
+    });
+  });
+}
+
+// ── Settings: the tracker connection, and finished builds and the web app ──
+
+function trackerBox(t) {
+  const opt = (v, label) => `<option value="${v}" ${(t.tracker || "") === v ? "selected" : ""}>${label}</option>`;
+  return `<div class="box" id="trackerbox"><h3>Ticket tracker</h3>
+    <p class="muted" style="margin-top:0">Connect Jira or Linear, and the Tickets tab lists what is waiting for a test. Which tracker, the site and the filter are saved to <span class="mono">probe/probe.yaml</span> for the team. Your API token is encrypted on this machine only and is never shown again; Probe uses it to read tickets, and to post a result as a comment when you press Post.</p>
+    <form class="inline" id="trf" autocomplete="off">
+      <label>Tracker<select name="tracker">${opt("", "None")}${t.trackers.map((x) => opt(x.id, x.label)).join("")}</select></label>
+      <label data-for="jira">Site<input name="site" value="${esc(t.site || "")}" placeholder="https://acme.atlassian.net" style="width:260px"></label>
+      <label data-for="jira">Account email <span class="src">this machine</span><input name="email" value="${esc(t.email || "")}" placeholder="you@example.com" style="width:220px" title="The Jira account the API token belongs to. Leave empty for a Jira Data Center personal access token."></label>
+      <label data-for="jira linear">API token <span class="src">${t.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${t.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>
+      <label data-for="linear">Team key<input name="team" value="${esc(t.team || "")}" placeholder="ENG" style="width:90px" title="Only this team's tickets: the prefix of its ticket ids"></label>
+      <label data-for="jira">Build field<input name="buildField" value="${esc(t.buildField || "")}" placeholder="Fix version" style="width:150px" title="The Jira field that holds the build to test. Empty: a build written in the description, else the fix version."></label>
+      <label data-for="jira" style="flex:1 1 100%">Tickets to list (JQL)<input name="filterJira" value="${t.tracker === "jira" ? esc(t.filter || "") : ""}" placeholder='status = "Ready for QA" ORDER BY updated DESC   (empty: ${esc(t.defaultFilter)})' class="mono"></label>
+      <label data-for="linear" style="flex:1 1 100%">Tickets to list (status names, comma separated)<input name="filterLinear" value="${t.tracker === "linear" ? esc(t.filter || "") : ""}" placeholder="Ready for QA, In Review   (empty: everything started or to do)"></label>
+      <button class="btn" type="submit">Save and test the connection</button>
+      ${t.hasToken ? `<button class="btn secondary" type="button" id="trdisc" title="Forgets the token on this machine">Disconnect</button>` : ""}
+    </form>
+    <p id="trout" style="margin-bottom:0"></p>
+    <p class="muted" style="margin-bottom:0" data-for="jira">A Jira API token: id.atlassian.com → Security → API tokens.</p>
+    <p class="muted" style="margin-bottom:0" data-for="linear">A Linear API key: Linear → Settings → Security &amp; access → Personal API keys. Linear has no build field: write "Build: 142" in the ticket, or give it a label like <span class="mono">build:142</span>.</p>
+  </div>`;
+}
+
+function bindTracker() {
+  const f = document.getElementById("trf");
+  const box = document.getElementById("trackerbox");
+  const out = document.getElementById("trout");
+  const sync = () => box.querySelectorAll("[data-for]").forEach((el) => { el.style.display = el.dataset.for.split(" ").includes(f.tracker.value) ? "" : "none"; });
+  f.tracker.addEventListener("change", sync);
+  sync();
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const tracker = f.tracker.value || null;
+    const saved = await post("/api/tracker", { tracker, site: f.site.value, email: f.email.value, token: f.token.value, team: f.team.value, buildField: f.buildField.value, filter: tracker === "linear" ? f.filterLinear.value : f.filterJira.value });
+    if (saved.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(saved.error)}`; return; }
+    if (!tracker) return renderSettings();
+    if (saved.missing) { out.innerHTML = `<span class="pill warn">saved</span> ${esc(saved.missing)}`; return; }
+    out.innerHTML = `<span class="muted">Saved. Asking ${tracker === "jira" ? "Jira" : "Linear"}…</span>`;
+    const test = await post("/api/tracker/test");
+    out.innerHTML = test.ok ? `<span class="pill passed">connected</span> as <strong>${esc(test.message)}</strong>. The Tickets tab now lists your tickets.` : `<span class="pill failed">saved, but not connected</span> ${esc(test.message)}`;
+    f.token.value = "";
+    state.tickets = null;
+  });
+  const disc = document.getElementById("trdisc");
+  if (disc) disc.addEventListener("click", async () => {
+    if (!confirm("Forget the API token on this machine?")) return;
+    await api("/api/tracker", { method: "DELETE" });
+    state.tickets = null;
+    renderSettings();
+  });
+}
+
+function buildsBox(b) {
+  const pw = b.playwright;
+  return `<div class="box" id="buildsbox"><h3>Builds and web</h3>
+    <p class="muted" style="margin-top:0">What a test can run against besides this code: the deployed web app in a browser${b.android ? ", or a finished Android build (a release file, Firebase App Distribution, Google Play)" : ""}. Shared values are saved to <span class="mono">probe/probe.yaml</span>; key files and tools only for this machine.</p>
+    <form class="inline" id="bf" autocomplete="off">
+      <label>Web app address<input name="webUrl" value="${esc(b.webUrl || "")}" placeholder="https://staging.example.com" style="width:300px" title="A staging or preview address, or a local dev server. Agents open it in Chromium."></label>
+      ${b.android ? `<label>Release app id <span class="src">${b.releasePackageFound ? "using " + esc(b.releasePackageFound) : "not found"}</span><input name="releasePackage" value="${esc(b.releasePackage || "")}" placeholder="${esc(b.releasePackageFound || "com.example.app")}" style="width:240px" title="The app's id on Google Play, when it differs from the debug build's"></label>
+      <label>Firebase app id<input name="firebaseApp" value="${esc(b.firebaseApp || "")}" placeholder="1:1234567890:android:abc123" style="width:280px" title="Firebase console → Project settings → Your apps → App ID"></label>
+      <label>Play track<input name="playTrack" value="${esc(b.playTrack)}" style="width:110px"></label>
+      <label>Google service account key file <span class="src">this machine</span><input name="serviceAccount" value="${esc(b.serviceAccount || "")}" placeholder="C:\\keys\\probe-builds.json" style="width:300px" title="A JSON key of a service account that may read Firebase App Distribution releases and the app in the Play Console"></label>
+      <label>bundletool jar <span class="src">this machine · only for .aab files</span><input name="bundletool" value="${esc(b.bundletool || "")}" placeholder="C:\\tools\\bundletool-all.jar" style="width:280px"></label>` : ""}
+      <label>Git tag of a build<input name="tag" value="${esc(b.tag || "")}" placeholder="v{build}" style="width:130px" class="mono" title="How a build number is tagged in git, so Probe can tell whether a build contains a ticket's commits. Empty: tries 142, v142, build-142, release-142."></label>
+      <button class="btn" type="submit">Save</button>
+    </form>
+    <p id="bout" style="margin-bottom:0"></p>
+    <p class="muted" style="margin-bottom:0">Web tests drive Chromium through Playwright: ${pw.installed && pw.browser ? "installed on this machine." : "not on this machine yet. The first web test installs it once (a few minutes, about 150 MB)."}</p>
+  </div>`;
+}
+
+function bindBuilds() {
+  const f = document.getElementById("bf");
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const v = (name) => (f[name] ? f[name].value : undefined);
+    const res = await post("/api/builds/settings", { webUrl: v("webUrl"), releasePackage: v("releasePackage"), firebaseApp: v("firebaseApp"), playTrack: v("playTrack"), serviceAccount: v("serviceAccount"), bundletool: v("bundletool"), tag: v("tag") });
+    document.getElementById("bout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;
+    // Whether cards can run at all may have changed with the web address.
+    if (!res.error) { state.scan = null; setTimeout(renderSettings, 700); }
   });
 }
 
@@ -1512,7 +1754,7 @@ const SOURCE_LABEL = { machine: "set on this machine", project: "from probe/prob
 
 /** Why device features are off for this project, or "" when its app runs on a device. */
 function noDevices() {
-  return state.scan && state.scan.project.devices === false ? "Not available for this kind of project: running the app on a device needs an adapter that supports it (Android/Gradle today)." : "";
+  return state.scan && state.scan.project.devices === false ? "Not available yet: this project builds no Android app. To run cards on a web app in a browser, set its address in Settings → Builds and web." : "";
 }
 
 const APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };
@@ -1572,13 +1814,13 @@ function bindProject() {
 
 async function renderSettings() {
   $view.innerHTML = `<div class="empty">Reading settings…</div>`;
-  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);
+  const [s, p, br, tracker, builds] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches"), api("/api/tracker"), api("/api/builds/settings")]);
   p.branches = br.branches;
   const current = s.agents.model;
   const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];
   const models = runner.models;
   const known = models.some(([m]) => m === current);
-  $view.innerHTML = projectBox(p) + `<div id="acctwrap"></div>` + `
+  $view.innerHTML = projectBox(p) + trackerBox(tracker) + buildsBox(builds) + `<div id="acctwrap"></div>` + `
     <div class="box"><h3>Agents</h3>
       <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer's tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>
       <form class="inline" id="sf">
@@ -1593,6 +1835,9 @@ async function renderSettings() {
       <p id="sout" style="margin-bottom:0"></p>
     </div>`;
   bindProject();
+  bindTracker();
+  bindBuilds();
+  if (state.scrollTo) { document.getElementById(state.scrollTo)?.scrollIntoView({ block: "start" }); state.scrollTo = null; }
   renderAccounts(document.getElementById("acctwrap"));
   const form = document.getElementById("sf");
   const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);

@@ -1,8 +1,8 @@
 import { stringify } from "yaml";
 import { accountsForPrompt } from "../accounts/accounts.js";
 import { newRunId } from "../core/store.js";
-import type { ExploreRun, NavScreen } from "../core/types.js";
-import { crashError, DEVICE_HOW_TO, runOnDevice } from "../devices/harness.js";
+import type { ExploreRun, NavScreen, RunTarget } from "../core/types.js";
+import { appOn, crashError, howTo, runOnDevice } from "../devices/harness.js";
 import type { Project } from "../engine/project.js";
 import { launchRun } from "../engine/runs.js";
 import { findFeature, latestScan } from "../engine/scan.js";
@@ -13,9 +13,9 @@ const NAVMAP_FILE = "navmap.json";
 /** Screens per feature from the latest explore run of each. */
 export type NavMap = Record<string, { runId: string; at: string; screens: NavScreen[]; issues: string[] }>;
 
-function prompt(project: Project, feature: string, device: string, pkg: string): string {
+function prompt(project: Project, feature: string, device: string, app: string, target: RunTarget): string {
   const cards = listCards(project.root, feature).map((c) => ({ title: c.title, reach: c.reach }));
-  return `You are mapping the "${feature}" feature of the Android app ${pkg} on ${device}. The app has just been launched.
+  return `You are mapping the "${feature}" feature of ${appOn(target, device, app)}. The app has just been ${target === "web" ? "opened" : "launched"}.
 
 ## Task
 Reach every screen, sheet and dialog of this feature you can, the way a user would. For each: how you got there (one hop per step, using visible labels), and whether it worked. Go back with the back key or the app's own navigation and check that back returns where it should.
@@ -29,14 +29,14 @@ ${cards.length ? stringify(cards) : "none yet\n"}\`\`\`
 ## Test accounts
 ${accountsForPrompt(project)}
 
-${DEVICE_HOW_TO}
+${howTo(target)}
 
 ## Finish
 Call probe_explore_report exactly once with every screen you reached (name, reach path, the step screenshot file name from observe if you know it, notes) and every issue you saw. Then stop.`;
 }
 
 /** An agent walks one feature's screens: the result is that feature's navigation map. */
-export function startExploreRun(project: Project, featureId: string, options: { device?: string; model?: string } = {}): { run: ExploreRun; done: Promise<ExploreRun> } {
+export function startExploreRun(project: Project, featureId: string, options: { device?: string; model?: string; target?: RunTarget } = {}): { run: ExploreRun; done: Promise<ExploreRun> } {
   const feature = findFeature(latestScan(project), featureId);
   if (!feature) throw new Error(`Unknown feature "${featureId}".`);
   const run: ExploreRun = {
@@ -53,7 +53,7 @@ export function startExploreRun(project: Project, featureId: string, options: { 
     costUsd: 0,
   };
   return launchRun(project, run, async (log) => {
-    const session = await runOnDevice(project, run, { ...options, prompt: (d, pkg) => prompt(project, feature.id, d, pkg), reportTools: ["probe_explore_report"] }, log);
+    const session = await runOnDevice(project, run, { ...options, prompt: (d, app, target) => prompt(project, feature.id, d, app, target), reportTools: ["probe_explore_report"] }, log);
     const report = session.report<{ screens: NavScreen[]; issues: string[] }>("explore");
     run.screens = report?.screens ?? [];
     run.issues = report?.issues ?? [];

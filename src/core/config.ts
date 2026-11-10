@@ -49,6 +49,26 @@ export interface ProbeConfig {
     package?: string;
     /** Build task that installs it on the selected device, e.g. ":app:installDebug". */
     installTask?: string;
+    /** Application id of the release build, when it differs from the debug one (no ".debug" suffix). */
+    releasePackage?: string;
+  };
+  /** Where a finished build comes from when a run tests one instead of the working tree. */
+  builds: {
+    /** Firebase App Distribution: the Firebase app id, `1:1234567890:android:abc123`. */
+    firebaseApp?: string;
+    /** Google Play: the track builds are read from. The app is `app.releasePackage`. */
+    playTrack: string;
+    /** Git tag of a build number, `{build}` replaced, e.g. `v{build}`. Tells whether a build contains a commit. */
+    tag?: string;
+    /** Per machine: Google service account key file (JSON) with access to Play and Firebase. */
+    serviceAccount?: string;
+    /** Per machine: bundletool jar, for installing an .aab. */
+    bundletool?: string;
+  };
+  /** The deployed web app agents test in a browser. */
+  web: {
+    /** Where it runs: a staging or preview URL, or a local dev server. */
+    url?: string;
   };
   verify: {
     /** Branch a change is compared with. Unset: the first of origin/develop, develop, origin/main, main, master. */
@@ -75,6 +95,21 @@ export interface ProbeConfig {
      * gh issue create --title {title} --body-file {file}. Unset: drafts are only copied, never filed.
      */
     fileCommand?: string;
+    /** The tracker Studio's ticket inbox reads from. Its token stays on each machine. */
+    tracker?: TrackerId;
+    /** Jira: the site, e.g. https://acme.atlassian.net. */
+    site?: string;
+    /**
+     * Which tickets the inbox lists. Jira: JQL (`status = "Ready for QA"`). Linear: status names,
+     * comma separated (`Ready for QA, In Review`).
+     */
+    filter?: string;
+    /** Linear: only this team's tickets (its key, the prefix of its ticket ids). */
+    team?: string;
+    /** Jira: the field that holds the build to test (name or id). Unset: the fix version. */
+    buildField?: string;
+    /** Per machine: the Jira account email the API token belongs to. */
+    email?: string;
   };
   agents: {
     /** The coding-agent CLI every Probe agent runs on: Claude Code (default) or Codex CLI. */
@@ -128,6 +163,10 @@ export interface ProbeConfig {
   };
 }
 
+/** Ticket trackers the inbox can read. */
+export const TRACKERS = ["jira", "linear"] as const;
+export type TrackerId = (typeof TRACKERS)[number];
+
 /** Coding-agent CLIs Probe can run its agents on. */
 export const AGENT_RUNNERS = ["claude", "codex"] as const;
 export type AgentRunnerId = (typeof AGENT_RUNNERS)[number];
@@ -149,6 +188,8 @@ const DEFAULTS: ProbeConfig = {
   exclude: [],
   unit: { androidTask: "testDebugUnitTest", jvmTask: "test" },
   app: {},
+  builds: { playTrack: "internal" },
+  web: {},
   verify: { cards: "approved", maxCards: 10 },
   perf: { maxStartupMs: 4000, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
@@ -165,7 +206,6 @@ export function configPath(root: string): string {
 export function loadConfig(root: string, localDir: string): ProbeConfig {
   const file = configPath(root);
   const raw = (existsSync(file) ? parse(readFileSync(file, "utf8")) ?? {} : {}) as Partial<ProbeConfig>;
-  const localFile = join(localDir, LOCAL_CONFIG_FILE);
   const local = readLocal(localDir);
   return {
     name: raw.name,
@@ -174,9 +214,12 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
     areas: raw.areas,
     unit: { ...DEFAULTS.unit, ...raw.unit },
     app: { ...raw.app },
+    // Key files and tool paths differ per machine, so they never come from the shared file.
+    builds: { ...DEFAULTS.builds, ...raw.builds, serviceAccount: local.builds?.serviceAccount, bundletool: local.builds?.bundletool },
+    web: { ...raw.web },
     verify: { ...DEFAULTS.verify, ...raw.verify },
     perf: { ...DEFAULTS.perf, ...raw.perf },
-    tickets: { ...DEFAULTS.tickets, ...raw.tickets },
+    tickets: { ...DEFAULTS.tickets, ...raw.tickets, email: local.tickets?.email },
     agents: resolveAgents(raw.agents, local.agents),
     watch: { ...DEFAULTS.watch, ...raw.watch },
     security: { ...DEFAULTS.security, ...raw.security },
@@ -197,7 +240,11 @@ export function resolveAgents(team: Partial<ProbeConfig["agents"]> | undefined, 
 }
 
 /** What a machine may set for itself, in `<store>/local.yaml`. */
-export type LocalSettings = Partial<Pick<ProbeConfig, "devices">> & { agents?: Partial<ProbeConfig["agents"]> };
+export type LocalSettings = Partial<Pick<ProbeConfig, "devices">> & {
+  agents?: Partial<ProbeConfig["agents"]>;
+  builds?: Pick<ProbeConfig["builds"], "serviceAccount" | "bundletool">;
+  tickets?: Pick<ProbeConfig["tickets"], "email">;
+};
 
 function readLocal(localDir: string): LocalSettings {
   const file = join(localDir, LOCAL_CONFIG_FILE);
@@ -304,6 +351,18 @@ unit:
 app:
   # package: com.example.app.debug
   # installTask: ":app:installDebug"
+  # releasePackage: com.example.app   # the release build's id, when it differs
+
+# Testing a finished build instead of the working tree (Studio -> Tickets, Verify).
+# The Google service account key file is set per machine in Studio -> Settings.
+# builds:
+#   firebaseApp: "1:1234567890:android:abc123"   # Firebase App Distribution
+#   playTrack: internal                          # Google Play track
+#   tag: "v{build}"                              # git tag of a build number
+
+# The deployed web app agents test in a browser.
+# web:
+#   url: https://staging.example.com
 
 # Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
 # probe/hints/accounts.yaml; passwords stay encrypted on each machine).
@@ -340,6 +399,10 @@ tickets:
   # pattern: 'PROJ-\\d+'
   # url: https://jira.example.com/browse/{id}
   # fileCommand: gh issue create --title {title} --body-file {file}
+  # The ticket inbox (Studio -> Tickets). Connect in Studio -> Settings; tokens stay on each machine.
+  # tracker: jira                      # or: linear
+  # site: https://acme.atlassian.net   # Jira only
+  # filter: 'status = "Ready for QA"'  # Jira: JQL. Linear: status names, comma separated
 `;
 
 export function isExcluded(config: ProbeConfig, featureId: string, moduleId?: string): boolean {
@@ -350,10 +413,21 @@ export function isExcluded(config: ProbeConfig, featureId: string, moduleId?: st
 
 /** Shared settings Studio may change. A value of null removes the key. */
 export interface ProjectPatch {
-  app?: { package?: string | null; installTask?: string | null };
+  app?: { package?: string | null; installTask?: string | null; releasePackage?: string | null };
+  builds?: { firebaseApp?: string | null; playTrack?: string | null; tag?: string | null };
+  web?: { url?: string | null };
   verify?: { base?: string | null; cards?: "approved" | "all"; maxCards?: number };
   perf?: { maxStartupMs?: number; maxJankyPct?: number; maxP90Ms?: number; maxMemoryMb?: number | null };
-  tickets?: { pattern?: string | null; url?: string | null; fileCommand?: string | null };
+  tickets?: {
+    pattern?: string | null;
+    url?: string | null;
+    fileCommand?: string | null;
+    tracker?: TrackerId | null;
+    site?: string | null;
+    filter?: string | null;
+    team?: string | null;
+    buildField?: string | null;
+  };
   agents?: { runner?: AgentRunnerId | null; model?: string | null };
 }
 
@@ -370,12 +444,16 @@ export function saveProject(root: string, patch: ProjectPatch): void {
   const doc = parseDocument(readFileSync(file, "utf8"));
   for (const [section, values] of Object.entries(patch)) {
     // "app:" with only comments under it parses as null, which setIn cannot descend into.
+    const added = !doc.has(section);
     if (!isMap(doc.get(section))) doc.set(section, doc.createNode({}));
     for (const [key, value] of Object.entries(values ?? {})) {
       if (value === undefined) continue;
       if (value === null || value === "") doc.deleteIn([section, key]);
       else doc.setIn([section, key], value);
     }
+    // A section this call added and left empty (every value cleared) is not written at all.
+    const node = doc.get(section);
+    if (added && isMap(node) && node.items.length === 0) doc.delete(section);
   }
   writeFileSync(file, doc.toString());
 }

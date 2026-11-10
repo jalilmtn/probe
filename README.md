@@ -224,6 +224,50 @@ see passwords (Probe types them on the device); a run stops as `blocked` if the 
 with an account that is not a test account, or a login needs a code or captcha it lacks. Agents
 never file tickets; a person does, from Studio, with the team's own command.
 
+## Tickets, builds and the web app
+
+Studio → **Tickets** is a tester's inbox. Connect Jira or Linear in Studio → Settings → Ticket
+tracker (the site and the filter are shared in `probe/probe.yaml`; your API token is encrypted
+on your machine and never shown again), and the tab lists the tickets waiting for a test: who
+wrote each one, its text, the build it names, and what this repository knows about it (the
+commits that name it, the features they touch, the cards drafted from it).
+
+For a ticket, **Draft cards from the ticket** has an agent read the ticket and the code and
+write the cards that check it; **Test this ticket** runs those cards and the cards of the
+features it touched, with no unit tests (a tester checks the product, not the code). When the
+run is over, **Post result to the ticket** shows the comment first and posts it under your own
+name only when you press Post. Probe never changes a ticket's status.
+
+A test runs against one of:
+
+| Test against | What runs | Needs |
+|---|---|---|
+| This code | The app built and installed from the working tree (the default) | An Android project |
+| A build file | An `.apk`, or an `.aab` through bundletool | The file; for `.aab`, bundletool's jar in Settings |
+| Firebase App Distribution | A release, by build number, or the newest | The Firebase app id, a Google service account key file |
+| Google Play | The copy Play signed for a track (default `internal`), by version code, or the newest | The release app id, a service account with access to the app in the Play Console |
+| Web | The deployed app at `web.url`, in Chromium | The address; Playwright, which the first web run installs once (about 150 MB) |
+
+A finished build replaces whatever copy of the app is on the emulator; when that copy was
+signed with another key (a debug build), it is removed first, with its data. A run on a build
+or on the web app says so in its record, and is not written to the shared results: those say
+what holds for the code in the working tree.
+
+When a ticket names a build (a Jira build field, the fix version, `Build: 142` in the text, or
+a Linear label `build:142`), Probe looks for that build's git tag (`builds.tag`, e.g.
+`v{build}`) and says whether the build contains the ticket's commits.
+
+On the web, the agent uses the same tools as on a device: it sees a screenshot and a numbered
+list of what is in the window, and clicks, types and scrolls. The browser profile is kept per
+project, so a login survives between runs. Page errors (uncaught exceptions, console errors,
+failed requests) are listed with the run and do not fail it on their own. Set
+`PROBE_WEB_HEADED=1` to watch the browser.
+
+```bash
+node dist/probe.cjs verify --ticket SHOP-7 --build firebase:142 --all-cards
+node dist/probe.cjs run checkout pay-button --target web
+```
+
 ## Shared results
 
 Every unit run and card run that judged the code is written to `probe/results/<feature>.yaml`:

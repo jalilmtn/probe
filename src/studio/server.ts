@@ -38,6 +38,12 @@ import { chooseFeatures, chosenFeatures, initPendingDrafts, initStatus, isInitSt
 import { areaGraph, usedBy, uses } from "../engine/impact.js";
 import { jobKeys, runningJobs, startJob } from "./jobs.js";
 import { agentSettings, branchInfo, branchMismatch, projectSettings, saveProjectSettings, setupChecklist, type ProjectSettingsBody } from "./project.js";
+import { buildSettings, disconnectTracker, saveBuildSettings, saveTracker, testOptions, testTracker, trackerSettings, type BuildSettingsBody, type TrackerBody } from "./qa.js";
+import { inbox, inboxTicket, postResult, resultComment } from "../tickets/inbox.js";
+import { openTracker } from "../tickets/tracker.js";
+import { listBuilds } from "../devices/builds.js";
+import { runTargets } from "../devices/driver.js";
+import type { BuildRef, BuildSource, RunTarget } from "../core/types.js";
 
 let running: { server: Server; url: string } | null = null;
 /** What the file watcher did lately, for Studio (Studio may run inside the MCP server, so never stdout). */
@@ -105,7 +111,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     return;
   }
   // Starting work: only on the branch the person is looking at (Studio sends it with every action).
-  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
+  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : undefined) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
@@ -278,7 +284,11 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   }
   if (method === "POST" && path === "/api/verify") {
     const options = JSON.parse(await readBody(req)) as VerifyOptions;
-    return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+    try {
+      return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
   }
 
   m = /^\/api\/unitwrite\/([^/]+)$/.exec(path);
@@ -314,6 +324,78 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     if (!features.length) return send(res, 400, { error: `No commits mention ${ticket}; choose the feature it belongs to.` });
     return send(res, 200, startJob(jobKeys.ticketCards(ticket), () => startBackfill(project, features, { ticket: { id: ticket, text: body.text?.trim() || undefined } })));
   }
+  // The tracker connection (Jira, Linear). A token goes in and is sealed on this machine; it never comes back out.
+  if (method === "GET" && path === "/api/tracker") return send(res, 200, trackerSettings(project));
+  if (method === "POST" && path === "/api/tracker") {
+    const error = saveTracker(project, JSON.parse(await readBody(req)) as TrackerBody);
+    return error ? send(res, 400, { error }) : send(res, 200, trackerSettings(project));
+  }
+  if (method === "POST" && path === "/api/tracker/test") return send(res, 200, await testTracker(project));
+  if (method === "DELETE" && path === "/api/tracker") {
+    disconnectTracker(project);
+    return send(res, 200, trackerSettings(project));
+  }
+
+  // Finished builds and the web app: what a test can run against besides the working tree.
+  if (method === "GET" && path === "/api/builds/settings") return send(res, 200, buildSettings(project));
+  if (method === "POST" && path === "/api/builds/settings") {
+    const error = saveBuildSettings(project, JSON.parse(await readBody(req)) as BuildSettingsBody);
+    return error ? send(res, 400, { error }) : send(res, 200, buildSettings(project));
+  }
+  if (method === "GET" && path === "/api/test-options") return send(res, 200, testOptions(project));
+  if (method === "GET" && path === "/api/builds") {
+    const source = url.searchParams.get("source") as BuildSource;
+    if (source !== "firebase" && source !== "play") return send(res, 400, { error: "source: firebase or play" });
+    try {
+      return send(res, 200, await listBuilds(project, source));
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
+
+  // The ticket inbox: the tracker's tickets waiting for a test, with what this repository knows about each.
+  if (method === "GET" && path === "/api/inbox") {
+    const settings = trackerSettings(project);
+    if (settings.missing) return send(res, 200, { connected: false, missing: settings.missing, tracker: settings.tracker, tickets: [] });
+    try {
+      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: await inbox(project, { refresh: url.searchParams.has("refresh") }) });
+    } catch (e) {
+      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: [], error: (e as Error).message });
+    }
+  }
+  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment))?$/.exec(path);
+  if (m) {
+    const id = decodeURIComponent(m[1]!);
+    try {
+      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id));
+      // Cards from the ticket's own text, read from the tracker rather than pasted.
+      if (method === "POST" && m[2] === "cards") {
+        const body = JSON.parse(await readBody(req)) as { features?: string[] };
+        const ticket = await inboxTicket(project, id);
+        const features = body.features?.length ? body.features : ticket.features;
+        if (!features.length) return send(res, 400, { error: `No commit names ${id} yet: choose the feature it belongs to.` });
+        const text = `${ticket.title}\n\n${ticket.description}`.trim();
+        return send(res, 200, startJob(jobKeys.ticketCards(id), () => startBackfill(project, features, { ticket: { id, text } })));
+      }
+      // A tester's check of the ticket: its cards (drafts too) on the working tree, a finished build or the web app.
+      if (method === "POST" && m[2] === "test") {
+        const body = JSON.parse(await readBody(req)) as { target?: RunTarget; build?: BuildRef; maxCards?: number };
+        const options: VerifyOptions = { ticket: id, cards: "all", noUnit: true, target: body.target, build: body.build, maxCards: body.maxCards };
+        return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+      }
+      // The comment a run would leave (GET), and leaving it (POST): only ever when a person presses Post.
+      if (m[2] === "comment") {
+        const runId = method === "GET" ? url.searchParams.get("run") : (JSON.parse(await readBody(req)) as { run?: string }).run;
+        const run = runId && /^[\w-]+$/.test(runId) ? project.store.read<Run>(`runs/${runId}.json`) : null;
+        if (!run) return send(res, 404, { error: "unknown run" });
+        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project), run) });
+        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run) });
+      }
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
+
   m = /^\/api\/runs\/([^/]+)\/ticket(\/file)?$/.exec(path);
   if (m) {
     const run = project.store.read<Run>(`runs/${m[1]}.json`);
@@ -335,11 +417,11 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   }
 
   // Evidence files of a run: step screenshots and the screen recording.
-  m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4))$/.exec(path);
+  m = /^\/api\/runs\/([^/]+)\/files\/([\w.-]+\.(png|mp4|webm))$/.exec(path);
   if (method === "GET" && m) {
     const file = join(project.store.dir, "runs", m[1]!, m[2]!);
     if (!/^[\w-]+$/.test(m[1]!) || !existsSync(file)) return send(res, 404, { error: "no such file" });
-    res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : "video/mp4", "cache-control": "max-age=3600" });
+    res.writeHead(200, { "content-type": m[3] === "png" ? "image/png" : `video/${m[3]}`, "cache-control": "max-age=3600" });
     createReadStream(file).pipe(res);
     return;
   }
@@ -503,7 +585,8 @@ function summary(result: ScanResult, project: Project) {
   const manifests = new Map(loadManifests(project.root).map((m) => [m.id, m]));
   const graph = safeGraph(project, result);
   return {
-    project: result.project,
+    // Whether cards can run follows the settings (a web address set since the scan), not the scan.
+    project: { ...result.project, devices: runTargets(project).length > 0 },
     scannedAt: result.scannedAt,
     excluded: result.excluded,
     features: result.features.map((f) => {

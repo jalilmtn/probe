@@ -22,6 +22,7 @@ export const jobKeys = {
   check: () => "check",
   verify(o: VerifyOptions): string {
     if (o.outdated) return `verify:outdated${o.features?.length ? `:${[...o.features].sort().join(",")}` : ""}`;
+    // One test of a ticket at a time, whatever it runs against.
     if (o.ticket) return `verify:ticket:${o.ticket}`;
     if (o.features?.length) return `verify:features:${[...o.features].sort().join(",")}`;
     return `verify:base:${o.base ?? ""}`;

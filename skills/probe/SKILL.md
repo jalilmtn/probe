@@ -26,7 +26,8 @@ running builds, reading reports, driving devices) without AI; you are the judgem
 | `probe_rule` | A feature's rules (or one rule) with the tests and cards that prove each, and whether each card's last pass still holds |
 | `probe_explore` | A background agent maps a feature's screens and navigation on an emulator |
 | `probe_login_check` | See which account the app on the emulator uses, or log it in as a test role |
-| `probe_verify` | Check a change end to end: affected features' unit tests, then their cards on a device |
+| `probe_verify` | Check a change end to end: affected features' unit tests, then their cards on a device. `target: "web"` runs cards on the web app in a browser; `build` (`firebase:142`, `play`, `file:<path>`) runs them on a finished Android build, without unit tests |
+| `probe_inbox` | Tickets waiting for a test, from the project's Jira or Linear: text, build, commits, cards. Test one with `probe_verify { ticket, build }` |
 | `probe_ticket` | A ticket's commits, features and cards; or a ticket draft for a run that did not pass |
 | `probe_check` | Check edited features: unit tests, manifest test links, a drafted manifest/brief correction |
 | `probe_stale` | Features edited since their last check, and drafts waiting for review |
@@ -166,6 +167,7 @@ without seeing them. Never ask the user for a password in chat.
   follow the project's existing test style and helpers (read neighbouring tests and the
   project's CLAUDE.md / AGENTS.md first), make each test fail when the behaviour it pins is
   broken, then rerun `probe_unit_run` to show they pass.
+- Probe never posts a test result to a ticket from an agent: the user does, from Studio → Tickets.
 - Probe never files tickets from an agent: offer the draft from `probe_ticket` and let the user
   file it from Studio.
 - Never commit, push or stage anything. Leave changes in the working tree for review.

@@ -11,6 +11,8 @@ export interface UiElement {
   checked: boolean;
   scrollable: boolean;
   password: boolean;
+  /** Text can be typed into it. Android marks that with the EditText class; a web page says so here. */
+  input?: boolean;
   center: [number, number];
   bounds: [number, number, number, number];
 }
@@ -58,7 +60,7 @@ export function formatUiTree(elements: UiElement[]): string {
       const flags = [
         e.clickable && "tap",
         e.scrollable && "scroll",
-        e.cls === "EditText" && "input",
+        (e.cls === "EditText" || e.input) && "input",
         e.focused && "focused",
         e.checked && "checked",
         !e.enabled && "disabled",

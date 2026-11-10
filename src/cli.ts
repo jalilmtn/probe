@@ -29,6 +29,8 @@ import { startUnitWrite, summarizeUnitWrite } from "./engine/unitwrite.js";
 import { startVerify, summarizeVerify } from "./engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "./tickets/tickets.js";
 import { startStudio } from "./studio/server.js";
+import { parseBuildRef } from "./devices/builds.js";
+import type { RunTarget } from "./core/types.js";
 import { gitHooks, runHook } from "./cli/hook.js";
 import { type ChangeSource, loadWatch, runningCheck, staleLabel, startCheck, summarizeCheckRun } from "./engine/watch.js";
 import { checkManifest, loadManifest, summarizeCheck } from "./knowledge/manifest.js";
@@ -58,10 +60,12 @@ Usage: probe <command> [options]
   backfill <feature|*>   Draft cards with a headless agent (* = all without cards)
                          --ticket <id> [--ticket-text <file>]: the cards a ticket needs
   run <feature> <card>   Run a card on a device with an agent (--device <serial>)
+                         --target web: in a browser, on the web app; --build: on a finished build (see below)
   explore <feature>      An agent maps a feature's screens and navigation on a device
   verify                 Check a change: affected features' unit tests, then cards on a device
                          --base <branch> --features a,b --ticket <id> --no-device --all-cards --max-cards n
                          --outdated: re-run only results that are outdated or missing; --rerun-fresh: up-to-date ones too
+                         --target web: cards run on the web app; --build: cards run on a finished build, no unit tests
   results [feature]      Recorded results (probe/results, shared via git) and whether they still hold
   login [role]           Check which account the app is logged in with, or log in as role
   issues <run>           Problems a run found, each with an id
@@ -102,7 +106,10 @@ Options:
   --port <n>             Studio port (default 7777)
   --no-open              Don't open the browser for studio
   --model <name>         Model for agent tasks (default: agents.model, else the runner's default)
-  --device <serial>      Device for run (default: a running emulator)`;
+  --device <serial>      Device for run (default: a running emulator)
+  --target <android|web> Where cards run (default: the project's first; web needs web.url)
+  --build <source>       A finished Android build instead of this code: firebase, firebase:<build number>,
+                         play, play:<version code>, or file:<path to .apk/.aab>`;
 
 async function main(argv: string[]): Promise<number> {
   const opt = (name: string) => {
@@ -113,6 +120,8 @@ async function main(argv: string[]): Promise<number> {
   const port = Number(opt("--port") ?? 7777);
   const model = opt("--model");
   const deviceArg = opt("--device");
+  const targetArg = opt("--target");
+  const buildArg = opt("--build");
   const baseArg = opt("--base");
   const featuresArg = opt("--features");
   const ticketArg = opt("--ticket");
@@ -298,6 +307,8 @@ ${summarizeSecurity(finished)}`);
         model,
         outdated,
         rerunFresh,
+        target: runTarget(targetArg),
+        build: buildArg ? parseBuildRef(buildArg) : undefined,
       });
       follow(run.id);
       const finished = await done;
@@ -347,7 +358,7 @@ ${summarizeSecurity(finished)}`);
     }
     case "run": {
       if (!arg || !arg2) return usage("probe run <feature> <card> [--device <serial>]");
-      const { run, done } = startCardRun(openProject(projectArg), arg, arg2, { device: deviceArg, model });
+      const { run, done } = startCardRun(openProject(projectArg), arg, arg2, { device: deviceArg, model, target: runTarget(targetArg), build: buildArg ? parseBuildRef(buildArg) : undefined });
       follow(run.id);
       const finished = await done;
       console.log(`\n${summarizeCardRun(finished)}`);
@@ -575,3 +586,10 @@ main(process.argv.slice(2)).then(
     process.exit(1);
   },
 );
+
+/** `--target` as a run target, or undefined for the project's own. */
+function runTarget(value: string | undefined): RunTarget | undefined {
+  if (value === undefined) return undefined;
+  if (value !== "android" && value !== "web") throw new Error(`--target: android or web, not "${value}".`);
+  return value;
+}
