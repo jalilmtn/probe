@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0 — 2026-11-11
+
+Connections per project, and a ticket workbench for developers.
+
+- Studio → Settings is split into sections for the project picked at the top: General, Connections, AI accounts and models, Workbench, Builds and web, Test accounts. Nothing is shared between projects; tokens and keys are sealed in each project's own store on your machine.
+- Connections: a project can use several trackers at once (Jira and Linear side by side) and Slack. Each shows whether it is connected, and can be tested, edited, have its token forgotten, or be removed. The shared part goes to `connections:` in `probe.yaml`.
+- Slack: add as many channels as you like, picked from Slack's own list. Per channel, choose whether it is searched for talk about a ticket, whether results may be posted there, and which ticket labels it is for. A ticket shows what was said about it, with links.
+- AI accounts: give a project several Claude (or Codex) accounts — the CLI's own login, a separate login folder, or an API key — and choose the account and model for coding, review and testing separately (for example coding on Opus with a work account).
+- Tickets is now a workbench: For me, Not for me (assigned to someone else, or labels and statuses you choose), Hidden and All, with status chips, a label filter and search. Tick tickets, choose the steps (read ticket and Slack, write the change, write unit tests, run them, test the UI, check against the ticket, commit, comment on the ticket), and the agent works through them one at a time with a progress grid.
+- Each ticket gets its own local commit, named by `workbench.commitPattern` (default `{type}({area}): {title} [{key}]`). Nothing is pushed; a tracker is only changed when "Comment on the ticket" is ticked. A file that already had uncommitted changes is never committed for a ticket.
+- The older single `tickets.tracker` setting keeps working and moves into the connections list the first time it is edited.
+
 ## 0.7.0 — 2026-11-10
 
 A tester's inbox, finished builds, and web apps.

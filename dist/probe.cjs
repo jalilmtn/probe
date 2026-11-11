@@ -1001,14 +1001,14 @@ var require_foldFlowLines = __commonJS({
     var FOLD_FLOW = "flow";
     var FOLD_BLOCK = "block";
     var FOLD_QUOTED = "quoted";
-    function foldFlowLines(text2, indent, mode = "flow", { indentAtStart, lineWidth = 80, minContentWidth = 20, onFold, onOverflow } = {}) {
+    function foldFlowLines(text3, indent, mode = "flow", { indentAtStart, lineWidth = 80, minContentWidth = 20, onFold, onOverflow } = {}) {
       if (!lineWidth || lineWidth < 0)
-        return text2;
+        return text3;
       if (lineWidth < minContentWidth)
         minContentWidth = 0;
       const endStep = Math.max(1 + minContentWidth, 1 + lineWidth - indent.length);
-      if (text2.length <= endStep)
-        return text2;
+      if (text3.length <= endStep)
+        return text3;
       const folds = [];
       const escapedFolds = {};
       let end = lineWidth - indent.length;
@@ -1025,14 +1025,14 @@ var require_foldFlowLines = __commonJS({
       let escStart = -1;
       let escEnd = -1;
       if (mode === FOLD_BLOCK) {
-        i = consumeMoreIndentedLines(text2, i, indent.length);
+        i = consumeMoreIndentedLines(text3, i, indent.length);
         if (i !== -1)
           end = i + endStep;
       }
-      for (let ch; ch = text2[i += 1]; ) {
+      for (let ch; ch = text3[i += 1]; ) {
         if (mode === FOLD_QUOTED && ch === "\\") {
           escStart = i;
-          switch (text2[i + 1]) {
+          switch (text3[i + 1]) {
             case "x":
               i += 3;
               break;
@@ -1049,12 +1049,12 @@ var require_foldFlowLines = __commonJS({
         }
         if (ch === "\n") {
           if (mode === FOLD_BLOCK)
-            i = consumeMoreIndentedLines(text2, i, indent.length);
+            i = consumeMoreIndentedLines(text3, i, indent.length);
           end = i + indent.length + endStep;
           split = void 0;
         } else {
           if (ch === " " && prev && prev !== " " && prev !== "\n" && prev !== "	") {
-            const next = text2[i + 1];
+            const next = text3[i + 1];
             if (next && next !== " " && next !== "\n" && next !== "	")
               split = i;
           }
@@ -1066,12 +1066,12 @@ var require_foldFlowLines = __commonJS({
             } else if (mode === FOLD_QUOTED) {
               while (prev === " " || prev === "	") {
                 prev = ch;
-                ch = text2[i += 1];
+                ch = text3[i += 1];
                 overflow = true;
               }
               const j = i > escEnd + 1 ? i - 2 : escStart - 1;
               if (escapedFolds[j])
-                return text2;
+                return text3;
               folds.push(j);
               escapedFolds[j] = true;
               end = j + endStep;
@@ -1086,39 +1086,39 @@ var require_foldFlowLines = __commonJS({
       if (overflow && onOverflow)
         onOverflow();
       if (folds.length === 0)
-        return text2;
+        return text3;
       if (onFold)
         onFold();
-      let res = text2.slice(0, folds[0]);
+      let res = text3.slice(0, folds[0]);
       for (let i2 = 0; i2 < folds.length; ++i2) {
         const fold = folds[i2];
-        const end2 = folds[i2 + 1] || text2.length;
+        const end2 = folds[i2 + 1] || text3.length;
         if (fold === 0)
           res = `
-${indent}${text2.slice(0, end2)}`;
+${indent}${text3.slice(0, end2)}`;
         else {
           if (mode === FOLD_QUOTED && escapedFolds[fold])
-            res += `${text2[fold]}\\`;
+            res += `${text3[fold]}\\`;
           res += `
-${indent}${text2.slice(fold + 1, end2)}`;
+${indent}${text3.slice(fold + 1, end2)}`;
         }
       }
       return res;
     }
-    function consumeMoreIndentedLines(text2, i, indent) {
+    function consumeMoreIndentedLines(text3, i, indent) {
       let end = i;
       let start = i + 1;
-      let ch = text2[start];
+      let ch = text3[start];
       while (ch === " " || ch === "	") {
         if (i < start + indent) {
-          ch = text2[++i];
+          ch = text3[++i];
         } else {
           do {
-            ch = text2[++i];
+            ch = text3[++i];
           } while (ch && ch !== "\n");
           end = i;
           start = i + 1;
-          ch = text2[start];
+          ch = text3[start];
         }
       }
       return end;
@@ -6348,15 +6348,15 @@ var require_parser = __commonJS({
     var node_process = require("process");
     var cst = require_cst();
     var lexer = require_lexer();
-    function includesToken(list, type) {
-      for (let i = 0; i < list.length; ++i)
-        if (list[i].type === type)
+    function includesToken(list2, type) {
+      for (let i = 0; i < list2.length; ++i)
+        if (list2[i].type === type)
           return true;
       return false;
     }
-    function findNonEmptyIndex(list) {
-      for (let i = 0; i < list.length; ++i) {
-        switch (list[i].type) {
+    function findNonEmptyIndex(list2) {
+      for (let i = 0; i < list2.length; ++i) {
+        switch (list2[i].type) {
           case "space":
           case "comment":
           case "newline":
@@ -12012,7 +12012,7 @@ var require_core = __commonJS({
       errorsText(errors = this.errors, { separator = ", ", dataVar = "data" } = {}) {
         if (!errors || errors.length === 0)
           return "No errors";
-        return errors.map((e) => `${dataVar}${e.instancePath} ${e.message}`).reduce((text2, msg) => text2 + separator + msg);
+        return errors.map((e) => `${dataVar}${e.instancePath} ${e.message}`).reduce((text3, msg) => text3 + separator + msg);
       }
       $dataMetaSchema(metaSchema, keywordsJsonPointers) {
         const rules = this.RULES.all;
@@ -14560,8 +14560,8 @@ var require_dist2 = __commonJS({
         return ajv;
       }
       const [formats, exportName] = opts.mode === "fast" ? [formats_1.fastFormats, fastName] : [formats_1.fullFormats, fullName];
-      const list = opts.formats || formats_1.formatNames;
-      addFormats(ajv, list, formats, exportName);
+      const list2 = opts.formats || formats_1.formatNames;
+      addFormats(ajv, list2, formats, exportName);
       if (opts.keywords)
         (0, limit_1.default)(ajv);
       return ajv;
@@ -14573,11 +14573,11 @@ var require_dist2 = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs, exportName) {
+    function addFormats(ajv, list2, fs, exportName) {
       var _a3;
       var _b;
       (_a3 = (_b = ajv.opts.code).formats) !== null && _a3 !== void 0 ? _a3 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
-      for (const f of list)
+      for (const f of list2)
         ajv.addFormat(f, fs[f]);
     }
     module2.exports = exports2 = formatsPlugin;
@@ -14590,8 +14590,8 @@ var require_dist2 = __commonJS({
 var import_node_fs39 = require("node:fs");
 
 // src/agent/headless.ts
-var import_node_fs2 = require("node:fs");
-var import_node_path3 = require("node:path");
+var import_node_fs4 = require("node:fs");
+var import_node_path5 = require("node:path");
 
 // src/core/proc.ts
 var import_node_async_hooks = require("node:async_hooks");
@@ -14653,8 +14653,597 @@ function openInBrowser(url2) {
   (0, import_node_child_process.spawn)(cmd, args, { detached: true, stdio: "ignore", windowsHide: true }).unref();
 }
 
-// src/agent/claude.ts
+// src/accounts/accounts.ts
+var import_node_child_process2 = require("node:child_process");
+var import_node_fs2 = require("node:fs");
+var import_node_path2 = require("node:path");
+var import_yaml2 = __toESM(require_dist(), 1);
+
+// src/core/config.ts
+var import_node_fs = require("node:fs");
 var import_node_path = require("node:path");
+var import_yaml = __toESM(require_dist(), 1);
+var CONNECTION_KINDS = ["jira", "linear", "slack"];
+var WORK_STEPS = ["context", "fix", "unitwrite", "unit", "ui", "validate", "commit", "comment"];
+var DEFAULT_COMMIT_PATTERN = "{type}({area}): {title} [{key}]";
+var TRACKERS = ["jira", "linear"];
+var AGENT_RUNNERS = ["claude", "codex"];
+var RUNNER_DEFAULT_MODEL = { claude: "sonnet", codex: "" };
+function isAgentRunner(value) {
+  return AGENT_RUNNERS.includes(value);
+}
+var CONFIG_DIR = "probe";
+var CONFIG_FILE = "probe.yaml";
+var LOCAL_CONFIG_FILE = "local.yaml";
+var DEFAULTS = {
+  features: { roots: ["feature", "features"] },
+  exclude: [],
+  unit: { androidTask: "testDebugUnitTest", jvmTask: "test" },
+  app: {},
+  builds: { playTrack: "internal" },
+  web: {},
+  verify: { cards: "approved", maxCards: 10 },
+  perf: { maxStartupMs: 4e3, maxJankyPct: 15, maxP90Ms: 32 },
+  tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
+  agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
+  watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
+  security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
+  devices: { allowReal: [] },
+  connections: [],
+  workbench: { commitPattern: DEFAULT_COMMIT_PATTERN, notForMe: { otherAssignee: true, labels: [], statuses: [] }, steps: ["context", "fix", "unitwrite", "unit", "commit"], hidden: [] }
+};
+function configPath(root) {
+  return (0, import_node_path.join)(root, CONFIG_DIR, CONFIG_FILE);
+}
+function loadConfig(root, localDir) {
+  const file2 = configPath(root);
+  const raw = (0, import_node_fs.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs.readFileSync)(file2, "utf8")) ?? {} : {};
+  const local = readLocal(localDir);
+  return {
+    name: raw.name,
+    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots, packages: raw.features?.packages, map: raw.features?.map },
+    exclude: raw.exclude ?? [],
+    areas: raw.areas,
+    unit: { ...DEFAULTS.unit, ...raw.unit },
+    app: { ...raw.app },
+    // Key files and tool paths differ per machine, so they never come from the shared file.
+    builds: { ...DEFAULTS.builds, ...raw.builds, serviceAccount: local.builds?.serviceAccount, bundletool: local.builds?.bundletool },
+    web: { ...raw.web },
+    verify: { ...DEFAULTS.verify, ...raw.verify },
+    perf: { ...DEFAULTS.perf, ...raw.perf },
+    tickets: { ...DEFAULTS.tickets, ...raw.tickets, email: local.tickets?.email },
+    agents: resolveAgents(raw.agents, local.agents),
+    watch: { ...DEFAULTS.watch, ...raw.watch },
+    security: { ...DEFAULTS.security, ...raw.security },
+    devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] },
+    connections: readConnections(raw.connections, local.connections),
+    workbench: readWorkbench(raw.workbench, local.workbench)
+  };
+}
+function strings(value) {
+  return Array.isArray(value) ? value.map((v) => String(v).trim()).filter(Boolean) : [];
+}
+function readConnections(raw, local) {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const kind = item.kind;
+    const id = String(item.id ?? "").trim();
+    if (!CONNECTION_KINDS.includes(kind) || !/^[\w-]{1,40}$/.test(id) || out.some((c) => c.id === id)) continue;
+    const text3 = (k) => typeof item[k] === "string" && item[k].trim() ? item[k].trim() : void 0;
+    const conn = { id, kind, label: text3("label") };
+    if (kind === "jira") Object.assign(conn, { site: text3("site"), filter: text3("filter"), buildField: text3("buildField"), email: local?.[id]?.email });
+    if (kind === "linear") Object.assign(conn, { filter: text3("filter"), team: text3("team") });
+    if (kind === "slack") {
+      conn.workspace = text3("workspace");
+      conn.days = typeof item.days === "number" && item.days > 0 ? Math.min(item.days, 365) : void 0;
+      conn.channels = (Array.isArray(item.channels) ? item.channels : []).filter((c) => c && typeof c.id === "string").map((c) => ({ id: String(c.id), name: String(c.name ?? c.id), search: c.search !== false, post: c.post === true, labels: strings(c.labels) }));
+    }
+    out.push(conn);
+  }
+  return out;
+}
+function readWorkbench(raw, local) {
+  const d = DEFAULTS.workbench;
+  const steps = strings(raw?.steps).filter((s) => WORK_STEPS.includes(s));
+  return {
+    commitPattern: typeof raw?.commitPattern === "string" && raw.commitPattern.trim() ? raw.commitPattern : d.commitPattern,
+    notForMe: {
+      otherAssignee: typeof raw?.notForMe?.otherAssignee === "boolean" ? raw.notForMe.otherAssignee : d.notForMe.otherAssignee,
+      labels: strings(raw?.notForMe?.labels),
+      statuses: strings(raw?.notForMe?.statuses)
+    },
+    steps: steps.length ? steps : d.steps,
+    hidden: strings(local?.hidden)
+  };
+}
+function resolveAgents(team, machine) {
+  const teamRunner = isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner;
+  const runner = isAgentRunner(machine?.runner) ? machine.runner : teamRunner;
+  const model = machine?.model ?? (runner === teamRunner ? team?.model : void 0) ?? RUNNER_DEFAULT_MODEL[runner];
+  return { runner, model: String(model ?? "") };
+}
+var AI_ROLES = ["coding", "review", "testing"];
+function readLocalSettings(localDir) {
+  return readLocal(localDir);
+}
+function readLocal(localDir) {
+  const file2 = (0, import_node_path.join)(localDir, LOCAL_CONFIG_FILE);
+  return (0, import_node_fs.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs.readFileSync)(file2, "utf8")) ?? {} : {};
+}
+function saveLocal(localDir, patch) {
+  const merged = { ...readLocal(localDir), ...patch };
+  for (const key of Object.keys(merged)) if (merged[key] === void 0) delete merged[key];
+  (0, import_node_fs.writeFileSync)((0, import_node_path.join)(localDir, LOCAL_CONFIG_FILE), (0, import_yaml.stringify)(merged));
+}
+function readLocalAgents(localDir) {
+  return readLocal(localDir).agents;
+}
+function localAgents(current3, change) {
+  const next = { ...current3 };
+  if (change.runner !== void 0) {
+    const runner = change.runner?.trim() || void 0;
+    if (runner !== void 0 && !isAgentRunner(runner)) return `Runner: one of ${AGENT_RUNNERS.join(", ")}`;
+    if (runner !== current3?.runner && change.model === void 0) delete next.model;
+    if (runner) next.runner = runner;
+    else delete next.runner;
+  }
+  if (change.model !== void 0) {
+    const model = change.model.trim();
+    if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return "Model: a name the runner's --model accepts, e.g. sonnet";
+    if (model) next.model = model;
+    else delete next.model;
+  }
+  return Object.keys(next).length ? next : void 0;
+}
+function saveLocalDevices(localDir, devices) {
+  saveLocal(localDir, { devices });
+}
+function agentModelSource(root, localDir) {
+  const local = readLocal(localDir).agents;
+  if (local?.model) return "machine";
+  const team = readRaw(root).agents;
+  const switched = isAgentRunner(local?.runner) && local.runner !== (isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner);
+  return team?.model && !switched ? "project" : "default";
+}
+function agentRunnerSource(root, localDir) {
+  if (isAgentRunner(readLocal(localDir).agents?.runner)) return "machine";
+  return isAgentRunner(readRaw(root).agents?.runner) ? "project" : "default";
+}
+function readRaw(root) {
+  const file2 = configPath(root);
+  return (0, import_node_fs.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs.readFileSync)(file2, "utf8")) ?? {} : {};
+}
+var CONFIG_TEMPLATE = `# Probe settings for this project. Everything here is optional.
+# Shared with the team: commit this folder. Local results live outside the repo.
+
+# name: MyApp
+
+features:
+  # Module folders whose next segment is a feature: :feature:chat:impl -> "chat"
+  roots: [feature, features]
+  # Packages whose next segment is a feature, when one module holds several (a KMP "shared"):
+  # packages: [com.example.app]   # com.example.app.money.* -> "money"
+  # Or name each feature's files yourself, in any project (wins over packages):
+  # map:
+  #   money: ["shared/**/money", "composeApp/**/MoneyScreens.kt"]
+
+# Leave features or modules out of scans and runs (prefix match).
+exclude: []
+#  - universe
+#  - :feature:legacy
+
+unit:
+  androidTask: testDebugUnitTest
+  jvmTask: test
+  # Projects without Gradle: the command that runs the unit tests, optionally per area,
+  # and where it writes JUnit XML (else results come from its output and exit code).
+  # command: npm test
+  # areas:
+  #   engine: npx vitest run src/engine
+  # junit: reports/junit.xml
+
+# Areas of a project without Gradle (default: top-level folders and those inside src/,
+# lib/, packages/, apps/...). A list makes each matching folder an area; a map names them.
+# areas: [packages/*, services/*]
+# areas:
+#   engine: src/engine
+#   web: [web/src, web/public]
+
+# The app agents test on a device.
+app:
+  # package: com.example.app.debug
+  # installTask: ":app:installDebug"
+  # releasePackage: com.example.app   # the release build's id, when it differs
+
+# Testing a finished build instead of the working tree (Studio -> Tickets, Verify).
+# The Google service account key file is set per machine in Studio -> Settings.
+# builds:
+#   firebaseApp: "1:1234567890:android:abc123"   # Firebase App Distribution
+#   playTrack: internal                          # Google Play track
+#   tag: "v{build}"                              # git tag of a build number
+
+# The deployed web app agents test in a browser.
+# web:
+#   url: https://staging.example.com
+
+# Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
+# probe/hints/accounts.yaml; passwords stay encrypted on each machine).
+
+# Probe's background agents: the coding-agent CLI they run on and its model.
+# runner: claude (Claude Code, default) or codex (Codex CLI). Each machine can override both
+# in Studio -> Settings. A model is a name that runner's --model accepts; leave it out for
+# the runner's default (claude: sonnet, codex: your ~/.codex/config.toml model).
+agents:
+  runner: claude
+  model: sonnet
+
+# probe verify: what a change is checked against.
+verify:
+  # base: origin/develop
+  cards: approved      # or: all (drafts too)
+  maxCards: 10
+
+# Device-run warnings (never failures on their own).
+perf:
+  maxStartupMs: 4000
+  maxJankyPct: 15
+  maxP90Ms: 32
+  # maxMemoryMb: 400
+
+# Keeping features current while you code (edit hooks, Studio's file watcher).
+watch:
+  enabled: true
+  drafts: true         # an agent drafts manifest and brief corrections for review
+  maxFeatures: 3
+  impactDepth: 1       # a platform edit marks the areas depending on it stale; 2 reaches theirs, 0 is off
+
+tickets:
+  # pattern: 'PROJ-\\d+'
+  # url: https://jira.example.com/browse/{id}
+  # fileCommand: gh issue create --title {title} --body-file {file}
+  # The ticket inbox (Studio -> Tickets). Connect in Studio -> Settings; tokens stay on each machine.
+  # tracker: jira                      # or: linear
+  # site: https://acme.atlassian.net   # Jira only
+  # filter: 'status = "Ready for QA"'  # Jira: JQL. Linear: status names, comma separated
+`;
+function isExcluded(config2, featureId, moduleId) {
+  return config2.exclude.some(
+    (rule2) => featureId === rule2 || featureId.startsWith(`${rule2}:`) || (moduleId?.startsWith(rule2) ?? false)
+  );
+}
+function saveConnections(root, list2) {
+  const file2 = configPath(root);
+  if (!(0, import_node_fs.existsSync)(file2)) {
+    (0, import_node_fs.mkdirSync)((0, import_node_path.join)(root, CONFIG_DIR), { recursive: true });
+    (0, import_node_fs.writeFileSync)(file2, CONFIG_TEMPLATE);
+  }
+  const doc = (0, import_yaml.parseDocument)((0, import_node_fs.readFileSync)(file2, "utf8"));
+  const shared = list2.filter((c) => !c.legacy).map(({ email: _email2, legacy: _legacy, ...c }) => Object.fromEntries(Object.entries(c).filter(([, v]) => v !== void 0 && v !== "")));
+  if (shared.length) doc.set("connections", doc.createNode(shared));
+  else doc.delete("connections");
+  (0, import_node_fs.writeFileSync)(file2, doc.toString());
+}
+function saveProject(root, patch) {
+  const file2 = configPath(root);
+  if (!(0, import_node_fs.existsSync)(file2)) {
+    (0, import_node_fs.mkdirSync)((0, import_node_path.join)(root, CONFIG_DIR), { recursive: true });
+    (0, import_node_fs.writeFileSync)(file2, CONFIG_TEMPLATE);
+  }
+  const doc = (0, import_yaml.parseDocument)((0, import_node_fs.readFileSync)(file2, "utf8"));
+  for (const [section, values] of Object.entries(patch)) {
+    const added = !doc.has(section);
+    if (!(0, import_yaml.isMap)(doc.get(section))) doc.set(section, doc.createNode({}));
+    for (const [key, value] of Object.entries(values ?? {})) {
+      if (value === void 0) continue;
+      if (value === null || value === "") doc.deleteIn([section, key]);
+      else doc.setIn([section, key], value);
+    }
+    const node2 = doc.get(section);
+    if (added && (0, import_yaml.isMap)(node2) && node2.items.length === 0) doc.delete(section);
+  }
+  (0, import_node_fs.writeFileSync)(file2, doc.toString());
+}
+
+// src/accounts/accounts.ts
+function accountsFile(root) {
+  return (0, import_node_path2.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
+}
+function listAccounts(root) {
+  const file2 = accountsFile(root);
+  if (!(0, import_node_fs2.existsSync)(file2)) return [];
+  const raw = (0, import_yaml2.parse)((0, import_node_fs2.readFileSync)(file2, "utf8")) ?? {};
+  return (raw.accounts ?? []).filter((a) => a.role && a.username);
+}
+function accountsForPrompt(project) {
+  const secrets = new Secrets(project.store.dir);
+  const lines = listAccounts(project.root).map(
+    (a) => `- ${a.role}: ${a.username}${a.shownAs ? ` \xB7 shown in the app as "${a.shownAs}"` : ""}${a.notes ? ` (${a.notes})` : ""} \xB7 password ${secrets.has(a.role, "password") ? "stored" : "NOT stored"} \xB7 login code ${secrets.has(a.role, "code") ? "stored" : "not stored"}`
+  );
+  return lines.length ? lines.join("\n") : "None configured.";
+}
+function saveAccount(root, account) {
+  const accounts = listAccounts(root).filter((a) => a.role !== account.role);
+  writeAccounts(root, [
+    ...accounts,
+    { role: account.role, username: account.username, ...account.shownAs ? { shownAs: account.shownAs } : {}, ...account.notes ? { notes: account.notes } : {} }
+  ]);
+}
+function removeAccount(root, role) {
+  writeAccounts(root, listAccounts(root).filter((a) => a.role !== role));
+}
+function writeAccounts(root, accounts) {
+  const file2 = accountsFile(root);
+  (0, import_node_fs2.mkdirSync)((0, import_node_path2.dirname)(file2), { recursive: true });
+  (0, import_node_fs2.writeFileSync)(file2, `# Test accounts: roles and usernames only. Passwords stay on each machine.
+${(0, import_yaml2.stringify)({ accounts })}`);
+}
+var Secrets = class {
+  file;
+  constructor(storeDir) {
+    this.file = (0, import_node_path2.join)(storeDir, "secrets.json");
+  }
+  load() {
+    return (0, import_node_fs2.existsSync)(this.file) ? JSON.parse((0, import_node_fs2.readFileSync)(this.file, "utf8")) : {};
+  }
+  has(role, kind) {
+    return this.hasKey(`${role}.${kind}`);
+  }
+  get(role, kind) {
+    return this.getKey(`${role}.${kind}`);
+  }
+  set(role, kind, value) {
+    this.setKey(`${role}.${kind}`, value);
+  }
+  /** Secrets that are not a test account's, such as a ticket tracker's API token, by name. */
+  hasKey(name) {
+    return name in this.load();
+  }
+  getKey(name) {
+    const sealed = this.load()[name];
+    return sealed === void 0 ? null : unseal(sealed);
+  }
+  setKey(name, value) {
+    const all = this.load();
+    all[name] = seal(value);
+    (0, import_node_fs2.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+    if (!isWindows) (0, import_node_fs2.chmodSync)(this.file, 384);
+  }
+  removeKey(name) {
+    const all = this.load();
+    delete all[name];
+    (0, import_node_fs2.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+  }
+  /** Forgets every secret of a role. */
+  remove(role) {
+    const all = this.load();
+    for (const kind of ["password", "code"]) delete all[`${role}.${kind}`];
+    (0, import_node_fs2.writeFileSync)(this.file, JSON.stringify(all, null, 2));
+  }
+};
+var PS_PROTECT = "Add-Type -AssemblyName System.Security; [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect([Text.Encoding]::UTF8.GetBytes($env:PROBE_SECRET), $null, 'CurrentUser'))";
+var PS_UNPROTECT = "Add-Type -AssemblyName System.Security; [Text.Encoding]::UTF8.GetString([Security.Cryptography.ProtectedData]::Unprotect([Convert]::FromBase64String($env:PROBE_SECRET), $null, 'CurrentUser'))";
+function powershell(script, input2) {
+  const r = (0, import_node_child_process2.spawnSync)("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
+    encoding: "utf8",
+    windowsHide: true,
+    env: { ...process.env, PROBE_SECRET: input2 },
+    timeout: 2e4
+  });
+  if (r.status !== 0) throw new Error(`Could not access the Windows credential store: ${r.stderr.trim()}`);
+  return r.stdout.replace(/\r?\n$/, "");
+}
+function seal(value) {
+  return isWindows ? `dpapi:${powershell(PS_PROTECT, value)}` : `plain:${value}`;
+}
+function unseal(sealed) {
+  if (sealed.startsWith("dpapi:")) return powershell(PS_UNPROTECT, sealed.slice(6));
+  return sealed.replace(/^plain:/, "");
+}
+
+// src/connections/connections.ts
+var KIND_LABEL = { jira: "Jira", linear: "Linear", slack: "Slack", ai: "AI account" };
+function groupOf(kind) {
+  return kind === "slack" ? "conversations" : "tickets";
+}
+function legacyTracker(config2) {
+  const t = config2.tickets;
+  if (!t.tracker) return null;
+  return { id: "tracker", kind: t.tracker, site: t.site, filter: t.filter, team: t.team, buildField: t.buildField, email: t.email, legacy: true };
+}
+function connections(project) {
+  const list2 = [...project.config.connections];
+  const legacy = legacyTracker(project.config);
+  if (legacy && !list2.some((c) => c.id === legacy.id)) list2.unshift(legacy);
+  return list2;
+}
+function trackerConnections(project) {
+  return connections(project).filter((c) => c.kind === "jira" || c.kind === "linear");
+}
+function slackConnections(project) {
+  return connections(project).filter((c) => c.kind === "slack");
+}
+function findConnection(project, id) {
+  return connections(project).find((c) => c.id === id);
+}
+function connectionTokenKey(conn) {
+  return conn.legacy ? `tracker.${conn.kind}.token` : `connection.${conn.id}.token`;
+}
+function connectionToken(project, conn) {
+  return new Secrets(project.store.dir).getKey(connectionTokenKey(conn));
+}
+function hasConnectionToken(project, conn) {
+  return new Secrets(project.store.dir).hasKey(connectionTokenKey(conn));
+}
+function connectionMissing(conn, hasToken) {
+  if (conn.kind === "jira" && !conn.site) return "Jira needs the site address, e.g. https://acme.atlassian.net.";
+  if (!hasToken) return `No ${KIND_LABEL[conn.kind]} ${conn.kind === "slack" ? "token" : "API token"} on this machine for this project.`;
+  if (conn.kind === "slack" && !(conn.channels ?? []).length) return "No channel added yet.";
+  return null;
+}
+function connectionLabel(conn) {
+  if (conn.label) return conn.label;
+  if (conn.kind === "jira") return `Jira${conn.site ? ` \xB7 ${conn.site.replace(/^https?:\/\//, "")}` : ""}`;
+  if (conn.kind === "linear") return `Linear${conn.team ? ` \xB7 ${conn.team}` : ""}`;
+  return `Slack${conn.workspace ? ` \xB7 ${conn.workspace}` : ""}`;
+}
+function newConnectionId(existing, kind) {
+  if (!existing.some((c) => c.id === kind)) return kind;
+  for (let n = 2; ; n++) if (!existing.some((c) => c.id === `${kind}-${n}`)) return `${kind}-${n}`;
+}
+function cleanSite(raw) {
+  let site = raw?.trim().replace(/\/+$/, "") || "";
+  if (!site) return { error: "Jira needs the site address, e.g. https://acme.atlassian.net" };
+  if (!/^https?:\/\//i.test(site)) site = `https://${site}`;
+  try {
+    const url2 = new URL(site);
+    if (url2.username || url2.password || url2.search || url2.hash) return { error: "Site: only the address, e.g. https://acme.atlassian.net" };
+    return url2.origin + url2.pathname.replace(/\/+$/, "");
+  } catch {
+    return { error: "Site: a web address, e.g. https://acme.atlassian.net" };
+  }
+}
+var text = (v) => v?.trim() || void 0;
+function saveConnection(project, body) {
+  const list2 = connections(project);
+  const existing = body.id ? list2.find((c) => c.id === body.id) : void 0;
+  if (body.id && !existing) return { error: `This project has no connection ${body.id}.` };
+  const kind = existing?.kind ?? body.kind;
+  if (!["jira", "linear", "slack"].includes(kind)) return { error: "Kind: jira, linear or slack" };
+  const conn = { id: existing && !existing.legacy ? existing.id : newConnectionId(list2.filter((c) => !c.legacy), kind), kind, label: text(body.label) };
+  if (kind === "jira") {
+    const site = cleanSite(body.site ?? existing?.site);
+    if (typeof site !== "string") return site;
+    const email3 = text(body.email);
+    if (email3 && !/^\S+@\S+$/.test(email3)) return { error: "Email: the address of the Jira account the token belongs to" };
+    Object.assign(conn, { site, filter: text(body.filter), buildField: text(body.buildField), email: email3 });
+  } else if (kind === "linear") {
+    Object.assign(conn, { filter: text(body.filter), team: text(body.team) });
+  } else {
+    const channels = [];
+    for (const c of body.channels ?? existing?.channels ?? []) {
+      const id = String(c.id ?? "").trim();
+      if (!/^[A-Z0-9]{6,20}$/.test(id) || channels.some((x) => x.id === id)) continue;
+      const labels = Array.isArray(c.labels) ? c.labels.map((l) => String(l).trim()).filter(Boolean) : [];
+      channels.push({ id, name: String(c.name ?? id).replace(/^#/, ""), search: c.search !== false, post: c.post === true, labels });
+    }
+    const days = body.days ?? existing?.days;
+    Object.assign(conn, { workspace: text(body.workspace ?? existing?.workspace), channels, days: days && days > 0 ? Math.min(Math.round(days), 365) : void 0 });
+  }
+  const secrets = new Secrets(project.store.dir);
+  if (existing?.legacy) {
+    const old = secrets.getKey(connectionTokenKey(existing));
+    if (old && !body.token?.trim()) secrets.setKey(connectionTokenKey(conn), old);
+    secrets.removeKey(connectionTokenKey(existing));
+    retireLegacy(project);
+  }
+  const next = existing && !existing.legacy ? list2.map((c) => c.id === conn.id ? conn : c) : [...list2, conn];
+  saveConnections(project.root, next.filter((c) => !c.legacy));
+  if (kind === "jira") {
+    const local = readLocalSettings(project.store.dir).connections ?? {};
+    saveLocal(project.store.dir, { connections: { ...local, [conn.id]: conn.email ? { email: conn.email } : {} } });
+  }
+  if (body.token?.trim()) secrets.setKey(connectionTokenKey(conn), body.token.trim());
+  project.config = loadConfig(project.root, project.store.dir);
+  return { id: conn.id };
+}
+function retireLegacy(project) {
+  saveProject(project.root, { tickets: { tracker: null, site: null, filter: null, team: null, buildField: null } });
+}
+function removeConnection(project, id) {
+  const conn = findConnection(project, id);
+  if (!conn) return false;
+  new Secrets(project.store.dir).removeKey(connectionTokenKey(conn));
+  if (conn.legacy) retireLegacy(project);
+  else saveConnections(project.root, connections(project).filter((c) => c.id !== id && !c.legacy));
+  project.config = loadConfig(project.root, project.store.dir);
+  return true;
+}
+function disconnect(project, id) {
+  const conn = findConnection(project, id);
+  if (!conn) return false;
+  new Secrets(project.store.dir).removeKey(connectionTokenKey(conn));
+  return true;
+}
+var ROLE_LABEL = {
+  coding: "Coding: writing changes and tests",
+  review: "Review: checking a change against its ticket",
+  testing: "Testing and everything else: cards, devices, drafts"
+};
+var apiKeyName = (id) => `ai.${id}.apiKey`;
+function aiSettings(project) {
+  const ai = readLocalSettings(project.store.dir).ai ?? {};
+  const secrets = new Secrets(project.store.dir);
+  const accounts = (ai.accounts ?? []).map((a) => ({ ...a, hasKey: a.mode === "apiKey" ? secrets.hasKey(apiKeyName(a.id)) : void 0 }));
+  return { accounts, use: ai.use ?? {}, roles: AI_ROLES.map((id) => ({ id, label: ROLE_LABEL[id] })) };
+}
+function saveAiAccount(project, body) {
+  const ai = readLocalSettings(project.store.dir).ai ?? {};
+  const accounts = [...ai.accounts ?? []];
+  const name = text(body.name);
+  if (!name) return { error: "Give the account a name you will recognise, e.g. Work Claude (Max)." };
+  const mode = body.mode ?? "default";
+  if (!["default", "profile", "apiKey"].includes(mode)) return { error: "Sign-in: default, profile or apiKey" };
+  const profileDir = text(body.profileDir);
+  if (mode === "profile" && !profileDir) return { error: "Give the folder that holds this account's own login, e.g. C:\\Users\\you\\.claude-work" };
+  let id = body.id && accounts.some((a) => a.id === body.id) ? body.id : "";
+  if (!id) {
+    const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "account";
+    id = base;
+    for (let n = 2; accounts.some((a) => a.id === id); n++) id = `${base}-${n}`;
+  }
+  const secrets = new Secrets(project.store.dir);
+  if (mode === "apiKey" && body.apiKey?.trim()) secrets.setKey(apiKeyName(id), body.apiKey.trim());
+  if (mode === "apiKey" && !secrets.hasKey(apiKeyName(id))) return { error: "Paste the API key for this account." };
+  if (mode !== "apiKey") secrets.removeKey(apiKeyName(id));
+  const account = { id, name, mode, profileDir: mode === "profile" ? profileDir : void 0 };
+  const at = accounts.findIndex((a) => a.id === id);
+  if (at >= 0) accounts[at] = account;
+  else accounts.push(account);
+  saveLocal(project.store.dir, { ai: { ...ai, accounts } });
+  return { id };
+}
+function removeAiAccount(project, id) {
+  const ai = readLocalSettings(project.store.dir).ai ?? {};
+  new Secrets(project.store.dir).removeKey(apiKeyName(id));
+  const use = Object.fromEntries(Object.entries(ai.use ?? {}).map(([role, u]) => [role, u?.account === id ? { ...u, account: void 0 } : u]));
+  saveLocal(project.store.dir, { ai: { accounts: (ai.accounts ?? []).filter((a) => a.id !== id), use } });
+}
+function saveAiUse(project, use) {
+  const ai = readLocalSettings(project.store.dir).ai ?? {};
+  const ids = new Set((ai.accounts ?? []).map((a) => a.id));
+  const next = {};
+  for (const role of AI_ROLES) {
+    const u = use[role];
+    if (!u) continue;
+    const account = u.account?.trim() || void 0;
+    const model = u.model?.trim() || void 0;
+    if (account && !ids.has(account)) return `${ROLE_LABEL[role]}: unknown account ${account}`;
+    if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return `${ROLE_LABEL[role]}: a model name such as opus or claude-opus-5-5`;
+    if (account || model) next[role] = { account, model };
+  }
+  saveLocal(project.store.dir, { ai: { ...ai, use: next } });
+  return null;
+}
+function aiFor(project, role = "testing") {
+  const ai = readLocalSettings(project.store.dir).ai ?? {};
+  const use = ai.use?.[role] ?? {};
+  const account = (ai.accounts ?? []).find((a) => a.id === use.account) ?? (ai.accounts ?? [])[0];
+  return { account, model: use.model };
+}
+function aiEnv(project, account) {
+  const codex = project.config.agents.runner === "codex";
+  if (account?.mode === "profile" && account.profileDir) return codex ? { CODEX_HOME: account.profileDir } : { CLAUDE_CONFIG_DIR: account.profileDir };
+  if (account?.mode === "apiKey") {
+    const key = new Secrets(project.store.dir).getKey(apiKeyName(account.id));
+    if (key) return codex ? { OPENAI_API_KEY: key } : { ANTHROPIC_API_KEY: key };
+  }
+  return {};
+}
+
+// src/agent/claude.ts
+var import_node_path3 = require("node:path");
 
 // src/agent/runner.ts
 function toolArg(input2) {
@@ -14666,11 +15255,11 @@ function toolArg(input2) {
   if (Array.isArray(input2.cards)) return `(${input2.cards.length} cards)`;
   return "";
 }
-function oneLine(text2, max = 300) {
-  return text2.trim().replace(/\s+/g, " ").slice(0, max);
+function oneLine(text3, max = 300) {
+  return text3.trim().replace(/\s+/g, " ").slice(0, max);
 }
-function looksLimited(text2) {
-  return /usage credits|usage limit|out of .*credits|rate limit|quota/i.test(text2);
+function looksLimited(text3) {
+  return /usage credits|usage limit|out of .*credits|rate limit|quota/i.test(text3);
 }
 function parseJsonLine(line) {
   if (!line.startsWith("{")) return null;
@@ -14696,7 +15285,7 @@ var claudeRunner = {
     ["fable", "Fable \u2014 may bill usage credits on your plan"]
   ],
   launch({ task, model, mcp, scratchDir, id }) {
-    const mcpConfig = (0, import_node_path.join)(scratchDir, `agent-mcp-${id}.json`);
+    const mcpConfig = (0, import_node_path3.join)(scratchDir, `agent-mcp-${id}.json`);
     const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
     const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
     const allowed = [...task.probeTools.map((t) => `mcp__probe__${t}`), ...builtins, ...task.allowEdits ? ["Edit", "Write"] : [], ...scoped];
@@ -14755,9 +15344,9 @@ var claudeRunner = {
   parseCheck(out, model) {
     try {
       const r = JSON.parse(out.slice(out.indexOf("{")));
-      const text2 = String(r.result ?? "").trim();
+      const text3 = String(r.result ?? "").trim();
       const used = Object.keys(r.modelUsage ?? {})[0] ?? model;
-      return { ok: !r.is_error && !looksLimited(text2), model: used, message: text2.slice(0, 300), costUsd: Number(r.total_cost_usd ?? 0) };
+      return { ok: !r.is_error && !looksLimited(text3), model: used, message: text3.slice(0, 300), costUsd: Number(r.total_cost_usd ?? 0) };
     } catch {
       return { ok: false, model, message: out.slice(0, 300) || "claude did not answer", costUsd: 0 };
     }
@@ -14786,9 +15375,9 @@ function describe(event) {
 }
 
 // src/agent/codex.ts
-var import_node_fs = require("node:fs");
+var import_node_fs3 = require("node:fs");
 var import_node_os = require("node:os");
-var import_node_path2 = require("node:path");
+var import_node_path4 = require("node:path");
 function codexRunner(readSettings = readCodexUserSettings) {
   const base = (settings, model, sandbox) => [
     "exec",
@@ -14908,15 +15497,15 @@ function codexParser() {
     }
   };
 }
-function readCodexUserSettings(home = process.env.CODEX_HOME || (0, import_node_path2.join)((0, import_node_os.homedir)(), ".codex")) {
-  const file2 = (0, import_node_path2.join)(home, "config.toml");
-  if (!(0, import_node_fs.existsSync)(file2)) return {};
-  return parseCodexUserSettings((0, import_node_fs.readFileSync)(file2, "utf8"));
+function readCodexUserSettings(home = process.env.CODEX_HOME || (0, import_node_path4.join)((0, import_node_os.homedir)(), ".codex")) {
+  const file2 = (0, import_node_path4.join)(home, "config.toml");
+  if (!(0, import_node_fs3.existsSync)(file2)) return {};
+  return parseCodexUserSettings((0, import_node_fs3.readFileSync)(file2, "utf8"));
 }
-function parseCodexUserSettings(text2) {
+function parseCodexUserSettings(text3) {
   const settings = {};
   let table = "";
-  for (const raw of text2.split(/\r?\n/)) {
+  for (const raw of text3.split(/\r?\n/)) {
     const line = raw.trim();
     const header = /^\[([^\]]+)\]$/.exec(line);
     if (header) {
@@ -14946,14 +15535,18 @@ function allRunners() {
 // src/agent/headless.ts
 async function runAgent(project, task, log) {
   const runner = agentRunner(project.config.agents.runner);
+  const chosen = aiFor(project, task.role);
+  const account = task.account ? aiSettings(project).accounts.find((a) => a.id === task.account) : chosen.account;
   const launch = runner.launch({
     task,
-    model: task.model ?? project.config.agents.model,
+    model: task.model ?? chosen.model ?? project.config.agents.model,
     mcp: probeMcpServer(project, task.mcpEnv),
     scratchDir: project.store.dir,
     // Two agents running at once must not share a config file.
     id: `${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
   });
+  launch.env = { ...launch.env, ...aiEnv(project, account) };
+  if (account) log(`account: ${account.name}`);
   const parser = runner.parser();
   const exitCode = await withFiles(
     launch,
@@ -14963,9 +15556,11 @@ async function runAgent(project, task, log) {
   if (exitCode !== 0 && result.ok) result.ok = false;
   return result;
 }
-async function checkModel(project, model) {
+async function checkModel(project, model, accountId) {
   const runner = agentRunner(project.config.agents.runner);
   const launch = runner.checkLaunch(model);
+  const account = accountId ? aiSettings(project).accounts.find((a) => a.id === accountId) : aiFor(project).account;
+  launch.env = { ...launch.env, ...aiEnv(project, account) };
   let out = "";
   try {
     await withFiles(launch, () => stream(launch.command, launch.args, project.root, (l) => out += `${l}
@@ -14976,43 +15571,43 @@ async function checkModel(project, model) {
   return runner.parseCheck(out, model);
 }
 function probeMcpServer(project, extraEnv = {}) {
-  return { command: process.execPath, args: [(0, import_node_path3.resolve)(process.argv[1]), "mcp"], env: { PROBE_PROJECT: project.root, ...extraEnv } };
+  return { command: process.execPath, args: [(0, import_node_path5.resolve)(process.argv[1]), "mcp"], env: { PROBE_PROJECT: project.root, ...extraEnv } };
 }
 async function withFiles(launch, work) {
-  for (const f of launch.files) (0, import_node_fs2.writeFileSync)(f.path, f.content);
+  for (const f of launch.files) (0, import_node_fs4.writeFileSync)(f.path, f.content);
   try {
     return await work();
   } finally {
-    for (const f of launch.files) (0, import_node_fs2.rmSync)(f.path, { force: true });
+    for (const f of launch.files) (0, import_node_fs4.rmSync)(f.path, { force: true });
   }
 }
 
 // src/core/store.ts
 var import_node_crypto = require("node:crypto");
-var import_node_fs3 = require("node:fs");
+var import_node_fs5 = require("node:fs");
 var import_node_os2 = require("node:os");
-var import_node_path4 = require("node:path");
+var import_node_path6 = require("node:path");
 var Store = class {
   dir;
   constructor(projectRoot) {
-    const abs = (0, import_node_path4.resolve)(projectRoot);
+    const abs = (0, import_node_path6.resolve)(projectRoot);
     const hash3 = (0, import_node_crypto.createHash)("sha1").update(abs.toLowerCase()).digest("hex").slice(0, 10);
-    this.dir = (0, import_node_path4.join)((0, import_node_os2.homedir)(), ".probe", "projects", `${(0, import_node_path4.basename)(abs)}-${hash3}`);
-    (0, import_node_fs3.mkdirSync)((0, import_node_path4.join)(this.dir, "runs"), { recursive: true });
+    this.dir = (0, import_node_path6.join)((0, import_node_os2.homedir)(), ".probe", "projects", `${(0, import_node_path6.basename)(abs)}-${hash3}`);
+    (0, import_node_fs5.mkdirSync)((0, import_node_path6.join)(this.dir, "runs"), { recursive: true });
   }
   read(name) {
-    const file2 = (0, import_node_path4.join)(this.dir, name);
-    if (!(0, import_node_fs3.existsSync)(file2)) return null;
-    return JSON.parse((0, import_node_fs3.readFileSync)(file2, "utf8"));
+    const file2 = (0, import_node_path6.join)(this.dir, name);
+    if (!(0, import_node_fs5.existsSync)(file2)) return null;
+    return JSON.parse((0, import_node_fs5.readFileSync)(file2, "utf8"));
   }
   write(name, value) {
-    (0, import_node_fs3.writeFileSync)((0, import_node_path4.join)(this.dir, name), JSON.stringify(value, null, 2));
+    (0, import_node_fs5.writeFileSync)((0, import_node_path6.join)(this.dir, name), JSON.stringify(value, null, 2));
   }
   writeRun(id, value) {
-    this.write((0, import_node_path4.join)("runs", `${id}.json`), value);
+    this.write((0, import_node_path6.join)("runs", `${id}.json`), value);
   }
   listRuns() {
-    return (0, import_node_fs3.readdirSync)((0, import_node_path4.join)(this.dir, "runs")).filter((f) => f.endsWith(".json")).sort().reverse().map((f) => this.read((0, import_node_path4.join)("runs", f))).filter((r) => r !== null);
+    return (0, import_node_fs5.readdirSync)((0, import_node_path6.join)(this.dir, "runs")).filter((f) => f.endsWith(".json")).sort().reverse().map((f) => this.read((0, import_node_path6.join)("runs", f))).filter((r) => r !== null);
   }
 };
 var issued = /* @__PURE__ */ new Set();
@@ -15112,8 +15707,8 @@ function stopRun(id) {
   return true;
 }
 function launchRun(project, run, work) {
-  const git2 = gitState(project.root);
-  if (git2) run.git = { branch: git2.branch, commit: git2.commit, dirty: git2.dirty };
+  const git3 = gitState(project.root);
+  if (git3) run.git = { branch: git3.branch, commit: git3.commit, dirty: git3.dirty };
   const stop = new AbortController();
   const parent = runSignal.getStore();
   parent?.addEventListener("abort", () => stop.abort(), { once: true });
@@ -15146,236 +15741,10 @@ function launchRun(project, run, work) {
   return { run, done };
 }
 
-// src/core/config.ts
-var import_node_fs4 = require("node:fs");
-var import_node_path5 = require("node:path");
-var import_yaml = __toESM(require_dist(), 1);
-var TRACKERS = ["jira", "linear"];
-var AGENT_RUNNERS = ["claude", "codex"];
-var RUNNER_DEFAULT_MODEL = { claude: "sonnet", codex: "" };
-function isAgentRunner(value) {
-  return AGENT_RUNNERS.includes(value);
-}
-var CONFIG_DIR = "probe";
-var CONFIG_FILE = "probe.yaml";
-var LOCAL_CONFIG_FILE = "local.yaml";
-var DEFAULTS = {
-  features: { roots: ["feature", "features"] },
-  exclude: [],
-  unit: { androidTask: "testDebugUnitTest", jvmTask: "test" },
-  app: {},
-  builds: { playTrack: "internal" },
-  web: {},
-  verify: { cards: "approved", maxCards: 10 },
-  perf: { maxStartupMs: 4e3, maxJankyPct: 15, maxP90Ms: 32 },
-  tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
-  agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
-  watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
-  security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
-  devices: { allowReal: [] }
-};
-function configPath(root) {
-  return (0, import_node_path5.join)(root, CONFIG_DIR, CONFIG_FILE);
-}
-function loadConfig(root, localDir) {
-  const file2 = configPath(root);
-  const raw = (0, import_node_fs4.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file2, "utf8")) ?? {} : {};
-  const local = readLocal(localDir);
-  return {
-    name: raw.name,
-    features: { roots: raw.features?.roots ?? DEFAULTS.features.roots, packages: raw.features?.packages, map: raw.features?.map },
-    exclude: raw.exclude ?? [],
-    areas: raw.areas,
-    unit: { ...DEFAULTS.unit, ...raw.unit },
-    app: { ...raw.app },
-    // Key files and tool paths differ per machine, so they never come from the shared file.
-    builds: { ...DEFAULTS.builds, ...raw.builds, serviceAccount: local.builds?.serviceAccount, bundletool: local.builds?.bundletool },
-    web: { ...raw.web },
-    verify: { ...DEFAULTS.verify, ...raw.verify },
-    perf: { ...DEFAULTS.perf, ...raw.perf },
-    tickets: { ...DEFAULTS.tickets, ...raw.tickets, email: local.tickets?.email },
-    agents: resolveAgents(raw.agents, local.agents),
-    watch: { ...DEFAULTS.watch, ...raw.watch },
-    security: { ...DEFAULTS.security, ...raw.security },
-    devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] }
-  };
-}
-function resolveAgents(team, machine) {
-  const teamRunner = isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner;
-  const runner = isAgentRunner(machine?.runner) ? machine.runner : teamRunner;
-  const model = machine?.model ?? (runner === teamRunner ? team?.model : void 0) ?? RUNNER_DEFAULT_MODEL[runner];
-  return { runner, model: String(model ?? "") };
-}
-function readLocal(localDir) {
-  const file2 = (0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE);
-  return (0, import_node_fs4.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file2, "utf8")) ?? {} : {};
-}
-function saveLocal(localDir, patch) {
-  const merged = { ...readLocal(localDir), ...patch };
-  for (const key of Object.keys(merged)) if (merged[key] === void 0) delete merged[key];
-  (0, import_node_fs4.writeFileSync)((0, import_node_path5.join)(localDir, LOCAL_CONFIG_FILE), (0, import_yaml.stringify)(merged));
-}
-function readLocalAgents(localDir) {
-  return readLocal(localDir).agents;
-}
-function localAgents(current3, change) {
-  const next = { ...current3 };
-  if (change.runner !== void 0) {
-    const runner = change.runner?.trim() || void 0;
-    if (runner !== void 0 && !isAgentRunner(runner)) return `Runner: one of ${AGENT_RUNNERS.join(", ")}`;
-    if (runner !== current3?.runner && change.model === void 0) delete next.model;
-    if (runner) next.runner = runner;
-    else delete next.runner;
-  }
-  if (change.model !== void 0) {
-    const model = change.model.trim();
-    if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return "Model: a name the runner's --model accepts, e.g. sonnet";
-    if (model) next.model = model;
-    else delete next.model;
-  }
-  return Object.keys(next).length ? next : void 0;
-}
-function saveLocalDevices(localDir, devices) {
-  saveLocal(localDir, { devices });
-}
-function agentModelSource(root, localDir) {
-  const local = readLocal(localDir).agents;
-  if (local?.model) return "machine";
-  const team = readRaw(root).agents;
-  const switched = isAgentRunner(local?.runner) && local.runner !== (isAgentRunner(team?.runner) ? team.runner : DEFAULTS.agents.runner);
-  return team?.model && !switched ? "project" : "default";
-}
-function agentRunnerSource(root, localDir) {
-  if (isAgentRunner(readLocal(localDir).agents?.runner)) return "machine";
-  return isAgentRunner(readRaw(root).agents?.runner) ? "project" : "default";
-}
-function readRaw(root) {
-  const file2 = configPath(root);
-  return (0, import_node_fs4.existsSync)(file2) ? (0, import_yaml.parse)((0, import_node_fs4.readFileSync)(file2, "utf8")) ?? {} : {};
-}
-var CONFIG_TEMPLATE = `# Probe settings for this project. Everything here is optional.
-# Shared with the team: commit this folder. Local results live outside the repo.
-
-# name: MyApp
-
-features:
-  # Module folders whose next segment is a feature: :feature:chat:impl -> "chat"
-  roots: [feature, features]
-  # Packages whose next segment is a feature, when one module holds several (a KMP "shared"):
-  # packages: [com.example.app]   # com.example.app.money.* -> "money"
-  # Or name each feature's files yourself, in any project (wins over packages):
-  # map:
-  #   money: ["shared/**/money", "composeApp/**/MoneyScreens.kt"]
-
-# Leave features or modules out of scans and runs (prefix match).
-exclude: []
-#  - universe
-#  - :feature:legacy
-
-unit:
-  androidTask: testDebugUnitTest
-  jvmTask: test
-  # Projects without Gradle: the command that runs the unit tests, optionally per area,
-  # and where it writes JUnit XML (else results come from its output and exit code).
-  # command: npm test
-  # areas:
-  #   engine: npx vitest run src/engine
-  # junit: reports/junit.xml
-
-# Areas of a project without Gradle (default: top-level folders and those inside src/,
-# lib/, packages/, apps/...). A list makes each matching folder an area; a map names them.
-# areas: [packages/*, services/*]
-# areas:
-#   engine: src/engine
-#   web: [web/src, web/public]
-
-# The app agents test on a device.
-app:
-  # package: com.example.app.debug
-  # installTask: ":app:installDebug"
-  # releasePackage: com.example.app   # the release build's id, when it differs
-
-# Testing a finished build instead of the working tree (Studio -> Tickets, Verify).
-# The Google service account key file is set per machine in Studio -> Settings.
-# builds:
-#   firebaseApp: "1:1234567890:android:abc123"   # Firebase App Distribution
-#   playTrack: internal                          # Google Play track
-#   tag: "v{build}"                              # git tag of a build number
-
-# The deployed web app agents test in a browser.
-# web:
-#   url: https://staging.example.com
-
-# Test accounts: add them in Studio -> Accounts (roles and usernames are saved to
-# probe/hints/accounts.yaml; passwords stay encrypted on each machine).
-
-# Probe's background agents: the coding-agent CLI they run on and its model.
-# runner: claude (Claude Code, default) or codex (Codex CLI). Each machine can override both
-# in Studio -> Settings. A model is a name that runner's --model accepts; leave it out for
-# the runner's default (claude: sonnet, codex: your ~/.codex/config.toml model).
-agents:
-  runner: claude
-  model: sonnet
-
-# probe verify: what a change is checked against.
-verify:
-  # base: origin/develop
-  cards: approved      # or: all (drafts too)
-  maxCards: 10
-
-# Device-run warnings (never failures on their own).
-perf:
-  maxStartupMs: 4000
-  maxJankyPct: 15
-  maxP90Ms: 32
-  # maxMemoryMb: 400
-
-# Keeping features current while you code (edit hooks, Studio's file watcher).
-watch:
-  enabled: true
-  drafts: true         # an agent drafts manifest and brief corrections for review
-  maxFeatures: 3
-  impactDepth: 1       # a platform edit marks the areas depending on it stale; 2 reaches theirs, 0 is off
-
-tickets:
-  # pattern: 'PROJ-\\d+'
-  # url: https://jira.example.com/browse/{id}
-  # fileCommand: gh issue create --title {title} --body-file {file}
-  # The ticket inbox (Studio -> Tickets). Connect in Studio -> Settings; tokens stay on each machine.
-  # tracker: jira                      # or: linear
-  # site: https://acme.atlassian.net   # Jira only
-  # filter: 'status = "Ready for QA"'  # Jira: JQL. Linear: status names, comma separated
-`;
-function isExcluded(config2, featureId, moduleId) {
-  return config2.exclude.some(
-    (rule2) => featureId === rule2 || featureId.startsWith(`${rule2}:`) || (moduleId?.startsWith(rule2) ?? false)
-  );
-}
-function saveProject(root, patch) {
-  const file2 = configPath(root);
-  if (!(0, import_node_fs4.existsSync)(file2)) {
-    (0, import_node_fs4.mkdirSync)((0, import_node_path5.join)(root, CONFIG_DIR), { recursive: true });
-    (0, import_node_fs4.writeFileSync)(file2, CONFIG_TEMPLATE);
-  }
-  const doc = (0, import_yaml.parseDocument)((0, import_node_fs4.readFileSync)(file2, "utf8"));
-  for (const [section, values] of Object.entries(patch)) {
-    const added = !doc.has(section);
-    if (!(0, import_yaml.isMap)(doc.get(section))) doc.set(section, doc.createNode({}));
-    for (const [key, value] of Object.entries(values ?? {})) {
-      if (value === void 0) continue;
-      if (value === null || value === "") doc.deleteIn([section, key]);
-      else doc.setIn([section, key], value);
-    }
-    const node2 = doc.get(section);
-    if (added && (0, import_yaml.isMap)(node2) && node2.items.length === 0) doc.delete(section);
-  }
-  (0, import_node_fs4.writeFileSync)(file2, doc.toString());
-}
-
 // src/adapters/generic/areas.ts
-var import_node_child_process2 = require("node:child_process");
-var import_node_fs5 = require("node:fs");
-var import_node_path6 = require("node:path");
+var import_node_child_process3 = require("node:child_process");
+var import_node_fs6 = require("node:fs");
+var import_node_path7 = require("node:path");
 
 // src/core/testfiles.ts
 var SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb|php|cs|cpp|cc|c|h|hpp|m|mm|scala|dart|ex|exs|lua|vue|svelte)$/;
@@ -15393,27 +15762,27 @@ function testedName(fileName) {
 function stemOf(fileName) {
   return fileName.replace(/\.[^.]+$/, "");
 }
-function testNamesIn(text2) {
+function testNamesIn(text3) {
   return [
-    ...text2.matchAll(/fun\s+`([^`]+)`/g),
-    ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g),
-    ...text2.matchAll(/\b(?:test|it)(?:\.\w+)?\(\s*(["'`])((?:(?!\1).)+)\1/g),
-    ...text2.matchAll(/\bdef\s+(test_\w+)\s*\(/g),
-    ...text2.matchAll(/\bfunc\s+(Test\w+)\s*\(/g)
+    ...text3.matchAll(/fun\s+`([^`]+)`/g),
+    ...text3.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g),
+    ...text3.matchAll(/\b(?:test|it)(?:\.\w+)?\(\s*(["'`])((?:(?!\1).)+)\1/g),
+    ...text3.matchAll(/\bdef\s+(test_\w+)\s*\(/g),
+    ...text3.matchAll(/\bfunc\s+(Test\w+)\s*\(/g)
   ].map((m) => m[m.length - 1]);
 }
 
 // src/adapters/generic/areas.ts
 var CONTAINER_DIRS = /* @__PURE__ */ new Set(["src", "lib", "libs", "packages", "apps", "modules", "services", "pkg", "internal", "cmd", "components", "crates", "plugins", "features"]);
 function listProjectFiles(root, ignored2) {
-  const git2 = (0, import_node_child_process2.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
-  const listed = !git2.error && git2.status === 0 ? git2.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored2);
+  const git3 = (0, import_node_child_process3.spawnSync)("git", ["ls-files", "-co", "--exclude-standard"], { cwd: root, encoding: "utf8", windowsHide: true, maxBuffer: 256 * 1024 * 1024, timeout: 6e4 });
+  const listed = !git3.error && git3.status === 0 ? git3.stdout.split("\n").map((l) => l.trim()).filter(Boolean) : walk(root, ignored2);
   return listed.filter((f) => !ignored2.test(f) && !f.startsWith("probe/"));
 }
 function walk(root, ignored2) {
   const out = [];
   const visit2 = (rel) => {
-    for (const entry of (0, import_node_fs5.readdirSync)((0, import_node_path6.join)(root, rel), { withFileTypes: true })) {
+    for (const entry of (0, import_node_fs6.readdirSync)((0, import_node_path7.join)(root, rel), { withFileTypes: true })) {
       const path = rel ? `${rel}/${entry.name}` : entry.name;
       if (ignored2.test(path)) continue;
       if (entry.isDirectory()) visit2(path);
@@ -15632,9 +16001,9 @@ function riskyGaps(feature, limit = 25) {
 }
 
 // src/cards/store.ts
-var import_node_fs6 = require("node:fs");
-var import_node_path7 = require("node:path");
-var import_yaml2 = __toESM(require_dist(), 1);
+var import_node_fs7 = require("node:fs");
+var import_node_path8 = require("node:path");
+var import_yaml3 = __toESM(require_dist(), 1);
 
 // node_modules/zod/v4/classic/external.js
 var external_exports = {};
@@ -15834,7 +16203,7 @@ __export(external_exports, {
   optional: () => optional,
   output: () => output,
   overwrite: () => _overwrite,
-  parse: () => parse3,
+  parse: () => parse4,
   parseAsync: () => parseAsync2,
   partialRecord: () => partialRecord,
   pipe: () => pipe,
@@ -16186,7 +16555,7 @@ __export(core_exports2, {
   memoizer: () => memoizer,
   mergeValues: () => mergeValues,
   meta: () => meta,
-  parse: () => parse2,
+  parse: () => parse3,
   parseAsync: () => parseAsync,
   parseURLObject: () => parseURLObject,
   prettifyError: () => prettifyError,
@@ -17406,7 +17775,7 @@ var _parse = (_Err) => {
   };
   return fn;
 };
-var parse2 = /* @__PURE__ */ _parse($ZodRealError);
+var parse3 = /* @__PURE__ */ _parse($ZodRealError);
 var _parseAsync = (_Err) => {
   const fn = async (schema, value, _ctx, params) => {
     const ctx = _ctx ? { ..._ctx, async: true } : { async: true };
@@ -20559,10 +20928,10 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
       throw new Error("implement() must be called with a function");
     }
     return Object.defineProperty(function(...args) {
-      const parsedArgs = inst._def.input ? parse2(inst._def.input, args) : args;
+      const parsedArgs = inst._def.input ? parse3(inst._def.input, args) : args;
       const result = Reflect.apply(func, this, parsedArgs);
       if (inst._def.output) {
-        return parse2(inst._def.output, result);
+        return parse3(inst._def.output, result);
       }
       return result;
     }, "_zod", { value: inst._zod, enumerable: false });
@@ -24986,8 +25355,8 @@ function ko_default() {
 }
 
 // node_modules/zod/v4/locales/lt.js
-var capitalizeFirstCharacter = (text2) => {
-  return text2.charAt(0).toUpperCase() + text2.slice(1);
+var capitalizeFirstCharacter = (text3) => {
+  return text3.charAt(0).toUpperCase() + text3.slice(1);
 };
 function getUnitTypeFromNumber(number4) {
   const abs = Math.abs(number4);
@@ -31841,8 +32210,8 @@ var contributors = {
 function aggregateChecks(schema) {
   const agg = {};
   const def = schema._zod.def;
-  const list = schema._zod.traits.has("$ZodCheck") ? [schema, ...def.checks ?? []] : def.checks ?? [];
-  for (const ch of list)
+  const list2 = schema._zod.traits.has("$ZodCheck") ? [schema, ...def.checks ?? []] : def.checks ?? [];
+  for (const ch of list2)
     contributors[ch._zod.def.check]?.(agg, ch._zod.def);
   const bag = schema._zod.bag;
   if (bag.minimum !== void 0)
@@ -32869,7 +33238,7 @@ var ZodRealError = /* @__PURE__ */ $constructor("ZodError", initializer2, void 0
 });
 
 // node_modules/zod/v4/classic/parse.js
-var parse3 = /* @__PURE__ */ _parse(ZodRealError);
+var parse4 = /* @__PURE__ */ _parse(ZodRealError);
 var parseAsync2 = /* @__PURE__ */ _parseAsync(ZodRealError);
 var safeParse2 = /* @__PURE__ */ _safeParse(ZodRealError);
 var safeParseAsync2 = /* @__PURE__ */ _safeParseAsync(ZodRealError);
@@ -33006,7 +33375,7 @@ var ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
     util_exports.own(this, "~standard", value);
   },
   parse: function _parse2(data, params) {
-    return parse3(this, data, params, { callee: _parse2 });
+    return parse4(this, data, params, { callee: _parse2 });
   },
   parseAsync: async function _parseAsync2(data, params) {
     return await parseAsync2(this, data, params, { callee: _parseAsync2 });
@@ -35383,14 +35752,14 @@ var CardInput = external_exports.object({
 
 // src/cards/store.ts
 function cardsDir(root, feature) {
-  const base = (0, import_node_path7.join)(root, CONFIG_DIR, "cards");
-  return feature ? (0, import_node_path7.join)(base, feature.replace(/:/g, "__")) : base;
+  const base = (0, import_node_path8.join)(root, CONFIG_DIR, "cards");
+  return feature ? (0, import_node_path8.join)(base, feature.replace(/:/g, "__")) : base;
 }
 function listCards(root, feature) {
   const base = cardsDir(root);
-  if (!(0, import_node_fs6.existsSync)(base)) return [];
-  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs6.readdirSync)(base).map((d) => (0, import_node_path7.join)(base, d));
-  return folders.filter(import_node_fs6.existsSync).flatMap((dir) => (0, import_node_fs6.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path7.join)(dir, f))).map((file2) => (0, import_yaml2.parse)((0, import_node_fs6.readFileSync)(file2, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
+  if (!(0, import_node_fs7.existsSync)(base)) return [];
+  const folders = feature ? [cardsDir(root, feature)] : (0, import_node_fs7.readdirSync)(base).map((d) => (0, import_node_path8.join)(base, d));
+  return folders.filter(import_node_fs7.existsSync).flatMap((dir) => (0, import_node_fs7.readdirSync)(dir).filter((f) => f.endsWith(".yaml")).map((f) => (0, import_node_path8.join)(dir, f))).map((file2) => (0, import_yaml3.parse)((0, import_node_fs7.readFileSync)(file2, "utf8"))).sort((a, b) => a.feature.localeCompare(b.feature) || levelOrder(a) - levelOrder(b) || a.id.localeCompare(b.id));
 }
 function findCard(root, feature, id) {
   return listCards(root, feature).find((c) => c.id === id);
@@ -35399,7 +35768,7 @@ function saveCards(root, feature, inputs, createdBy) {
   const result = { written: [], kept: [], errors: [] };
   const existing = new Map(listCards(root, feature).map((c) => [c.id, c]));
   const dir = cardsDir(root, feature);
-  (0, import_node_fs6.mkdirSync)(dir, { recursive: true });
+  (0, import_node_fs7.mkdirSync)(dir, { recursive: true });
   inputs.forEach((raw, i) => {
     const parsed = CardInput.safeParse(raw);
     if (!parsed.success) {
@@ -35451,7 +35820,7 @@ function recordDeviceRun(root, feature, id, runId) {
   writeCard(root, { ...card, confidence: "high", sources, updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
 }
 function writeCard(root, card) {
-  (0, import_node_fs6.writeFileSync)((0, import_node_path7.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml2.stringify)(card, { lineWidth: 100 }));
+  (0, import_node_fs7.writeFileSync)((0, import_node_path8.join)(cardsDir(root, card.feature), `${card.id}.yaml`), (0, import_yaml3.stringify)(card, { lineWidth: 100 }));
 }
 function levelOrder(c) {
   return c.level === "feature" ? 0 : c.level === "capability" ? 1 : 2;
@@ -35532,11 +35901,11 @@ function summarizeBackfill(run) {
 }
 
 // src/cards/context.ts
-var import_node_path9 = require("node:path");
+var import_node_path10 = require("node:path");
 
 // src/engine/docs.ts
-var import_node_fs7 = require("node:fs");
-var import_node_path8 = require("node:path");
+var import_node_fs8 = require("node:fs");
+var import_node_path9 = require("node:path");
 function nameVariants(featureId) {
   const last = featureId.split(":").pop();
   const words = last.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").toLowerCase().trim();
@@ -35551,18 +35920,18 @@ function docsAbout(root, featureId, budget = 16e3) {
   const files = trackedFiles(root, "*.md").filter((f) => !/(^|\/)(build|node_modules)\//.test(f));
   const out = [];
   let used = 0;
-  const add = (ref, text2) => {
+  const add = (ref, text3) => {
     const room = budget - used;
     if (room < 400) return;
-    const clipped = text2.length > room ? `${text2.slice(0, room)}
-\u2026(truncated)` : text2;
+    const clipped = text3.length > room ? `${text3.slice(0, room)}
+\u2026(truncated)` : text3;
     out.push({ ref, text: clipped });
     used += clipped.length;
   };
   const named = files.filter((f) => variants.some((v) => f.toLowerCase().split("/").pop().includes(v.replace(/ /g, ""))));
-  for (const f of named) add(f, (0, import_node_fs7.readFileSync)((0, import_node_path8.join)(root, f), "utf8"));
+  for (const f of named) add(f, (0, import_node_fs8.readFileSync)((0, import_node_path9.join)(root, f), "utf8"));
   for (const f of files.filter((x) => !named.includes(x))) {
-    for (const section of sections((0, import_node_fs7.readFileSync)((0, import_node_path8.join)(root, f), "utf8"))) {
+    for (const section of sections((0, import_node_fs8.readFileSync)((0, import_node_path9.join)(root, f), "utf8"))) {
       if (mentions(section.heading) > 0) add(`${f}#${section.heading}`, `${section.heading}
 ${section.body}`);
     }
@@ -35605,11 +35974,11 @@ var CARD_RULES = `## How to write cards
 - Cards someone already approved or rejected are kept as they are; don't re-propose them.`;
 function cardContext(project, feature) {
   const root = project.root;
-  const dirs = feature.modules.map((m) => (0, import_node_path9.relative)(root, m.dir).replace(/\\/g, "/"));
+  const dirs = feature.modules.map((m) => (0, import_node_path10.relative)(root, m.dir).replace(/\\/g, "/"));
   const classes = feature.modules.flatMap((m) => m.classes.map((c) => ({ ...c, module: m.id })));
   const out = [`# Feature: ${feature.id} (${project.name})`, ""];
   out.push("## Modules");
-  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path9.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
+  for (const m of feature.modules) out.push(`- ${m.id} \u2192 ${(0, import_node_path10.relative)(root, m.dir).replace(/\\/g, "/")} (${m.mainFiles} source, ${m.testFiles} unit test files)`);
   out.push("", "## Key classes", "Test status: direct = has its own test class, referenced = used by tests, none = untested.");
   for (const kind of KEY_KINDS) {
     const ofKind = classes.filter((c) => c.kind === kind).sort((a, b) => b.lines - a.lines).slice(0, kind === "ui" ? 25 : 15);
@@ -35643,106 +36012,6 @@ function cardContext(project, feature) {
 
 // src/cards/run.ts
 var import_yaml5 = __toESM(require_dist(), 1);
-
-// src/accounts/accounts.ts
-var import_node_child_process3 = require("node:child_process");
-var import_node_fs8 = require("node:fs");
-var import_node_path10 = require("node:path");
-var import_yaml3 = __toESM(require_dist(), 1);
-function accountsFile(root) {
-  return (0, import_node_path10.join)(root, CONFIG_DIR, "hints", "accounts.yaml");
-}
-function listAccounts(root) {
-  const file2 = accountsFile(root);
-  if (!(0, import_node_fs8.existsSync)(file2)) return [];
-  const raw = (0, import_yaml3.parse)((0, import_node_fs8.readFileSync)(file2, "utf8")) ?? {};
-  return (raw.accounts ?? []).filter((a) => a.role && a.username);
-}
-function accountsForPrompt(project) {
-  const secrets = new Secrets(project.store.dir);
-  const lines = listAccounts(project.root).map(
-    (a) => `- ${a.role}: ${a.username}${a.shownAs ? ` \xB7 shown in the app as "${a.shownAs}"` : ""}${a.notes ? ` (${a.notes})` : ""} \xB7 password ${secrets.has(a.role, "password") ? "stored" : "NOT stored"} \xB7 login code ${secrets.has(a.role, "code") ? "stored" : "not stored"}`
-  );
-  return lines.length ? lines.join("\n") : "None configured.";
-}
-function saveAccount(root, account) {
-  const accounts = listAccounts(root).filter((a) => a.role !== account.role);
-  writeAccounts(root, [
-    ...accounts,
-    { role: account.role, username: account.username, ...account.shownAs ? { shownAs: account.shownAs } : {}, ...account.notes ? { notes: account.notes } : {} }
-  ]);
-}
-function removeAccount(root, role) {
-  writeAccounts(root, listAccounts(root).filter((a) => a.role !== role));
-}
-function writeAccounts(root, accounts) {
-  const file2 = accountsFile(root);
-  (0, import_node_fs8.mkdirSync)((0, import_node_path10.dirname)(file2), { recursive: true });
-  (0, import_node_fs8.writeFileSync)(file2, `# Test accounts: roles and usernames only. Passwords stay on each machine.
-${(0, import_yaml3.stringify)({ accounts })}`);
-}
-var Secrets = class {
-  file;
-  constructor(storeDir) {
-    this.file = (0, import_node_path10.join)(storeDir, "secrets.json");
-  }
-  load() {
-    return (0, import_node_fs8.existsSync)(this.file) ? JSON.parse((0, import_node_fs8.readFileSync)(this.file, "utf8")) : {};
-  }
-  has(role, kind) {
-    return this.hasKey(`${role}.${kind}`);
-  }
-  get(role, kind) {
-    return this.getKey(`${role}.${kind}`);
-  }
-  set(role, kind, value) {
-    this.setKey(`${role}.${kind}`, value);
-  }
-  /** Secrets that are not a test account's, such as a ticket tracker's API token, by name. */
-  hasKey(name) {
-    return name in this.load();
-  }
-  getKey(name) {
-    const sealed = this.load()[name];
-    return sealed === void 0 ? null : unseal(sealed);
-  }
-  setKey(name, value) {
-    const all = this.load();
-    all[name] = seal(value);
-    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
-    if (!isWindows) (0, import_node_fs8.chmodSync)(this.file, 384);
-  }
-  removeKey(name) {
-    const all = this.load();
-    delete all[name];
-    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
-  }
-  /** Forgets every secret of a role. */
-  remove(role) {
-    const all = this.load();
-    for (const kind of ["password", "code"]) delete all[`${role}.${kind}`];
-    (0, import_node_fs8.writeFileSync)(this.file, JSON.stringify(all, null, 2));
-  }
-};
-var PS_PROTECT = "Add-Type -AssemblyName System.Security; [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect([Text.Encoding]::UTF8.GetBytes($env:PROBE_SECRET), $null, 'CurrentUser'))";
-var PS_UNPROTECT = "Add-Type -AssemblyName System.Security; [Text.Encoding]::UTF8.GetString([Security.Cryptography.ProtectedData]::Unprotect([Convert]::FromBase64String($env:PROBE_SECRET), $null, 'CurrentUser'))";
-function powershell(script, input2) {
-  const r = (0, import_node_child_process3.spawnSync)("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], {
-    encoding: "utf8",
-    windowsHide: true,
-    env: { ...process.env, PROBE_SECRET: input2 },
-    timeout: 2e4
-  });
-  if (r.status !== 0) throw new Error(`Could not access the Windows credential store: ${r.stderr.trim()}`);
-  return r.stdout.replace(/\r?\n$/, "");
-}
-function seal(value) {
-  return isWindows ? `dpapi:${powershell(PS_PROTECT, value)}` : `plain:${value}`;
-}
-function unseal(sealed) {
-  if (sealed.startsWith("dpapi:")) return powershell(PS_UNPROTECT, sealed.slice(6));
-  return sealed.replace(/^plain:/, "");
-}
 
 // src/devices/harness.ts
 var import_node_path15 = require("node:path");
@@ -35811,9 +36080,9 @@ function shQuote(s) {
 }
 
 // src/devices/builds.ts
-function parseBuildRef(text2) {
-  const m = /^(file|firebase|play)(?::(.*))?$/s.exec(text2.trim());
-  if (!m) throw new Error(`Build: "firebase", "firebase:<build>", "play", "play:<version code>" or "file:<path to .apk/.aab>", not "${text2}".`);
+function parseBuildRef(text3) {
+  const m = /^(file|firebase|play)(?::(.*))?$/s.exec(text3.trim());
+  if (!m) throw new Error(`Build: "firebase", "firebase:<build>", "play", "play:<version code>" or "file:<path to .apk/.aab>", not "${text3}".`);
   return { source: m[1], value: m[2]?.trim() || void 0 };
 }
 function base64url3(input2) {
@@ -35846,16 +36115,16 @@ async function accessToken(config2, scope, fetcher) {
 }
 async function googleJson(fetcher, token, url2, what, method = "GET") {
   const res = await fetcher(url2, { method, headers: { authorization: `Bearer ${token}`, accept: "application/json" }, signal: AbortSignal.timeout(6e4) });
-  const text2 = await res.text();
+  const text3 = await res.text();
   if (!res.ok) {
-    let detail = text2.slice(0, 300);
+    let detail = text3.slice(0, 300);
     try {
-      detail = JSON.parse(text2).error?.message ?? detail;
+      detail = JSON.parse(text3).error?.message ?? detail;
     } catch {
     }
     throw new Error(`${what} answered ${res.status}: ${detail}`);
   }
-  return text2 ? JSON.parse(text2) : {};
+  return text3 ? JSON.parse(text3) : {};
 }
 async function download(fetcher, url2, file2, headers, what) {
   const res = await fetcher(url2, { headers, signal: AbortSignal.timeout(10 * 6e4) });
@@ -36069,7 +36338,7 @@ function parseUiTree(xml) {
 function formatUiTree(elements) {
   if (elements.length === 0) return "(no readable elements \u2014 the screen may be loading or drawn without accessibility info)";
   return elements.map((e) => {
-    const text2 = e.password ? "\u2022\u2022\u2022\u2022" : e.text;
+    const text3 = e.password ? "\u2022\u2022\u2022\u2022" : e.text;
     const desc = e.desc && e.desc !== e.text ? e.desc : "";
     const flags = [
       e.clickable && "tap",
@@ -36079,7 +36348,7 @@ function formatUiTree(elements) {
       e.checked && "checked",
       !e.enabled && "disabled"
     ].filter(Boolean);
-    return `[${e.index}] ${e.cls}${e.id ? ` #${e.id}` : ""} ${text2 ? `"${text2.slice(0, 80)}"` : ""}${desc ? ` [${desc.slice(0, 80)}]` : ""}${flags.length ? ` (${flags.join(",")})` : ""} @${e.center.join(",")}`;
+    return `[${e.index}] ${e.cls}${e.id ? ` #${e.id}` : ""} ${text3 ? `"${text3.slice(0, 80)}"` : ""}${desc ? ` [${desc.slice(0, 80)}]` : ""}${flags.length ? ` (${flags.join(",")})` : ""} @${e.center.join(",")}`;
   }).join("\n");
 }
 function decode3(s) {
@@ -36148,8 +36417,8 @@ var AndroidDevice = class {
     this.shell(`input swipe ${x} ${y} ${x} ${y} ${ms}`);
   }
   /** Types into the focused field. `input text` needs spaces as %s. */
-  type(text2) {
-    this.shell(`input text ${shQuote(text2.replace(/%/g, "\\%").replace(/ /g, "%s"))}`);
+  type(text3) {
+    this.shell(`input text ${shQuote(text3.replace(/%/g, "\\%").replace(/ /g, "%s"))}`);
   }
   key(key) {
     this.shell(`input keyevent ${KEYCODES[key]}`);
@@ -36522,8 +36791,8 @@ var WebDevice = class {
   async longPress(x, y) {
     await (await this.page()).mouse.click(x, y, { delay: 800 });
   }
-  async type(text2) {
-    await (await this.page()).keyboard.type(text2);
+  async type(text3) {
+    await (await this.page()).keyboard.type(text3);
   }
   async key(key) {
     const page = await this.page();
@@ -36836,7 +37105,7 @@ function git(root, args, input2) {
   const r = (0, import_node_child_process7.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, input: input2, maxBuffer: 512 * 1024 * 1024, timeout: 6e4 });
   return r.status === 0 ? r.stdout : "";
 }
-var short = (text2) => (0, import_node_crypto3.createHash)("sha256").update(text2).digest("hex").slice(0, 12);
+var short = (text3) => (0, import_node_crypto3.createHash)("sha256").update(text3).digest("hex").slice(0, 12);
 var ContentIndex = class {
   constructor(project, modules) {
     this.project = project;
@@ -36874,11 +37143,11 @@ var ContentIndex = class {
       }
       if (!owner) continue;
       const target2 = project.adapter.isTestSource(path) ? this.testFiles : this.files;
-      const list = target2.get(owner);
-      if (list) list.push(`${path} ${blob}`);
+      const list2 = target2.get(owner);
+      if (list2) list2.push(`${path} ${blob}`);
       else target2.set(owner, [`${path} ${blob}`]);
     }
-    for (const list of [...this.files.values(), ...this.testFiles.values()]) list.sort();
+    for (const list2 of [...this.files.values(), ...this.testFiles.values()]) list2.sort();
     this.deps = project.adapter.moduleDependencies(root);
   }
   project;
@@ -37227,10 +37496,10 @@ function lineOps(a, b) {
   const m = midB.length;
   if (n * m > 4e6) {
     return [
-      ...a.slice(0, head).map((text2, k) => ({ op: " ", text: text2, a: k, b: k })),
-      ...midA.map((text2, k) => ({ op: "-", text: text2, a: head + k, b: head })),
-      ...midB.map((text2, k) => ({ op: "+", text: text2, a: head + n, b: head + k })),
-      ...a.slice(a.length - tail).map((text2, k) => ({ op: " ", text: text2, a: head + n + k, b: head + m + k }))
+      ...a.slice(0, head).map((text3, k) => ({ op: " ", text: text3, a: k, b: k })),
+      ...midA.map((text3, k) => ({ op: "-", text: text3, a: head + k, b: head })),
+      ...midB.map((text3, k) => ({ op: "+", text: text3, a: head + n, b: head + k })),
+      ...a.slice(a.length - tail).map((text3, k) => ({ op: " ", text: text3, a: head + n + k, b: head + m + k }))
     ];
   }
   const lcs = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
@@ -37280,7 +37549,7 @@ function loadManifests(root) {
   return out;
 }
 function normalize(raw, file2) {
-  const list = (v) => Array.isArray(v) ? v : [];
+  const list2 = (v) => Array.isArray(v) ? v : [];
   const slash = (p) => String(p).replace(/\\/g, "/");
   return {
     id: String(raw.id ?? manifestIdOf(file2)),
@@ -37289,19 +37558,19 @@ function normalize(raw, file2) {
     summary: raw.summary,
     owner: raw.owner ?? null,
     brief: raw.brief,
-    alsoRead: list(raw.also_read),
-    paths: list(raw.paths).map(slash),
-    related: list(raw.related).map((r) => typeof r === "string" ? { path: slash(r) } : { path: slash(String(r.path)), why: r.why }),
+    alsoRead: list2(raw.also_read),
+    paths: list2(raw.paths).map(slash),
+    related: list2(raw.related).map((r) => typeof r === "string" ? { path: slash(r) } : { path: slash(String(r.path)), why: r.why }),
     unitCommand: raw.unit?.command,
-    flows: list(raw.flows).map((f) => ({ id: String(f.id), text: String(f.text ?? "") })),
-    invariants: list(raw.invariants).map((i) => ({
+    flows: list2(raw.flows).map((f) => ({ id: String(f.id), text: String(f.text ?? "") })),
+    invariants: list2(raw.invariants).map((i) => ({
       id: String(i.id),
       rule: String(i.rule ?? ""),
-      coveredBy: list(i.covered_by),
-      cards: [...list(i.cards), ...typeof i.card === "string" && i.card ? [i.card] : []].map(String),
+      coveredBy: list2(i.covered_by),
+      cards: [...list2(i.cards), ...typeof i.card === "string" && i.card ? [i.card] : []].map(String),
       gap: i.gap ?? null
     })),
-    deviceOnly: list(raw.device_only).map((d) => typeof d === "string" ? d : String(d.text ?? "")),
+    deviceOnly: list2(raw.device_only).map((d) => typeof d === "string" ? d : String(d.text ?? "")),
     file: file2
   };
 }
@@ -37309,12 +37578,12 @@ function cardRef(feature, ref) {
   const at = ref.lastIndexOf("/");
   return at < 0 ? { feature, id: ref } : { feature: ref.slice(0, at), id: ref.slice(at + 1) };
 }
-function checkManifest(root, id, text2) {
+function checkManifest(root, id, text3) {
   const file2 = manifestFile(id);
   const result = { feature: id, file: file2, errors: [], links: 0, broken: [], gaps: [], unexplained: [], missingPaths: [], cardLinks: 0, brokenCards: [] };
   let raw;
   try {
-    const source = text2 ?? ((0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, file2)) ? (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, file2), "utf8") : null);
+    const source = text3 ?? ((0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, file2)) ? (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, file2), "utf8") : null);
     raw = source === null ? null : (0, import_yaml6.parse)(source) ?? {};
   } catch (e) {
     result.errors.push(`Does not parse: ${e.message.split("\n")[0]}`);
@@ -37373,9 +37642,9 @@ function testIndex(root) {
   return out;
 }
 function testNames(file2) {
-  const text2 = (0, import_node_fs14.readFileSync)(file2, "utf8");
-  if (/\.(kt|java)$/.test(file2)) return [...text2.matchAll(/fun\s+`([^`]+)`/g), ...text2.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
-  return testNamesIn(text2);
+  const text3 = (0, import_node_fs14.readFileSync)(file2, "utf8");
+  if (/\.(kt|java)$/.test(file2)) return [...text3.matchAll(/fun\s+`([^`]+)`/g), ...text3.matchAll(/(?:fun|void)\s+([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]);
+  return testNamesIn(text3);
 }
 function closest(name, names) {
   const words = new Set(name.toLowerCase().split(/\W+/).filter(Boolean));
@@ -37389,8 +37658,8 @@ function closest(name, names) {
 }
 function briefGlance(root, m) {
   if (!m.brief || !(0, import_node_fs14.existsSync)((0, import_node_path18.join)(root, m.brief))) return null;
-  const text2 = (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, m.brief), "utf8");
-  const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text2);
+  const text3 = (0, import_node_fs14.readFileSync)((0, import_node_path18.join)(root, m.brief), "utf8");
+  const match = /^##\s+(?:0\)\s*)?At a glance\s*$([\s\S]*?)(?=^##\s)/m.exec(text3);
   return match ? match[1].trim() : null;
 }
 function summarizeCheck(c) {
@@ -37411,7 +37680,7 @@ var DRAFTS = "drafts";
 function draftDir(project, id) {
   return (0, import_node_path19.join)(project.store.dir, DRAFTS, id);
 }
-var hash2 = (text2) => (0, import_node_crypto4.createHash)("sha1").update(text2).digest("hex");
+var hash2 = (text3) => (0, import_node_crypto4.createHash)("sha1").update(text3).digest("hex");
 var current = (project, path) => {
   const abs = (0, import_node_path19.join)(project.root, path);
   return (0, import_node_fs15.existsSync)(abs) ? (0, import_node_fs15.readFileSync)(abs, "utf8") : "";
@@ -37421,9 +37690,9 @@ function openDraft(project, feature, files) {
   const dir = draftDir(project, id);
   (0, import_node_fs15.mkdirSync)(dir, { recursive: true });
   const staged = files.map((f) => {
-    const text2 = current(project, f.path);
-    (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(dir, f.staged), (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, f.path)) ? text2 : f.initial ?? "");
-    return { path: f.path, base: hash2(text2), staged: f.staged };
+    const text3 = current(project, f.path);
+    (0, import_node_fs15.writeFileSync)((0, import_node_path19.join)(dir, f.staged), (0, import_node_fs15.existsSync)((0, import_node_path19.join)(project.root, f.path)) ? text3 : f.initial ?? "");
+    return { path: f.path, base: hash2(text3), staged: f.staged };
   });
   const format = (0, import_node_path19.join)(project.root, FEATURES_DIR, "README.md");
   if ((0, import_node_fs15.existsSync)(format)) (0, import_node_fs15.copyFileSync)(format, (0, import_node_path19.join)(dir, "FORMAT.md"));
@@ -37658,12 +37927,12 @@ function doctor(project, error62) {
     detail: app.package || app.installTask ? `${app.package ?? "id known after the first install"} \xB7 ${app.installTask ?? "no install task"}${app.packageSource && app.packageSource !== "probe.yaml" ? ` (from the ${app.packageSource})` : ""}` : "no application module found",
     fix: app.installTask ? void 0 : "Set it in Studio \u2192 Settings \u2192 Project"
   });
-  const git2 = gitState(project.root);
+  const git3 = gitState(project.root);
   checks.push({
     id: "git",
     label: "Branch",
-    status: git2?.branch ? "ok" : "warn",
-    detail: git2 ? `${git2.branch ?? "detached HEAD"} @ ${git2.commit}${git2.dirty ? ` + ${git2.dirty} uncommitted` : ""}` : "not a git repository"
+    status: git3?.branch ? "ok" : "warn",
+    detail: git3 ? `${git3.branch ?? "detached HEAD"} @ ${git3.commit}${git3.dirty ? ` + ${git3.dirty} uncommitted` : ""}` : "not a git repository"
   });
   checks.push(...project.adapter.doctor(project.root, project.config));
   checks.push({ id: "store", label: "Local results", status: "ok", detail: project.store.dir });
@@ -37758,9 +38027,9 @@ function initStatus(project) {
   const chosen = chosenFeatures(project);
   const proposed = scanned ? proposedAreas(project) : [];
   const undecided = chosen ? undecidedAreas(project) : [];
-  const kinds = (list) => {
-    const platform = list.filter((a) => a.kind === "platform").length;
-    return `${list.length - platform} features, ${platform} platform areas`;
+  const kinds = (list2) => {
+    const platform = list2.filter((a) => a.kind === "platform").length;
+    return `${list2.length - platform} features, ${platform} platform areas`;
   };
   add(
     "features",
@@ -37905,7 +38174,7 @@ function startInit(project, options = {}) {
       log(`also proposed, not chosen yet: ${undecided.map((a) => `${a.id}${a.kind === "platform" ? " (platform)" : ""}`).join(", ")} \u2014 \`probe init --step features --features a,b\` adds them`);
     }
     if (chosen) {
-      const only = (list) => options.features && options.step !== "features" ? list.filter((f) => options.features.includes(f)) : list;
+      const only = (list2) => options.features && options.step !== "features" ? list2.filter((f) => options.features.includes(f)) : list2;
       if (wants("manifests")) await draftManifests(project, run, only(manifestProgress(project, chosen).todo).slice(0, options.limit), options.model, log);
       if (wants("cards")) {
         const named = options.step === "cards" && options.features ? options.features : void 0;
@@ -38191,13 +38460,13 @@ function settingsFile(root) {
 function includedModules(root) {
   const file2 = settingsFile(root);
   if (!file2) return [];
-  const text2 = stripComments((0, import_node_fs18.readFileSync)(file2, "utf8"));
+  const text3 = stripComments((0, import_node_fs18.readFileSync)(file2, "utf8"));
   const overrides = /* @__PURE__ */ new Map();
-  for (const m of text2.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
+  for (const m of text3.matchAll(/project\(\s*["'](:[^"']+)["']\s*\)\.projectDir\s*=\s*(?:file\()?\s*["']([^"']+)["']/g)) {
     overrides.set(m[1], m[2]);
   }
   const ids = /* @__PURE__ */ new Set();
-  for (const call of text2.matchAll(/^\s*include\s*\(?([^\n]*)/gm)) {
+  for (const call of text3.matchAll(/^\s*include\s*\(?([^\n]*)/gm)) {
     for (const s of call[1].matchAll(/["']([^"']+)["']/g)) {
       const raw = s[1];
       ids.add(raw.startsWith(":") ? raw : `:${raw}`);
@@ -38205,8 +38474,8 @@ function includedModules(root) {
   }
   return [...ids].map((id) => ({ id, dir: (0, import_node_path22.join)(root, overrides.get(id) ?? id.slice(1).split(":").join("/")) })).filter((m) => (0, import_node_fs18.existsSync)((0, import_node_path22.join)(m.dir, "build.gradle.kts")) || (0, import_node_fs18.existsSync)((0, import_node_path22.join)(m.dir, "build.gradle")));
 }
-function stripComments(text2) {
-  return text2.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+function stripComments(text3) {
+  return text3.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 }
 
 // src/adapters/android-gradle/app.ts
@@ -38257,10 +38526,10 @@ function moduleDependencies(modules) {
   for (const m of modules) {
     const file2 = ["build.gradle.kts", "build.gradle"].map((f) => (0, import_node_path24.join)(m.dir, f)).find(import_node_fs20.existsSync);
     if (!file2) continue;
-    const text2 = (0, import_node_fs20.readFileSync)(file2, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const text3 = (0, import_node_fs20.readFileSync)(file2, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     const deps = /* @__PURE__ */ new Set();
-    for (const x of text2.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
-    for (const x of text2.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
+    for (const x of text3.matchAll(/project\(\s*(?:path\s*=\s*)?["'](:[^"']+)["']/g)) if (ids.has(x[1])) deps.add(x[1]);
+    for (const x of text3.matchAll(/\bprojects(?:\.[A-Za-z_][\w]*)+/g)) {
       let ref = x[0];
       while (ref.includes(".") && !byAccessor.has(ref)) ref = ref.slice(0, ref.lastIndexOf("."));
       const id = byAccessor.get(ref);
@@ -38301,9 +38570,9 @@ function sourceSetFiles(moduleDir, set2) {
   return (0, import_node_fs21.readdirSync)(src, { withFileTypes: true }).filter((e) => e.isDirectory() && sourceSetKind(e.name) === set2).flatMap((e) => sourceFiles((0, import_node_path25.join)(src, e.name)));
 }
 var DECLARATION = /^(?:@\w+(?:\([^)]*\))?\s+)*((?:(?:public|internal|private|protected|abstract|open|final|data|sealed|enum|value|inline|annotation|fun|static)\s+)*)(class|object|interface)\s+([A-Z]\w*)/;
-function declaredClasses(text2) {
+function declaredClasses(text3) {
   const out = [];
-  for (const line of text2.split(/\r?\n/)) {
+  for (const line of text3.split(/\r?\n/)) {
     const m = DECLARATION.exec(line);
     if (!m) continue;
     out.push({ name: m[3], keyword: m[2], modifiers: m[1].trim().split(/\s+/).filter(Boolean) });
@@ -38338,8 +38607,8 @@ function indexTests(testFiles) {
   const bases = /* @__PURE__ */ new Set();
   const identifiers = /* @__PURE__ */ new Set();
   for (const file2 of testFiles) {
-    const text2 = (0, import_node_fs21.readFileSync)(file2, "utf8");
-    for (const c of declaredClasses(text2)) {
+    const text3 = (0, import_node_fs21.readFileSync)(file2, "utf8");
+    for (const c of declaredClasses(text3)) {
       if (!TEST_SUFFIX.test(c.name)) continue;
       let base = c.name.replace(TEST_SUFFIX, "");
       bases.add(normalize2(base));
@@ -38348,7 +38617,7 @@ function indexTests(testFiles) {
         bases.add(normalize2(base));
       }
     }
-    for (const id of text2.matchAll(/\b[A-Z]\w+\b/g)) identifiers.add(id[0]);
+    for (const id of text3.matchAll(/\b[A-Z]\w+\b/g)) identifiers.add(id[0]);
   }
   return { bases, identifiers };
 }
@@ -38360,12 +38629,12 @@ function testLink(name, index) {
 function inventory(projectRoot, mainFiles, tests) {
   const out = [];
   for (const file2 of mainFiles) {
-    const text2 = (0, import_node_fs21.readFileSync)(file2, "utf8");
-    const declared = declaredClasses(text2).filter((c) => !c.modifiers.includes("private"));
+    const text3 = (0, import_node_fs21.readFileSync)(file2, "utf8");
+    const declared = declaredClasses(text3).filter((c) => !c.modifiers.includes("private"));
     if (declared.length === 0) continue;
-    const lines = Math.max(1, Math.round(text2.split("\n").length / declared.length));
+    const lines = Math.max(1, Math.round(text3.split("\n").length / declared.length));
     for (const c of declared) {
-      const kind = classify(c, text2);
+      const kind = classify(c, text3);
       const test = testLink(c.name, tests);
       const weight = KIND_WEIGHT[kind];
       out.push({
@@ -38520,9 +38789,9 @@ var androidGradleAdapter = {
     for (const m of modules) {
       for (const file2 of sourceSetFiles(m.dir, "main")) {
         const lines = (0, import_node_fs23.readFileSync)(file2, "utf8").split(/\r?\n/);
-        lines.forEach((text2, i) => {
-          if (out.length < limit && NAV_HINT.test(text2)) {
-            out.push(`${(0, import_node_path27.relative)(root, file2).replace(/\\/g, "/")}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+        lines.forEach((text3, i) => {
+          if (out.length < limit && NAV_HINT.test(text3)) {
+            out.push(`${(0, import_node_path27.relative)(root, file2).replace(/\\/g, "/")}:${i + 1}: ${text3.trim().slice(0, 160)}`);
           }
         });
       }
@@ -38615,8 +38884,8 @@ function buildModules(root, files, areas, unitCommand) {
   const direct = /* @__PURE__ */ new Set();
   const referenced = /* @__PURE__ */ new Set();
   const readTest = (test, scope) => {
-    const text2 = safeRead((0, import_node_path28.join)(root, test));
-    const imported = resolveImports(test, text2, sourcesBySansExt);
+    const text3 = safeRead((0, import_node_path28.join)(root, test));
+    const imported = resolveImports(test, text3, sourcesBySansExt);
     for (const f of imported) referenced.add(f);
     const dirsTouched = scope ?? new Set([...imported].map((f) => ownerOf(f)).filter(Boolean));
     const name = normal(testedName(import_node_path28.posix.basename(test)));
@@ -38651,16 +38920,16 @@ function buildModules(root, files, areas, unitCommand) {
     };
   });
 }
-function resolveImports(file2, text2, sources) {
+function resolveImports(file2, text3, sources) {
   const out = /* @__PURE__ */ new Set();
   const dir = import_node_path28.posix.dirname(file2);
   const lookup = (path) => sources.get(path) ?? sources.get(`${path}/index`) ?? sources.get(`${path}/__init__`);
-  for (const m of text2.matchAll(/(?:\bfrom\s+|\bimport\s*\(?\s*|\brequire\(\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
+  for (const m of text3.matchAll(/(?:\bfrom\s+|\bimport\s*\(?\s*|\brequire\(\s*)["'](\.{1,2}\/[^"']+)["']/g)) {
     const found3 = lookup(import_node_path28.posix.normalize(import_node_path28.posix.join(dir, m[1])).replace(/\.(m?[jt]sx?|c[jt]s)$/, ""));
     if (found3) out.add(found3);
   }
   if (file2.endsWith(".py")) {
-    for (const m of text2.matchAll(/^\s*(?:from|import)\s+([\w.]+)/gm)) {
+    for (const m of text3.matchAll(/^\s*(?:from|import)\s+([\w.]+)/gm)) {
       const path = m[1].replace(/\./g, "/");
       const found3 = lookup(path) ?? [...sources.keys()].filter((k) => k.endsWith(`/${path}`)).map((k) => sources.get(k))[0];
       if (found3) out.add(found3);
@@ -38703,8 +38972,8 @@ function routeHints(root, modules, limit) {
   for (const m of modules) {
     for (const c of m.classes) {
       if (out.length >= limit) return out;
-      safeRead((0, import_node_path28.join)(root, c.file)).split(/\r?\n/).forEach((text2, i) => {
-        if (out.length < limit && ROUTE_HINT.test(text2)) out.push(`${c.file}:${i + 1}: ${text2.trim().slice(0, 160)}`);
+      safeRead((0, import_node_path28.join)(root, c.file)).split(/\r?\n/).forEach((text3, i) => {
+        if (out.length < limit && ROUTE_HINT.test(text3)) out.push(`${c.file}:${i + 1}: ${text3.trim().slice(0, 160)}`);
       });
     }
   }
@@ -38747,10 +39016,10 @@ function lastLines(tail) {
   return tail.filter((l) => l.trim()).slice(-8).join("\n").slice(0, 1e3);
 }
 function fromOutput(module2, lines) {
-  const text2 = lines.map(stripAnsi).join("\n");
-  const counts = nodeCounts(text2) ?? jestCounts(text2) ?? vitestCounts(text2) ?? pytestCounts(text2) ?? cargoCounts(text2);
+  const text3 = lines.map(stripAnsi).join("\n");
+  const counts = nodeCounts(text3) ?? jestCounts(text3) ?? vitestCounts(text3) ?? pytestCounts(text3) ?? cargoCounts(text3);
   if (!counts) return null;
-  const names = failedNames(text2).slice(0, 50);
+  const names = failedNames(text3).slice(0, 50);
   const failures = names.map((name) => ({ name, className: "", status: "failed", durationMs: 0 }));
   if (counts.failed > 0 && failures.length === 0) failures.push({ name: `${counts.failed} failed`, className: "", status: "failed", durationMs: 0, message: lastLines(lines.map(stripAnsi)) });
   return { module: module2, ...counts, durationMs: 0, failures };
@@ -38758,52 +39027,52 @@ function fromOutput(module2, lines) {
 function stripAnsi(line) {
   return line.replace(/\x1b\[[0-9;]*[A-Za-z]/g, "");
 }
-function count(text2, re) {
-  const all = [...text2.matchAll(re)];
+function count(text3, re) {
+  const all = [...text3.matchAll(re)];
   return all.length ? Number(all[all.length - 1][1]) : void 0;
 }
-function nodeCounts(text2) {
-  const tests = count(text2, /^[ℹ#]\s+tests\s+(\d+)/gm);
+function nodeCounts(text3) {
+  const tests = count(text3, /^[ℹ#]\s+tests\s+(\d+)/gm);
   if (tests === void 0) return null;
-  return { tests, failed: count(text2, /^[ℹ#]\s+fail\s+(\d+)/gm) ?? 0, skipped: (count(text2, /^[ℹ#]\s+skipped\s+(\d+)/gm) ?? count(text2, /^[ℹ#]\s+skip\s+(\d+)/gm) ?? 0) + (count(text2, /^[ℹ#]\s+todo\s+(\d+)/gm) ?? 0) };
+  return { tests, failed: count(text3, /^[ℹ#]\s+fail\s+(\d+)/gm) ?? 0, skipped: (count(text3, /^[ℹ#]\s+skipped\s+(\d+)/gm) ?? count(text3, /^[ℹ#]\s+skip\s+(\d+)/gm) ?? 0) + (count(text3, /^[ℹ#]\s+todo\s+(\d+)/gm) ?? 0) };
 }
-function jestCounts(text2) {
-  const line = [...text2.matchAll(/^Tests:\s+(.+total)\s*$/gm)].pop()?.[1];
+function jestCounts(text3) {
+  const line = [...text3.matchAll(/^Tests:\s+(.+total)\s*$/gm)].pop()?.[1];
   if (!line) return null;
   const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(line)?.[1] ?? 0);
   return { tests: n("total"), failed: n("failed"), skipped: n("skipped") + n("todo") };
 }
-function vitestCounts(text2) {
-  const m = [...text2.matchAll(/^\s*Tests\s+(.+)\((\d+)\)\s*$/gm)].pop();
+function vitestCounts(text3) {
+  const m = [...text3.matchAll(/^\s*Tests\s+(.+)\((\d+)\)\s*$/gm)].pop();
   if (!m) return null;
   const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(m[1])?.[1] ?? 0);
   return { tests: Number(m[2]), failed: n("failed"), skipped: n("skipped") + n("todo") };
 }
-function pytestCounts(text2) {
-  const line = [...text2.matchAll(/^=+ (.*\b(?:passed|failed|error)\b.*) in [\d.]+s.*=+\s*$/gm)].pop()?.[1];
+function pytestCounts(text3) {
+  const line = [...text3.matchAll(/^=+ (.*\b(?:passed|failed|error)\b.*) in [\d.]+s.*=+\s*$/gm)].pop()?.[1];
   if (!line) return null;
   const n = (word) => Number(new RegExp(`(\\d+) ${word}`).exec(line)?.[1] ?? 0);
   const failed = n("failed") + n("errors?");
   const skipped = n("skipped") + n("xfailed");
   return { tests: n("passed") + failed + skipped + n("xpassed"), failed, skipped };
 }
-function cargoCounts(text2) {
-  const all = [...text2.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored/g)];
+function cargoCounts(text3) {
+  const all = [...text3.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored/g)];
   if (!all.length) return null;
   const sum = (i) => all.reduce((n, m) => n + Number(m[i]), 0);
   return { tests: sum(1) + sum(2) + sum(3), failed: sum(2), skipped: sum(3) };
 }
-function failedNames(text2) {
+function failedNames(text3) {
   const names = [
-    ...text2.matchAll(/^\s*✖\s+(?!failing tests)(.+?)(?:\s+\([\d.]+m?s\))?\s*$/gm),
+    ...text3.matchAll(/^\s*✖\s+(?!failing tests)(.+?)(?:\s+\([\d.]+m?s\))?\s*$/gm),
     // node --test
-    ...text2.matchAll(/^\s*●\s+(?!Test suite failed)(.+?)\s*$/gm),
+    ...text3.matchAll(/^\s*●\s+(?!Test suite failed)(.+?)\s*$/gm),
     // Jest
-    ...text2.matchAll(/^\s*(?:×|FAIL)\s+(.+?)(?:\s+\d+m?s)?\s*$/gm),
+    ...text3.matchAll(/^\s*(?:×|FAIL)\s+(.+?)(?:\s+\d+m?s)?\s*$/gm),
     // Vitest
-    ...text2.matchAll(/^FAILED\s+(\S+)/gm),
+    ...text3.matchAll(/^FAILED\s+(\S+)/gm),
     // pytest
-    ...text2.matchAll(/^test (\S+) \.\.\. FAILED$/gm)
+    ...text3.matchAll(/^test (\S+) \.\.\. FAILED$/gm)
     // cargo
   ].map((m) => m[1].trim());
   return [...new Set(names)];
@@ -39271,8 +39540,8 @@ function featureOwner(project, scan2) {
   const dirs = (scan2?.features ?? []).flatMap((f) => f.modules.map((m) => ({ feature: f.id, dir: (0, import_node_path34.relative)(project.root, (0, import_node_path34.resolve)(project.root, m.dir)).replace(/\\/g, "/") }))).filter((d) => d.dir && !d.dir.startsWith("..")).sort((a, b) => b.dir.length - a.dir.length);
   return (file2) => dirs.find((d) => file2 === d.dir || file2.startsWith(`${d.dir}/`))?.feature ?? "project";
 }
-function mask(text2) {
-  return text2.replace(/[A-Za-z0-9+/_\-=]{8,}/g, (s) => `${s.slice(0, 4)}${"\u2022".repeat(Math.min(12, s.length - 6))}${s.slice(-2)}`);
+function mask(text3) {
+  return text3.replace(/[A-Za-z0-9+/_\-=]{8,}/g, (s) => `${s.slice(0, 4)}${"\u2022".repeat(Math.min(12, s.length - 6))}${s.slice(-2)}`);
 }
 function fingerprint(check2, file2, evidence) {
   const norm = evidence.replace(/\s+/g, " ").trim().toLowerCase();
@@ -39287,23 +39556,23 @@ function loadDismissals(project) {
 }
 function dismiss(project, finding2, reason) {
   if (!reason.trim()) throw new Error("Say why it is not an issue: the reason is what keeps a dismissal honest.");
-  const list = loadDismissals(project).filter((d) => d.fingerprint !== finding2.fingerprint);
+  const list2 = loadDismissals(project).filter((d) => d.fingerprint !== finding2.fingerprint);
   const entry = { fingerprint: finding2.fingerprint, check: finding2.check, file: finding2.file, reason: reason.trim(), at: (/* @__PURE__ */ new Date()).toISOString() };
-  project.store.write(DISMISSED, [...list, entry]);
+  project.store.write(DISMISSED, [...list2, entry]);
   return entry;
 }
 function undismiss(project, fingerprintId) {
-  const list = loadDismissals(project);
-  const next = list.filter((d) => d.fingerprint !== fingerprintId);
+  const list2 = loadDismissals(project);
+  const next = list2.filter((d) => d.fingerprint !== fingerprintId);
   project.store.write(DISMISSED, next);
-  return next.length !== list.length;
+  return next.length !== list2.length;
 }
-function sortFindings(list) {
-  return [...list].sort((a, b) => severityRank(a.severity) - severityRank(b.severity) || (a.file ?? "").localeCompare(b.file ?? "") || (a.line ?? 0) - (b.line ?? 0));
+function sortFindings(list2) {
+  return [...list2].sort((a, b) => severityRank(a.severity) - severityRank(b.severity) || (a.file ?? "").localeCompare(b.file ?? "") || (a.line ?? 0) - (b.line ?? 0));
 }
-function dedupe(list) {
+function dedupe(list2) {
   const seen = /* @__PURE__ */ new Map();
-  for (const f of list) {
+  for (const f of list2) {
     const prev = seen.get(f.fingerprint);
     if (!prev || severityRank(f.severity) < severityRank(prev.severity)) seen.set(f.fingerprint, f);
   }
@@ -39455,9 +39724,9 @@ End with exactly one fenced json block and nothing after it:
 {"findings": [{"check": "API-AUZ-01", "title": "short title", "severity": "critical|high|medium|low|info", "file": "path/relative/to/project", "line": 42, "evidence": "the code that shows it (one or two lines)", "why": "the attack path in one or two sentences", "fix": "the smallest change that closes it"}]}
 \`\`\``;
 }
-function parseAgentFindings(text2, feature) {
-  const blocks = [...text2.matchAll(/```json\s*([\s\S]*?)```/g)];
-  const raw = blocks.length ? blocks[blocks.length - 1][1] : /\{[\s\S]*"findings"[\s\S]*\}/.exec(text2)?.[0] ?? "";
+function parseAgentFindings(text3, feature) {
+  const blocks = [...text3.matchAll(/```json\s*([\s\S]*?)```/g)];
+  const raw = blocks.length ? blocks[blocks.length - 1][1] : /\{[\s\S]*"findings"[\s\S]*\}/.exec(text3)?.[0] ?? "";
   let data;
   try {
     data = JSON.parse(raw);
@@ -39551,16 +39820,16 @@ function artifactFindings(root, rules, owner) {
     out.push(artifact("WEB-SEC-02", "low", rel, `${maps.length} source map(s), e.g. ${rel}`, "Source maps in the web build", "If these are deployed, anyone can read your original source code and comments.", "Do not deploy .map files (hidden-source-map + upload to your error tracker).", ["CWE-540"], owner(rel)));
   }
   for (const path of web.filter((p) => !p.endsWith(".map"))) {
-    let text2;
+    let text3;
     try {
       if ((0, import_node_fs28.statSync)(path).size > 8 * 1024 * 1024) continue;
-      text2 = (0, import_node_fs28.readFileSync)(path, "utf8");
+      text3 = (0, import_node_fs28.readFileSync)(path, "utf8");
     } catch {
       continue;
     }
     const rel = (0, import_node_path37.relative)(root, path).replace(/\\/g, "/");
     for (const r of secretRules) {
-      const m = r.match.exec(text2);
+      const m = r.match.exec(text3);
       if (m) out.push(artifact(r.id, r.severity, rel, mask(m[0]), `${r.title} \u2014 in the shipped web bundle`, `${r.why} The browser downloads this file, so every visitor has it.`, r.fix, [...r.refs, "WEB-SEC-01"], owner(rel)));
     }
   }
@@ -39569,14 +39838,14 @@ function artifactFindings(root, rules, owner) {
 function packageFindings(rel, entries, secretRules, feature) {
   const out = [];
   const isApk = /\.(apk|aab)$/.test(rel);
-  const strings = [];
+  const strings2 = [];
   for (const e of entries) {
     if (isApk ? /(^|\/)classes\d*\.dex$|resources\.arsc$|^(base\/)?assets\/|\.(json|properties|xml|txt|js)$/.test(e.name) : /\.app\/[^/]+$|\.(plist|json|js|strings)$/.test(e.name)) {
       const data = e.read();
-      if (data) strings.push(...printable(data));
+      if (data) strings2.push(...printable(data));
     }
   }
-  const pool2 = strings.join("\n");
+  const pool2 = strings2.join("\n");
   const seen = /* @__PURE__ */ new Set();
   for (const r of secretRules) {
     const re = new RegExp(r.match.source, `${r.match.flags.replace("g", "")}g`);
@@ -40180,32 +40449,32 @@ function runStatic(root, files, rules, options) {
     for (const r of presence) out.push(finding(r, file2, void 0, file2, options.owner(file2)));
     const readers = mine.filter((r) => !r.fileOnly && (r.tests || !test));
     if (!readers.length) continue;
-    const text2 = readText((0, import_node_path38.join)(root, file2));
-    if (text2 === null) continue;
-    for (const r of readers) out.push(...matchRule(r, file2, text2, options.owner(file2)));
+    const text3 = readText((0, import_node_path38.join)(root, file2));
+    if (text3 === null) continue;
+    for (const r of readers) out.push(...matchRule(r, file2, text3, options.owner(file2)));
   }
   return out;
 }
-function matchRule(r, file2, text2, feature) {
-  if (r.when && !r.when.test(text2)) return [];
-  if (r.unless && r.unless.test(text2)) return [];
+function matchRule(r, file2, text3, feature) {
+  if (r.when && !r.when.test(text3)) return [];
+  if (r.unless && r.unless.test(text3)) return [];
   if (r.absent) {
-    if (r.match && r.match.test(text2)) return [];
+    if (r.match && r.match.test(text3)) return [];
     return [finding(r, file2, void 0, `${file2}: ${r.title.charAt(0).toLowerCase()}${r.title.slice(1)}`, feature)];
   }
   if (!r.match) return [];
   const out = [];
   const re = new RegExp(r.match.source, r.match.flags.includes("g") ? r.match.flags : `${r.match.flags}g`);
-  const lines = lineStarts(text2);
+  const lines = lineStarts(text3);
   let m;
   let hits = 0;
-  while ((m = re.exec(text2)) !== null && hits < 20) {
+  while ((m = re.exec(text3)) !== null && hits < 20) {
     if (m[0].length === 0) {
       re.lastIndex++;
       continue;
     }
     const line = lineOf(lines, m.index);
-    if (!ignored(text2, lines, line, r.id)) {
+    if (!ignored(text3, lines, line, r.id)) {
       out.push(finding(r, file2, line + 1, m[0], feature));
       hits++;
     }
@@ -40238,9 +40507,9 @@ function readText(path) {
     return null;
   }
 }
-function lineStarts(text2) {
+function lineStarts(text3) {
   const starts = [0];
-  for (let i = 0; i < text2.length; i++) if (text2.charCodeAt(i) === 10) starts.push(i + 1);
+  for (let i = 0; i < text3.length; i++) if (text3.charCodeAt(i) === 10) starts.push(i + 1);
   return starts;
 }
 function lineOf(starts, index) {
@@ -40253,10 +40522,10 @@ function lineOf(starts, index) {
   }
   return lo;
 }
-function ignored(text2, starts, line, id) {
+function ignored(text3, starts, line, id) {
   for (const l of [line, line - 1]) {
     if (l < 0) continue;
-    const s = text2.slice(starts[l], starts[l + 1] ?? text2.length);
+    const s = text3.slice(starts[l], starts[l + 1] ?? text3.length);
     const m = IGNORE.exec(s);
     if (m && m[1].split(/\s*,\s*/).some((x) => x === id || id.startsWith(x))) return true;
   }
@@ -40275,85 +40544,85 @@ function readDependencies(root, files) {
     const base = file2.split("/").pop();
     const reader = READERS[base] ?? (/\.versions\.toml$/.test(base) ? READERS["libs.versions.toml"] : /\.csproj$/.test(base) ? READERS[".csproj"] : void 0);
     if (!reader) continue;
-    const text2 = readText((0, import_node_path39.join)(root, file2));
-    if (text2 === null) continue;
+    const text3 = readText((0, import_node_path39.join)(root, file2));
+    if (text3 === null) continue;
     try {
-      reader(text2, (e, n, v) => add(e, n, v, file2), file2, unpinned);
+      reader(text3, (e, n, v) => add(e, n, v, file2), file2, unpinned);
     } catch {
     }
   }
   return { deps: uniq(deps), unpinned };
 }
 var READERS = {
-  "package-lock.json": (text2, add) => {
-    const lock = JSON.parse(text2);
+  "package-lock.json": (text3, add) => {
+    const lock = JSON.parse(text3);
     for (const [path, p] of Object.entries(lock.packages ?? {})) if (path) add("npm", path.slice(path.lastIndexOf("node_modules/") + 13), p.version);
     if (!lock.packages) for (const [name, p] of Object.entries(lock.dependencies ?? {})) add("npm", name, p.version);
   },
-  "yarn.lock": (text2, add) => {
-    for (const block of text2.split(/\n(?=\S)/)) {
+  "yarn.lock": (text3, add) => {
+    for (const block of text3.split(/\n(?=\S)/)) {
       const head = /^"?(@?[^@\s"]+)@/.exec(block);
       const version2 = /\n\s+version:?\s+"?([^"\s]+)"?/.exec(block);
       if (head && version2) add("npm", head[1], version2[1]);
     }
   },
-  "pnpm-lock.yaml": (text2, add) => {
-    const lock = (0, import_yaml8.parse)(text2);
+  "pnpm-lock.yaml": (text3, add) => {
+    const lock = (0, import_yaml8.parse)(text3);
     for (const key of Object.keys(lock.packages ?? {})) {
       const m = /^\/?(@?[^@(]+)@([^(]+)/.exec(key) ?? /^\/(@?[^/]+(?:\/[^/]+)?)\/([^/(]+)/.exec(key);
       if (m) add("npm", m[1], m[2]);
     }
   },
-  "requirements.txt": (text2, add) => {
-    for (const line of text2.split("\n")) {
+  "requirements.txt": (text3, add) => {
+    for (const line of text3.split("\n")) {
       const m = /^\s*([A-Za-z0-9_.-]+)(\[[^\]]*\])?\s*==\s*([\w.]+)/.exec(line);
       if (m) add("PyPI", m[1], m[3]);
     }
   },
-  "poetry.lock": (text2, add) => tomlPackages(text2, (n, v) => add("PyPI", n, v)),
-  "uv.lock": (text2, add) => tomlPackages(text2, (n, v) => add("PyPI", n, v)),
-  "Pipfile.lock": (text2, add) => {
-    const lock = JSON.parse(text2);
+  "poetry.lock": (text3, add) => tomlPackages(text3, (n, v) => add("PyPI", n, v)),
+  "uv.lock": (text3, add) => tomlPackages(text3, (n, v) => add("PyPI", n, v)),
+  "Pipfile.lock": (text3, add) => {
+    const lock = JSON.parse(text3);
     for (const section of ["default", "develop"]) for (const [n, p] of Object.entries(lock[section] ?? {})) add("PyPI", n, p.version?.replace(/^==/, ""));
   },
-  "Cargo.lock": (text2, add) => tomlPackages(text2, (n, v) => add("crates.io", n, v)),
-  "go.sum": (text2, add) => {
-    for (const line of text2.split("\n")) {
+  "Cargo.lock": (text3, add) => tomlPackages(text3, (n, v) => add("crates.io", n, v)),
+  "go.sum": (text3, add) => {
+    for (const line of text3.split("\n")) {
       const m = /^(\S+)\s+v([^\s/]+?)(\/go\.mod)?\s/.exec(line);
       if (m && !m[3]) add("Go", m[1], m[2]);
     }
   },
-  "Gemfile.lock": (text2, add) => {
+  "Gemfile.lock": (text3, add) => {
     const specs = /^ {4}([\w.-]+) \(([\w.]+)\)$/gm;
     let m;
-    while (m = specs.exec(text2)) add("RubyGems", m[1], m[2]);
+    while (m = specs.exec(text3)) add("RubyGems", m[1], m[2]);
   },
-  "composer.lock": (text2, add) => {
-    const lock = JSON.parse(text2);
+  "composer.lock": (text3, add) => {
+    const lock = JSON.parse(text3);
     for (const p of [...lock.packages ?? [], ...lock["packages-dev"] ?? []]) add("Packagist", p.name, p.version);
   },
-  "pubspec.lock": (text2, add) => {
-    const lock = (0, import_yaml8.parse)(text2);
+  "pubspec.lock": (text3, add) => {
+    const lock = (0, import_yaml8.parse)(text3);
     for (const [n, p] of Object.entries(lock.packages ?? {})) if (p.source !== "sdk") add("Pub", n, p.version);
   },
-  "Podfile.lock": (text2, add) => {
+  "Podfile.lock": (text3, add) => {
     const re = /^ {2}- ([\w+/-]+) \(([\w.]+)\)/gm;
     let m;
-    while (m = re.exec(text2)) add("CocoaPods", m[1].split("/")[0], m[2]);
+    while (m = re.exec(text3)) add("CocoaPods", m[1].split("/")[0], m[2]);
   },
-  "Package.resolved": (text2, add) => {
-    const lock = JSON.parse(text2);
+  "Package.resolved": (text3, add) => {
+    const lock = JSON.parse(text3);
     for (const p of lock.pins ?? lock.object?.pins ?? []) add("SwiftURL", (p.location ?? p.repositoryURL ?? "").replace(/\.git$/, ""), p.state?.version);
   },
-  "gradle.lockfile": (text2, add) => {
-    for (const line of text2.split("\n")) {
+  "gradle.lockfile": (text3, add) => {
+    for (const line of text3.split("\n")) {
       const m = /^([\w.-]+):([\w.-]+):([\w.-]+)=/.exec(line);
       if (m) add("Maven", `${m[1]}:${m[2]}`, m[3]);
     }
   },
-  "libs.versions.toml": (text2, add, file2, unpinned) => {
+  "libs.versions.toml": (text3, add, file2, unpinned) => {
     const versions = /* @__PURE__ */ new Map();
-    const section = (name) => new RegExp(`^\\[${name}\\]([\\s\\S]*?)(?=^\\[|$(?![\\s\\S]))`, "m").exec(text2)?.[1] ?? "";
+    const section = (name) => new RegExp(`^\\[${name}\\]([\\s\\S]*?)(?=^\\[|$(?![\\s\\S]))`, "m").exec(text3)?.[1] ?? "";
     for (const m of section("versions").matchAll(/^\s*([\w-]+)\s*=\s*"([^"]+)"/gm)) versions.set(m[1], m[2]);
     for (const line of section("libraries").split("\n")) {
       const module2 = /module\s*=\s*"([^"]+)"/.exec(line)?.[1] ?? /group\s*=\s*"([^"]+)"[^}]*name\s*=\s*"([^"]+)"/.exec(line)?.slice(1, 3).join(":");
@@ -40367,26 +40636,26 @@ var READERS = {
       add("Maven", name, version2);
     }
   },
-  "pom.xml": (text2, add) => {
+  "pom.xml": (text3, add) => {
     const props = /* @__PURE__ */ new Map();
-    for (const m of text2.matchAll(/<([\w.-]+)>([^<${}]+)<\/\1>/g)) props.set(m[1], m[2]);
-    for (const m of text2.matchAll(/<dependency>\s*<groupId>([^<]+)<\/groupId>\s*<artifactId>([^<]+)<\/artifactId>\s*<version>([^<]+)<\/version>/g)) {
+    for (const m of text3.matchAll(/<([\w.-]+)>([^<${}]+)<\/\1>/g)) props.set(m[1], m[2]);
+    for (const m of text3.matchAll(/<dependency>\s*<groupId>([^<]+)<\/groupId>\s*<artifactId>([^<]+)<\/artifactId>\s*<version>([^<]+)<\/version>/g)) {
       const v = m[3].replace(/\$\{([^}]+)\}/, (_, k) => props.get(k) ?? "");
       add("Maven", `${m[1]}:${m[2]}`, v);
     }
   },
-  ".csproj": (text2, add) => {
-    for (const m of text2.matchAll(/<PackageReference\s+Include="([^"]+)"\s+Version="([^"]+)"/g)) add("NuGet", m[1], m[2]);
+  ".csproj": (text3, add) => {
+    for (const m of text3.matchAll(/<PackageReference\s+Include="([^"]+)"\s+Version="([^"]+)"/g)) add("NuGet", m[1], m[2]);
   },
-  "package.json": (text2, add, file2, unpinned) => {
-    const pkg = JSON.parse(text2);
+  "package.json": (text3, add, file2, unpinned) => {
+    const pkg = JSON.parse(text3);
     for (const key of ["dependencies", "devDependencies"]) {
       for (const [n, v] of Object.entries(pkg[key] ?? {})) if (v === "*" || v === "latest" || /^(git|github|https?):/.test(v)) unpinned.push(unpinnedFinding(file2, n, v));
     }
   }
 };
-function tomlPackages(text2, add) {
-  for (const block of text2.split(/^\[\[package\]\]\s*$/m).slice(1)) {
+function tomlPackages(text3, add) {
+  for (const block of text3.split(/^\[\[package\]\]\s*$/m).slice(1)) {
     const name = /^name\s*=\s*"([^"]+)"/m.exec(block)?.[1];
     const version2 = /^version\s*=\s*"([^"]+)"/m.exec(block)?.[1];
     if (name && version2) add(name, version2);
@@ -40489,18 +40758,18 @@ function historyFindings(root, rules, commits, owner) {
   const secretRules = rules.filter((r) => r.secret && r.match && !r.absent && !r.fileOnly && !r.when && r.platform === "common");
   const keyFiles = rules.filter((r) => r.fileOnly && r.id === "COM-SEC-02");
   if (!secretRules.length || commits <= 0) return [];
-  const git2 = (0, import_node_child_process8.spawnSync)("git", ["log", "--all", `--max-count=${commits}`, "-p", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=AM", "--format=@@@commit %h %ad", "--date=short"], {
+  const git3 = (0, import_node_child_process8.spawnSync)("git", ["log", "--all", `--max-count=${commits}`, "-p", "-U0", "--no-color", "--no-ext-diff", "--diff-filter=AM", "--format=@@@commit %h %ad", "--date=short"], {
     cwd: root,
     encoding: "utf8",
     windowsHide: true,
     maxBuffer: 512 * 1024 * 1024,
     timeout: 12e4
   });
-  if (git2.error || git2.status !== 0) return [];
+  if (git3.error || git3.status !== 0) return [];
   const out = [];
   let commit = "";
   let file2 = "";
-  for (const line of git2.stdout.split("\n")) {
+  for (const line of git3.stdout.split("\n")) {
     if (line.startsWith("@@@commit ")) {
       commit = line.slice(10).trim();
       continue;
@@ -40654,9 +40923,9 @@ function androidRuntimeFindings(project, pkg, rules, log) {
   if (debuggable) {
     const files = sh(`run-as ${shQuote(pkg)} sh -c 'ls shared_prefs/*.xml files/datastore/*.preferences_pb 2>/dev/null'`).out.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 40);
     for (const file2 of files) {
-      const text2 = sh(`run-as ${shQuote(pkg)} cat ${shQuote(file2)}`).out;
-      const hit = /(token|jwt|password|secret|session)[^<>"\n]{0,40}["'>=:]\s*([A-Za-z0-9._\-+/=]{16,})/i.exec(text2) ?? jwt2.exec(text2);
-      if (hit && !/encrypted|__androidx_security_crypto/i.test(text2)) out.push(found2("AND-STO-10", "critical", `${file2}: ${mask(hit[0].slice(0, 120))}`, "Token stored in a plain file on the device", "Backups, rooted devices and forensic tools read this file directly.", "Store tokens with EncryptedSharedPreferences / Tink with an Android Keystore key.", ["CWE-312", "MASTG-TEST-0001"], file2));
+      const text3 = sh(`run-as ${shQuote(pkg)} cat ${shQuote(file2)}`).out;
+      const hit = /(token|jwt|password|secret|session)[^<>"\n]{0,40}["'>=:]\s*([A-Za-z0-9._\-+/=]{16,})/i.exec(text3) ?? jwt2.exec(text3);
+      if (hit && !/encrypted|__androidx_security_crypto/i.test(text3)) out.push(found2("AND-STO-10", "critical", `${file2}: ${mask(hit[0].slice(0, 120))}`, "Token stored in a plain file on the device", "Backups, rooted devices and forensic tools read this file directly.", "Store tokens with EncryptedSharedPreferences / Tink with an Android Keystore key.", ["CWE-312", "MASTG-TEST-0001"], file2));
     }
   }
   return out;
@@ -40801,8 +41070,8 @@ function safePackage(project) {
     return void 0;
   }
 }
-function countBySeverity(list) {
-  const n = (s) => list.filter((f) => f.severity === s).length;
+function countBySeverity(list2) {
+  const n = (s) => list2.filter((f) => f.severity === s).length;
   return ["critical", "high", "medium", "low", "info"].filter((s) => n(s)).map((s) => `${n(s)} ${s}`).join(", ") || "none";
 }
 function summarizeSecurity(run) {
@@ -40823,9 +41092,9 @@ async function recheckFinding(project, finding2) {
       const there = (0, import_node_fs30.existsSync)((0, import_node_path40.join)(project.root, finding2.file));
       return { checked: true, stillFound: there, count: there ? 1 : 0, note: there ? `${finding2.file} is still in the project` : `${finding2.file} is gone` };
     }
-    const text2 = readText((0, import_node_path40.join)(project.root, finding2.file));
-    if (text2 === null) return { checked: true, stillFound: false, count: 0, note: `${finding2.file} no longer exists` };
-    const hits = rules.flatMap((r) => matchRule(r, finding2.file, text2, finding2.feature));
+    const text3 = readText((0, import_node_path40.join)(project.root, finding2.file));
+    if (text3 === null) return { checked: true, stillFound: false, count: 0, note: `${finding2.file} no longer exists` };
+    const hits = rules.flatMap((r) => matchRule(r, finding2.file, text3, finding2.feature));
     const same = hits.some((h) => h.fingerprint === finding2.fingerprint);
     return { checked: true, stillFound: same, count: hits.length, note: same ? `${finding2.check} still matches ${finding2.file}` : hits.length ? `the original match is gone; ${hits.length} other ${finding2.check} match(es) remain in ${finding2.file}` : `${finding2.check} no longer matches ${finding2.file}` };
   }
@@ -40876,7 +41145,7 @@ function startFix(project, issueId, options = {}) {
     const before = dirtyFiles(project.root);
     const result = await runAgent(
       project,
-      { prompt: fixPrompt(project, issue2, source, true), probeTools: ["probe_feature", "probe_unit_run", "probe_cards_list"], model: options.model, allowEdits: true },
+      { prompt: fixPrompt(project, issue2, source, true), probeTools: ["probe_feature", "probe_unit_run", "probe_cards_list"], model: options.model, allowEdits: true, role: "coding" },
       log
     );
     run.costUsd += result.costUsd;
@@ -44863,7 +45132,7 @@ var ZodMiniType = /* @__PURE__ */ $constructor("ZodMiniType", (inst, def) => {
     own(this, "with", value);
   },
   parse(data, params) {
-    return parse2(this, data, params, { callee: this.parse });
+    return parse3(this, data, params, { callee: this.parse });
   },
   parseAsync(data, params) {
     return parseAsync(this, data, params, { callee: this.parseAsync });
@@ -50635,7 +50904,7 @@ var StdioServerTransport = class {
 };
 
 // src/studio/server.ts
-var import_node_child_process12 = require("node:child_process");
+var import_node_child_process13 = require("node:child_process");
 var import_node_fs37 = require("node:fs");
 var import_node_http = require("node:http");
 var import_node_path46 = require("node:path");
@@ -50902,7 +51171,7 @@ function startUnitWrite(project, featureId, options = {}) {
     const before = dirtyFiles(project.root);
     const result = await runAgent(
       project,
-      { prompt: prompt5(feature, targets), probeTools: ["probe_feature", "probe_unit_run"], model: options.model, allowEdits: true },
+      { prompt: prompt5(feature, targets), probeTools: ["probe_feature", "probe_unit_run"], model: options.model, allowEdits: true, role: "coding" },
       log
     );
     run.costUsd = result.costUsd;
@@ -51188,7 +51457,7 @@ function knownProjects() {
 }
 
 // src/studio/page.html
-var page_default = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Probe Studio</title>\n<style>\n  :root {\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root {\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\n    }\n  }\n  * { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\n  header .meta { color: var(--muted); font-size: 12px; }\n  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }\n  header .spacer { flex: 1; }\n  nav { display: flex; gap: 4px; }\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\n  .btn.secondary { background: var(--track); color: var(--text); }\n  .btn:disabled { opacity: .5; cursor: default; }\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\n  .card .k { color: var(--muted); font-size: 12px; }\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\n  tbody tr:last-child td { border-bottom: 0; }\n  tr.click { cursor: pointer; }\n  tr.click:hover td { background: var(--track); }\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\n  .bar span { display: block; height: 100%; }\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\n  .tile:hover { background: var(--track); }\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\n  .box ul { margin: 4px 0; padding-left: 18px; }\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\n  .muted { color: var(--muted); }\n  .mono { font-family: var(--mono); font-size: 12px; }\n  td.mono { word-break: break-all; }\n  h2 { font-size: 15px; margin: 22px 0 10px; }\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\n  .desc { white-space: pre-wrap; max-height: 280px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0; }\n  .row { display: flex; gap: 12px; align-items: center; }\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\n  details.fc > summary::-webkit-details-marker { display: none; }\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\n  .fc-body { padding: 4px 16px 14px; }\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\n  .fc-body ul.expect li { margin: 3px 0; }\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\n  .reach b { color: var(--muted); font-weight: 400; }\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-critical { color: #fff; background: var(--fail); }\n  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }\n  .bwrap { position: relative; }\n  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }\n  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }\n  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }\n  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .blist button:hover, .blist button.on { background: var(--track); }\n  .blist .cur { font-weight: 600; }\n  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\n  .jobs[hidden] { display: none; }\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\n  ul.setup { list-style: none; padding: 0; margin: 0; }\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\n  ul.setup li:last-child { border-bottom: 0; }\n  ul.setup .what { flex: 1; min-width: 200px; }\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\n  .side .head input { width: 100%; min-width: 0; }\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\n  .side li:hover { background: var(--track); }\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\n  .issues { margin: 12px 0; }\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\n  .issue:last-child { border-bottom: 0; }\n  .issue .what { flex: 1; min-width: 220px; }\n  .issue .k { font-size: 11px; }\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\n  .box.stale { border-color: var(--warn); }\n  .box a { color: var(--accent); font-weight: 600; }\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\n  .runs-list td.res { overflow-wrap: anywhere; }\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\n  .runs-detail .empty { padding: 40px 12px; }\n  @media (max-width: 1100px) {\n    .runs-layout { grid-template-columns: 1fr; }\n    .runs-detail { display: none; }\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\n  }\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\n  @media (max-width: 720px) {\n    header { flex-wrap: wrap; padding: 12px 16px; }\n    main { padding: 16px; }\n    .hide-sm { display: none; }\n    table { font-size: 13px; }\n  }\n</style>\n</head>\n<body>\n<header>\n  <h1>Probe</h1>\n  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>\n  <div class="meta" id="meta">loading\u2026</div>\n  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">\u2026</button>\n    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches\u2026" autocomplete="off"><div class="blist" id="blist"></div></div></div>\n  <button class="jobs" id="jobs" hidden></button>\n  <div class="spacer"></div>\n  <nav>\n    <button data-tab="atlas" class="active">Atlas</button>\n    <button data-tab="cards">Cards</button>\n    <button data-tab="verify">Verify</button>\n    <button data-tab="tickets">Tickets</button>\n    <button data-tab="security">Security</button>\n    <button data-tab="runs">Runs</button>\n    <button data-tab="settings">Settings</button>\n    <button data-tab="setup">Setup</button>\n  </nav>\n</header>\n<div id="banner"></div>\n<main id="view"></main>\n\n<script>\nconst $view = document.getElementById("view");\nconst $meta = document.getElementById("meta");\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\n\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\nconst ago = (iso) => {\n  if (!iso) return "never";\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\n  if (s < 60) return "just now";\n  if (s < 3600) return Math.round(s / 60) + "m ago";\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\n  return Math.round(s / 86400) + "d ago";\n};\n\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\n  state.tab = b.dataset.tab; state.feature = null; render();\n}));\n\n// \u2500\u2500 Project: Studio shows one at a time; the picker switches to any project Probe knows \u2500\u2500\n\nconst OPEN_OTHER = "__open_folder__";\n\nasync function loadProjects() {\n  const data = await api("/api/projects").catch(() => null);\n  if (!data) return;\n  const sel = document.getElementById("proj");\n  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +\n    `<option value="${OPEN_OTHER}">Open another folder\u2026</option>`;\n  sel.dataset.current = data.current.root;\n}\n\ndocument.getElementById("proj").addEventListener("change", async (e) => {\n  const sel = e.target;\n  let root = sel.value;\n  if (root === OPEN_OTHER) {\n    root = (prompt("Project folder (full path):") || "").trim();\n    if (!root) { sel.value = sel.dataset.current; return; }\n  }\n  const running = state.jobs.length;\n  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }\n  sel.disabled = true;\n  const res = await post("/api/projects/open", { root });\n  sel.disabled = false;\n  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }\n  // Everything on the page belonged to the old project.\n  closeStream();\n  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, tickets: null, jobs: [] });\n  history.replaceState(null, "", "#atlas");\n  document.getElementById("banner").innerHTML = "";\n  await loadProjects();\n  if (typeof checkBranch === "function") checkBranch();\n  render();\n});\n\nloadProjects();\n\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\n\nasync function render() {\n  closeStream();\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\n  saveRoute();\n  if (state.tab === "setup") await renderSetup();\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\n  else if (state.tab === "cards") await renderCards();\n  else if (state.tab === "verify") await renderVerify();\n  else if (state.tab === "tickets") await renderTickets();\n  else if (state.tab === "security") await renderSecurity();\n  else if (state.tab === "runs") await renderRuns();\n  else if (state.tab === "settings") await renderSettings();\n  showJobs();\n}\n\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\n\nfunction saveRoute() {\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : state.tab === "tickets" ? state.tickets?.selected : null;\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\n}\n\nfunction loadRoute() {\n  const m = /^#(atlas|cards|verify|tickets|security|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\n  if (!m) return false;\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\n  return true;\n}\n\nfunction goTo(route) {\n  state.tab = route.tab;\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\n  if (route.tab === "runs") runsState().selected = route.feature || null;\n  if (route.tab === "tickets" && route.feature) ticketsState().selected = route.feature;\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\n}\n\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\n// it as busy and follows the run, so closing the tab never hides work that is still going.\n\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\nconst jobKey = {\n  unit: (f) => `unit:${f}`,\n  backfill: (f) => `backfill:${f}`,\n  explore: (f) => `explore:${f}`,\n  unitwrite: (f) => `unitwrite:${f}`,\n  card: (f, id) => `card:${f}/${id}`,\n  login: (role) => `login:${role || "check"}`,\n  security: (f) => `security:${f || "*"}`,\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\n  verifyBase: (base) => `verify:base:${base || ""}`,\n};\n\n/** Where a job\'s button lives, to open the page on it. */\nfunction routeOf(j) {\n  const [kind, ...rest] = j.key.split(":");\n  const arg = rest.join(":");\n  if (kind === "init") return { tab: "setup" };\n  if (kind === "login") return { tab: "settings" };\n  if (kind === "check") return { tab: "atlas" };\n  if (kind === "security") return { tab: "security" };\n  if (kind === "verify") {\n    if (arg === "outdated") return { tab: "atlas" };\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\n    // A ticket\'s test has a button on Verify and one on its ticket in Tickets.\n    if (arg.startsWith("ticket:") && state.tab !== "verify") return { tab: "tickets", feature: arg.slice(7) };\n    return { tab: "verify" };\n  }\n  if (kind === "backfill" && arg.startsWith("ticket:")) return state.tab === "verify" ? { tab: "verify" } : { tab: "tickets", feature: arg.slice(7) };\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\n  // The Runs tab opens the run itself beside the list.\n  return { tab: "runs", feature: j.runId };\n}\n\nfunction onRoute(route) {\n  if (route.tab !== state.tab) return false;\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\n  if (route.tab === "tickets") return !route.feature || route.feature === state.tickets?.selected;\n  return true;\n}\n\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\n\nasync function refreshJobs() {\n  const jobs = await api("/api/jobs").catch(() => null);\n  if (!jobs) return;\n  state.jobs = jobs.filter((j) => !j.child);\n  showJobs();\n}\n\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\nfunction showJobs() {\n  const chip = document.getElementById("jobs");\n  chip.hidden = !state.jobs.length;\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\n  const running = new Set(state.jobs.map((j) => j.key));\n  document.querySelectorAll("[data-job]").forEach((b) => {\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\n    if (running.has(b.dataset.job)) {\n      if (b.dataset.marked) return;\n      b.dataset.marked = "1";\n      b.disabled = true;\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\n    } else if (b.dataset.marked) {\n      delete b.dataset.marked;\n      b.disabled = false;\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\n    }\n  });\n  followJob();\n}\n\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\nfunction followJob() {\n  const panel = document.getElementById("runpanel");\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\n  if (state.showRun) {\n    const id = state.showRun;\n    state.showRun = null;\n    return followRun(id, panel);\n  }\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\n  state.followId = null;\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\n  // When it ends, the view reloads with what it made and shows the finished run again.\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\n}\n\ndocument.getElementById("jobs").addEventListener("click", () => {\n  const j = state.jobs[state.jobs.length - 1];\n  if (!j) return;\n  goTo(routeOf(j));\n  state.followId = j.runId;\n  render();\n});\nsetInterval(refreshJobs, 3000);\n\nfunction coverageBar(s) {\n  const t = Math.max(1, s.testable);\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\n  </div>`;\n}\n\nfunction runPill(r) {\n  if (!r) return `<span class="pill none">not run</span>`;\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\n}\n\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\nfunction healthPill(f) {\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\n}\n\nfunction devicePill(d) {\n  const ran = d.passed + d.failed + d.blocked + d.error;\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\n}\n\n/** Marks a result that no longer holds for the code checked out here. */\nfunction freshPill(r) {\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\n  const why = (r.freshReasons || []).join("\\n");\n  return r.fresh === "stale"\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\n}\n\nfunction whoRan(r) {\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\n}\n\nfunction lastRunPill(r) {\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\n}\n\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\n\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\nfunction manifestPill(f) {\n  const m = f.manifest;\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\n}\n\nfunction cardsPill(c) {\n  if (!c) return `<span class="pill none">none</span>`;\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\n}\n\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\nfunction outdatedCount(features) {\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\n}\n\nasync function loadScan(refresh) {\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\n  const p = state.scan.project;\n  $meta.textContent = `${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\n  document.title = `${p.name} \xB7 Probe`;\n}\n\nasync function renderAtlas() {\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\n  const watch = await api("/api/watch");\n  const all = state.scan.features;\n  const list = all\n    .filter((f) => state.group === "all" || f.group === state.group)\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\n  const testable = sum("testable");\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\n\n  $view.innerHTML = `\n    <div class="cards">\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\n    </div>\n    <div class="toolbar">\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\n      <div class="seg" id="group">\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\n      </div>\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\n      <div style="flex:1"></div>\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\n      <button class="btn secondary" id="rescan">Rescan</button>\n    </div>\n    ${watchBanner(watch)}\n    <div id="runpanel"></div>\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\n    <table>\n      <thead><tr>\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\n      </tr></thead>\n      <tbody>\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\n          <td class="num hide-sm">${f.stats.modules}</td>\n          <td class="num">${f.stats.testable}</td>\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\n          <td class="num hide-sm">${f.stats.untested}</td>\n          <td>${manifestPill(f)}</td>\n          <td>${cardsPill(f.cards)}</td>\n          <td>${runPill(f.lastUnitRun)}</td>\n          <td>${devicePill(f.device)}</td>\n          <td>${healthPill(f)}</td>\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\n      </tbody>\n    </table>`}`;\n\n  const filter = document.getElementById("filter");\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\n  document.querySelectorAll("#group button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.g === state.group);\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\n  });\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("rescan").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\n    await loadScan(true); renderAtlas();\n  });\n  document.querySelectorAll("#view button").forEach((b) => {\n    b.classList.toggle("active", b.dataset.v === state.view);\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\n  });\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\n  bindWatchBanner(() => renderAtlas());\n}\n\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\n\nfunction stalePill(watch, id) {\n  const e = watch.stale[id];\n  if (!e) return "";\n  // Reached through the module graph: none of its own files changed, code it depends on did.\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\n}\n\nfunction watchBanner(watch) {\n  if (!watch.enabled) return "";\n  const stale = Object.keys(watch.stale);\n  const parts = [];\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\n  if (!parts.length) return "";\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\n}\n\nfunction bindWatchBanner(refresh) {\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/watch/check", {});\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\n  });\n}\n\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\nfunction miniMd(text) {\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\n  const items = [];\n  for (const line of text.split("\\n")) {\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\n  }\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\n}\n\nfunction diffHtml(diff) {\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\n}\n\nasync function renderKnowledge(id) {\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\n  const el = document.getElementById("knowledge");\n  if (!el) return;\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\n  if (!k.manifest && !k.check && k.drafts.length) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\n    return;\n  }\n  if (!k.manifest && !k.check) {\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\n    return;\n  }\n  const m = k.manifest || {};\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\n  const brokenBy = {};\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\n  const brokenCardsBy = {};\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\n  // A card proves its rule only while its last pass still holds for this code.\n  const cardPill = (x) => {\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\n  };\n  const proof = (inv) => {\n    const broken = brokenBy[inv.id] || [];\n    const pills = [];\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\n    const cards = (k.cards || {})[inv.id] || [];\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\n    return pills.join(" ") + cards.map(cardPill).join("") +\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\n  };\n  el.innerHTML = `\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\n      ${linksHtml}\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\n    </div>\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\n    const at = b.dataset.runcard.lastIndexOf("/");\n    b.disabled = true; b.textContent = "\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  }));\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\n    const res = await post("/api/watch/check", { features: [id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\n  });\n  showJobs();\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.approve;\n    const draftId = b.dataset.approve || b.dataset.reject;\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderKnowledge(id);\n  }));\n}\n\nasync function renderFeature(id) {\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\n  // A remembered address can name a feature that is gone since.\n  if (f.error) { state.feature = null; return render(); }\n  if (!state.scan) await loadScan(false);\n  const h = state.scan.features.find((x) => x.id === f.id);\n  const nav = navmap[f.id];\n  const s = f.stats;\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\n  $view.innerHTML = `\n    <button class="back" id="back">\u2190 Atlas</button>\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\n    <div id="knowledge"></div>\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\n    <div class="cards">\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\n    </div>\n    <div id="runpanel"></div>\n    <h2>Cards</h2>\n    <div id="featurecards"></div>\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\n    <h2>Riskiest untested classes</h2>\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\n    <table>\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\n    </table>\n    <h2>Modules</h2>\n    <table>\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\n    </table>`;\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\n  renderKnowledge(f.id);\n  const showCards = async () => {\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\n    const el = document.getElementById("featurecards");\n    if (!el) return;\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\n    bindCardActions(el, showCards);\n    showJobs();\n  };\n  showCards();\n  document.getElementById("backfill").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\n  });\n  document.getElementById("run").addEventListener("click", async (e) => {\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\n  });\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\n    const label = e.target.textContent;\n    e.target.disabled = true; e.target.textContent = busy;\n    const res = await post(path, body);\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\n  });\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\n}\n\n// Every action carries the branch the person is looking at; the server refuses it if the\n// project has moved to another branch since (a checkout in a terminal or the IDE).\nconst post = async (path, body) => {\n  const headers = { "content-type": "application/json" };\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\n  if (res.branchChanged) checkBranch();\n  return res;\n};\n\nasync function checkBranch() {\n  const b = await api("/api/branch").catch(() => null);\n  if (!b) return;\n  state.branchInfo = b;\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\n  const chip = document.getElementById("branch");\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""} \u25BE` : "no git";\n  chip.disabled = !b.git;\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\n  const banner = document.getElementById("banner");\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\n  } else banner.innerHTML = "";\n}\nsetInterval(checkBranch, 5000);\n\n// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.\nconst $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");\n\nfunction renderBranchList() {\n  const cur = state.branchInfo?.id;\n  const words = $bq.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);\n  const all = state.branchList || [];\n  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);\n  $blist.innerHTML = !state.branchList ? `<div class="none">Loading\u2026</div>`\n    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "\u2713 " : ""}${esc(x)}</button>`).join("")\n    : `<div class="none">No branch matches.</div>`;\n}\n\nasync function openBranchPicker() {\n  $bpop.hidden = false;\n  $bq.value = "";\n  renderBranchList();\n  $bq.focus();\n  const b = await api("/api/branch?branches").catch(() => null);\n  if (b) { state.branchList = b.branches; renderBranchList(); }\n}\n\nasync function switchBranch(want) {\n  $bpop.hidden = true;\n  if (!want || want === state.branchInfo?.id) return;\n  if (!confirm(`Switch this project\'s working tree to ${want}? Studio rescans afterwards.`)) return;\n  const chip = document.getElementById("branch");\n  chip.disabled = true;\n  chip.textContent = `\u2387 switching to ${want}\u2026`;\n  const res = await post("/api/branch/switch", { branch: want });\n  chip.disabled = false;\n  if (res.error) { alert(res.error); checkBranch(); return; }\n  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });\n  document.getElementById("banner").innerHTML = "";\n  checkBranch();\n  render();\n}\n\ndocument.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });\n$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });\ndocument.addEventListener("click", () => { $bpop.hidden = true; });\n$bq.addEventListener("input", renderBranchList);\n$bq.addEventListener("keydown", (e) => {\n  if (e.key === "Escape") $bpop.hidden = true;\n  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }\n});\n\nfunction followRun(runId, el, onDone) {\n  closeStream();\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\n  const log = el.querySelector("#log");\n  const stopBtn = el.querySelector("#rstop");\n  stopBtn.addEventListener("click", async () => {\n    if (!confirm(`Stop run ${runId}?`)) return;\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\n    const res = await stopRunReq(runId);\n    if (res.error) { alert(res.error); stopBtn.remove(); }\n  });\n  const es = new EventSource(`/api/runs/${runId}/stream`);\n  state.eventSource = es;\n  es.onmessage = (msg) => {\n    const e = JSON.parse(msg.data);\n    if (e.type === "log") {\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\n      log.textContent += e.line + "\\n";\n      if (atBottom) log.scrollTop = log.scrollHeight;\n    } else if (e.type === "done") {\n      es.close(); state.eventSource = null;\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\n      el.querySelector("#rstop")?.remove();\n      const rr = el.querySelector("#rr");\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\n      bindTicket(rr);\n      renderIssues(e.run, rr.querySelector("#ri"), el);\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\n      onDone && onDone(e.run);\n      showJobs();\n    }\n  };\n  es.onerror = () => { es.close(); state.eventSource = null; };\n}\n\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };\n\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\nasync function renderIssues(run, el, panel) {\n  if (run.status === "running" || run.kind === "fix") return;\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\n  if (!Array.isArray(issues) || !issues.length) return;\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\n      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>\n      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\n  el.querySelectorAll(".issue").forEach((row) => {\n    const id = row.dataset.issue;\n    const out = row.querySelector(".ip");\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\n      if (out.innerHTML) { out.innerHTML = ""; return; }\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\n        const ta = out.querySelector("textarea");\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\n        out.querySelector("[data-copied]").textContent = "Copied.";\n      });\n    });\n    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {\n      const reason = prompt(`Why is this not an issue here?\\n\\n${row.querySelector("strong").textContent}`);\n      if (!reason || !reason.trim()) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });\n      if (res.error) return alert(res.error);\n      row.remove();\n    });\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\n      if (res.error) return alert(res.error);\n      followRun(res.runId, panel);\n    });\n  });\n}\n\nfunction securityHead(f) {\n  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;\n}\n\nfunction securityBody(f) {\n  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> \xB7 ` : ""}<span class="muted">${esc(f.layer)}</span></div>\n    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}\n    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;\n}\n\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\n\nfunction perfBlock(p) {\n  if (!p) return "";\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\n}\n\nfunction evidence(run) {\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\n  const shots = run.timeline.filter((t) => t.screenshot);\n  const pageErrors = run.webErrors || [];\n  return `<p>${esc(run.device)}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : ""} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\n    (pageErrors.length ? `<details style="margin:8px 0"><summary style="color:var(--warn)">${pageErrors.length} page error${pageErrors.length === 1 ? "" : "s"} during the run (console, failed requests)</summary><pre class="log">${pageErrors.map(esc).join("\\n")}</pre></details>` : "") +\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\n}\n\nfunction ticketButton(run) {\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\n}\n\nasync function bindTicket(el) {\n  const b = el.querySelector("button[data-ticket]");\n  if (!b) return;\n  b.addEventListener("click", async () => {\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\n    const panel = el.querySelector(".ticketpanel");\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\n    const file = panel.querySelector("[data-file]");\n    if (file) file.addEventListener("click", async () => {\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\n      file.disabled = true;\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\n    });\n  });\n}\n\nfunction resultsTable(run) {\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\n  if (run.kind === "verify") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${!run.device ? "unit only" : run.features.some((f) => f.unitStatus) ? "unit + device" : "cards only"}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : run.target === "web" ? " \xB7 cards on the web app" : ""} \xB7 $${run.costUsd.toFixed(2)}</p>\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\n      </tbody></table>\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\n  }\n  if (run.kind === "init") {\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\n  }\n  if (run.kind === "login") {\n    const l = run.login;\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\n  }\n  if (run.kind === "explore") {\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "unitwrite") {\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\n  }\n  if (run.kind === "card") {\n    const v = run.verdict;\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\n  }\n  if (run.kind === "security") {\n    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);\n    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} \xB7 ${run.files} files \xB7 platforms: ${run.platforms.map(esc).join(", ") || "\u2014"}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</p>\n      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">\xB7 ${run.dismissed} dismissed</span>` : ""}</p>\n      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;\n  }\n  if (run.kind === "fix") {\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\n      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\n  }\n  if (run.kind === "check") {\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\n    const features = run.features || [];\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\n  }\n  if (run.kind === "backfill") {\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\n  }\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\n  const results = run.results || [];\n  if (!results.length) return err;\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\n  </tbody></table>`;\n}\n\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\n\nfunction cardHtml(c) {\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\n    <summary>\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\n      <strong>${esc(c.title)}</strong>\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\n      <span style="flex:1"></span>\n      ${lastRunPill(c.lastRun)}\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\n      <span class="pill st-${c.status}">${c.status}</span>\n    </summary>\n    <div class="fc-body">\n      <p>${esc(c.summary)}</p>\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\n      <div class="row" style="margin-top:10px">\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\n      </div>\n    </div>\n  </details>`;\n}\n\nfunction bindCardActions(el, refresh) {\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\n    b.disabled = true; b.textContent = "Agent testing\u2026";\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\n    let panel = d.querySelector(".runpanel");\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\n  })));\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\n    });\n    state.scan = null;\n    refresh();\n  })));\n}\n\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\n\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\nfunction cardFeatures(all) {\n  const by = new Map();\n  for (const c of all) {\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\n    f.cards.push(c);\n    if (c.status === "draft") f.draft++;\n    if (c.status === "approved") f.approved++;\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\n    by.set(c.feature, f);\n  }\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\n}\n\nasync function renderCards() {\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\n  const fl = state.cardFilter;\n  const all = await api("/api/cards");\n  if (!all.length) {\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\n    return bindBackfillAll();\n  }\n  const features = cardFeatures(all);\n  const listed = features\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\n  // Open on what needs a person: a failing feature, else one with drafts.\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\n  saveRoute();\n  const f = features.find((x) => x.id === fl.feature);\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\n\n  $view.innerHTML = `\n    <div class="toolbar">\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\n      <span class="pill st-draft">${total("draft")} to review</span>\n      <span class="pill st-approved">${total("approved")} approved</span>\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\n      <div style="flex:1"></div>\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\n    </div>\n    <div id="runpanel"></div>\n    <div class="split">\n      <aside class="side">\n        <div class="head">\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\n        </div>\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\n      </aside>\n      <section>\n        <div class="toolbar">\n          <h2 style="margin:0">${esc(f.id)}</h2>\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\n          <div style="flex:1"></div>\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\n        </div>\n        <div class="toolbar">\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\n        </div>\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\n      </section>\n    </div>`;\n\n  bindCardActions(document.getElementById("cardlist"), renderCards);\n  const q = document.getElementById("cq");\n  q.addEventListener("input", () => {\n    const v = q.value.toLowerCase();\n    // Filter the sidebar in place, so typing never loses focus.\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\n      const x = features.find((y) => y.id === li.dataset.f);\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\n    });\n  });\n  q.addEventListener("change", () => { fl.q = q.value; });\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\n    e.target.disabled = true;\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\n  });\n  const approveAll = document.getElementById("approveall");\n  if (approveAll) approveAll.addEventListener("click", async () => {\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\n    approveAll.disabled = true;\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\n    renderCards();\n  });\n  bindBackfillAll();\n}\n\nfunction bindBackfillAll() {\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\n    e.target.disabled = true;\n    const res = await post("/api/cards/*/backfill");\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\n  });\n}\n\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\n\nconst RUNS_PAGE = 50;\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\nconst PROBLEM = new Set(["failed", "error"]);\n\nfunction runsState() {\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\n  return state.runs;\n}\n\nfunction runResult(r) {\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\n  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` \xB7 <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;\n  const results = r.results || [];\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\n}\n\nfunction filteredRuns() {\n  const s = runsState();\n  const q = s.q.trim().toLowerCase();\n  return s.data.filter((r) =>\n    (s.kind === "all" || r.kind === s.kind) &&\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\n}\n\nasync function renderRuns() {\n  const s = runsState();\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\n  s.data = await api("/api/runs");\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\n  $view.innerHTML = `<div class="runs-layout">\n    <section class="runs-list">\n      <div class="filters">\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\n      </div>\n      <div id="runrows"></div>\n    </section>\n    <aside class="runs-detail" id="rundetail"></aside>\n  </div>`;\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\n  renderRunRows();\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\n  if (s.selected) {\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\n    showRun(s.selected);\n  }\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction renderRunRows() {\n  const s = runsState();\n  const all = filteredRuns();\n  const shown = all.slice(0, s.limit);\n  const el = document.getElementById("runrows");\n  if (!el) return;\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\n    e.stopPropagation();\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\n    b.disabled = true;\n    const res = await stopRunReq(b.dataset.stop);\n    if (res.error) alert(res.error);\n    setTimeout(renderRuns, 1500);\n  }));\n}\n\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\nfunction selectRun(id) {\n  runsState().selected = id;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\n  showRun(id);\n}\n\nfunction closeRun() {\n  closeStream();\n  runsState().selected = null;\n  saveRoute();\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\n  const panel = document.getElementById("rundetail");\n  panel.classList.remove("open");\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\n}\n\nfunction showRun(id) {\n  const panel = document.getElementById("rundetail");\n  if (!panel) return;\n  panel.classList.add("open");\n  panel.scrollTop = 0;\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\n}\n\nasync function renderSecurity() {\n  $view.innerHTML = `<div class="empty">Loading security results\u2026</div>`;\n  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);\n  state.scan = sc;\n  const last = sec.latest;\n  $view.innerHTML = `\n    <div class="box"><h3>Security checks</h3>\n      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>\n      <form class="inline" id="sf">\n        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>\n        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>\n        <label class="check"><input type="checkbox" name="agent"> agent code review</label>\n        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking\u2026">\u26E8 Run security checks</button>\n      </form>\n    </div>\n    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>\n    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "\u2014")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;\n  const panel = document.getElementById("runpanel");\n  if (last) renderIssues(last, panel.querySelector("#ri"), panel);\n  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));\n  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {\n    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });\n    renderSecurity();\n  }));\n  const sf = document.getElementById("sf");\n  sf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;\n    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, () => {});\n  });\n}\n\nasync function renderVerify() {\n  if (!state.verify) state.verify = { base: "" };\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\n  const [ch, br, options] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches"), api("/api/test-options")]);\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\n  $view.innerHTML = `\n    <div class="box"><h3>Verify this change</h3>\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\n      <form class="inline" id="vf">\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\n        ${options.length > 1 ? targetPicker(options, state.verify.against) : ""}\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\n      </form>\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\n    </div>\n    <div class="box"><h3>From a ticket</h3>\n      <form class="inline" id="tf">\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\n      </form>\n      <div id="tinfo"></div>\n      <form class="inline" id="tc" style="margin-top:10px">\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\n      </form>\n    </div>\n    <div id="runpanel"></div>`;\n  const vf = document.getElementById("vf");\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\n  bindTargetPicker(vf, options, (v) => { state.verify.against = v; });\n  vf.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const against = vf.noDevice.checked ? {} : readTarget(vf, options);\n    if (against.error) return alert(against.error);\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined, ...against });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  const tf = document.getElementById("tf");\n  const ticket = () => tf.ticket.value.trim();\n  document.getElementById("tlook").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\n  });\n  document.getElementById("tverify").addEventListener("click", async () => {\n    if (!ticket()) return;\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n  document.getElementById("tc").addEventListener("submit", async (e) => {\n    e.preventDefault();\n    if (!ticket()) return alert("Enter the ticket id above.");\n    const tc = e.target;\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\n  });\n}\n\n// \u2500\u2500 What a test runs against: this code, a finished build, or the web app \u2500\u2500\n\n/** The picker\'s fields, for a form.inline. `options` comes from /api/test-options. */\nfunction targetPicker(options, chosen, build) {\n  if (!options.length) return `<span class="muted" style="flex:1 1 100%">Nothing to run cards on yet: this project builds no Android app. To test a web app, set its address in Settings \u2192 Builds and web.</span>`;\n  const pick = options.find((o) => o.id === chosen && !o.missing) || options.find((o) => !o.missing);\n  return `<label>Test against<select name="against">${options.map((o) => `<option value="${esc(o.id)}" ${o.missing ? "disabled" : ""} ${pick && o.id === pick.id ? "selected" : ""}>${esc(o.label)}${o.missing ? " \u2014 " + esc(o.missing) : ""}</option>`).join("")}</select></label>\n    <label class="buildwrap" style="display:none">Build<input name="build" list="buildlist" value="${esc(build || "")}" autocomplete="off" style="width:240px"><datalist id="buildlist"></datalist></label>`;\n}\n\nfunction bindTargetPicker(form, options, onChange) {\n  if (!form.against) return;\n  const sync = async () => {\n    const o = options.find((x) => x.id === form.against.value);\n    form.querySelector(".buildwrap").style.display = o && o.source ? "" : "none";\n    form.build.placeholder = o && o.source === "file" ? "path to the .apk or .aab" : "newest, or a build number";\n    const list = form.querySelector("datalist");\n    list.innerHTML = "";\n    if (o && (o.source === "firebase" || o.source === "play")) {\n      const builds = await api("/api/builds?source=" + o.source).catch(() => null);\n      if (Array.isArray(builds)) list.innerHTML = builds.map((b) => `<option value="${esc(b.value)}">${esc(b.label)}</option>`).join("");\n      else if (builds && builds.error) form.build.title = builds.error;\n    }\n  };\n  form.against.addEventListener("change", () => { onChange && onChange(form.against.value); sync(); });\n  sync();\n}\n\n/** What the picker says, as a run\'s options. An error string when a build file is needed and none is given. */\nfunction readTarget(form, options) {\n  const o = form.against && options.find((x) => x.id === form.against.value);\n  if (!o) return {};\n  const value = form.build.value.trim();\n  if (o.source === "file" && !value) return { error: "Give the path of the .apk or .aab to test." };\n  return { target: o.target, build: o.source ? { source: o.source, value: value || undefined } : undefined };\n}\n\n// \u2500\u2500 Tickets: the tracker\'s tickets waiting for a test \u2500\u2500\n\nfunction ticketsState() {\n  return state.tickets || (state.tickets = { selected: null, against: null, refresh: false, q: "" });\n}\n\nconst BUILD_STATE = {\n  included: ["passed", "contains the ticket\'s commits"],\n  missing: ["failed", "does not contain the ticket\'s commits"],\n  unknown: ["unknown", "cannot tell: no git tag for this build, or no commit names the ticket"],\n};\n\nfunction ticketDetail(t, options, st) {\n  const bs = t.build && t.buildState ? BUILD_STATE[t.buildState] : null;\n  const canTest = t.cards.length > 0;\n  return `<h2 style="margin-top:0"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>\n    <p class="muted" style="margin-top:0">${esc(t.status)}${t.author ? ` \xB7 written by ${esc(t.author)}` : ""}${t.assignee ? ` \xB7 assigned to ${esc(t.assignee)}` : ""} \xB7 updated ${ago(t.updatedAt)}${t.labels.length ? ` \xB7 ${t.labels.map(esc).join(", ")}` : ""}</p>\n    <p>${t.build ? `Build <strong class="mono">${esc(t.build)}</strong> ${bs ? `<span class="pill ${bs[0]}" title="${t.buildTag ? "git tag " + esc(t.buildTag) : ""}">${bs[1]}</span>` : ""}` : `<span class="muted">The ticket names no build.</span>`}</p>\n    <div class="desc">${esc(t.description) || `<span class="muted">No description.</span>`}</div>\n    <p>${t.commits} commit${t.commits === 1 ? "" : "s"} name it \xB7 features: ${t.features.map(esc).join(", ") || `<span class="muted">none yet</span>`} \xB7 cards: ${t.cards.map((c) => `<span class="mono">${esc(c)}</span>`).join(", ") || `<span class="muted">none yet</span>`}</p>\n    <form class="inline" id="tkf">\n      ${targetPicker(options, st.against, t.build)}\n      <button class="btn" type="submit" data-job="verify:ticket:${esc(t.id)}" data-busy="Testing\u2026" ${canTest && options.length ? "" : "disabled"} title="${canTest ? "An agent runs this ticket\'s cards, then the cards of the features it touched" : "Draft cards from the ticket first"}">\u25B6 Test this ticket</button>\n      ${t.features.length ? "" : `<label>Feature it belongs to<input name="features" placeholder="checkout" style="width:160px" title="No commit names the ticket yet, so Probe cannot tell which feature it is about"></label>`}\n      <button class="btn secondary" type="button" id="tkcards" data-job="backfill:ticket:${esc(t.id)}" data-busy="Drafting\u2026" title="An agent reads the ticket and the code, and drafts the cards that check it">\u2726 Draft cards from the ticket</button>\n    </form>\n    ${t.lastRun ? `<div class="row" style="margin-top:12px;flex-wrap:wrap">Last test <span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span> <span class="muted">${ago(t.lastRun.at)}</span>\n      <button class="btn secondary" type="button" id="tkshow">Show</button>\n      <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}\n    <div id="tkpostpanel"></div>\n    <div id="runpanel" style="margin-top:12px"></div>`;\n}\n\nasync function renderTickets() {\n  const st = ticketsState();\n  $view.innerHTML = `<div class="empty">Reading tickets\u2026</div>`;\n  const [box, options] = await Promise.all([api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options")]);\n  st.refresh = false;\n  if (!box.connected) {\n    $view.innerHTML = `<div class="box"><h3>Tickets to test</h3>\n      <p style="margin-top:0">Connect Jira or Linear, and the tickets waiting for a test show up here: who wrote each one, the build it names, and a button to test it.</p>\n      <p class="muted">${esc(box.missing)}</p>\n      <button class="btn" id="tkconnect">Connect a ticket tracker</button></div>`;\n    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.scrollTo = "trackerbox"; render(); });\n    return;\n  }\n  const tickets = box.tickets;\n  if (!tickets.some((t) => t.id === st.selected)) st.selected = tickets[0] ? tickets[0].id : null;\n  const sel = tickets.find((t) => t.id === st.selected);\n  const name = box.tracker === "jira" ? "Jira" : "Linear";\n  $view.innerHTML = `\n    <div class="box"><div class="row" style="flex-wrap:wrap"><strong>Tickets to test</strong>\n      <span class="muted">${name} \xB7 ${box.filter ? esc(box.filter) : "default filter"} \xB7 ${tickets.length} ticket${tickets.length === 1 ? "" : "s"}</span><span style="flex:1"></span>\n      <button class="btn secondary" id="tkrefresh">Refresh</button></div>\n      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}</div>\n    ${tickets.length ? `<div class="split">\n      <div class="side"><div class="head"><input type="search" id="tkq" placeholder="Find a ticket\u2026" value="${esc(st.q)}"></div>\n        <ul id="tklist">${tickets.map((t) => `<li data-t="${esc(t.id)}" class="${t.id === st.selected ? "active" : ""}" title="${esc(t.title)}"><span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>${t.lastRun ? `<span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span>` : t.cards.length ? `<span class="n">${t.cards.length} card${t.cards.length === 1 ? "" : "s"}</span>` : ""}</li>`).join("")}</ul></div>\n      <div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : ""}</div></div>`\n      : box.error ? "" : `<div class="empty">No ticket matches the filter. Change it in Settings \u2192 Ticket tracker.</div>`}`;\n  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; renderTickets(); });\n  if (!tickets.length) return;\n  const filterList = () => {\n    const v = st.q.toLowerCase();\n    document.querySelectorAll("#tklist li").forEach((li) => { li.style.display = !v || (li.dataset.t + " " + li.title).toLowerCase().includes(v) ? "" : "none"; });\n  };\n  document.getElementById("tkq").addEventListener("input", (e) => { st.q = e.target.value; filterList(); });\n  filterList();\n  document.querySelectorAll("#tklist li").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; render(); }));\n  if (!sel) return;\n\n  const form = document.getElementById("tkf");\n  const panel = document.getElementById("runpanel");\n  const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };\n  bindTargetPicker(form, options, (v) => { st.against = v; });\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const against = readTarget(form, options);\n    if (against.error) return alert(against.error);\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test`, against);\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, done);\n  });\n  document.getElementById("tkcards").addEventListener("click", async () => {\n    const features = form.features ? form.features.value.split(",").map((x) => x.trim()).filter(Boolean) : [];\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards`, { features });\n    if (res.error) return alert(res.error);\n    followRun(res.runId, panel, done);\n  });\n  const show = document.getElementById("tkshow");\n  if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));\n  const postBtn = document.getElementById("tkpost");\n  if (postBtn) postBtn.addEventListener("click", async () => {\n    const out = document.getElementById("tkpostpanel");\n    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment?run=${encodeURIComponent(sel.lastRun.id)}`);\n    if (preview.error) { out.innerHTML = `<p style="color:var(--fail)">${esc(preview.error)}</p>`; return; }\n    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${name}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>\n      <div class="row" style="margin-top:8px"><button class="btn" id="tkpostgo">Post comment</button><button class="btn secondary" id="tkpostno">Cancel</button><span id="tkpostout"></span></div></div>`;\n    document.getElementById("tkpostno").addEventListener("click", () => { out.innerHTML = ""; });\n    document.getElementById("tkpostgo").addEventListener("click", async (ev) => {\n      ev.target.disabled = true;\n      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment`, { run: sel.lastRun.id });\n      document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;\n      if (res.error) ev.target.disabled = false;\n    });\n  });\n}\n\n// \u2500\u2500 Settings: the tracker connection, and finished builds and the web app \u2500\u2500\n\nfunction trackerBox(t) {\n  const opt = (v, label) => `<option value="${v}" ${(t.tracker || "") === v ? "selected" : ""}>${label}</option>`;\n  return `<div class="box" id="trackerbox"><h3>Ticket tracker</h3>\n    <p class="muted" style="margin-top:0">Connect Jira or Linear, and the Tickets tab lists what is waiting for a test. Which tracker, the site and the filter are saved to <span class="mono">probe/probe.yaml</span> for the team. Your API token is encrypted on this machine only and is never shown again; Probe uses it to read tickets, and to post a result as a comment when you press Post.</p>\n    <form class="inline" id="trf" autocomplete="off">\n      <label>Tracker<select name="tracker">${opt("", "None")}${t.trackers.map((x) => opt(x.id, x.label)).join("")}</select></label>\n      <label data-for="jira">Site<input name="site" value="${esc(t.site || "")}" placeholder="https://acme.atlassian.net" style="width:260px"></label>\n      <label data-for="jira">Account email <span class="src">this machine</span><input name="email" value="${esc(t.email || "")}" placeholder="you@example.com" style="width:220px" title="The Jira account the API token belongs to. Leave empty for a Jira Data Center personal access token."></label>\n      <label data-for="jira linear">API token <span class="src">${t.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${t.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>\n      <label data-for="linear">Team key<input name="team" value="${esc(t.team || "")}" placeholder="ENG" style="width:90px" title="Only this team\'s tickets: the prefix of its ticket ids"></label>\n      <label data-for="jira">Build field<input name="buildField" value="${esc(t.buildField || "")}" placeholder="Fix version" style="width:150px" title="The Jira field that holds the build to test. Empty: a build written in the description, else the fix version."></label>\n      <label data-for="jira" style="flex:1 1 100%">Tickets to list (JQL)<input name="filterJira" value="${t.tracker === "jira" ? esc(t.filter || "") : ""}" placeholder=\'status = "Ready for QA" ORDER BY updated DESC   (empty: ${esc(t.defaultFilter)})\' class="mono"></label>\n      <label data-for="linear" style="flex:1 1 100%">Tickets to list (status names, comma separated)<input name="filterLinear" value="${t.tracker === "linear" ? esc(t.filter || "") : ""}" placeholder="Ready for QA, In Review   (empty: everything started or to do)"></label>\n      <button class="btn" type="submit">Save and test the connection</button>\n      ${t.hasToken ? `<button class="btn secondary" type="button" id="trdisc" title="Forgets the token on this machine">Disconnect</button>` : ""}\n    </form>\n    <p id="trout" style="margin-bottom:0"></p>\n    <p class="muted" style="margin-bottom:0" data-for="jira">A Jira API token: id.atlassian.com \u2192 Security \u2192 API tokens.</p>\n    <p class="muted" style="margin-bottom:0" data-for="linear">A Linear API key: Linear \u2192 Settings \u2192 Security &amp; access \u2192 Personal API keys. Linear has no build field: write "Build: 142" in the ticket, or give it a label like <span class="mono">build:142</span>.</p>\n  </div>`;\n}\n\nfunction bindTracker() {\n  const f = document.getElementById("trf");\n  const box = document.getElementById("trackerbox");\n  const out = document.getElementById("trout");\n  const sync = () => box.querySelectorAll("[data-for]").forEach((el) => { el.style.display = el.dataset.for.split(" ").includes(f.tracker.value) ? "" : "none"; });\n  f.tracker.addEventListener("change", sync);\n  sync();\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const tracker = f.tracker.value || null;\n    const saved = await post("/api/tracker", { tracker, site: f.site.value, email: f.email.value, token: f.token.value, team: f.team.value, buildField: f.buildField.value, filter: tracker === "linear" ? f.filterLinear.value : f.filterJira.value });\n    if (saved.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(saved.error)}`; return; }\n    if (!tracker) return renderSettings();\n    if (saved.missing) { out.innerHTML = `<span class="pill warn">saved</span> ${esc(saved.missing)}`; return; }\n    out.innerHTML = `<span class="muted">Saved. Asking ${tracker === "jira" ? "Jira" : "Linear"}\u2026</span>`;\n    const test = await post("/api/tracker/test");\n    out.innerHTML = test.ok ? `<span class="pill passed">connected</span> as <strong>${esc(test.message)}</strong>. The Tickets tab now lists your tickets.` : `<span class="pill failed">saved, but not connected</span> ${esc(test.message)}`;\n    f.token.value = "";\n    state.tickets = null;\n  });\n  const disc = document.getElementById("trdisc");\n  if (disc) disc.addEventListener("click", async () => {\n    if (!confirm("Forget the API token on this machine?")) return;\n    await api("/api/tracker", { method: "DELETE" });\n    state.tickets = null;\n    renderSettings();\n  });\n}\n\nfunction buildsBox(b) {\n  const pw = b.playwright;\n  return `<div class="box" id="buildsbox"><h3>Builds and web</h3>\n    <p class="muted" style="margin-top:0">What a test can run against besides this code: the deployed web app in a browser${b.android ? ", or a finished Android build (a release file, Firebase App Distribution, Google Play)" : ""}. Shared values are saved to <span class="mono">probe/probe.yaml</span>; key files and tools only for this machine.</p>\n    <form class="inline" id="bf" autocomplete="off">\n      <label>Web app address<input name="webUrl" value="${esc(b.webUrl || "")}" placeholder="https://staging.example.com" style="width:300px" title="A staging or preview address, or a local dev server. Agents open it in Chromium."></label>\n      ${b.android ? `<label>Release app id <span class="src">${b.releasePackageFound ? "using " + esc(b.releasePackageFound) : "not found"}</span><input name="releasePackage" value="${esc(b.releasePackage || "")}" placeholder="${esc(b.releasePackageFound || "com.example.app")}" style="width:240px" title="The app\'s id on Google Play, when it differs from the debug build\'s"></label>\n      <label>Firebase app id<input name="firebaseApp" value="${esc(b.firebaseApp || "")}" placeholder="1:1234567890:android:abc123" style="width:280px" title="Firebase console \u2192 Project settings \u2192 Your apps \u2192 App ID"></label>\n      <label>Play track<input name="playTrack" value="${esc(b.playTrack)}" style="width:110px"></label>\n      <label>Google service account key file <span class="src">this machine</span><input name="serviceAccount" value="${esc(b.serviceAccount || "")}" placeholder="C:\\\\keys\\\\probe-builds.json" style="width:300px" title="A JSON key of a service account that may read Firebase App Distribution releases and the app in the Play Console"></label>\n      <label>bundletool jar <span class="src">this machine \xB7 only for .aab files</span><input name="bundletool" value="${esc(b.bundletool || "")}" placeholder="C:\\\\tools\\\\bundletool-all.jar" style="width:280px"></label>` : ""}\n      <label>Git tag of a build<input name="tag" value="${esc(b.tag || "")}" placeholder="v{build}" style="width:130px" class="mono" title="How a build number is tagged in git, so Probe can tell whether a build contains a ticket\'s commits. Empty: tries 142, v142, build-142, release-142."></label>\n      <button class="btn" type="submit">Save</button>\n    </form>\n    <p id="bout" style="margin-bottom:0"></p>\n    <p class="muted" style="margin-bottom:0">Web tests drive Chromium through Playwright: ${pw.installed && pw.browser ? "installed on this machine." : "not on this machine yet. The first web test installs it once (a few minutes, about 150 MB)."}</p>\n  </div>`;\n}\n\nfunction bindBuilds() {\n  const f = document.getElementById("bf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const v = (name) => (f[name] ? f[name].value : undefined);\n    const res = await post("/api/builds/settings", { webUrl: v("webUrl"), releasePackage: v("releasePackage"), firebaseApp: v("firebaseApp"), playTrack: v("playTrack"), serviceAccount: v("serviceAccount"), bundletool: v("bundletool"), tag: v("tag") });\n    document.getElementById("bout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    // Whether cards can run at all may have changed with the web address.\n    if (!res.error) { state.scan = null; setTimeout(renderSettings, 700); }\n  });\n}\n\nasync function renderAccounts(el) {\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\n  const l = login && login.run.login;\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\n  el.innerHTML = `\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\n      <div id="runpanel"></div></div>`;\n  el.innerHTML += `\n    <div class="box"><h3>Test accounts</h3>\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\n    <form class="acct" autocomplete="off">\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\n      <button class="btn" type="submit">Save account</button>\n    </form></div>`;\n  const startLogin = async (role, b) => {\n    b.disabled = true;\n    const res = await post("/api/login", { role });\n    if (res.error) { alert(res.error); b.disabled = false; return; }\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\n  };\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\n  const form = el.querySelector("form.acct");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const body = Object.fromEntries(new FormData(form));\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\n    if (res.error) return alert(res.error);\n    renderAccounts(el);\n  });\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\n    const a = accounts.find((x) => x.role === b.dataset.edit);\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\n    form.password.focus();\n  }));\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\n    renderAccounts(el);\n  }));\n}\n\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\n\n/** Why device features are off for this project, or "" when its app runs on a device. */\nfunction noDevices() {\n  return state.scan && state.scan.project.devices === false ? "Not available yet: this project builds no Android app. To run cards on a web app in a browser, set its address in Settings \u2192 Builds and web." : "";\n}\n\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\n\nfunction projectBox(p) {\n  const a = p.app;\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\n  const branches = p.branches || [];\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\n  const dev = p.devices.supported !== false;\n  return `<div class="box"><h3>Project</h3>\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\n    <form class="inline" id="pf">\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\n      <button class="btn" type="submit">Save project settings</button>\n    </form>\n    <p id="pout" style="margin-bottom:0"></p>\n  </div>`;\n}\n\nfunction bindProject() {\n  const f = document.getElementById("pf");\n  f.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const num = (v) => (v === "" ? null : Number(v));\n    const body = {\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\n    };\n    // App, device and performance fields only exist on a project whose app runs on a device.\n    if (f.package) {\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\n    }\n    const res = await post("/api/project", body);\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\n    if (!res.error) setTimeout(renderSettings, 700);\n  });\n}\n\nasync function renderSettings() {\n  $view.innerHTML = `<div class="empty">Reading settings\u2026</div>`;\n  const [s, p, br, tracker, builds] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches"), api("/api/tracker"), api("/api/builds/settings")]);\n  p.branches = br.branches;\n  const current = s.agents.model;\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\n  const models = runner.models;\n  const known = models.some(([m]) => m === current);\n  $view.innerHTML = projectBox(p) + trackerBox(tracker) + buildsBox(builds) + `<div id="acctwrap"></div>` + `\n    <div class="box"><h3>Agents</h3>\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\n      <form class="inline" id="sf">\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\n        <button class="btn" type="submit">Save</button>\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\n      </form>\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\n      <p id="sout" style="margin-bottom:0"></p>\n    </div>`;\n  bindProject();\n  bindTracker();\n  bindBuilds();\n  if (state.scrollTo) { document.getElementById(state.scrollTo)?.scrollIntoView({ block: "start" }); state.scrollTo = null; }\n  renderAccounts(document.getElementById("acctwrap"));\n  const form = document.getElementById("sf");\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\n  form.runner.addEventListener("change", async () => {\n    const res = await post("/api/settings", { runner: form.runner.value });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  const out = document.getElementById("sout");\n  form.addEventListener("submit", async (e) => {\n    e.preventDefault();\n    const res = await post("/api/settings", { model: chosen() });\n    if (res.error) return alert(res.error);\n    renderSettings();\n  });\n  document.getElementById("stest").addEventListener("click", async (e) => {\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\n    const r = await post("/api/settings/test", { model: chosen() });\n    e.target.disabled = false;\n    out.innerHTML = r.ok\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\n  });\n  const reset = document.getElementById("sreset");\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\n}\n\nasync function renderDoctor(el) {\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\n  const checks = await api("/api/doctor");\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\n  </tbody></table>`;\n}\n\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\n\n/**\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\n * a written manifest stays chosen.\n */\nfunction areaPicker(k) {\n  const first = !k.chosen;\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\n  const group = (kind, label, hint) => {\n    const list = k.proposed.filter((a) => a.kind === kind);\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\n  };\n  return `${group("feature", "Features to give a manifest", "")}\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\n}\n\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\nasync function renderInit(el) {\n  const k = await api("/api/init");\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\n  const features = k.steps.find((s) => s.id === "features");\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\n  </div>\n  <div id="initpanel"></div>\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\n\n  const start = async (body) => {\n    const res = await post("/api/init/run", body);\n    if (res.error) return alert(res.error);\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\n  };\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\n    const res = await post("/api/init/features", { features: chosen });\n    if (res.error) return alert(res.error);\n    renderInit(el);\n  });\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\n    const approve = !!b.dataset.iapprove;\n    const id = b.dataset.iapprove || b.dataset.ireject;\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\n    b.disabled = true;\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\n    if (!res.ok) alert(res.error);\n    renderInit(el);\n  }));\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\n}\n\nasync function renderSetup() {\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\n  const items = await api("/api/setup");\n  const left = items.filter((i) => i.status !== "ok").length;\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\n  renderDoctor(document.getElementById("docwrap"));\n  renderInit(document.getElementById("initwrap"));\n}\n\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\ndocument.addEventListener("keydown", (e) => {\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\n});\n\n(async () => {\n  await Promise.all([checkBranch(), refreshJobs()]);\n  // Back where the page was; else on work still going; else a project that cannot be tested\n  // yet opens on what is missing.\n  if (loadRoute()) return render();\n  const latest = state.jobs[state.jobs.length - 1];\n  if (latest) {\n    goTo(routeOf(latest));\n    state.followId = latest.runId;\n    return render();\n  }\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\n  render();\n})();\n</script>\n</body>\n</html>\n';
+var page_default = '<!doctype html>\r\n<html lang="en">\r\n<head>\r\n<meta charset="utf-8">\r\n<meta name="viewport" content="width=device-width, initial-scale=1">\r\n<title>Probe Studio</title>\r\n<style>\r\n  :root {\r\n    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;\r\n    --accent: #3b5bdb; --ok: #2f9e44; --warn: #e8890c; --fail: #e03131; --track: #ececE7;\r\n    --mono: ui-monospace, SFMono-Regular, Consolas, monospace;\r\n  }\r\n  @media (prefers-color-scheme: dark) {\r\n    :root {\r\n      --bg: #141413; --panel: #1d1d1b; --text: #ececE7; --muted: #9a9a93; --line: #2e2e2b;\r\n      --accent: #748ffc; --ok: #51cf66; --warn: #ffa94d; --fail: #ff6b6b; --track: #2a2a27;\r\n    }\r\n  }\r\n  * { box-sizing: border-box; }\r\n  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }\r\n  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }\r\n  header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }\r\n  header .meta { color: var(--muted); font-size: 12px; }\r\n  header select.proj { font-weight: 600; max-width: 240px; padding: 3px 6px; }\r\n  header .spacer { flex: 1; }\r\n  nav { display: flex; gap: 4px; }\r\n  nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  nav button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  main { padding: 20px 24px; max-width: 1280px; margin: 0 auto; }\r\n  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }\r\n  .btn.secondary { background: var(--track); color: var(--text); }\r\n  .btn:disabled { opacity: .5; cursor: default; }\r\n  .btn.stop { background: var(--fail); padding: 3px 12px; font-size: 13px; }\r\n  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }\r\n  form.acct { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-top: 16px; }\r\n  form.acct label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.acct input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: 0; }\r\n  input[type=search] { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; min-width: 220px; }\r\n  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }\r\n  .seg button { background: var(--panel); border: 0; padding: 6px 12px; color: var(--muted); cursor: pointer; font: inherit; }\r\n  .seg button.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }\r\n  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }\r\n  .card .k { color: var(--muted); font-size: 12px; }\r\n  .card .v { font-size: 22px; font-weight: 650; margin-top: 2px; }\r\n  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }\r\n  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }\r\n  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--panel); }\r\n  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }\r\n  tbody tr:last-child td { border-bottom: 0; }\r\n  tr.click { cursor: pointer; }\r\n  tr.click:hover td { background: var(--track); }\r\n  .bar { display: flex; height: 8px; width: 140px; border-radius: 4px; overflow: hidden; background: var(--track); }\r\n  .bar span { display: block; height: 100%; }\r\n  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }\r\n  .pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.fail, .pill.failed, .pill.error { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.warn, .pill.running, .pill.blocked { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.passed { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.none, .pill.skipped, .pill.unknown, .pill.stopped { color: var(--muted); background: var(--track); }\r\n  .pill.h-ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.h-warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.h-fail { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.h-unknown { color: var(--muted); background: var(--track); }\r\n  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }\r\n  .tile { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--track); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-height: 86px; }\r\n  .tile:hover { background: var(--track); }\r\n  .tile.h-ok { border-left-color: var(--ok); } .tile.h-warn { border-left-color: var(--warn); } .tile.h-fail { border-left-color: var(--fail); }\r\n  .tile strong { display: block; margin-bottom: 4px; overflow-wrap: anywhere; }\r\n  .tile .sig { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }\r\n  .tile .why { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }\r\n  .box h3 { font-size: 13px; margin: 0 0 8px; }\r\n  .box ul { margin: 4px 0; padding-left: 18px; }\r\n  form.inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }\r\n  form.inline label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }\r\n  form.inline input, form.inline textarea, form.inline select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }\r\n  form.inline label.check { display: flex; gap: 6px; align-items: center; font-weight: 400; color: var(--text); font-size: 13px; }\r\n  textarea { width: 100%; min-height: 90px; resize: vertical; }\r\n  .muted { color: var(--muted); }\r\n  .mono { font-family: var(--mono); font-size: 12px; }\r\n  td.mono { word-break: break-all; }\r\n  h2 { font-size: 15px; margin: 22px 0 10px; }\r\n  .back { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; margin-bottom: 10px; }\r\n  pre.log { background: #0f0f0e; color: #d8d8d2; padding: 12px; border-radius: 10px; max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; margin: 0; }\r\n  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }\r\n  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }\r\n  .empty { padding: 30px; text-align: center; color: var(--muted); }\r\n  .desc { white-space: pre-wrap; max-height: 280px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0; }\r\n  .row { display: flex; gap: 12px; align-items: center; }\r\n  .shots { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0; }\r\n  .shots figure { margin: 0; flex: 0 0 auto; width: 150px; }\r\n  .shots img { width: 150px; border-radius: 8px; border: 1px solid var(--line); display: block; }\r\n  .shots figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }\r\n  details.fc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }\r\n  details.fc > summary { display: flex; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; flex-wrap: wrap; }\r\n  details.fc > summary::-webkit-details-marker { display: none; }\r\n  details.fc[open] > summary { border-bottom: 1px solid var(--line); }\r\n  .fc-body { padding: 4px 16px 14px; }\r\n  .fc-body .k { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 10px; }\r\n  .fc-body ul, .fc-body ol { margin: 4px 0; padding-left: 20px; }\r\n  .fc-body ul.expect { list-style: none; padding-left: 0; }\r\n  .fc-body ul.expect li { margin: 3px 0; }\r\n  .reach { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }\r\n  .reach span { background: var(--track); padding: 2px 8px; border-radius: 6px; font-size: 13px; }\r\n  .reach b { color: var(--muted); font-weight: 400; }\r\n  .pill.lvl-feature { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }\r\n  .pill.lvl-capability { color: var(--text); background: var(--track); }\r\n  .pill.lvl-regression { color: var(--fail); background: color-mix(in srgb, var(--fail) 12%, transparent); }\r\n  .pill.conf-high, .pill.st-approved { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }\r\n  .pill.conf-medium, .pill.st-draft { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.sev-critical { color: #fff; background: var(--fail); }\r\n  .pill.sev-high { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .pill.sev-medium { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .pill.sev-low, .pill.sev-info { color: var(--muted); background: var(--track); }\r\n  .pill.conf-low, .pill.st-rejected { color: var(--fail); background: color-mix(in srgb, var(--fail) 14%, transparent); }\r\n  .branch { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--track); white-space: nowrap; cursor: pointer; border: 0; color: inherit; font: inherit; font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }\r\n  .bwrap { position: relative; }\r\n  .bpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 5; width: 340px; max-width: calc(100vw - 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); padding: 8px; }\r\n  .bpop input { width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; font-size: 13px; }\r\n  .blist { max-height: 320px; overflow-y: auto; margin-top: 6px; }\r\n  .blist button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: 5px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\r\n  .blist button:hover, .blist button.on { background: var(--track); }\r\n  .blist .cur { font-weight: 600; }\r\n  .blist .none { color: var(--muted); font-size: 12px; padding: 6px 8px; }\r\n  .branch.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .jobs { font: inherit; font-size: 12px; padding: 3px 10px; border: 0; border-radius: 999px; cursor: pointer; white-space: nowrap; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }\r\n  .jobs[hidden] { display: none; }\r\n  .banner { background: color-mix(in srgb, var(--fail) 12%, var(--panel)); border-bottom: 1px solid var(--fail); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\r\n  .banner.warn { background: color-mix(in srgb, var(--warn) 12%, var(--panel)); border-bottom-color: var(--warn); }\r\n  ul.setup { list-style: none; padding: 0; margin: 0; }\r\n  ul.setup li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }\r\n  ul.setup li:last-child { border-bottom: 0; }\r\n  ul.setup .what { flex: 1; min-width: 200px; }\r\n  .src { font-size: 11px; color: var(--muted); font-weight: 400; }\r\n  .split { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start; }\r\n  .side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; max-height: calc(100vh - 90px); display: flex; flex-direction: column; }\r\n  .side .head { padding: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }\r\n  .side .head input { width: 100%; min-width: 0; }\r\n  .side .chips { display: flex; flex-wrap: wrap; gap: 4px; }\r\n  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }\r\n  .chip.active { background: var(--track); color: var(--text); font-weight: 600; }\r\n  .side ul { list-style: none; margin: 0; padding: 4px; overflow: auto; }\r\n  .side li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }\r\n  .side li:hover { background: var(--track); }\r\n  .side li.active { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }\r\n  .side li .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\r\n  .side li .n { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }\r\n  .side li .d { width: 8px; height: 8px; border-radius: 50%; background: var(--track); flex: 0 0 auto; }\r\n  .side li .d.fail { background: var(--fail); } .side li .d.draft { background: var(--warn); } .side li .d.ok { background: var(--ok); }\r\n  .issues { margin: 12px 0; }\r\n  .issue { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }\r\n  .issue:last-child { border-bottom: 0; }\r\n  .issue .what { flex: 1; min-width: 220px; }\r\n  .issue .k { font-size: 11px; }\r\n  textarea.prompt { font: 12px/1.4 var(--mono); min-height: 220px; margin-top: 8px; }\r\n  pre.diff { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 420px; overflow: auto; font: 12px/1.45 var(--mono); margin: 6px 0; white-space: pre-wrap; }\r\n  pre.diff .add { color: var(--ok); } pre.diff .del { color: var(--fail); } pre.diff .hunk { color: var(--muted); }\r\n  .glance { font-size: 13px; } .glance ul { margin: 4px 0; padding-left: 18px; } .glance code { font-family: var(--mono); font-size: 12px; background: var(--track); padding: 0 4px; border-radius: 4px; }\r\n  .box.stale { border-color: var(--warn); }\r\n  .box a { color: var(--accent); font-weight: 600; }\r\n  /* Runs: the list on the left, the selected run beside it, each with its own scroll. */\r\n  .runs-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }\r\n  .runs-list .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }\r\n  .runs-list .filters select, .runs-list .filters input { font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }\r\n  .runs-list .filters input { flex: 1 1 160px; min-width: 0; }\r\n  .runs-list .count { color: var(--muted); font-size: 12px; margin: 8px 2px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }\r\n  .runs-list td.res { overflow-wrap: anywhere; }\r\n  tr.click.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); }\r\n  tr.click.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }\r\n  .runs-detail { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }\r\n  .runs-detail .dhead { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: -12px; background: var(--panel); padding: 4px 0; z-index: 1; }\r\n  .runs-detail h2 { font-size: 16px; margin: 0 0 8px; overflow-wrap: anywhere; }\r\n  .runs-detail .empty { padding: 40px 12px; }\r\n  @media (max-width: 1100px) {\r\n    .runs-layout { grid-template-columns: 1fr; }\r\n    .runs-detail { display: none; }\r\n    .runs-detail.open { display: block; position: fixed; inset: 0; z-index: 30; max-height: none; border-radius: 0; border: 0; }\r\n  }\r\n  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .side { position: static; max-height: 320px; } }\r\n  @media (max-width: 720px) {\r\n    header { flex-wrap: wrap; padding: 12px 16px; }\r\n    main { padding: 16px; }\r\n    .hide-sm { display: none; }\r\n    table { font-size: 13px; }\r\n  }\r\n</style>\r\n</head>\r\n<body>\r\n<header>\r\n  <h1>Probe</h1>\r\n  <select class="proj" id="proj" title="Project Studio shows: switch to another one Probe knows, or open a folder"></select>\r\n  <div class="meta" id="meta">loading\u2026</div>\r\n  <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">\u2026</button>\r\n    <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches\u2026" autocomplete="off"><div class="blist" id="blist"></div></div></div>\r\n  <button class="jobs" id="jobs" hidden></button>\r\n  <div class="spacer"></div>\r\n  <nav>\r\n    <button data-tab="atlas" class="active">Atlas</button>\r\n    <button data-tab="cards">Cards</button>\r\n    <button data-tab="verify">Verify</button>\r\n    <button data-tab="tickets">Tickets</button>\r\n    <button data-tab="security">Security</button>\r\n    <button data-tab="runs">Runs</button>\r\n    <button data-tab="settings">Settings</button>\r\n    <button data-tab="setup">Setup</button>\r\n  </nav>\r\n</header>\r\n<div id="banner"></div>\r\n<main id="view"></main>\r\n\r\n<script>\r\nconst $view = document.getElementById("view");\r\nconst $meta = document.getElementById("meta");\r\nconst state = { tab: "atlas", scan: null, filter: "", group: "feature", view: "table", feature: null, eventSource: null, jobs: [] };\r\n\r\nconst api = (path, opts) => fetch(path, opts).then((r) => r.json());\r\nconst esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", \'"\': "&quot;" })[c]);\r\nconst ago = (iso) => {\r\n  if (!iso) return "never";\r\n  const s = (Date.now() - new Date(iso).getTime()) / 1000;\r\n  if (s < 60) return "just now";\r\n  if (s < 3600) return Math.round(s / 60) + "m ago";\r\n  if (s < 86400) return Math.round(s / 3600) + "h ago";\r\n  return Math.round(s / 86400) + "d ago";\r\n};\r\n\r\ndocument.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {\r\n  state.tab = b.dataset.tab; state.feature = null; render();\r\n}));\r\n\r\n// \u2500\u2500 Project: Studio shows one at a time; the picker switches to any project Probe knows \u2500\u2500\r\n\r\nconst OPEN_OTHER = "__open_folder__";\r\n\r\nasync function loadProjects() {\r\n  const data = await api("/api/projects").catch(() => null);\r\n  if (!data) return;\r\n  const sel = document.getElementById("proj");\r\n  sel.innerHTML = data.projects.map((p) => `<option value="${esc(p.root)}" title="${esc(p.root)}" ${p.root === data.current.root ? "selected" : ""}>${esc(p.name)}</option>`).join("") +\r\n    `<option value="${OPEN_OTHER}">Open another folder\u2026</option>`;\r\n  sel.dataset.current = data.current.root;\r\n}\r\n\r\ndocument.getElementById("proj").addEventListener("change", async (e) => {\r\n  const sel = e.target;\r\n  let root = sel.value;\r\n  if (root === OPEN_OTHER) {\r\n    root = (prompt("Project folder (full path):") || "").trim();\r\n    if (!root) { sel.value = sel.dataset.current; return; }\r\n  }\r\n  const running = state.jobs.length;\r\n  if (running && !confirm(`${running} run${running === 1 ? " is" : "s are"} still going in this project. They keep running; switch anyway?`)) { sel.value = sel.dataset.current; return; }\r\n  sel.disabled = true;\r\n  const res = await post("/api/projects/open", { root });\r\n  sel.disabled = false;\r\n  if (res.error) { alert(res.error); sel.value = sel.dataset.current; return; }\r\n  // Everything on the page belonged to the old project.\r\n  closeStream();\r\n  Object.assign(state, { tab: "atlas", scan: null, feature: null, branchSeen: null, branchList: null, cardFilter: null, runs: null, verify: null, tickets: null, jobs: [] });\r\n  history.replaceState(null, "", "#atlas");\r\n  document.getElementById("banner").innerHTML = "";\r\n  await loadProjects();\r\n  if (typeof checkBranch === "function") checkBranch();\r\n  render();\r\n});\r\n\r\nloadProjects();\r\n\r\nfunction closeStream() { if (state.eventSource) { state.eventSource.close(); state.eventSource = null; } }\r\n\r\nasync function render() {\r\n  closeStream();\r\n  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));\r\n  saveRoute();\r\n  if (state.tab === "setup") await renderSetup();\r\n  else if (state.tab === "atlas") await (state.feature ? renderFeature(state.feature) : renderAtlas());\r\n  else if (state.tab === "cards") await renderCards();\r\n  else if (state.tab === "verify") await renderVerify();\r\n  else if (state.tab === "tickets") await renderTickets();\r\n  else if (state.tab === "security") await renderSecurity();\r\n  else if (state.tab === "runs") await renderRuns();\r\n  else if (state.tab === "settings") await renderSettings();\r\n  showJobs();\r\n}\r\n\r\n// \u2500\u2500 Where the page is, in the address, so a reopened tab comes back to it \u2500\u2500\r\n\r\nfunction saveRoute() {\r\n  const sub = state.tab === "atlas" ? state.feature : state.tab === "cards" ? state.cardFilter?.feature : state.tab === "runs" ? state.runs?.selected : state.tab === "tickets" ? state.tickets?.selected : null;\r\n  history.replaceState(null, "", "#" + state.tab + (sub ? "/" + encodeURIComponent(sub) : ""));\r\n}\r\n\r\nfunction loadRoute() {\r\n  const m = /^#(atlas|cards|verify|tickets|security|runs|settings|setup)(?:\\/(.+))?$/.exec(location.hash);\r\n  if (!m) return false;\r\n  goTo({ tab: m[1], feature: m[2] ? decodeURIComponent(m[2]) : null });\r\n  return true;\r\n}\r\n\r\nfunction goTo(route) {\r\n  state.tab = route.tab;\r\n  state.feature = route.tab === "atlas" ? route.feature || null : null;\r\n  if (route.tab === "runs") runsState().selected = route.feature || null;\r\n  if (route.tab === "tickets" && route.feature) ticketsState().selected = route.feature;\r\n  if (route.tab === "cards" && route.feature) state.cardFilter = { side: "all", q: "", level: "all", status: "all", ...state.cardFilter, feature: route.feature };\r\n}\r\n\r\n// \u2500\u2500 Jobs: work the server is doing (drafting cards, unit runs, verify\u2026), whoever started it \u2500\u2500\r\n// The server is the record. A page opened mid-run asks for it, marks the buttons that started\r\n// it as busy and follows the run, so closing the tab never hides work that is still going.\r\n\r\n/** The same keys as the server\'s jobKeys (src/studio/jobs.ts). */\r\nconst jobKey = {\r\n  unit: (f) => `unit:${f}`,\r\n  backfill: (f) => `backfill:${f}`,\r\n  explore: (f) => `explore:${f}`,\r\n  unitwrite: (f) => `unitwrite:${f}`,\r\n  card: (f, id) => `card:${f}/${id}`,\r\n  login: (role) => `login:${role || "check"}`,\r\n  security: (f) => `security:${f || "*"}`,\r\n  verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,\r\n  verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,\r\n  verifyBase: (base) => `verify:base:${base || ""}`,\r\n  work: () => "work",\r\n};\r\n\r\n/** Where a job\'s button lives, to open the page on it. */\r\nfunction routeOf(j) {\r\n  const [kind, ...rest] = j.key.split(":");\r\n  const arg = rest.join(":");\r\n  if (kind === "init") return { tab: "setup" };\r\n  if (kind === "work") return { tab: "tickets" };\r\n  if (kind === "login") return { tab: "settings" };\r\n  if (kind === "check") return { tab: "atlas" };\r\n  if (kind === "security") return { tab: "security" };\r\n  if (kind === "verify") {\r\n    if (arg === "outdated") return { tab: "atlas" };\r\n    if (arg.startsWith("outdated:") && !arg.includes(",")) return { tab: "cards", feature: arg.slice(9) };\r\n    if (arg.startsWith("features:") && !arg.includes(",")) return { tab: "atlas", feature: arg.slice(9) };\r\n    // A ticket\'s test has a button on Verify and one on its ticket in Tickets.\r\n    if (arg.startsWith("ticket:") && state.tab !== "verify") return { tab: "tickets", feature: arg.slice(7) };\r\n    return { tab: "verify" };\r\n  }\r\n  if (kind === "backfill" && arg.startsWith("ticket:")) return state.tab === "verify" ? { tab: "verify" } : { tab: "tickets", feature: arg.slice(7) };\r\n  if (kind === "backfill" && j.feature === "*") return { tab: "cards" };\r\n  if (["unit", "backfill", "explore", "unitwrite", "card"].includes(kind) && j.feature !== "*") return { tab: "atlas", feature: j.feature };\r\n  // The Runs tab opens the run itself beside the list.\r\n  return { tab: "runs", feature: j.runId };\r\n}\r\n\r\nfunction onRoute(route) {\r\n  if (route.tab !== state.tab) return false;\r\n  if (route.tab === "atlas") return (route.feature || null) === state.feature;\r\n  if (route.tab === "cards") return !route.feature || route.feature === state.cardFilter?.feature;\r\n  if (route.tab === "tickets") return !route.feature || route.feature === state.tickets?.selected;\r\n  return true;\r\n}\r\n\r\nconst jobLabel = (j) => `${j.kind} ${j.kind === "card" ? `${j.feature}/${j.cardId}` : j.feature === "*" ? "" : j.feature} \xB7 started ${ago(j.startedAt)}`;\r\n\r\nasync function refreshJobs() {\r\n  const jobs = await api("/api/jobs").catch(() => null);\r\n  if (!jobs) return;\r\n  state.jobs = jobs.filter((j) => !j.child);\r\n  showJobs();\r\n}\r\n\r\n/** Reflects the jobs on the page: the header count, busy buttons, and a run to follow. */\r\nfunction showJobs() {\r\n  const chip = document.getElementById("jobs");\r\n  chip.hidden = !state.jobs.length;\r\n  chip.textContent = `\u25CF ${state.jobs.length} running`;\r\n  chip.title = state.jobs.map(jobLabel).join("\\n") + "\\nClick to open the latest";\r\n  const running = new Set(state.jobs.map((j) => j.key));\r\n  document.querySelectorAll("[data-job]").forEach((b) => {\r\n    if (b.dataset.label === undefined && !b.disabled) b.dataset.label = b.textContent;\r\n    if (running.has(b.dataset.job)) {\r\n      if (b.dataset.marked) return;\r\n      b.dataset.marked = "1";\r\n      b.disabled = true;\r\n      if (b.dataset.busy) b.textContent = b.dataset.busy;\r\n    } else if (b.dataset.marked) {\r\n      delete b.dataset.marked;\r\n      b.disabled = false;\r\n      if (b.dataset.label !== undefined) b.textContent = b.dataset.label;\r\n    }\r\n  });\r\n  followJob();\r\n}\r\n\r\n/** Into an empty run panel: the run asked for, else the latest job this view started. */\r\nfunction followJob() {\r\n  const panel = document.getElementById("runpanel");\r\n  if (!panel || panel.innerHTML.trim() || state.eventSource) return;\r\n  if (state.showRun) {\r\n    const id = state.showRun;\r\n    state.showRun = null;\r\n    return followRun(id, panel);\r\n  }\r\n  const wanted = state.followId && state.jobs.find((j) => j.runId === state.followId);\r\n  state.followId = null;\r\n  const job = wanted || (state.tab !== "runs" && [...state.jobs].reverse().find((j) => onRoute(routeOf(j))));\r\n  // When it ends, the view reloads with what it made and shows the finished run again.\r\n  if (job) followRun(job.runId, panel, () => { state.scan = null; state.showRun = job.runId; render(); });\r\n}\r\n\r\ndocument.getElementById("jobs").addEventListener("click", () => {\r\n  const j = state.jobs[state.jobs.length - 1];\r\n  if (!j) return;\r\n  goTo(routeOf(j));\r\n  state.followId = j.runId;\r\n  render();\r\n});\r\nsetInterval(refreshJobs, 3000);\r\n\r\nfunction coverageBar(s) {\r\n  const t = Math.max(1, s.testable);\r\n  const w = (n) => (100 * n / t).toFixed(1) + "%";\r\n  return `<div class="bar" title="${s.direct} direct \xB7 ${s.referenced} referenced \xB7 ${s.untested} untested">\r\n    <span style="width:${w(s.direct)};background:var(--ok)"></span>\r\n    <span style="width:${w(s.referenced)};background:var(--warn)"></span>\r\n  </div>`;\r\n}\r\n\r\nfunction runPill(r) {\r\n  if (!r) return `<span class="pill none">not run</span>`;\r\n  const label = r.status === "running" || r.status === "error" ? r.status : `${r.tests - r.failed}/${r.tests}`;\r\n  return `<span class="pill ${r.status}" title="${esc(r.finishedAt || "")}${esc(whoRan(r))}">${label}</span>${freshPill(r)} <span class="muted">${ago(r.finishedAt)}</span>`;\r\n}\r\n\r\nconst HEALTH_LABEL = { ok: "ok", warn: "warn", fail: "fail", unknown: "never run" };\r\nfunction healthPill(f) {\r\n  return `<span class="pill h-${f.health}" title="${esc(f.reasons.join("\\n"))}">${HEALTH_LABEL[f.health]}</span>`;\r\n}\r\n\r\nfunction devicePill(d) {\r\n  const ran = d.passed + d.failed + d.blocked + d.error;\r\n  if (!ran && d.stale) return `<span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale} outdated</span>`;\r\n  if (!ran) return d.notRun ? `<span class="pill none" title="${d.notRun} cards never run on a device">not run</span>` : `<span class="muted">\u2014</span>`;\r\n  const cls = d.failed ? "failed" : d.blocked || d.error ? "blocked" : "passed";\r\n  return `<span class="pill ${cls}" title="${d.passed} passed \xB7 ${d.failed} failed \xB7 ${d.blocked} blocked \xB7 ${d.error} error \xB7 ${d.stale} outdated \xB7 ${d.maybe} maybe outdated \xB7 ${d.notRun} not run">${d.passed}/${ran + d.stale + d.notRun}</span>${d.stale ? ` <span class="pill warn" title="${d.stale} card results outdated: code or card changed since">\u27F3 ${d.stale}</span>` : ""}`;\r\n}\r\n\r\n/** Marks a result that no longer holds for the code checked out here. */\r\nfunction freshPill(r) {\r\n  if (!r || !r.fresh || r.fresh === "fresh" || r.fresh === "never") return "";\r\n  const why = (r.freshReasons || []).join("\\n");\r\n  return r.fresh === "stale"\r\n    ? ` <span class="pill warn" title="Outdated: ${esc(why)}">\u27F3 outdated</span>`\r\n    : ` <span class="pill none" title="Maybe outdated: ${esc(why)}">? maybe</span>`;\r\n}\r\n\r\nfunction whoRan(r) {\r\n  return r.remote ? ` \xB7 recorded by ${r.by || "someone else"} (no evidence on this machine)` : "";\r\n}\r\n\r\nfunction lastRunPill(r) {\r\n  if (!r) return `<span class="pill none" title="never run on a device">not run</span>`;\r\n  return `<span class="pill ${r.status}" title="last device run ${esc(r.runId)}, ${esc(r.at || "")}${esc(whoRan(r))}">${r.status}</span>${freshPill(r)}${r.perfIssues ? ` <span class="pill warn" title="performance warnings">perf</span>` : ""}`;\r\n}\r\n\r\nconst GROUP_LABEL = { feature: "Features", platform: "Platform areas", all: "Features and areas" };\r\n\r\n/** A feature\'s or platform area\'s manifest: its rules, and how many nothing proves yet. */\r\nfunction manifestPill(f) {\r\n  const m = f.manifest;\r\n  if (!m) return `<span class="pill none" title="No manifest yet: Setup \u2192 Feature knowledge drafts one">none</span>`;\r\n  return `<span class="pill ${m.unproven ? "warn" : "ok"}" title="${m.rules} rules \xB7 ${m.unproven} unproven">${m.rules} rule${m.rules === 1 ? "" : "s"}${m.unproven ? ` \xB7 ${m.unproven} unproven` : ""}</span>`;\r\n}\r\n\r\nfunction cardsPill(c) {\r\n  if (!c) return `<span class="pill none">none</span>`;\r\n  const title = `${c.approved} approved \xB7 ${c.draft} draft \xB7 ${c.rejected} rejected`;\r\n  return `<span class="pill ${c.draft ? "warn" : "ok"}" title="${title}">${c.total}${c.draft ? ` \xB7 ${c.draft} to review` : ""}</span>`;\r\n}\r\n\r\n/** Features whose unit or card results are outdated: what "Bring up to date" would re-run. */\r\nfunction outdatedCount(features) {\r\n  return features.filter((f) => f.device.stale || f.device.maybe || f.unit?.fresh === "stale" || f.unit?.fresh === "maybe").length;\r\n}\r\n\r\nasync function loadScan(refresh) {\r\n  state.scan = await api("/api/scan", { method: refresh ? "POST" : "GET" });\r\n  const p = state.scan.project;\r\n  $meta.textContent = `${p.adapter} \xB7 scanned ${ago(state.scan.scannedAt)}`;\r\n  document.title = `${p.name} \xB7 Probe`;\r\n}\r\n\r\nasync function renderAtlas() {\r\n  if (!state.scan) { $view.innerHTML = `<div class="empty">Scanning project\u2026</div>`; await loadScan(false); }\r\n  const watch = await api("/api/watch");\r\n  const all = state.scan.features;\r\n  const list = all\r\n    .filter((f) => state.group === "all" || f.group === state.group)\r\n    .filter((f) => f.id.toLowerCase().includes(state.filter.toLowerCase()));\r\n  const sum = (k) => list.reduce((n, f) => n + f.stats[k], 0);\r\n  const testable = sum("testable");\r\n  const pct = (n) => testable ? Math.round(100 * n / testable) + "%" : "\u2013";\r\n\r\n  $view.innerHTML = `\r\n    <div class="cards">\r\n      <div class="card"><div class="k">${GROUP_LABEL[state.group]}</div><div class="v">${list.length}</div></div>\r\n      <div class="card"><div class="k">With a manifest</div><div class="v">${list.filter((f) => f.manifest).length}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${testable}</div></div>\r\n      <div class="card"><div class="k">Have a test class</div><div class="v" style="color:var(--ok)">${pct(sum("direct"))}</div></div>\r\n      <div class="card"><div class="k">Only referenced</div><div class="v" style="color:var(--warn)">${pct(sum("referenced"))}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${pct(sum("untested"))}</div></div>\r\n      <div class="card"><div class="k">Health</div><div class="v" style="font-size:15px;margin-top:6px">${["ok", "warn", "fail", "unknown"].map((h) => `<span class="pill h-${h}">${list.filter((f) => f.health === h).length} ${HEALTH_LABEL[h]}</span>`).join(" ")}</div></div>\r\n    </div>\r\n    <div class="toolbar">\r\n      <div class="seg" id="view"><button data-v="table">Table</button><button data-v="map">Map</button></div>\r\n      <input type="search" id="filter" placeholder="Filter\u2026" value="${esc(state.filter)}">\r\n      <div class="seg" id="group">\r\n        <button data-g="feature">Features</button><button data-g="platform">Platform</button><button data-g="all">All</button>\r\n      </div>\r\n      <div class="legend hide-sm"><span><span class="dot" style="background:var(--ok)"></span>test class</span><span><span class="dot" style="background:var(--warn)"></span>referenced in tests</span><span><span class="dot" style="background:var(--track)"></span>untested</span></div>\r\n      <div style="flex:1"></div>\r\n      ${outdatedCount(all) ? `<button class="btn" id="uptodate" data-job="${esc(jobKey.verifyOutdated())}" data-busy="Bringing up to date\u2026" title="Re-runs only results that are outdated, maybe outdated or missing for this code: unit tests, then cards on a device">\u27F3 Bring ${outdatedCount(all)} feature${outdatedCount(all) === 1 ? "" : "s"} up to date</button>` : ""}\r\n      <button class="btn secondary" id="rescan">Rescan</button>\r\n    </div>\r\n    ${watchBanner(watch)}\r\n    <div id="runpanel"></div>\r\n    ${state.scan.excluded.length ? `<p class="muted">Excluded by probe.yaml: ${state.scan.excluded.map(esc).join(", ")}</p>` : ""}\r\n    ${state.view === "map" ? `<div class="map">${list.map((f) => `<div class="tile h-${f.health}" data-id="${esc(f.id)}" title="${esc(f.reasons.join("\\n"))}">\r\n        <strong>${esc(f.id)}${stalePill(watch, f.id)}</strong>\r\n        <div class="sig"><span>${f.manifest ? `${f.manifest.rules} rules` : "no manifest"}</span>${f.group === "platform" && f.usedBy ? `<span>used by ${f.usedBy}</span>` : ""}<span>unit ${f.unit ? (f.unit.failed ? `\u2717${f.unit.failed}` : "\u2713") : "\u2014"}</span><span>${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}% classes</span><span>cards ${f.cards ? f.cards.total : 0}</span><span>device ${f.device.passed}/${f.device.passed + f.device.failed + f.device.blocked + f.device.error + f.device.notRun}</span>${f.nav ? `<span>${f.nav.screens} screens</span>` : ""}</div>\r\n        <div class="why">${esc(f.reasons[0] || (f.health === "ok" ? "all checks passed" : ""))}</div>\r\n      </div>`).join("") || `<div class="empty">Nothing matches.</div>`}</div>` : `\r\n    <table>\r\n      <thead><tr>\r\n        <th>${state.group === "platform" ? "Platform area" : state.group === "all" ? "Feature or area" : "Feature"}</th><th class="num hide-sm">Modules</th><th class="num">Testable</th><th>Unit coverage (static)</th>\r\n        <th class="num hide-sm">Untested</th><th>Manifest</th><th>Cards</th><th>Last unit run</th><th>On device</th><th>Health</th>\r\n      </tr></thead>\r\n      <tbody>\r\n        ${list.map((f) => `<tr class="click" data-id="${esc(f.id)}">\r\n          <td><strong>${esc(f.id)}</strong>${stalePill(watch, f.id)}${f.group === "platform" && f.usedBy ? `<div class="muted" style="font-size:11px">used by ${f.usedBy}</div>` : ""}</td>\r\n          <td class="num hide-sm">${f.stats.modules}</td>\r\n          <td class="num">${f.stats.testable}</td>\r\n          <td><div class="row">${coverageBar(f.stats)}<span class="muted">${f.stats.testable ? Math.round(100 * f.stats.direct / f.stats.testable) : 0}%</span></div></td>\r\n          <td class="num hide-sm">${f.stats.untested}</td>\r\n          <td>${manifestPill(f)}</td>\r\n          <td>${cardsPill(f.cards)}</td>\r\n          <td>${runPill(f.lastUnitRun)}</td>\r\n          <td>${devicePill(f.device)}</td>\r\n          <td>${healthPill(f)}</td>\r\n        </tr>`).join("") || `<tr><td colspan="10" class="empty">Nothing matches.</td></tr>`}\r\n      </tbody>\r\n    </table>`}`;\r\n\r\n  const filter = document.getElementById("filter");\r\n  filter.addEventListener("input", () => { state.filter = filter.value; renderAtlas().then(() => { const f = document.getElementById("filter"); f.focus(); f.setSelectionRange(f.value.length, f.value.length); }); });\r\n  document.querySelectorAll("#group button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.g === state.group);\r\n    b.addEventListener("click", () => { state.group = b.dataset.g; renderAtlas(); });\r\n  });\r\n  document.getElementById("uptodate")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Re-run every outdated or missing result? Unit tests run first, then approved cards on an emulator (at most the max card runs from Settings).")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("rescan").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Scanning\u2026";\r\n    await loadScan(true); renderAtlas();\r\n  });\r\n  document.querySelectorAll("#view button").forEach((b) => {\r\n    b.classList.toggle("active", b.dataset.v === state.view);\r\n    b.addEventListener("click", () => { state.view = b.dataset.v; renderAtlas(); });\r\n  });\r\n  document.querySelectorAll("tr.click, .tile").forEach((tr) => tr.addEventListener("click", () => { state.feature = tr.dataset.id; render(); }));\r\n  bindWatchBanner(() => renderAtlas());\r\n}\r\n\r\n// \u2500\u2500 Keeping features current: stale marks, the check, drafted corrections \u2500\u2500\r\n\r\nfunction stalePill(watch, id) {\r\n  const e = watch.stale[id];\r\n  if (!e) return "";\r\n  // Reached through the module graph: none of its own files changed, code it depends on did.\r\n  const via = !e.owned && e.dependsOn?.length ? e.dependsOn : null;\r\n  return ` <span class="pill warn" title="${via ? `Depends on ${esc(via.join(", "))}, edited` : "Edited"} since its last check (${esc(e.sources.join(", "))}, ${ago(e.last)}):\\n${esc(e.files.slice(0, 12).join("\\n"))}">${via ? "dependency edited" : "edited"}</span>`;\r\n}\r\n\r\nfunction watchBanner(watch) {\r\n  if (!watch.enabled) return "";\r\n  const stale = Object.keys(watch.stale);\r\n  const parts = [];\r\n  if (watch.running) parts.push(`<span class="pill running">checking</span> <a href="#" data-follow="${esc(watch.running.runId)}">run ${esc(watch.running.runId)}</a>`);\r\n  if (stale.length) parts.push(`${stale.length} feature${stale.length === 1 ? "" : "s"} edited since their last check: ${stale.map((id) => `<strong>${esc(id)}</strong>`).join(", ")}`);\r\n  if (watch.drafts.length) parts.push(`${watch.drafts.length} drafted correction${watch.drafts.length === 1 ? "" : "s"} to review: ${watch.drafts.map((d) => `<a href="#" data-feature="${esc(d.feature)}">${esc(d.feature)}</a>`).join(", ")}`);\r\n  if (!parts.length) return "";\r\n  return `<div class="box stale"><div class="row" style="flex-wrap:wrap">${parts.map((p) => `<span>${p}</span>`).join(\'<span class="muted">\xB7</span>\')}<div style="flex:1"></div>${stale.length && !watch.running ? `<button class="btn secondary" id="checknow" title="Unit tests and manifest links of the edited features, then drafted corrections for review">\u2713 Check now</button>` : ""}</div></div>`;\r\n}\r\n\r\nfunction bindWatchBanner(refresh) {\r\n  document.querySelectorAll("[data-follow]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); followRun(a.dataset.follow, document.getElementById("runpanel"), refresh); }));\r\n  document.querySelectorAll("[data-feature]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); state.feature = a.dataset.feature; render(); }));\r\n  document.getElementById("checknow")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/watch/check", {});\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), refresh);\r\n  });\r\n}\r\n\r\n/** Just enough markdown for a brief\'s At a glance: bullets, bold, code, links as text. */\r\nfunction miniMd(text) {\r\n  const inline = (t) => esc(t).replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, "$1");\r\n  const items = [];\r\n  for (const line of text.split("\\n")) {\r\n    if (/^\\s*[-*] /.test(line)) items.push(line.replace(/^\\s*[-*] /, ""));\r\n    else if (items.length && line.trim()) items[items.length - 1] += " " + line.trim();\r\n  }\r\n  return items.length ? `<ul>${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>` : `<p>${inline(text)}</p>`;\r\n}\r\n\r\nfunction diffHtml(diff) {\r\n  return `<pre class="diff">${diff.split("\\n").map((l) => `<span class="${l.startsWith("@@") ? "hunk" : l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : ""}">${esc(l)}</span>`).join("\\n")}</pre>`;\r\n}\r\n\r\nasync function renderKnowledge(id) {\r\n  const k = await api("/api/knowledge/" + encodeURIComponent(id));\r\n  // Looked up after the fetch: the page may have re-rendered while it loaded.\r\n  const el = document.getElementById("knowledge");\r\n  if (!el) return;\r\n  const title = k.kind === "platform" ? "Platform area knowledge" : "Feature knowledge";\r\n  // Who builds on whom, from the build files: an edit in a platform area makes its users stale.\r\n  const links = [k.usedBy?.length ? `Used by ${k.usedBy.length}: ${k.usedBy.map(esc).join(", ")}` : "", k.uses?.length ? `Uses: ${k.uses.map(esc).join(", ")}` : ""].filter(Boolean);\r\n  const linksHtml = links.length ? `<div class="muted" style="font-size:12px;margin-top:6px">${links.join(" \xB7 ")}</div>` : "";\r\n  if (!k.manifest && !k.check && k.drafts.length) {\r\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet; one is drafted. Review it in <a href="#" id="gosetup">Setup</a>.</span>${linksHtml}</div>`;\r\n    el.querySelector("#gosetup").addEventListener("click", (e) => { e.preventDefault(); state.tab = "setup"; state.feature = null; render(); });\r\n    return;\r\n  }\r\n  if (!k.manifest && !k.check) {\r\n    el.innerHTML = `<div class="box"><h3>${title}</h3><span class="muted">No manifest yet. Run <code class="mono">probe init</code> (or Setup \u2192 Feature knowledge) to draft one, or write <code class="mono">${esc(k.file)}</code> by hand (format in <code class="mono">probe/features/README.md</code>). It gives ${k.kind === "platform" ? "this area a summary, the contract it keeps for the code built on it" : "this feature a summary, its rules"} and the tests that prove them; Probe then keeps them in step with the code.</span>${linksHtml}</div>`;\r\n    return;\r\n  }\r\n  const m = k.manifest || {};\r\n  const c = k.check || { broken: [], gaps: [], errors: [], unexplained: [], missingPaths: [], links: 0 };\r\n  const brokenBy = {};\r\n  for (const b of c.broken) (brokenBy[b.invariant] ||= []).push(b);\r\n  const brokenCardsBy = {};\r\n  for (const b of c.brokenCards || []) (brokenCardsBy[b.invariant] ||= []).push(b);\r\n  // A card proves its rule only while its last pass still holds for this code.\r\n  const cardPill = (x) => {\r\n    const cls = x.freshness === "missing" || x.result === "failed" ? "fail" : x.result === "passed" && x.freshness === "fresh" ? "ok" : "warn";\r\n    const run = x.freshness === "missing" ? "" : ` <button class="btn secondary" style="padding:1px 8px;font-size:11px" data-runcard="${esc(x.feature)}/${esc(x.id)}" data-job="${esc(jobKey.card(x.feature, x.id))}" data-busy="\u2026" title="Run this card on a device">\u25B6</button>`;\r\n    return `<div style="margin:2px 0"><span class="pill ${cls}" title="${esc(x.text)}">card ${esc(x.id)}</span> <span class="muted" style="font-size:12px">${esc(x.title || "")} \xB7 ${esc(x.text)}</span>${run}</div>`;\r\n  };\r\n  const proof = (inv) => {\r\n    const broken = brokenBy[inv.id] || [];\r\n    const pills = [];\r\n    if (inv.coveredBy.length) pills.push(`<span class="pill ${broken.length ? "fail" : "ok"}" title="${esc(inv.coveredBy.join("\\n"))}">${inv.coveredBy.length - broken.length}/${inv.coveredBy.length} tests</span>`);\r\n    const cards = (k.cards || {})[inv.id] || [];\r\n    if (!inv.coveredBy.length && !cards.length) pills.push(`<span class="pill ${inv.gap ? "warn" : "fail"}" title="${esc(inv.gap || "no test, no card and no reason given")}">${inv.gap ? "unproven" : "unexplained"}</span>`);\r\n    return pills.join(" ") + cards.map(cardPill).join("") +\r\n      broken.map((b) => `<div class="muted" style="font-size:12px">\u2717 ${esc(b.entry)} \u2014 ${esc(b.problem)}${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("") +\r\n      (brokenCardsBy[inv.id] || []).map((b) => `<div class="muted" style="font-size:12px">\u2717 card ${esc(b.card)} \u2014 no such card${b.closest ? `; closest: \u201C${esc(b.closest)}\u201D` : ""}</div>`).join("");\r\n  };\r\n  el.innerHTML = `\r\n    ${k.stale ? `<div class="box stale"><div class="row" style="flex-wrap:wrap"><span><span class="pill warn">${!k.stale.owned && k.stale.dependsOn?.length ? `depends on ${esc(k.stale.dependsOn.join(", "))}` : "edited"}</span> since its last check, ${ago(k.stale.last)} (${esc(k.stale.sources.join(", "))}): <span class="mono">${esc(k.stale.files.slice(0, 6).join(", "))}${k.stale.files.length > 6 ? ` +${k.stale.files.length - 6}` : ""}</span></span><div style="flex:1"></div><button class="btn secondary" id="checkfeature" data-job="check" data-busy="Checking\u2026">\u2713 Check now</button></div></div>` : ""}\r\n    ${k.drafts.map((d) => `<div class="box stale"><h3>Drafted correction <span class="muted" style="font-weight:400">\xB7 ${ago(d.createdAt)}${d.runId ? ` \xB7 check ${esc(d.runId)}` : ""}</span></h3>\r\n      <p style="margin:4px 0 8px">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-approve="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-reject="${esc(d.id)}">Reject</button></div></div>`).join("")}\r\n    <div class="box"><h3>${esc(m.name || id)} ${k.kind === "platform" ? `<span class="pill none">platform</span> ` : ""}${m.owner ? `<span class="muted" style="font-weight:400">\xB7 owner ${esc(m.owner)}</span>` : `<span class="pill warn" title="Nobody approves changes to this feature\'s manifest and brief yet">no owner</span>`}</h3>\r\n      ${m.summary ? `<p style="margin:0 0 8px">${esc(m.summary)}</p>` : ""}\r\n      ${k.glance ? `<div class="glance">${miniMd(k.glance)}</div>` : ""}\r\n      <div class="muted" style="font-size:12px;margin-top:6px">${m.brief ? `Brief <span class="mono">${esc(m.brief)}</span> \xB7 ` : ""}manifest <span class="mono">${esc(k.file)}</span> \xB7 ${c.links} test links \xB7 ${c.cardLinks || 0} card links${c.broken.length + (c.brokenCards || []).length ? ` \xB7 <strong style="color:var(--fail)">${c.broken.length + (c.brokenCards || []).length} broken</strong>` : ""}</div>\r\n      ${linksHtml}\r\n      ${[...c.errors, ...c.missingPaths.map((p) => `path does not exist: ${p}`), ...c.unexplained.map((u) => `${u}: no test, no card and no gap given`)].map((e) => `<div style="color:var(--fail);font-size:12px">\u2717 ${esc(e)}</div>`).join("")}\r\n    </div>\r\n    ${m.invariants?.length ? `<details class="fc" ${c.broken.length ? "open" : ""}><summary><strong>Rules that must hold</strong> <span class="muted">${m.invariants.length} rules \xB7 ${c.gaps.length} unproven${c.broken.length ? ` \xB7 ${c.broken.length} broken links` : ""}</span></summary><div class="fc-body">\r\n      <table><thead><tr><th>Rule</th><th>Proved by</th></tr></thead><tbody>${m.invariants.map((inv) => `<tr><td><strong class="mono" style="font-size:12px">${esc(inv.id)}</strong><div>${esc(inv.rule)}</div></td><td>${proof(inv)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}\r\n    ${m.flows?.length ? `<details class="fc"><summary><strong>User flows</strong> <span class="muted">${m.flows.length}</span></summary><div class="fc-body"><ul>${m.flows.map((f) => `<li><span class="mono muted">${esc(f.id)}</span> ${esc(f.text)}</li>`).join("")}</ul>${m.deviceOnly?.length ? `<div class="k">Only on a device</div><ul>${m.deviceOnly.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}</div></details>` : ""}`;\r\n  el.querySelectorAll("[data-runcard]").forEach((b) => b.addEventListener("click", async () => {\r\n    const at = b.dataset.runcard.lastIndexOf("/");\r\n    b.disabled = true; b.textContent = "\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(b.dataset.runcard.slice(0, at))}/${encodeURIComponent(b.dataset.runcard.slice(at + 1))}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  }));\r\n  document.getElementById("checkfeature")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Checking\u2026";\r\n    const res = await post("/api/watch/check", { features: [id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2713 Check now"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderKnowledge(id));\r\n  });\r\n  showJobs();\r\n  el.querySelectorAll("[data-approve],[data-reject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.approve;\r\n    const draftId = b.dataset.approve || b.dataset.reject;\r\n    if (approve && !confirm("Write this correction into the manifest/brief? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(draftId)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderKnowledge(id);\r\n  }));\r\n}\r\n\r\nasync function renderFeature(id) {\r\n  $view.innerHTML = `<div class="empty">Loading ${esc(id)}\u2026</div>`;\r\n  const [f, navmap] = await Promise.all([api("/api/feature/" + encodeURIComponent(id)), api("/api/navmap")]);\r\n  // A remembered address can name a feature that is gone since.\r\n  if (f.error) { state.feature = null; return render(); }\r\n  if (!state.scan) await loadScan(false);\r\n  const h = state.scan.features.find((x) => x.id === f.id);\r\n  const nav = navmap[f.id];\r\n  const s = f.stats;\r\n  const withTests = f.modules.filter((m) => m.unitTestTask).length;\r\n  $view.innerHTML = `\r\n    <button class="back" id="back">\u2190 Atlas</button>\r\n    <div class="toolbar"><h2 style="margin:0">${esc(f.id)}</h2><span class="pill none">${f.group}</span><div style="flex:1"></div>\r\n      <button class="btn secondary" id="backfill" data-job="${esc(jobKey.backfill(f.id))}" data-busy="Agent drafting\u2026" title="A background agent reads code, docs and git history and drafts cards">\u2726 Draft cards</button>\r\n      <button class="btn secondary" id="explore" data-job="${esc(jobKey.explore(f.id))}" data-busy="Agent mapping\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent walks this feature\'s screens on an emulator and maps how each is reached"`}>\u2316 Map screens</button>\r\n      <button class="btn secondary" id="unitwrite" data-job="${esc(jobKey.unitwrite(f.id))}" data-busy="Agent writing tests\u2026" ${f.gaps.length ? "" : "disabled"} title="An agent writes unit tests for the riskiest untested classes, then runs them">\u270E Write missing tests</button>\r\n      <button class="btn secondary" id="verifyf" data-job="${esc(jobKey.verifyFeatures([f.id]))}" data-busy="Verifying\u2026" title="Unit tests, then this feature\'s approved cards on a device">\u2713 Verify</button>\r\n      <button class="btn" id="run" data-job="${esc(jobKey.unit(f.id))}" data-busy="Running\u2026" ${withTests ? "" : "disabled"}>\u25B6 Run unit tests</button></div>\r\n    <div id="knowledge"></div>\r\n    ${h ? `<div class="box"><h3>Health ${healthPill(h)}</h3>${h.reasons.length ? `<ul>${h.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : `<span class="muted">Every check Probe has run passed.</span>`}</div>` : ""}\r\n    <div class="cards">\r\n      <div class="card"><div class="k">Modules</div><div class="v">${s.modules}</div></div>\r\n      <div class="card"><div class="k">Testable classes</div><div class="v">${s.testable}</div></div>\r\n      <div class="card"><div class="k">Test class</div><div class="v" style="color:var(--ok)">${s.direct}</div></div>\r\n      <div class="card"><div class="k">Referenced</div><div class="v" style="color:var(--warn)">${s.referenced}</div></div>\r\n      <div class="card"><div class="k">Untested</div><div class="v" style="color:var(--fail)">${s.untested}</div></div>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <h2>Cards</h2>\r\n    <div id="featurecards"></div>\r\n    <h2>Screens ${nav ? `<span class="muted" style="font-weight:400">\xB7 mapped ${ago(nav.at)}</span>` : ""}</h2>\r\n    ${nav ? `${nav.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Navigation issues</h3><ul>${nav.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table><thead><tr><th>Screen</th><th>How to reach it</th><th class="hide-sm">Notes</th></tr></thead><tbody>\r\n      ${nav.screens.map((sc) => `<tr><td><strong>${esc(sc.name)}</strong>${sc.screenshot ? ` <a class="muted" target="_blank" href="/api/runs/${encodeURIComponent(nav.runId)}/files/${esc(sc.screenshot)}">screenshot</a>` : ""}</td><td><div class="reach">${sc.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div></td><td class="muted hide-sm">${esc(sc.notes)}</td></tr>`).join("")}\r\n      </tbody></table>` : `<div class="empty card">Not mapped yet. <strong>\u2316 Map screens</strong> lets an agent walk this feature on an emulator.</div>`}\r\n    <h2>Riskiest untested classes</h2>\r\n    <p class="muted" style="margin-top:-4px">Ranked by kind (reducer, use case, view model\u2026) and size. Static analysis: a class counts as tested when a test class is named after it.</p>\r\n    <table>\r\n      <thead><tr><th>Class</th><th>Kind</th><th class="num">Lines</th><th class="num">Risk</th><th class="hide-sm">File</th></tr></thead>\r\n      <tbody>${f.gaps.map((c) => `<tr><td><strong>${esc(c.name)}</strong></td><td>${c.kind}</td><td class="num">${c.lines}</td><td class="num">${c.risk}</td><td class="mono muted hide-sm">${esc(c.file)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No untested classes worth testing \u{1F389}</td></tr>`}</tbody>\r\n    </table>\r\n    <h2>Modules</h2>\r\n    <table>\r\n      <thead><tr><th>Module</th><th>Platform</th><th class="num">Source files</th><th class="num">Unit test files</th><th class="num hide-sm">Instrumented</th><th class="hide-sm">Unit task</th></tr></thead>\r\n      <tbody>${f.modules.map((m) => `<tr><td class="mono">${esc(m.id)}</td><td>${m.platform}</td><td class="num">${m.mainFiles}</td><td class="num">${m.testFiles}</td><td class="num hide-sm">${m.instrumentedTestFiles}</td><td class="mono muted hide-sm">${esc(m.unitTestTask || "\u2014")}</td></tr>`).join("")}</tbody>\r\n    </table>`;\r\n  document.getElementById("back").addEventListener("click", () => { state.feature = null; render(); });\r\n  renderKnowledge(f.id);\r\n  const showCards = async () => {\r\n    const cards = (await api("/api/cards")).filter((c) => c.feature === f.id);\r\n    const el = document.getElementById("featurecards");\r\n    if (!el) return;\r\n    el.innerHTML = cards.length ? cards.map(cardHtml).join("") : `<div class="empty card">No cards yet. <strong>\u2726 Draft cards</strong> lets an agent write them from code, docs and git history.</div>`;\r\n    bindCardActions(el, showCards);\r\n    showJobs();\r\n  };\r\n  showCards();\r\n  document.getElementById("backfill").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Agent drafting\u2026";\r\n    const res = await api("/api/cards/" + encodeURIComponent(f.id) + "/backfill", { method: "POST" });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u2726 Draft cards"; state.scan = null; showCards(); });\r\n  });\r\n  document.getElementById("run").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; e.target.textContent = "Running\u2026";\r\n    const res = await post("/api/unit/" + encodeURIComponent(f.id));\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; return; }\r\n    followRun(res.runId,document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = "\u25B6 Run unit tests"; state.scan = null; });\r\n  });\r\n  const start = (btnId, busy, path, body, after) => document.getElementById(btnId).addEventListener("click", async (e) => {\r\n    const label = e.target.textContent;\r\n    e.target.disabled = true; e.target.textContent = busy;\r\n    const res = await post(path, body);\r\n    if (res.error) { alert(res.error); e.target.disabled = false; e.target.textContent = label; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { e.target.disabled = false; e.target.textContent = label; state.scan = null; after && after(); });\r\n  });\r\n  start("explore", "Agent mapping\u2026", "/api/explore/" + encodeURIComponent(f.id), {}, () => renderFeature(f.id));\r\n  start("unitwrite", "Agent writing tests\u2026", "/api/unitwrite/" + encodeURIComponent(f.id), {});\r\n  start("verifyf", "Verifying\u2026", "/api/verify", { features: [f.id] }, showCards);\r\n}\r\n\r\n// Every action carries the branch the person is looking at; the server refuses it if the\r\n// project has moved to another branch since (a checkout in a terminal or the IDE).\r\nconst post = async (path, body) => {\r\n  const headers = { "content-type": "application/json" };\r\n  if (state.branchSeen) headers["x-probe-branch"] = encodeURIComponent(state.branchSeen);\r\n  const res = await api(path, { method: "POST", headers, body: JSON.stringify(body || {}) });\r\n  if (res.branchChanged) checkBranch();\r\n  return res;\r\n};\r\n\r\nasync function checkBranch() {\r\n  const b = await api("/api/branch").catch(() => null);\r\n  if (!b) return;\r\n  state.branchInfo = b;\r\n  if (b.id && !state.branchSeen) state.branchSeen = b.id;\r\n  const chip = document.getElementById("branch");\r\n  chip.textContent = b.git ? `\u2387 ${b.id}${b.git.dirty ? ` \xB7 ${b.git.dirty} uncommitted` : ""} \u25BE` : "no git";\r\n  chip.disabled = !b.git;\r\n  chip.className = "branch" + (b.warnings.length ? " warn" : "");\r\n  chip.title = ["Branch this project is on" + (b.base ? `; verify compares with ${b.base}` : ""), ...b.warnings].join("\\n");\r\n  const banner = document.getElementById("banner");\r\n  if (b.id && state.branchSeen && b.id !== state.branchSeen) {\r\n    banner.innerHTML = `<div class="banner"><strong>The branch changed: ${esc(state.branchSeen)} \u2192 ${esc(b.id)}.</strong>\r\n      <span>Actions are paused so nothing runs on code you did not mean to test.</span>\r\n      <button class="btn" id="bok">Continue on ${esc(b.id)}</button></div>`;\r\n    document.getElementById("bok").addEventListener("click", () => { state.branchSeen = b.id; state.scan = null; banner.innerHTML = ""; checkBranch(); render(); });\r\n  } else if (!b.git || b.warnings.some((w) => /base branch itself|Detached/.test(w))) {\r\n    banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" \xB7 ")}</div>`;\r\n  } else banner.innerHTML = "";\r\n}\r\nsetInterval(checkBranch, 5000);\r\n\r\n// Branch picker: the list loads when it opens (slow on big repos) and filters as you type.\r\nconst $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");\r\n\r\nfunction renderBranchList() {\r\n  const cur = state.branchInfo?.id;\r\n  const words = $bq.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);\r\n  const all = state.branchList || [];\r\n  const hits = all.filter((x) => words.every((w) => x.toLowerCase().includes(w))).slice(0, 200);\r\n  $blist.innerHTML = !state.branchList ? `<div class="none">Loading\u2026</div>`\r\n    : hits.length ? hits.map((x, i) => `<button data-b="${esc(x)}" class="${i === 0 && words.length ? "on" : ""} ${x === cur ? "cur" : ""}">${x === cur ? "\u2713 " : ""}${esc(x)}</button>`).join("")\r\n    : `<div class="none">No branch matches.</div>`;\r\n}\r\n\r\nasync function openBranchPicker() {\r\n  $bpop.hidden = false;\r\n  $bq.value = "";\r\n  renderBranchList();\r\n  $bq.focus();\r\n  const b = await api("/api/branch?branches").catch(() => null);\r\n  if (b) { state.branchList = b.branches; renderBranchList(); }\r\n}\r\n\r\nasync function switchBranch(want) {\r\n  $bpop.hidden = true;\r\n  if (!want || want === state.branchInfo?.id) return;\r\n  if (!confirm(`Switch this project\'s working tree to ${want}? Studio rescans afterwards.`)) return;\r\n  const chip = document.getElementById("branch");\r\n  chip.disabled = true;\r\n  chip.textContent = `\u2387 switching to ${want}\u2026`;\r\n  const res = await post("/api/branch/switch", { branch: want });\r\n  chip.disabled = false;\r\n  if (res.error) { alert(res.error); checkBranch(); return; }\r\n  Object.assign(state, { branchSeen: res.id, branchList: null, scan: null, verify: null, runs: null });\r\n  document.getElementById("banner").innerHTML = "";\r\n  checkBranch();\r\n  render();\r\n}\r\n\r\ndocument.getElementById("branch").addEventListener("click", (e) => { e.stopPropagation(); $bpop.hidden ? openBranchPicker() : ($bpop.hidden = true); });\r\n$bpop.addEventListener("click", (e) => { e.stopPropagation(); const btn = e.target.closest("button[data-b]"); if (btn) switchBranch(btn.dataset.b); });\r\ndocument.addEventListener("click", () => { $bpop.hidden = true; });\r\n$bq.addEventListener("input", renderBranchList);\r\n$bq.addEventListener("keydown", (e) => {\r\n  if (e.key === "Escape") $bpop.hidden = true;\r\n  if (e.key === "Enter") { const first = $blist.querySelector("button[data-b]"); if (first) switchBranch(first.dataset.b); }\r\n});\r\n\r\nfunction followRun(runId, el, onDone) {\r\n  closeStream();\r\n  el.innerHTML = `<h2>Run ${esc(runId)} <span class="pill running" id="rs">running</span> <button class="btn stop" id="rstop" title="Kills its build or agent; the run ends as stopped and does not count toward health">\u25A0 Stop</button></h2><div id="rr"></div><pre class="log" id="log"></pre>`;\r\n  const log = el.querySelector("#log");\r\n  const stopBtn = el.querySelector("#rstop");\r\n  stopBtn.addEventListener("click", async () => {\r\n    if (!confirm(`Stop run ${runId}?`)) return;\r\n    stopBtn.disabled = true; stopBtn.textContent = "Stopping\u2026";\r\n    const res = await stopRunReq(runId);\r\n    if (res.error) { alert(res.error); stopBtn.remove(); }\r\n  });\r\n  const es = new EventSource(`/api/runs/${runId}/stream`);\r\n  state.eventSource = es;\r\n  es.onmessage = (msg) => {\r\n    const e = JSON.parse(msg.data);\r\n    if (e.type === "log") {\r\n      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;\r\n      log.textContent += e.line + "\\n";\r\n      if (atBottom) log.scrollTop = log.scrollHeight;\r\n    } else if (e.type === "done") {\r\n      es.close(); state.eventSource = null;\r\n      const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;\r\n      el.querySelector("#rstop")?.remove();\r\n      const rr = el.querySelector("#rr");\r\n      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;\r\n      bindTicket(rr);\r\n      renderIssues(e.run, rr.querySelector("#ri"), el);\r\n      rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));\r\n      // Over at once here, not at the next poll, so a re-render does not mark its button busy again.\r\n      state.jobs = state.jobs.filter((j) => j.runId !== e.run.id);\r\n      onDone && onDone(e.run);\r\n      showJobs();\r\n    }\r\n  };\r\n  es.onerror = () => { es.close(); state.eventSource = null; };\r\n}\r\n\r\nconst ISSUE_KIND = { test: "failing test", build: "build", card: "card failed", expectation: "not as expected", crash: "crash", perf: "performance", navigation: "navigation", security: "security" };\r\n\r\n/** Problems a run found, each with the two ways to fix it: a prompt to paste anywhere, or a fix agent here. */\r\nasync function renderIssues(run, el, panel) {\r\n  if (run.status === "running" || run.kind === "fix") return;\r\n  const issues = await api(`/api/runs/${encodeURIComponent(run.id)}/issues`).catch(() => []);\r\n  if (!Array.isArray(issues) || !issues.length) return;\r\n  el.innerHTML = `<div class="box issues" style="border-color:var(--fail)"><h3>${issues.length} problem${issues.length === 1 ? "" : "s"} to fix</h3>\r\n    ${issues.map((i) => `<div class="issue" data-issue="${esc(i.id)}">\r\n      <div class="what">${i.security ? securityHead(i.security) : `<span class="pill none k">${esc(ISSUE_KIND[i.kind] || i.kind)}</span> <strong>${esc(i.title)}</strong>`}<div class="muted" style="font-size:12px">${esc(i.feature)}${i.cardId ? ` / ${esc(i.cardId)}` : ""}${i.runId !== run.id ? ` \xB7 run ${esc(i.runId)}` : ""}</div>${i.security ? securityBody(i.security) : ""}</div>\r\n      ${i.security ? `<button class="btn secondary" data-dismiss title="Not a problem here: hide it from later runs, with the reason">Dismiss</button>` : ""}\r\n      <button class="btn secondary" data-prompt title="A prompt with the problem, its evidence and the code to look at, for any coding agent">\u29C9 Fix prompt</button>\r\n      <button class="btn" data-fix title="An agent edits the code to fix it, then Probe runs the unit tests and the card again. Nothing is committed.">\u2726 Fix</button>\r\n      <div class="ip" style="flex:1 1 100%"></div></div>`).join("")}</div>`;\r\n  el.querySelectorAll(".issue").forEach((row) => {\r\n    const id = row.dataset.issue;\r\n    const out = row.querySelector(".ip");\r\n    row.querySelector("[data-prompt]").addEventListener("click", async () => {\r\n      if (out.innerHTML) { out.innerHTML = ""; return; }\r\n      const r = await api(`/api/issues/${encodeURIComponent(id)}/prompt`);\r\n      out.innerHTML = `<textarea class="prompt" readonly>${esc(r.prompt)}</textarea><div class="row"><button class="btn secondary" data-copy>Copy</button><span class="muted" data-copied></span></div>`;\r\n      out.querySelector("[data-copy]").addEventListener("click", async () => {\r\n        const ta = out.querySelector("textarea");\r\n        try { await navigator.clipboard.writeText(ta.value); } catch { ta.select(); document.execCommand("copy"); }\r\n        out.querySelector("[data-copied]").textContent = "Copied.";\r\n      });\r\n    });\r\n    row.querySelector("[data-dismiss]")?.addEventListener("click", async () => {\r\n      const reason = prompt(`Why is this not an issue here?\\n\\n${row.querySelector("strong").textContent}`);\r\n      if (!reason || !reason.trim()) return;\r\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/dismiss`, { reason });\r\n      if (res.error) return alert(res.error);\r\n      row.remove();\r\n    });\r\n    row.querySelector("[data-fix]").addEventListener("click", async () => {\r\n      const branch = state.branchSeen ? ` on ${state.branchSeen}` : "";\r\n      if (!confirm(`An agent will change the code${branch} to fix:\\n\\n${row.querySelector("strong").textContent}\\n\\nThen Probe runs the unit tests (and the card again). Nothing is committed: you review the changes. Start?`)) return;\r\n      const res = await post(`/api/issues/${encodeURIComponent(id)}/fix`);\r\n      if (res.error) return alert(res.error);\r\n      followRun(res.runId, panel);\r\n    });\r\n  });\r\n}\r\n\r\nfunction securityHead(f) {\r\n  return `<span class="pill sev-${esc(f.severity)}">${esc(f.severity)}</span> <span class="pill none mono" title="${esc(f.refs.join(", "))}">${esc(f.check)}</span> <strong>${esc(f.title)}</strong>`;\r\n}\r\n\r\nfunction securityBody(f) {\r\n  return `<div style="font-size:12px;margin-top:4px">${f.file ? `<span class="mono">${esc(f.file)}${f.line ? `:${f.line}` : ""}</span> \xB7 ` : ""}<span class="muted">${esc(f.layer)}</span></div>\r\n    ${f.evidence ? `<pre class="mono" style="font-size:12px;white-space:pre-wrap;margin:4px 0;background:var(--track);padding:6px;border-radius:6px">${esc(f.evidence)}</pre>` : ""}\r\n    <details style="font-size:13px"><summary class="muted">Why and how to fix</summary><p>${esc(f.why)}</p><p><strong>Fix:</strong> ${esc(f.fix)}</p></details>`;\r\n}\r\n\r\nconst stopRunReq = (id) => post(`/api/runs/${encodeURIComponent(id)}/stop`);\r\n\r\nfunction perfBlock(p) {\r\n  if (!p) return "";\r\n  const cell = (k, v) => `<div class="card"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div></div>`;\r\n  return `<div class="cards" style="margin:8px 0">${p.startupMs !== undefined ? cell("Cold start", p.startupMs + " ms") : ""}${cell("Frames", p.frames)}${cell("Janky", p.jankyPct + "%")}${cell("p50 / p90 / p99", `${p.p50Ms} / ${p.p90Ms} / ${p.p99Ms} ms`)}${p.memoryMb ? cell("Memory", p.memoryMb + " MB") : ""}</div>` +\r\n    p.issues.map((i) => `<p style="color:var(--warn)">\u26A0 ${esc(i)}</p>`).join("");\r\n}\r\n\r\nfunction evidence(run) {\r\n  const file = (name) => `/api/runs/${encodeURIComponent(run.id)}/files/${name}`;\r\n  const shots = run.timeline.filter((t) => t.screenshot);\r\n  const pageErrors = run.webErrors || [];\r\n  return `<p>${esc(run.device)}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : ""} \xB7 ${run.timeline.length} steps \xB7 $${run.costUsd.toFixed(2)}</p>` + perfBlock(run.perf) +\r\n    (pageErrors.length ? `<details style="margin:8px 0"><summary style="color:var(--warn)">${pageErrors.length} page error${pageErrors.length === 1 ? "" : "s"} during the run (console, failed requests)</summary><pre class="log">${pageErrors.map(esc).join("\\n")}</pre></details>` : "") +\r\n    run.crashes.map((c) => `<pre class="log" style="color:var(--fail)">${esc(c)}</pre>`).join("") +\r\n    (run.video ? `<video controls preload="metadata" src="${file(run.video)}" style="max-height:420px;max-width:100%;border-radius:10px;margin:8px 0"></video>` : "") +\r\n    (shots.length ? `<div class="shots">${shots.map((t, i) => `<figure><a href="${file(t.screenshot)}" target="_blank"><img loading="lazy" src="${file(t.screenshot)}" alt="step ${i + 1}"></a><figcaption>${esc(t.action)} \xB7 ${esc(t.detail).slice(0, 80)}</figcaption></figure>`).join("")}</div>` : "") +\r\n    `<details style="margin-top:8px"><summary class="muted">All ${run.timeline.length} steps</summary><ol class="mono">${run.timeline.map((t) => `<li>${esc(t.action)} \u2014 ${esc(t.detail)}</li>`).join("")}</ol></details>`;\r\n}\r\n\r\nfunction ticketButton(run) {\r\n  if (run.status === "passed" || run.status === "running" || run.status === "stopped" || run.kind === "backfill" || run.kind === "login" || run.kind === "init") return "";\r\n  return `<div class="row" style="margin:10px 0"><button class="btn secondary" data-ticket="${esc(run.id)}">\u29C9 Ticket draft</button></div><div class="ticketpanel"></div>`;\r\n}\r\n\r\nasync function bindTicket(el) {\r\n  const b = el.querySelector("button[data-ticket]");\r\n  if (!b) return;\r\n  b.addEventListener("click", async () => {\r\n    const [d, cfg] = await Promise.all([api(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket`), api("/api/tickets/config")]);\r\n    const panel = el.querySelector(".ticketpanel");\r\n    panel.innerHTML = `<div class="box"><h3>${esc(d.title)}</h3><textarea class="mono" readonly style="min-height:220px">${esc(d.body)}</textarea>\r\n      <div class="row" style="margin-top:8px"><button class="btn secondary" data-copy>Copy</button>${cfg.canFile ? `<button class="btn" data-file>File ticket</button>` : `<span class="muted">Set tickets.fileCommand in probe.yaml to file from here.</span>`}<span class="muted" data-out></span></div></div>`;\r\n    panel.querySelector("[data-copy]").addEventListener("click", () => navigator.clipboard.writeText(`${d.title}\\n\\n${d.body}`).then(() => (panel.querySelector("[data-out]").textContent = "Copied.")));\r\n    const file = panel.querySelector("[data-file]");\r\n    if (file) file.addEventListener("click", async () => {\r\n      if (!confirm(`File "${d.title}" with the configured ticket command?`)) return;\r\n      file.disabled = true;\r\n      const res = await post(`/api/runs/${encodeURIComponent(b.dataset.ticket)}/ticket/file`);\r\n      panel.querySelector("[data-out]").textContent = res.error ? res.error : `Filed: ${res.output}`;\r\n    });\r\n  });\r\n}\r\n\r\nfunction resultsTable(run) {\r\n  const err = run.error ? `<p style="color:var(--fail)">${esc(run.error)}</p>` : "";\r\n  if (run.kind === "verify") {\r\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\r\n    return err + `<p>vs <strong>${esc(run.base)}</strong> \xB7 ${run.changed.length} changed files \xB7 ${run.features.length} features \xB7 ${!run.device ? "unit only" : run.features.some((f) => f.unitStatus) ? "unit + device" : "cards only"}${run.build ? ` \xB7 build <strong>${esc(run.build.label)}</strong>` : run.target === "web" ? " \xB7 cards on the web app" : ""} \xB7 $${run.costUsd.toFixed(2)}</p>\r\n      <table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Cards on device</th></tr></thead><tbody>\r\n      ${run.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong><br><span class="muted">${f.files.length} files</span></td>\r\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}</td>\r\n        <td>${f.cards.map((c) => `<div><span class="pill ${c.status}">${c.status}</span> ${link(c.runId, c.cardId)}${c.note ? ` <span class="muted">\u2014 ${esc(c.note)}</span>` : ""}</div>`).join("") || "\u2014"}</td></tr>`).join("")}\r\n      </tbody></table>\r\n      ${run.unowned.length ? `<details><summary class="muted">${run.unowned.length} changed files outside any module</summary><p class="mono muted">${run.unowned.map(esc).join("<br>")}</p></details>` : ""}` + ticketButton(run);\r\n  }\r\n  if (run.kind === "init") {\r\n    return err + `<p>${run.drafts.length ? `${run.drafts.length} drafts to review below` : "no new drafts"}${run.costUsd ? ` \xB7 ${run.costUsd.toFixed(2)}` : ""}</p>`;\r\n  }\r\n  if (run.kind === "login") {\r\n    const l = run.login;\r\n    return err + (l ? `<p><strong>${l.state === "logged_in" ? (l.role ? `Logged in as ${esc(l.role)}` : "Logged in with a NON-test account") : l.state === "logged_out" ? "Logged out" : "Unknown"}</strong>${l.seenAs ? ` \xB7 shows ${esc(l.seenAs)}` : ""}</p>${l.notes ? `<p class="muted">${esc(l.notes)}</p>` : ""}` : "") + evidence(run);\r\n  }\r\n  if (run.kind === "explore") {\r\n    return err + `${run.issues.length ? `<div class="box" style="border-color:var(--fail)"><h3>Issues</h3><ul>${run.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>` : ""}\r\n      <table style="margin:8px 0"><thead><tr><th>Screen</th><th>Reach</th></tr></thead><tbody>${run.screens.map((sc) => `<tr><td>${esc(sc.name)}</td><td>${sc.reach.map(esc).join(" \u2192 ")}</td></tr>`).join("")}</tbody></table>` + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "unitwrite") {\r\n    return err + `<p>Targets: ${run.targets.map(esc).join(", ")} \xB7 $${run.costUsd.toFixed(2)}${run.unitRun ? ` \xB7 <a href="#" data-open="${esc(run.unitRun)}">unit run</a>` : ""}</p>\r\n      <ul class="mono">${run.files.map((f) => `<li style="${run.outsideTests.includes(f) ? "color:var(--warn)" : ""}">${run.outsideTests.includes(f) ? "\u26A0 " : "+ "}${esc(f)}</li>`).join("")}</ul>\r\n      <p class="muted">Nothing is committed: review the files in your working tree.</p>`;\r\n  }\r\n  if (run.kind === "card") {\r\n    const v = run.verdict;\r\n    const exp = v ? `<table style="margin:8px 0"><tbody>${v.expectations.map((e) => `<tr><td>${e.met === true ? "\u2705" : e.met === false ? "\u274C" : "\u2754"}</td><td>${esc(e.text)}<br><span class="muted">${esc(e.evidence)}</span></td></tr>`).join("")}</tbody></table>` : "";\r\n    return err + `<p class="muted">${esc(run.feature)} / ${esc(run.cardId)}${run.parent ? ` \xB7 part of <a href="#" data-open="${esc(run.parent)}">verify ${esc(run.parent)}</a>` : ""}</p>` + (v?.notes ? `<p>${esc(v.notes)}</p>` : "") + exp + evidence(run) + ticketButton(run);\r\n  }\r\n  if (run.kind === "security") {\r\n    const sev = ["critical", "high", "medium", "low", "info"].map((s) => [s, run.findings.filter((f) => f.severity === s).length]).filter(([, n]) => n);\r\n    return (run.status === "error" ? err : "") + `<p>${run.feature === "*" ? "Whole project" : esc(run.feature)} \xB7 ${run.files} files \xB7 platforms: ${run.platforms.map(esc).join(", ") || "\u2014"}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</p>\r\n      <p>${sev.map(([s, n]) => `<span class="pill sev-${s}">${n} ${s}</span>`).join(" ") || `<span class="pill passed">no open findings</span>`}${run.dismissed ? ` <span class="muted">\xB7 ${run.dismissed} dismissed</span>` : ""}</p>\r\n      <table style="margin:8px 0"><thead><tr><th>Layer</th><th>Status</th><th>Note</th></tr></thead><tbody>${run.layers.map((l) => `<tr><td>${esc(l.layer)}</td><td><span class="pill ${l.status === "ran" ? "passed" : l.status === "error" ? "error" : "skipped"}">${esc(l.status)}</span></td><td class="muted">${esc(l.note || "")}</td></tr>`).join("")}</tbody></table>`;\r\n  }\r\n  if (run.kind === "fix") {\r\n    const link = (id, label) => id ? ` \xB7 <a href="#" data-open="${esc(id)}">${label}</a>` : "";\r\n    return err + `<p><strong>${esc(run.issue.title)}</strong></p>\r\n      <p class="muted">${esc(run.feature)} \xB7 $${run.costUsd.toFixed(2)}${link(run.issue.runId, "where it was found")}${link(run.unitRun, "unit run")}${link(run.recheckRun, "device recheck")}</p>\r\n      ${run.securityRecheck ? `<p>${run.securityRecheck.stillFound ? `<span class="pill failed">still found</span>` : `<span class="pill passed">check passes</span>`} <span class="muted">${esc(run.securityRecheck.note)}</span></p>` : ""}\r\n      ${run.files.length ? `<ul class="mono">${run.files.map((f) => `<li>~ ${esc(f)}</li>`).join("")}</ul><p class="muted">Nothing is committed: review the changes in your working tree.</p>` : ""}\r\n      ${run.summary ? `<details open><summary class="muted">Agent\'s account</summary><pre class="log" style="background:var(--track);color:var(--text)">${esc(run.summary)}</pre></details>` : ""}`;\r\n  }\r\n  if (run.kind === "check") {\r\n    const link = (id, label) => id ? `<a href="#" data-open="${esc(id)}">${esc(label)}</a>` : esc(label);\r\n    const features = run.features || [];\r\n    return err + `<p class="muted">After ${esc(TRIGGER[run.trigger] || run.trigger)} edits \xB7 ${features.length} feature${features.length === 1 ? "" : "s"} checked</p>\r\n      ${features.length ? `<table style="margin:8px 0"><thead><tr><th>Feature</th><th>Unit</th><th>Manifest</th></tr></thead><tbody>\r\n      ${features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong>${f.owned ? "" : `<br><span class="muted">depends on the change</span>`}${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ""}</td>\r\n        <td>${f.unitStatus ? `<span class="pill ${f.unitStatus}">${link(f.unitRun, f.unitStatus)}</span>` : "\u2014"}\r\n          ${(f.failures || []).map((x) => `<div class="mono" style="color:var(--fail);font-size:12px;margin-top:4px">\u2717 ${esc(x)}</div>`).join("")}\r\n          ${(f.deviceRules || []).length ? `<div class="muted" style="font-size:12px;margin-top:4px">Only a device proves: ${f.deviceRules.map(esc).join(", ")}</div>` : ""}</td>\r\n        <td>${f.manifest ? `${f.manifest.links} links${f.manifest.broken ? ` \xB7 <strong style="color:var(--fail)">${f.manifest.broken} broken</strong>` : ""}${f.manifest.gaps ? ` \xB7 ${f.manifest.gaps} unproven` : ""}` : "\u2014"}\r\n          ${f.draftId ? `<div style="font-size:12px;margin-top:4px">\u270E correction drafted \xB7 <a href="#setup">review in Setup</a></div>` : ""}</td></tr>`).join("")}\r\n      </tbody></table>` : `<p>Nothing was stale.</p>`}\r\n      ${(run.skipped || []).length ? `<details><summary class="muted">${run.skipped.length} left for a later check</summary><p class="mono muted">${run.skipped.map(esc).join(", ")}</p></details>` : ""}`;\r\n  }\r\n  if (run.kind === "backfill") {\r\n    return err + `<p>${run.written.length} cards written \xB7 $${run.costUsd.toFixed(2)}</p>` +\r\n      (run.written.length ? `<p class="mono muted">${run.written.map(esc).join(" \xB7 ")}</p>` : "");\r\n  }\r\n  // Unit runs, and anything this page does not know yet: never let a missing field blank the panel.\r\n  const results = run.results || [];\r\n  if (!results.length) return err;\r\n  return err + ticketButton(run) + `<table style="margin-bottom:12px"><thead><tr><th>Module</th><th class="num">Tests</th><th class="num">Failed</th><th class="num">Skipped</th><th class="num">Time</th></tr></thead><tbody>\r\n    ${results.map((r) => `<tr><td class="mono">${esc(r.module)}${r.cached ? ` <span class="pill none" title="Code unchanged since the last build; results reused">cached</span>` : ""}</td><td class="num">${r.tests}</td><td class="num" style="${r.failed ? "color:var(--fail);font-weight:700" : ""}">${r.failed}</td><td class="num">${r.skipped}</td><td class="num">${(r.durationMs / 1000).toFixed(1)}s</td></tr>\r\n      ${r.failures.map((x) => `<tr><td colspan="5" class="mono" style="color:var(--fail)">\u2717 ${esc(x.className)}.${esc(x.name)}<br><span class="muted">${esc(x.message || "")}</span></td></tr>`).join("")}`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst LEVEL_LABEL = { feature: "overview", capability: "flow", regression: "regression" };\r\n\r\nfunction cardHtml(c) {\r\n  const list = (items) => items.map((x) => `<li>${esc(x)}</li>`).join("");\r\n  return `<details class="fc" data-feature="${esc(c.feature)}" data-id="${esc(c.id)}">\r\n    <summary>\r\n      <span class="pill lvl-${c.level}">${LEVEL_LABEL[c.level]}</span>\r\n      <strong>${esc(c.title)}</strong>\r\n      ${c.tickets.map((t) => `<span class="mono muted">${esc(t)}</span>`).join(" ")}\r\n      <span style="flex:1"></span>\r\n      ${lastRunPill(c.lastRun)}\r\n      <span class="pill conf-${c.confidence}" title="confidence">${c.confidence}</span>\r\n      <span class="pill st-${c.status}">${c.status}</span>\r\n    </summary>\r\n    <div class="fc-body">\r\n      <p>${esc(c.summary)}</p>\r\n      <div class="reach">${c.reach.map((r) => `<span>${esc(r)}</span>`).join("<b>\u2192</b>")}</div>\r\n      ${c.preconditions.length ? `<div class="k">Given</div><ul>${list(c.preconditions)}</ul>` : ""}\r\n      <div class="k">Steps</div><ol>${list(c.steps)}</ol>\r\n      <div class="k">Expect</div><ul class="expect">${c.expect.map((e) => `<li><span class="pill none">${e.check}</span> ${esc(e.text)}</li>`).join("")}</ul>\r\n      <div class="k">Sources</div><ul class="mono muted">${c.sources.map((s) => `<li>${s.type}: ${esc(s.ref)}${s.note ? ` \u2014 ${esc(s.note)}` : ""}</li>`).join("")}</ul>\r\n      <div class="muted" style="font-size:12px">${c.accounts} test account${c.accounts === 1 ? "" : "s"} \xB7 ${esc(c.modules.join(", "))} \xB7 ${c.createdBy}, ${ago(c.updatedAt)}</div>\r\n      <div class="row" style="margin-top:10px">\r\n        <button class="btn" data-run data-job="${esc(jobKey.card(c.feature, c.id))}" data-busy="Agent testing\u2026" ${noDevices() ? `disabled title="${esc(noDevices())}"` : `title="An agent performs this card on an emulator and checks every expectation"`}>\u25B6 Run on device</button>\r\n        ${c.status !== "approved" ? `<button class="btn secondary" data-status="approved">Approve</button>` : ""}\r\n        ${c.status !== "rejected" ? `<button class="btn secondary" data-status="rejected">Reject</button>` : ""}\r\n        ${c.status !== "draft" ? `<button class="btn secondary" data-status="draft">Back to draft</button>` : ""}\r\n      </div>\r\n    </div>\r\n  </details>`;\r\n}\r\n\r\nfunction bindCardActions(el, refresh) {\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-run]").forEach((b) => b.addEventListener("click", async () => {\r\n    b.disabled = true; b.textContent = "Agent testing\u2026";\r\n    const res = await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/run`, { method: "POST" });\r\n    if (res.error) { alert(res.error); b.disabled = false; b.textContent = "\u25B6 Run on device"; return; }\r\n    let panel = d.querySelector(".runpanel");\r\n    if (!panel) { panel = document.createElement("div"); panel.className = "runpanel"; d.querySelector(".fc-body").appendChild(panel); }\r\n    followRun(res.runId, panel, () => { b.disabled = false; b.textContent = "\u25B6 Run on device"; });\r\n  })));\r\n  el.querySelectorAll("details.fc").forEach((d) => d.querySelectorAll("button[data-status]").forEach((b) => b.addEventListener("click", async () => {\r\n    await api(`/api/cards/${encodeURIComponent(d.dataset.feature)}/${encodeURIComponent(d.dataset.id)}/status`, {\r\n      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.status }),\r\n    });\r\n    state.scan = null;\r\n    refresh();\r\n  })));\r\n}\r\n\r\nconst LEVEL_TABS = [["all", "All"], ["feature", "Overview"], ["capability", "Flows"], ["regression", "Regressions"]];\r\nconst SIDE_FILTERS = [["all", "All"], ["draft", "To review"], ["failing", "Failing"], ["outdated", "Outdated"], ["notrun", "Never run"]];\r\n\r\n/** One entry per feature: its counts, and the dot that says what needs attention first. */\r\nfunction cardFeatures(all) {\r\n  const by = new Map();\r\n  for (const c of all) {\r\n    const f = by.get(c.feature) || { id: c.feature, cards: [], draft: 0, approved: 0, failing: 0, notrun: 0, outdated: 0 };\r\n    f.cards.push(c);\r\n    if (c.status === "draft") f.draft++;\r\n    if (c.status === "approved") f.approved++;\r\n    if (c.lastRun && ["failed", "error"].includes(c.lastRun.status) && c.lastRun.fresh !== "stale") f.failing++;\r\n    if (c.lastRun && (c.lastRun.fresh === "stale" || c.lastRun.fresh === "maybe") && c.status !== "rejected") f.outdated++;\r\n    if (!c.lastRun && c.status !== "rejected") f.notrun++;\r\n    by.set(c.feature, f);\r\n  }\r\n  return [...by.values()].sort((a, b) => a.id.localeCompare(b.id));\r\n}\r\n\r\nasync function renderCards() {\r\n  if (!state.cardFilter) state.cardFilter = { side: "all", q: "", level: "all", status: "all", feature: null };\r\n  const fl = state.cardFilter;\r\n  const all = await api("/api/cards");\r\n  if (!all.length) {\r\n    $view.innerHTML = `<div class="empty">No cards yet. Open a feature in Atlas and choose \u2726 Draft cards, or <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026">\u2726 Draft cards for every feature</button></div><div id="runpanel"></div>`;\r\n    return bindBackfillAll();\r\n  }\r\n  const features = cardFeatures(all);\r\n  const listed = features\r\n    .filter((f) => !fl.q || (f.id + " " + f.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(fl.q.toLowerCase()))\r\n    .filter((f) => fl.side === "all" || f[fl.side] > 0);\r\n  // Open on what needs a person: a failing feature, else one with drafts.\r\n  if (!fl.feature || !features.some((f) => f.id === fl.feature)) fl.feature = (features.find((f) => f.failing) || features.find((f) => f.draft) || features[0]).id;\r\n  saveRoute();\r\n  const f = features.find((x) => x.id === fl.feature);\r\n  const cards = f.cards.filter((c) => (fl.level === "all" || c.level === fl.level) && (fl.status === "all" || c.status === fl.status));\r\n  const total = (k) => features.reduce((n, x) => n + x[k], 0);\r\n  const dot = (x) => (x.failing ? "fail" : x.draft || x.outdated ? "draft" : x.approved ? "ok" : "");\r\n\r\n  $view.innerHTML = `\r\n    <div class="toolbar">\r\n      <span><strong>${all.length}</strong> cards in <strong>${features.length}</strong> features</span>\r\n      <span class="pill st-draft">${total("draft")} to review</span>\r\n      <span class="pill st-approved">${total("approved")} approved</span>\r\n      ${total("failing") ? `<span class="pill failed">${total("failing")} failing</span>` : ""}\r\n      <div style="flex:1"></div>\r\n      <button class="btn secondary" id="bfall" data-job="${esc(jobKey.backfill("*"))}" data-busy="Agents drafting\u2026" title="Runs a background agent per feature that has no cards yet">\u2726 Draft cards for features without any</button>\r\n    </div>\r\n    <div id="runpanel"></div>\r\n    <div class="split">\r\n      <aside class="side">\r\n        <div class="head">\r\n          <input type="search" id="cq" placeholder="Find a feature, card or ticket\u2026" value="${esc(fl.q)}">\r\n          <div class="chips">${SIDE_FILTERS.map(([k, label]) => `<button class="chip ${fl.side === k ? "active" : ""}" data-side="${k}">${label}${k === "all" ? "" : ` ${total(k)}`}</button>`).join("")}</div>\r\n        </div>\r\n        <ul>${listed.map((x) => `<li data-f="${esc(x.id)}" class="${x.id === f.id ? "active" : ""}" title="${x.draft} to review \xB7 ${x.approved} approved \xB7 ${x.failing} failing \xB7 ${x.notrun} never run">\r\n          <span class="d ${dot(x)}"></span><span class="name">${esc(x.id)}</span><span class="n">${x.draft ? `${x.draft}/` : ""}${x.cards.length}</span></li>`).join("") || `<li class="muted">No feature matches.</li>`}</ul>\r\n      </aside>\r\n      <section>\r\n        <div class="toolbar">\r\n          <h2 style="margin:0">${esc(f.id)}</h2>\r\n          <span class="muted">${f.cards.length} cards \xB7 ${f.approved} approved \xB7 ${f.draft} to review${f.failing ? ` \xB7 <span style="color:var(--fail)">${f.failing} failing</span>` : ""}${f.outdated ? ` \xB7 <span style="color:var(--warn)">${f.outdated} outdated</span>` : ""}</span>\r\n          <div style="flex:1"></div>\r\n          ${f.outdated || f.notrun ? `<button class="btn secondary" id="rerunold" data-job="${esc(jobKey.verifyOutdated([f.id]))}" data-busy="Re-running\u2026" title="Runs this feature\'s approved cards whose result is outdated or missing">\u27F3 Re-run ${f.outdated + f.notrun} outdated / never run</button>` : ""}\r\n          ${f.draft ? `<button class="btn secondary" id="approveall" title="Approve every draft card of ${esc(f.id)}">Approve all ${f.draft} drafts</button>` : ""}\r\n        </div>\r\n        <div class="toolbar">\r\n          <div class="seg" id="clv">${LEVEL_TABS.map(([k, label]) => `<button data-l="${k}" class="${fl.level === k ? "active" : ""}">${label} <span class="muted">${k === "all" ? f.cards.length : f.cards.filter((c) => c.level === k).length}</span></button>`).join("")}</div>\r\n          <div class="seg" id="cst">${["all", "draft", "approved", "rejected"].map((k) => `<button data-s="${k}" class="${fl.status === k ? "active" : ""}">${k}</button>`).join("")}</div>\r\n        </div>\r\n        <div id="cardlist">${cards.length ? cards.map(cardHtml).join("") : `<div class="empty">No cards here with these filters.</div>`}</div>\r\n      </section>\r\n    </div>`;\r\n\r\n  bindCardActions(document.getElementById("cardlist"), renderCards);\r\n  const q = document.getElementById("cq");\r\n  q.addEventListener("input", () => {\r\n    const v = q.value.toLowerCase();\r\n    // Filter the sidebar in place, so typing never loses focus.\r\n    $view.querySelectorAll(".side li[data-f]").forEach((li) => {\r\n      const x = features.find((y) => y.id === li.dataset.f);\r\n      li.style.display = !v || (x.id + " " + x.cards.map((c) => c.title + " " + c.tickets.join(" ")).join(" ")).toLowerCase().includes(v) ? "" : "none";\r\n    });\r\n  });\r\n  q.addEventListener("change", () => { fl.q = q.value; });\r\n  $view.querySelectorAll(".side li[data-f]").forEach((li) => li.addEventListener("click", () => { fl.feature = li.dataset.f; fl.level = "all"; render(); }));\r\n  $view.querySelectorAll("button[data-side]").forEach((b) => b.addEventListener("click", () => { fl.side = b.dataset.side; renderCards(); }));\r\n  $view.querySelectorAll("#clv button").forEach((b) => b.addEventListener("click", () => { fl.level = b.dataset.l; renderCards(); }));\r\n  $view.querySelectorAll("#cst button").forEach((b) => b.addEventListener("click", () => { fl.status = b.dataset.s; renderCards(); }));\r\n  document.getElementById("rerunold")?.addEventListener("click", async (e) => {\r\n    e.target.disabled = true;\r\n    const res = await post("/api/verify", { outdated: true, features: [f.id] });\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => renderCards());\r\n  });\r\n  const approveAll = document.getElementById("approveall");\r\n  if (approveAll) approveAll.addEventListener("click", async () => {\r\n    if (!confirm(`Approve all ${f.draft} draft cards of ${f.id}? Approved cards run on a device in every verify.`)) return;\r\n    approveAll.disabled = true;\r\n    for (const c of f.cards.filter((x) => x.status === "draft")) await post(`/api/cards/${encodeURIComponent(c.feature)}/${encodeURIComponent(c.id)}/status`, { status: "approved" });\r\n    renderCards();\r\n  });\r\n  bindBackfillAll();\r\n}\r\n\r\nfunction bindBackfillAll() {\r\n  document.getElementById("bfall")?.addEventListener("click", async (e) => {\r\n    if (!confirm("Draft cards for every feature that has none? This runs one agent per feature and can take a while.")) return;\r\n    e.target.disabled = true;\r\n    const res = await post("/api/cards/*/backfill");\r\n    if (res.error) { alert(res.error); e.target.disabled = false; return; }\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; renderCards(); });\r\n  });\r\n}\r\n\r\n// \u2500\u2500 Runs: a filtered list with the selected run beside it, and a link (#runs/<id>) for each \u2500\u2500\r\n\r\nconst RUNS_PAGE = 50;\r\nconst TRIGGER = { claude: "Claude", agent: "an agent\'s", commit: "commit", editor: "editor", manual: "manual" };\r\nconst PROBLEM = new Set(["failed", "error"]);\r\n\r\nfunction runsState() {\r\n  if (!state.runs) state.runs = { data: null, kind: "all", status: "all", feature: "all", q: "", limit: RUNS_PAGE, selected: null };\r\n  return state.runs;\r\n}\r\n\r\nfunction runResult(r) {\r\n  if (r.kind === "backfill") return `${(r.written || []).length} cards \xB7 $${(r.costUsd || 0).toFixed(2)}`;\r\n  if (r.kind === "card") return `${esc(r.cardId)} \xB7 ${(r.timeline || []).length} steps \xB7 $${(r.costUsd || 0).toFixed(2)}${r.perf?.issues?.length ? ` \xB7 <span style="color:var(--warn)">perf \u26A0</span>` : ""}`;\r\n  if (r.kind === "verify") return `vs ${esc(r.base)} \xB7 ${r.features.length} features \xB7 ${r.features.reduce((n, f) => n + f.cards.filter((c) => c.runId).length, 0)} card runs`;\r\n  if (r.kind === "explore") return `${r.screens.length} screens \xB7 ${r.issues.length} issues`;\r\n  if (r.kind === "login") return r.login ? (r.login.state === "logged_in" ? (r.login.role ? `as ${esc(r.login.role)}` : "non-test account") : r.login.state.replace("_", " ")) : "\u2014";\r\n  if (r.kind === "unitwrite") return `${r.files.length} files \xB7 $${(r.costUsd || 0).toFixed(2)}`;\r\n  if (r.kind === "check") return (r.features || []).map((f) => `${esc(f.feature)} <span class="pill ${f.unitStatus || "none"}">${f.unitStatus || "\u2014"}</span>${f.draftId ? " \u270E" : ""}`).join(" ") || "nothing stale";\r\n  if (r.kind === "fix") return `${esc(r.issue.title.slice(0, 70))} \xB7 ${r.files.length} files`;\r\n  if (r.kind === "init") return `${(r.drafts || []).length} drafts`;\r\n  if (r.kind === "security") return `${(r.findings || []).length} open${(r.findings || []).some((f) => f.severity === "critical") ? ` \xB7 <strong style="color:var(--fail)">${r.findings.filter((f) => f.severity === "critical").length} critical</strong>` : ""}`;\r\n  const results = r.results || [];\r\n  const t = results.reduce((n, x) => n + x.tests, 0), f = results.reduce((n, x) => n + x.failed, 0);\r\n  if (r.status === "error" && !t) return `<span style="color:var(--fail)">build failed</span>`;\r\n  return `${t} tests${f ? ` \xB7 <strong style="color:var(--fail)">${f} failed</strong>` : ""}`;\r\n}\r\n\r\nfunction filteredRuns() {\r\n  const s = runsState();\r\n  const q = s.q.trim().toLowerCase();\r\n  return s.data.filter((r) =>\r\n    (s.kind === "all" || r.kind === s.kind) &&\r\n    (s.status === "all" || (s.status === "problems" ? PROBLEM.has(r.status) : r.status === s.status)) &&\r\n    (s.feature === "all" || r.feature === s.feature || (r.features || []).some((f) => f.feature === s.feature)) &&\r\n    (!q || [r.id, r.feature, r.cardId, r.kind].some((x) => String(x || "").toLowerCase().includes(q))));\r\n}\r\n\r\nasync function renderRuns() {\r\n  const s = runsState();\r\n  $view.innerHTML = `<div class="empty">Loading runs\u2026</div>`;\r\n  s.data = await api("/api/runs");\r\n  if (!s.data.length) { $view.innerHTML = `<div class="empty">No runs yet. Open a feature in Atlas and run its unit tests.</div>`; return; }\r\n  const kinds = [...new Set(s.data.map((r) => r.kind))].sort();\r\n  const features = [...new Set(s.data.flatMap((r) => [r.feature, ...(r.features || []).map((f) => f.feature)]).filter((f) => f && f !== "*"))].sort();\r\n  const opt = (v, label, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(label)}</option>`;\r\n  $view.innerHTML = `<div class="runs-layout">\r\n    <section class="runs-list">\r\n      <div class="filters">\r\n        <select id="fk" title="Kind">${opt("all", "All kinds", s.kind)}${kinds.map((k) => opt(k, k, s.kind)).join("")}</select>\r\n        <select id="fs" title="Status">${opt("all", "Any status", s.status)}${opt("problems", "Failed or error", s.status)}${["passed", "running", "stopped"].map((k) => opt(k, k, s.status)).join("")}</select>\r\n        <select id="ff" title="Feature">${opt("all", "All features", s.feature)}${features.map((f) => opt(f, f, s.feature)).join("")}</select>\r\n        <input id="fq" type="search" placeholder="Search run, card\u2026" value="${esc(s.q)}">\r\n      </div>\r\n      <div id="runrows"></div>\r\n    </section>\r\n    <aside class="runs-detail" id="rundetail"></aside>\r\n  </div>`;\r\n  const bind = (id, key, ev = "change") => document.getElementById(id).addEventListener(ev, (e) => { s[key] = e.target.value; s.limit = RUNS_PAGE; renderRunRows(); });\r\n  bind("fk", "kind"); bind("fs", "status"); bind("ff", "feature"); bind("fq", "q", "input");\r\n  renderRunRows();\r\n  // Opened from a link: bring its row into view too, showing more of the list if it is further down.\r\n  if (s.selected) {\r\n    const at = filteredRuns().findIndex((r) => r.id === s.selected);\r\n    if (at >= s.limit) { s.limit = Math.ceil((at + 1) / RUNS_PAGE) * RUNS_PAGE; renderRunRows(); }\r\n    document.querySelector("#runrows tr.sel")?.scrollIntoView({ block: "center" });\r\n    showRun(s.selected);\r\n  }\r\n  else document.getElementById("rundetail").innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\r\n}\r\n\r\nfunction renderRunRows() {\r\n  const s = runsState();\r\n  const all = filteredRuns();\r\n  const shown = all.slice(0, s.limit);\r\n  const el = document.getElementById("runrows");\r\n  if (!el) return;\r\n  el.innerHTML = !all.length ? `<div class="empty">No runs match these filters.</div>` : `<table><thead><tr><th>When</th><th>Feature</th><th>Kind</th><th>Status</th><th>Result</th></tr></thead><tbody>\r\n    ${shown.map((r) => `<tr class="click${r.id === s.selected ? " sel" : ""}" data-id="${esc(r.id)}">\r\n      <td><span title="${esc(r.finishedAt || r.startedAt)}">${ago(r.finishedAt || r.startedAt)}</span><br><span class="mono muted" style="font-size:11px">${esc(r.id)}</span></td>\r\n      <td>${esc(r.feature)}</td><td>${esc(r.kind)}</td>\r\n      <td><span class="pill ${r.status}">${r.status}</span>${r.status === "running" ? ` <button class="btn stop" data-stop="${esc(r.id)}">\u25A0 Stop</button>` : ""}</td>\r\n      <td class="res">${runResult(r)}</td></tr>`).join("")}</tbody></table>`;\r\n  el.insertAdjacentHTML("beforeend", `<div class="count"><span>${shown.length} of ${all.length} runs${all.length < s.data.length ? ` (${s.data.length} in all)` : ""}</span>${all.length > shown.length ? `<button class="btn secondary" id="rmore">Show ${Math.min(RUNS_PAGE, all.length - shown.length)} more</button>` : ""}</div>`);\r\n  el.querySelectorAll("tr.click").forEach((tr) => tr.addEventListener("click", () => selectRun(tr.dataset.id)));\r\n  el.querySelector("#rmore")?.addEventListener("click", () => { s.limit += RUNS_PAGE; renderRunRows(); });\r\n  el.querySelectorAll("button[data-stop]").forEach((b) => b.addEventListener("click", async (e) => {\r\n    e.stopPropagation();\r\n    if (!confirm(`Stop run ${b.dataset.stop}?`)) return;\r\n    b.disabled = true;\r\n    const res = await stopRunReq(b.dataset.stop);\r\n    if (res.error) alert(res.error);\r\n    setTimeout(renderRuns, 1500);\r\n  }));\r\n}\r\n\r\n/** Opens a run beside the list and puts it in the address, so the link reopens it. */\r\nfunction selectRun(id) {\r\n  runsState().selected = id;\r\n  saveRoute();\r\n  document.querySelectorAll("#runrows tr.click").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === id));\r\n  showRun(id);\r\n}\r\n\r\nfunction closeRun() {\r\n  closeStream();\r\n  runsState().selected = null;\r\n  saveRoute();\r\n  document.querySelectorAll("#runrows tr.sel").forEach((tr) => tr.classList.remove("sel"));\r\n  const panel = document.getElementById("rundetail");\r\n  panel.classList.remove("open");\r\n  panel.innerHTML = `<div class="empty">Select a run to see its result, evidence and fixes.</div>`;\r\n}\r\n\r\nfunction showRun(id) {\r\n  const panel = document.getElementById("rundetail");\r\n  if (!panel) return;\r\n  panel.classList.add("open");\r\n  panel.scrollTop = 0;\r\n  panel.innerHTML = `<div class="dhead"><button class="btn secondary" id="rlink" title="Copy a link to this run">\u29C9 Link</button><button class="btn secondary" id="rclose" title="Close">\u2715</button></div><div id="rbody"></div>`;\r\n  panel.querySelector("#rclose").addEventListener("click", closeRun);\r\n  panel.querySelector("#rlink").addEventListener("click", (e) => navigator.clipboard.writeText(location.href).then(() => { e.target.textContent = "Copied"; }));\r\n  // A run that ends while it is open refreshes the list, so its row shows how it ended.\r\n  followRun(id, panel.querySelector("#rbody"), () => api("/api/runs").then((runs) => { runsState().data = runs; renderRunRows(); }));\r\n}\r\n\r\nasync function renderSecurity() {\r\n  $view.innerHTML = `<div class="empty">Loading security results\u2026</div>`;\r\n  const [sec, sc] = await Promise.all([api("/api/security"), state.scan ? Promise.resolve(state.scan) : api("/api/scan")]);\r\n  state.scan = sc;\r\n  const last = sec.latest;\r\n  $view.innerHTML = `\r\n    <div class="box"><h3>Security checks</h3>\r\n      <p class="muted" style="margin-top:0">${sec.rules} rules picked by what the project is (Android, iOS, web, backends, cross-platform, desktop, Docker, CI, IaC), dependencies against OSV, secrets in git history, the built app on disk, and the running app (a local URL, the installed Android app on an emulator). The agent review reads the code for authorization and logic flaws; it costs an agent run per feature. The full catalog is in <code class="mono">docs/security/</code>.</p>\r\n      <form class="inline" id="sf">\r\n        <label>Scope<select name="feature"><option value="">Whole project</option>${(sc.features || []).map((f) => `<option>${esc(f.id)}</option>`).join("")}</select></label>\r\n        <label>Running app URL<input name="url" placeholder="${esc(sec.url || "http://localhost:3000")}" style="width:220px"></label>\r\n        <label class="check"><input type="checkbox" name="agent"> agent code review</label>\r\n        <button class="btn" type="submit" data-job="${esc(jobKey.security(""))}" data-busy="Checking\u2026">\u26E8 Run security checks</button>\r\n      </form>\r\n    </div>\r\n    <div id="runpanel">${last ? `<div class="box"><h3>Last run <a href="#" data-open="${esc(last.id)}" class="mono" style="font-weight:400">${esc(last.id)}</a> <span class="pill ${esc(last.status)}">${esc(last.status)}</span> <span class="muted" style="font-weight:400">${ago(last.finishedAt || last.startedAt)}</span></h3>${resultsTable(last)}<div id="ri"></div></div>` : `<div class="empty">No security run yet.</div>`}</div>\r\n    ${sec.dismissed.length ? `<div class="box"><h3>Dismissed (${sec.dismissed.length})</h3><table><thead><tr><th>Check</th><th>Where</th><th>Reason</th><th></th></tr></thead><tbody>${sec.dismissed.map((d) => `<tr><td class="mono">${esc(d.check)}</td><td class="mono muted">${esc(d.file || "\u2014")}</td><td>${esc(d.reason)}<br><span class="muted" style="font-size:12px">${ago(d.at)}</span></td><td><button class="btn secondary" data-undismiss="${esc(d.fingerprint)}">Undo</button></td></tr>`).join("")}</tbody></table></div>` : ""}`;\r\n  const panel = document.getElementById("runpanel");\r\n  if (last) renderIssues(last, panel.querySelector("#ri"), panel);\r\n  panel.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab = "runs"; runsState().selected = a.dataset.open; render(); }));\r\n  document.querySelectorAll("[data-undismiss]").forEach((b) => b.addEventListener("click", async () => {\r\n    await post("/api/security/undismiss", { fingerprint: b.dataset.undismiss });\r\n    renderSecurity();\r\n  }));\r\n  const sf = document.getElementById("sf");\r\n  sf.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    if (sf.agent.checked && !confirm("The agent review runs one agent per feature (minutes each, billed to your agent plan). Start?")) return;\r\n    const res = await post("/api/security", { feature: sf.feature.value || undefined, agent: sf.agent.checked, url: sf.url.value.trim() || undefined });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, panel, () => {});\r\n  });\r\n}\r\n\r\nasync function renderVerify() {\r\n  if (!state.verify) state.verify = { base: "" };\r\n  $view.innerHTML = `<div class="empty">Reading the change\u2026</div>`;\r\n  const [ch, br, options] = await Promise.all([api("/api/changes" + (state.verify.base ? `?base=${encodeURIComponent(state.verify.base)}` : "")), api("/api/branch?branches"), api("/api/test-options")]);\r\n  const here = br.git ? `<strong>${esc(br.id)}</strong> @ <span class="mono">${esc(br.git.commit)}</span>${br.git.dirty ? ` + ${br.git.dirty} uncommitted file(s)` : ""}` : "no git";\r\n  $view.innerHTML = `\r\n    <div class="box"><h3>Verify this change</h3>\r\n      <p style="margin-top:0">Testing ${here}${ch.base ? ` against <strong>${esc(ch.base)}</strong>` : ""}.</p>\r\n      ${br.warnings.length ? `<ul style="color:var(--warn);margin-top:0">${br.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}\r\n      <p class="muted" style="margin-top:0">Files changed since the base branch, plus uncommitted and untracked work, mapped to features. Verify runs their unit tests, then reinstalls the app from this code and runs their cards on an emulator.</p>\r\n      <form class="inline" id="vf">\r\n        <label>Compare with<select name="base">${(br.branches.includes(ch.base) || !ch.base ? br.branches : [ch.base, ...br.branches]).map((b) => `<option ${b === ch.base ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>\r\n        <label>Max card runs<input name="maxCards" type="number" min="0" max="50" style="width:90px" placeholder="10"></label>\r\n        <label class="check"><input type="checkbox" name="allCards"> include draft cards</label>\r\n        <label class="check"><input type="checkbox" name="noDevice"> unit tests only</label>\r\n        ${options.length > 1 ? targetPicker(options, state.verify.against) : ""}\r\n        <button class="btn" type="submit" data-job="${esc(jobKey.verifyBase(ch.base))}" data-busy="Verifying\u2026" ${ch.features.length ? "" : "disabled"}>\u2713 Verify ${ch.features.length} feature${ch.features.length === 1 ? "" : "s"}</button>\r\n        <button class="btn secondary" type="button" id="vrefresh">Refresh</button>\r\n      </form>\r\n      <div style="margin-top:12px">${ch.base ? `${ch.files.length} changed files vs <strong>${esc(ch.base)}</strong>` : `<span style="color:var(--fail)">No base branch found; enter one.</span>`}</div>\r\n      ${ch.features.length ? `<table style="margin-top:8px"><thead><tr><th>Feature</th><th>Changed files</th></tr></thead><tbody>${ch.features.map((f) => `<tr><td><strong>${esc(f.feature)}</strong></td><td class="mono muted">${f.files.slice(0, 6).map(esc).join("<br>")}${f.files.length > 6 ? `<br>\u2026 ${f.files.length - 6} more` : ""}</td></tr>`).join("")}</tbody></table>` : ""}\r\n      ${ch.unowned.length ? `<details style="margin-top:8px"><summary class="muted">${ch.unowned.length} files outside any module</summary><p class="mono muted">${ch.unowned.map(esc).join("<br>")}</p></details>` : ""}\r\n    </div>\r\n    <div class="box"><h3>From a ticket</h3>\r\n      <form class="inline" id="tf">\r\n        <label>Ticket<input name="ticket" placeholder="PROJ-1234" required></label>\r\n        <button class="btn secondary" type="button" id="tlook">Look up</button>\r\n        <button class="btn secondary" type="button" id="tverify" title="Unit tests and cards of the features this ticket\'s commits touched, its own cards first">\u2713 Verify ticket</button>\r\n      </form>\r\n      <div id="tinfo"></div>\r\n      <form class="inline" id="tc" style="margin-top:10px">\r\n        <label style="flex:1 1 100%">Ticket text (optional: paste the description and acceptance criteria)<textarea name="text" placeholder="As a user I can\u2026"></textarea></label>\r\n        <label>Feature(s), when no commit names the ticket yet<input name="features" placeholder="comment, chat"></label>\r\n        <button class="btn" type="submit">\u2726 Draft cards from ticket</button>\r\n      </form>\r\n    </div>\r\n    <div id="runpanel"></div>`;\r\n  const vf = document.getElementById("vf");\r\n  document.getElementById("vrefresh").addEventListener("click", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  vf.base.addEventListener("change", () => { state.verify.base = vf.base.value; renderVerify(); });\r\n  bindTargetPicker(vf, options, (v) => { state.verify.against = v; });\r\n  vf.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const against = vf.noDevice.checked ? {} : readTarget(vf, options);\r\n    if (against.error) return alert(against.error);\r\n    const res = await post("/api/verify", { base: vf.base.value || undefined, noDevice: vf.noDevice.checked, cards: vf.allCards.checked ? "all" : undefined, maxCards: vf.maxCards.value ? Number(vf.maxCards.value) : undefined, ...against });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  const tf = document.getElementById("tf");\r\n  const ticket = () => tf.ticket.value.trim();\r\n  document.getElementById("tlook").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const t = await api("/api/tickets/" + encodeURIComponent(ticket()));\r\n    document.getElementById("tinfo").innerHTML = `<div style="margin-top:10px">${t.url ? `<a href="${esc(t.url)}" target="_blank">${esc(t.id)}</a>` : `<strong>${esc(t.id)}</strong>`} \xB7 features: ${t.features.map(esc).join(", ") || "none"} \xB7 cards: ${t.cards.map(esc).join(", ") || "none"}\r\n      <ul class="mono muted">${t.commits.map((c) => `<li>${esc(c.hash)} ${esc(c.date)} ${esc(c.subject)}</li>`).join("") || "<li>No commits mention it.</li>"}</ul></div>`;\r\n  });\r\n  document.getElementById("tverify").addEventListener("click", async () => {\r\n    if (!ticket()) return;\r\n    const res = await post("/api/verify", { ticket: ticket(), cards: "all" });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n  document.getElementById("tc").addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    if (!ticket()) return alert("Enter the ticket id above.");\r\n    const tc = e.target;\r\n    const res = await post("/api/tickets/cards", { ticket: ticket(), text: tc.text.value, features: tc.features.value.split(",").map((x) => x.trim()).filter(Boolean) });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, document.getElementById("runpanel"), () => { state.scan = null; });\r\n  });\r\n}\r\n\r\n// \u2500\u2500 What a test runs against: this code, a finished build, or the web app \u2500\u2500\r\n\r\n/** The picker\'s fields, for a form.inline. `options` comes from /api/test-options. */\r\nfunction targetPicker(options, chosen, build) {\r\n  if (!options.length) return `<span class="muted" style="flex:1 1 100%">Nothing to run cards on yet: this project builds no Android app. To test a web app, set its address in Settings \u2192 Builds and web.</span>`;\r\n  const pick = options.find((o) => o.id === chosen && !o.missing) || options.find((o) => !o.missing);\r\n  return `<label>Test against<select name="against">${options.map((o) => `<option value="${esc(o.id)}" ${o.missing ? "disabled" : ""} ${pick && o.id === pick.id ? "selected" : ""}>${esc(o.label)}${o.missing ? " \u2014 " + esc(o.missing) : ""}</option>`).join("")}</select></label>\r\n    <label class="buildwrap" style="display:none">Build<input name="build" list="buildlist" value="${esc(build || "")}" autocomplete="off" style="width:240px"><datalist id="buildlist"></datalist></label>`;\r\n}\r\n\r\nfunction bindTargetPicker(form, options, onChange) {\r\n  if (!form.against) return;\r\n  const sync = async () => {\r\n    const o = options.find((x) => x.id === form.against.value);\r\n    form.querySelector(".buildwrap").style.display = o && o.source ? "" : "none";\r\n    form.build.placeholder = o && o.source === "file" ? "path to the .apk or .aab" : "newest, or a build number";\r\n    const list = form.querySelector("datalist");\r\n    list.innerHTML = "";\r\n    if (o && (o.source === "firebase" || o.source === "play")) {\r\n      const builds = await api("/api/builds?source=" + o.source).catch(() => null);\r\n      if (Array.isArray(builds)) list.innerHTML = builds.map((b) => `<option value="${esc(b.value)}">${esc(b.label)}</option>`).join("");\r\n      else if (builds && builds.error) form.build.title = builds.error;\r\n    }\r\n  };\r\n  form.against.addEventListener("change", () => { onChange && onChange(form.against.value); sync(); });\r\n  sync();\r\n}\r\n\r\n/** What the picker says, as a run\'s options. An error string when a build file is needed and none is given. */\r\nfunction readTarget(form, options) {\r\n  const o = form.against && options.find((x) => x.id === form.against.value);\r\n  if (!o) return {};\r\n  const value = form.build.value.trim();\r\n  if (o.source === "file" && !value) return { error: "Give the path of the .apk or .aab to test." };\r\n  return { target: o.target, build: o.source ? { source: o.source, value: value || undefined } : undefined };\r\n}\r\n\r\n// \u2500\u2500 Tickets: the tracker\'s tickets waiting for a test \u2500\u2500\r\n\r\nfunction ticketsState() {\r\n  return state.tickets || (state.tickets = { selected: null, against: null, refresh: false, q: "" });\r\n}\r\n\r\nconst BUILD_STATE = {\r\n  included: ["passed", "contains the ticket\'s commits"],\r\n  missing: ["failed", "does not contain the ticket\'s commits"],\r\n  unknown: ["unknown", "cannot tell: no git tag for this build, or no commit names the ticket"],\r\n};\r\n\r\nfunction ticketDetail(t, options, st) {\r\n  const bs = t.build && t.buildState ? BUILD_STATE[t.buildState] : null;\r\n  const canTest = t.cards.length > 0;\r\n  return `<div class="row" style="align-items:start"><h2 style="margin-top:0;flex:1"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>\r\n      <button class="btn secondary" id="tkhide" title="${t.group === "hidden" ? "Show it in your list again" : "Hide it from your list on this machine"}">${t.group === "hidden" ? "Show again" : "Hide"}</button></div>\r\n    ${t.why ? `<p style="margin-top:0"><span class="pill warn">not for you</span> <span class="muted">${esc(t.why)}</span></p>` : ""}\r\n    <p class="muted" style="margin-top:0">${t.sourceLabel ? `${esc(t.sourceLabel)} \xB7 ` : ""}${esc(t.status)}${t.author ? ` \xB7 written by ${esc(t.author)}` : ""}${t.assignee ? ` \xB7 assigned to ${esc(t.assignee)}` : ""} \xB7 updated ${ago(t.updatedAt)}${t.labels.length ? ` \xB7 ${t.labels.map(esc).join(", ")}` : ""}</p>\r\n    <p>${t.build ? `Build <strong class="mono">${esc(t.build)}</strong> ${bs ? `<span class="pill ${bs[0]}" title="${t.buildTag ? "git tag " + esc(t.buildTag) : ""}">${bs[1]}</span>` : ""}` : `<span class="muted">The ticket names no build.</span>`}</p>\r\n    <div class="desc">${esc(t.description) || `<span class="muted">No description.</span>`}</div>\r\n    <p>${t.commits} commit${t.commits === 1 ? "" : "s"} name it \xB7 features: ${t.features.map(esc).join(", ") || `<span class="muted">none yet</span>`} \xB7 cards: ${t.cards.map((c) => `<span class="mono">${esc(c)}</span>`).join(", ") || `<span class="muted">none yet</span>`}</p>\r\n    <form class="inline" id="tkf">\r\n      ${targetPicker(options, st.against, t.build)}\r\n      <button class="btn" type="submit" data-job="verify:ticket:${esc(t.id)}" data-busy="Testing\u2026" ${canTest && options.length ? "" : "disabled"} title="${canTest ? "An agent runs this ticket\'s cards, then the cards of the features it touched" : "Draft cards from the ticket first"}">\u25B6 Test this ticket</button>\r\n      ${t.features.length ? "" : `<label>Feature it belongs to<input name="features" placeholder="checkout" style="width:160px" title="No commit names the ticket yet, so Probe cannot tell which feature it is about"></label>`}\r\n      <button class="btn secondary" type="button" id="tkcards" data-job="backfill:ticket:${esc(t.id)}" data-busy="Drafting\u2026" title="An agent reads the ticket and the code, and drafts the cards that check it">\u2726 Draft cards from the ticket</button>\r\n    </form>\r\n    ${t.lastRun ? `<div class="row" style="margin-top:12px;flex-wrap:wrap">Last test <span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span> <span class="muted">${ago(t.lastRun.at)}</span>\r\n      <button class="btn secondary" type="button" id="tkshow">Show</button>\r\n      <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}\r\n    <div id="tkpostpanel"></div>\r\n    <div id="runpanel" style="margin-top:12px"></div>\r\n    <h3 style="margin-top:16px">Talk about it in Slack</h3><div id="tktalk"><span class="muted">Searching this project\'s channels\u2026</span></div>`;\r\n}\r\n\r\n// \u2500\u2500 Tickets: the workbench. Your tickets from every tracker of this project; tick some, choose\r\n// what the agent does for each, and it works through them one by one, a commit per ticket.\r\n\r\nconst tkKey = (t) => `${t.source || ""}/${t.id}`;\r\nconst tkQuery = (t) => (t.source ? `?source=${encodeURIComponent(t.source)}` : "");\r\nconst GROUPS = [["mine", "For me"], ["notForMe", "Not for me"], ["hidden", "Hidden"], ["all", "All"]];\r\n\r\n/** The same rules as the server\'s commitMessage (src/tickets/workbench.ts), for the live preview. */\r\nfunction previewCommit(pattern, t, area) {\r\n  const words = `${(t.labels || []).join(" ")} ${t.title}`.toLowerCase();\r\n  const type = /\\b(bug|fix|crash|broken|error|regression|defect)\\b/.test(words) ? "fix" : /\\b(test|tests|coverage)\\b/.test(words) ? "test" : /\\b(docs?|documentation|readme)\\b/.test(words) ? "docs" : /\\b(chore|refactor|cleanup|upgrade|bump)\\b/.test(words) ? "chore" : "feat";\r\n  const title = t.title.trim().replace(/\\s+/g, " ").replace(/[.\\s]+$/, "");\r\n  return pattern.replace(/\\{key\\}/g, t.id).replace(/\\{title\\}/g, title).replace(/\\{type\\}/g, type).replace(/\\{area\\}/g, area || "")\r\n    .replace(/\\(\\s*\\)/g, "").replace(/\\[\\s*\\]/g, "").replace(/ {2,}/g, " ").trim();\r\n}\r\n\r\nasync function renderTickets() {\r\n  const st = ticketsState();\r\n  st.picked = st.picked || new Set();\r\n  st.group = st.group || "mine";\r\n  st.statuses = st.statuses || new Set();\r\n  st.label = st.label || "";\r\n  $view.innerHTML = `<div class="empty">Reading tickets\u2026</div>`;\r\n  const [box, options, wb, conns] = await Promise.all([\r\n    api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options"), api("/api/workbench/settings"), api("/api/connections"),\r\n  ]);\r\n  st.refresh = false;\r\n  st.steps = st.steps || new Set(wb.steps);\r\n  st.pattern = st.pattern ?? wb.commitPattern;\r\n  const projectName = conns.project.name;\r\n  st.ai = conns.ai;\r\n  if (!box.connected) {\r\n    $view.innerHTML = `<div class="box"><h3>Tickets for ${esc(projectName)}</h3>\r\n      <p style="margin-top:0">Connect Jira or Linear to this project, and its tickets show up here. Tick the ones you want, choose what the agent does for each, and it works through them with a commit per ticket.</p>\r\n      <p class="muted">${esc(box.missing)}</p>\r\n      <button class="btn" id="tkconnect">Open this project\'s connections</button></div>`;\r\n    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "connections"; render(); });\r\n    return;\r\n  }\r\n  const all = box.tickets;\r\n  const sources = [...new Set(all.map((t) => t.sourceLabel).filter(Boolean))];\r\n  const inGroup = (t) => st.group === "all" ? t.group !== "hidden" : t.group === st.group;\r\n  const counts = Object.fromEntries(GROUPS.map(([g]) => [g, all.filter((t) => (g === "all" ? t.group !== "hidden" : t.group === g)).length]));\r\n  const grouped = all.filter(inGroup);\r\n  const statuses = [...new Set(grouped.map((t) => t.status))].sort();\r\n  const labels = [...new Set(grouped.flatMap((t) => t.labels))].sort();\r\n  for (const s of [...st.statuses]) if (!statuses.includes(s)) st.statuses.delete(s);\r\n  const visible = grouped.filter((t) => (!st.statuses.size || st.statuses.has(t.status)) && (!st.label || t.labels.includes(st.label)) &&\r\n    (!st.q || `${t.id} ${t.title}`.toLowerCase().includes(st.q.toLowerCase())));\r\n  for (const k of [...st.picked]) if (!all.some((t) => tkKey(t) === k)) st.picked.delete(k);\r\n  if (!all.some((t) => tkKey(t) === st.selected)) st.selected = visible[0] ? tkKey(visible[0]) : null;\r\n  const sel = all.find((t) => tkKey(t) === st.selected);\r\n\r\n  $view.innerHTML = `\r\n    <div class="box"><div class="row" style="flex-wrap:wrap;gap:8px">\r\n      <strong>Tickets \xB7 ${esc(projectName)}</strong>\r\n      <span class="muted">${esc(sources.join(" + ") || "")}${box.me && box.me.length ? ` \xB7 you are ${esc(box.me.join(", "))}` : ""}</span>\r\n      <span style="flex:1"></span>\r\n      <button class="btn secondary" id="tkrules" title="Which tickets are not for you, and how commits are named">Rules</button>\r\n      <button class="btn secondary" id="tkrefresh">Refresh</button></div>\r\n      <div class="chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${GROUPS.map(([g, label]) => `<button class="chip ${st.group === g ? "active" : ""}" data-g="${g}">${label} ${counts[g]}</button>`).join("")}</div>\r\n      ${statuses.length > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="muted" style="font-size:12px">Status</span>${statuses.map((s) => `<button class="chip ${st.statuses.has(s) ? "active" : ""}" data-s="${esc(s)}">${esc(s)} ${grouped.filter((t) => t.status === s).length}</button>`).join("")}</div>` : ""}\r\n      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}\r\n      ${(box.warnings || []).map((w) => `<p style="color:var(--warn);margin-bottom:0">${esc(w)}</p>`).join("")}</div>\r\n    <div id="workpanel"></div>\r\n    <div class="split">\r\n      <div class="side"><div class="head">\r\n        <input type="search" id="tkq" placeholder="Find a ticket\u2026" value="${esc(st.q)}">\r\n        ${labels.length ? `<select id="tklabel"><option value="">Any label</option>${labels.map((l) => `<option ${l === st.label ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>` : ""}\r\n        <label class="muted" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="tkall" ${visible.length && visible.every((t) => st.picked.has(tkKey(t))) ? "checked" : ""}> Select all ${visible.length}</label></div>\r\n        <ul id="tklist">${visible.map((t) => `<li data-t="${esc(tkKey(t))}" class="${tkKey(t) === st.selected ? "active" : ""}" title="${esc(t.title)}${t.why ? " \xB7 not for you: " + esc(t.why) : ""}">\r\n          <input type="checkbox" data-pick="${esc(tkKey(t))}" ${st.picked.has(tkKey(t)) ? "checked" : ""} aria-label="Select ${esc(t.id)}">\r\n          <span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>\r\n          <span class="n">${esc(t.status)}</span></li>`).join("") || `<li class="muted" style="cursor:default">No ticket here.</li>`}</ul></div>\r\n      <div><div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : `<div class="empty">Choose a ticket.</div>`}</div></div></div>\r\n    <div id="tkbar"></div>`;\r\n\r\n  const rerender = () => renderTickets();\r\n  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; rerender(); });\r\n  document.getElementById("tkrules").addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "workbench"; render(); });\r\n  $view.querySelectorAll("[data-g]").forEach((b) => b.addEventListener("click", () => { st.group = b.dataset.g; st.statuses.clear(); rerender(); }));\r\n  $view.querySelectorAll("[data-s]").forEach((b) => b.addEventListener("click", () => { st.statuses.has(b.dataset.s) ? st.statuses.delete(b.dataset.s) : st.statuses.add(b.dataset.s); rerender(); }));\r\n  document.getElementById("tkq").addEventListener("change", (e) => { st.q = e.target.value; rerender(); });\r\n  document.getElementById("tklabel")?.addEventListener("change", (e) => { st.label = e.target.value; rerender(); });\r\n  document.getElementById("tkall").addEventListener("change", (e) => { visible.forEach((t) => (e.target.checked ? st.picked.add(tkKey(t)) : st.picked.delete(tkKey(t)))); rerender(); });\r\n  $view.querySelectorAll("[data-pick]").forEach((cb) => {\r\n    cb.addEventListener("click", (e) => e.stopPropagation());\r\n    cb.addEventListener("change", () => { cb.checked ? st.picked.add(cb.dataset.pick) : st.picked.delete(cb.dataset.pick); renderWorkBar(all, wb, st); });\r\n  });\r\n  $view.querySelectorAll("#tklist li[data-t]").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; rerender(); }));\r\n  renderWorkBar(all, wb, st);\r\n  const running = state.jobs.find((j) => j.key === "work");\r\n  if (running || st.workRun) showWork(running ? running.runId : st.workRun, st);\r\n  if (sel) bindTicketDetail(sel, options, st, rerender);\r\n}\r\n\r\n/** The bar under the list: what the agent does for the ticked tickets, the commit name, and Start. */\r\nfunction renderWorkBar(all, wb, st) {\r\n  const bar = document.getElementById("tkbar");\r\n  const picked = all.filter((t) => st.picked.has(tkKey(t)));\r\n  if (!picked.length) { bar.innerHTML = ""; return; }\r\n  const first = picked[0];\r\n  bar.innerHTML = `<div class="box" style="position:sticky;bottom:0;margin-top:14px;border-color:var(--accent)">\r\n    <div class="row" style="flex-wrap:wrap"><strong>${picked.length} ticket${picked.length === 1 ? "" : "s"} selected</strong>\r\n      <span class="muted">${picked.map((t) => esc(t.id)).join(", ")}</span><span style="flex:1"></span>\r\n      <button class="btn secondary" id="wbclear">Clear</button></div>\r\n    <p class="muted" style="margin:8px 0 6px">What should the agent do for each ticket? It works through them one at a time.</p>\r\n    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">${wb.allSteps.map((s) => `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-step="${s.id}" ${st.steps.has(s.id) ? "checked" : ""}> ${esc(s.label)}</label>`).join("")}</div>\r\n    <form class="inline" id="wbf" style="margin-top:10px">\r\n      <label style="flex:1 1 320px">Commit message <span class="src">{key} {title} {type} {area}</span><input name="pattern" class="mono" value="${esc(st.pattern)}"></label>\r\n      ${(() => { const ai = st.ai; const coding = ai.use.coding || {}; st.account = st.account ?? (coding.account || ""); st.model = st.model ?? (coding.model || "");\r\n        return `<label>Coding account<select name="account"><option value="">${ai.accounts.length ? "As in Settings (" + esc((ai.accounts.find((a) => a.id === coding.account) || ai.accounts[0]).name) + ")" : "CLI\'s own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${st.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>\r\n        <label>Coding model<select name="model"><option value="">As in Settings (${esc(coding.model || ai.model || "default")})</option>${ai.models.filter(([m]) => m).map(([m, l]) => `<option value="${esc(m)}" ${st.model === m ? "selected" : ""}>${esc(l.split(" \u2014 ")[0])}</option>`).join("")}${st.model && !ai.models.some(([m]) => m === st.model) ? `<option selected>${esc(st.model)}</option>` : ""}</select></label>`; })()}\r\n      <button class="btn" type="submit" data-job="work" data-busy="Working\u2026">\u25B6 Start ${picked.length} ticket${picked.length === 1 ? "" : "s"}</button>\r\n    </form>\r\n    <p class="muted" style="margin:6px 0 0" id="wbprev"></p>\r\n    <p class="muted" style="margin:6px 0 0">Commits stay on this machine on branch <strong>${esc(state.branchSeen || "the current branch")}</strong>. Nothing is pushed. A ticket\'s tracker is only changed if you tick \u201CComment on the ticket\u201D.</p>\r\n  </div>`;\r\n  const prev = () => {\r\n    const commit = st.steps.has("commit");\r\n    document.getElementById("wbprev").innerHTML = commit ? `First commit: <span class="mono">${esc(previewCommit(st.pattern, first, first.features.length === 1 ? first.features[0] : ""))}</span>` : "No commit: the changes stay in your working tree for you to review.";\r\n  };\r\n  prev();\r\n  bar.querySelectorAll("[data-step]").forEach((cb) => cb.addEventListener("change", () => { cb.checked ? st.steps.add(cb.dataset.step) : st.steps.delete(cb.dataset.step); prev(); }));\r\n  const f = document.getElementById("wbf");\r\n  f.pattern.addEventListener("input", () => { st.pattern = f.pattern.value; prev(); });\r\n  f.account.addEventListener("change", () => { st.account = f.account.value; });\r\n  f.model.addEventListener("change", () => { st.model = f.model.value; });\r\n  document.getElementById("wbclear").addEventListener("click", () => { st.picked.clear(); renderTickets(); });\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    if (!st.steps.size) return alert("Tick at least one step.");\r\n    if (st.steps.has("commit") && !/\\{key\\}/.test(st.pattern)) return alert("The commit message needs {key}, so each commit names its ticket.");\r\n    const steps = wb.allSteps.map((s) => s.id).filter((s) => st.steps.has(s));\r\n    if (!confirm(`The agent will work on ${picked.length} ticket(s) in ${state.branchSeen || "this branch"}: ${steps.join(", ")}.${steps.includes("commit") ? " Each ticket gets its own local commit." : ""} Start?`)) return;\r\n    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined });\r\n    if (res.error) return alert(res.error);\r\n    st.workRun = res.runId;\r\n    st.picked.clear();\r\n    await refreshJobs();\r\n    renderTickets();\r\n  });\r\n}\r\n\r\nconst STEP_ICON = { passed: "\u2713", failed: "\u2717", error: "\u2717", blocked: "!", running: "\u2026", queued: "\xB7", skipped: "\u2013", stopped: "\u25A0" };\r\nconst STEP_CLASS = { passed: "passed", failed: "failed", error: "failed", blocked: "warn", running: "running", queued: "none", skipped: "skipped", stopped: "stopped" };\r\n\r\n/** A workbench run as a grid: a row per ticket, a cell per step. Follows it while it runs. */\r\nasync function showWork(runId, st) {\r\n  const el = document.getElementById("workpanel");\r\n  if (!el) return;\r\n  const run = await api(`/api/work/${encodeURIComponent(runId)}`).catch(() => null);\r\n  if (!run || run.error || run.kind !== "work") return;\r\n  const done = run.status !== "running";\r\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><strong>Workbench run</strong>\r\n      <span class="pill ${esc(run.status)}">${esc(run.status)}</span><span class="muted">started ${ago(run.startedAt)}${run.costUsd ? ` \xB7 $${run.costUsd.toFixed(2)}` : ""}</span><span style="flex:1"></span>\r\n      ${done ? `<button class="btn secondary" id="wkclose">Close</button>` : `<button class="btn stop" id="wkstop">\u25A0 Stop</button>`}\r\n      <a href="#runs/${encodeURIComponent(run.id)}">Full log</a></div>\r\n    ${run.error ? `<p style="color:var(--warn)">${esc(run.error)}</p>` : ""}\r\n    <table style="margin-top:8px"><thead><tr><th>Ticket</th>${run.steps.map((s) => `<th>${esc(STEP_NAMES[s] || s)}</th>`).join("")}<th>Result</th></tr></thead><tbody>\r\n    ${run.tickets.map((t) => `<tr><td><span class="mono">${esc(t.key)}</span><br><span class="muted">${esc(t.title === t.key ? "" : t.title)}</span></td>\r\n      ${run.steps.map((s) => { const x = t.steps.find((y) => y.step === s) || { status: "queued" }; return `<td title="${esc(x.note || x.status)}"><span class="pill ${STEP_CLASS[x.status] || "none"}">${STEP_ICON[x.status] || "\xB7"}</span>${x.runId ? ` <a href="#runs/${encodeURIComponent(x.runId)}" class="muted" style="font-size:11px">run</a>` : ""}</td>`; }).join("")}\r\n      <td>${t.commit ? `<span class="mono">${esc(t.commit.hash)}</span> ${esc(t.commit.message)}` : t.status === "needs-you" ? `<span class="pill warn">needs you</span> ${esc((t.steps.find((x) => ["failed", "blocked", "error"].includes(x.status)) || {}).note || "")}` : `<span class="pill ${esc(t.status)}">${esc(t.status)}</span>`}\r\n      ${t.files.length ? `<details><summary class="muted">${t.files.length} file(s)</summary><div class="mono">${t.files.map(esc).join("<br>")}</div></details>` : ""}</td></tr>`).join("")}\r\n    </tbody></table></div>`;\r\n  document.getElementById("wkclose")?.addEventListener("click", () => { st.workRun = null; el.innerHTML = ""; });\r\n  document.getElementById("wkstop")?.addEventListener("click", async () => { if (confirm("Stop the workbench run? The ticket in progress stops where it is.")) await stopRunReq(run.id); });\r\n  if (!done && state.tab === "tickets") setTimeout(() => { if (state.tab === "tickets" && document.getElementById("workpanel") === el) showWork(runId, st); }, 2500);\r\n  else if (done) refreshJobs();\r\n}\r\n\r\nconst STEP_NAMES = { context: "Context", fix: "Change", unitwrite: "Write tests", unit: "Unit tests", ui: "UI test", validate: "Validate", commit: "Commit", comment: "Comment" };\r\n\r\n/** The ticket on the right: its text, what Slack said about it, and testing it. */\r\nfunction bindTicketDetail(sel, options, st, rerender) {\r\n  const q = tkQuery(sel);\r\n  const form = document.getElementById("tkf");\r\n  const panel = document.getElementById("runpanel");\r\n  const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };\r\n  bindTargetPicker(form, options, (v) => { st.against = v; });\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const against = readTarget(form, options);\r\n    if (against.error) return alert(against.error);\r\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test${q}`, against);\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, panel, done);\r\n  });\r\n  document.getElementById("tkcards").addEventListener("click", async () => {\r\n    const features = form.features ? form.features.value.split(",").map((x) => x.trim()).filter(Boolean) : [];\r\n    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards${q}`, { features });\r\n    if (res.error) return alert(res.error);\r\n    followRun(res.runId, panel, done);\r\n  });\r\n  document.getElementById("tkhide").addEventListener("click", async () => {\r\n    await post("/api/workbench/hide", { key: sel.id, source: sel.source, hidden: sel.group !== "hidden" });\r\n    st.selected = null;\r\n    rerender();\r\n  });\r\n  const show = document.getElementById("tkshow");\r\n  if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));\r\n  const postBtn = document.getElementById("tkpost");\r\n  if (postBtn) postBtn.addEventListener("click", async () => {\r\n    const out = document.getElementById("tkpostpanel");\r\n    const sep = q ? "&" : "?";\r\n    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment${q}${sep}run=${encodeURIComponent(sel.lastRun.id)}`);\r\n    if (preview.error) { out.innerHTML = `<p style="color:var(--fail)">${esc(preview.error)}</p>`; return; }\r\n    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${esc(sel.sourceLabel || "the tracker")}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>\r\n      <div class="row" style="margin-top:8px"><button class="btn" id="tkpostgo">Post comment</button><button class="btn secondary" id="tkpostno">Cancel</button><span id="tkpostout"></span></div></div>`;\r\n    document.getElementById("tkpostno").addEventListener("click", () => { out.innerHTML = ""; });\r\n    document.getElementById("tkpostgo").addEventListener("click", async (ev) => {\r\n      ev.target.disabled = true;\r\n      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment${q}`, { run: sel.lastRun.id });\r\n      document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;\r\n      if (res.error) ev.target.disabled = false;\r\n    });\r\n  });\r\n  // What people said about it in this project\'s Slack channels.\r\n  const talk = document.getElementById("tktalk");\r\n  api(`/api/inbox/${encodeURIComponent(sel.id)}/discussion${q}`).then((d) => {\r\n    if (!talk || d.error) { if (talk) talk.innerHTML = `<span class="muted">${esc(d.error)}</span>`; return; }\r\n    if (!d.searched.length && !d.errors.length) { talk.innerHTML = `<span class="muted">No Slack channel connected to this project. Add one in Settings \u2192 Connections.</span>`; return; }\r\n    talk.innerHTML = `${d.matches.length ? d.matches.map((m) => `<div style="border-left:3px solid var(--line);padding:4px 10px;margin:6px 0">\r\n        <div class="muted" style="font-size:12px">#${esc(m.channelName)} \xB7 ${esc(m.user)} \xB7 ${ago(m.at)}${m.replies ? ` \xB7 ${m.replies} replies` : ""} \xB7 <a href="${esc(m.link)}" target="_blank" rel="noopener">open in Slack</a></div>\r\n        <div style="white-space:pre-wrap">${esc(m.text)}</div></div>`).join("") : `<span class="muted">Nothing about ${esc(sel.id)} in ${esc(d.searched.join(", "))}.</span>`}\r\n      ${d.errors.map((e) => `<p style="color:var(--warn);margin:4px 0">${esc(e)}</p>`).join("")}`;\r\n  });\r\n}\r\n\r\n\r\nfunction buildsBox(b) {\r\n  const pw = b.playwright;\r\n  return `<div class="box" id="buildsbox"><h3>Builds and web</h3>\r\n    <p class="muted" style="margin-top:0">What a test can run against besides this code: the deployed web app in a browser${b.android ? ", or a finished Android build (a release file, Firebase App Distribution, Google Play)" : ""}. Shared values are saved to <span class="mono">probe/probe.yaml</span>; key files and tools only for this machine.</p>\r\n    <form class="inline" id="bf" autocomplete="off">\r\n      <label>Web app address<input name="webUrl" value="${esc(b.webUrl || "")}" placeholder="https://staging.example.com" style="width:300px" title="A staging or preview address, or a local dev server. Agents open it in Chromium."></label>\r\n      ${b.android ? `<label>Release app id <span class="src">${b.releasePackageFound ? "using " + esc(b.releasePackageFound) : "not found"}</span><input name="releasePackage" value="${esc(b.releasePackage || "")}" placeholder="${esc(b.releasePackageFound || "com.example.app")}" style="width:240px" title="The app\'s id on Google Play, when it differs from the debug build\'s"></label>\r\n      <label>Firebase app id<input name="firebaseApp" value="${esc(b.firebaseApp || "")}" placeholder="1:1234567890:android:abc123" style="width:280px" title="Firebase console \u2192 Project settings \u2192 Your apps \u2192 App ID"></label>\r\n      <label>Play track<input name="playTrack" value="${esc(b.playTrack)}" style="width:110px"></label>\r\n      <label>Google service account key file <span class="src">this machine</span><input name="serviceAccount" value="${esc(b.serviceAccount || "")}" placeholder="C:\\\\keys\\\\probe-builds.json" style="width:300px" title="A JSON key of a service account that may read Firebase App Distribution releases and the app in the Play Console"></label>\r\n      <label>bundletool jar <span class="src">this machine \xB7 only for .aab files</span><input name="bundletool" value="${esc(b.bundletool || "")}" placeholder="C:\\\\tools\\\\bundletool-all.jar" style="width:280px"></label>` : ""}\r\n      <label>Git tag of a build<input name="tag" value="${esc(b.tag || "")}" placeholder="v{build}" style="width:130px" class="mono" title="How a build number is tagged in git, so Probe can tell whether a build contains a ticket\'s commits. Empty: tries 142, v142, build-142, release-142."></label>\r\n      <button class="btn" type="submit">Save</button>\r\n    </form>\r\n    <p id="bout" style="margin-bottom:0"></p>\r\n    <p class="muted" style="margin-bottom:0">Web tests drive Chromium through Playwright: ${pw.installed && pw.browser ? "installed on this machine." : "not on this machine yet. The first web test installs it once (a few minutes, about 150 MB)."}</p>\r\n  </div>`;\r\n}\r\n\r\nfunction bindBuilds() {\r\n  const f = document.getElementById("bf");\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const v = (name) => (f[name] ? f[name].value : undefined);\r\n    const res = await post("/api/builds/settings", { webUrl: v("webUrl"), releasePackage: v("releasePackage"), firebaseApp: v("firebaseApp"), playTrack: v("playTrack"), serviceAccount: v("serviceAccount"), bundletool: v("bundletool"), tag: v("tag") });\r\n    document.getElementById("bout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\r\n    // Whether cards can run at all may have changed with the web address.\r\n    if (!res.error) { state.scan = null; setTimeout(renderSettings, 700); }\r\n  });\r\n}\r\n\r\nasync function renderAccounts(el) {\r\n  const [accounts, login] = await Promise.all([api("/api/accounts"), api("/api/login")]);\r\n  const mark = (ok) => ok ? `<span class="pill passed">stored</span>` : `<span class="muted">\u2014</span>`;\r\n  const l = login && login.run.login;\r\n  const loginText = !l ? "Not checked yet." : l.state === "logged_in" ? (l.role ? `Logged in as <strong>${esc(l.role)}</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""}` : `<strong style="color:var(--fail)">Logged in with an account that is not a test account</strong>${l.seenAs ? ` (${esc(l.seenAs)})` : ""} \u2014 agents will not change anything`) : l.state === "logged_out" ? "Logged out" : "Unknown";\r\n  el.innerHTML = `\r\n    <div class="box"><h3>Who the app on the device is logged in as</h3>\r\n      <div class="row" style="flex-wrap:wrap">${loginText} ${login ? `<span class="muted">\xB7 ${esc(login.run.device)} \xB7 ${ago(login.at)}</span>` : ""}<span style="flex:1"></span>\r\n        <button class="btn secondary" id="logincheck" data-job="${esc(jobKey.login())}" data-busy="Checking\u2026" title="An agent opens the app on the emulator and reports who is logged in">Check login</button></div>\r\n      <div id="runpanel"></div></div>`;\r\n  el.innerHTML += `\r\n    <div class="box"><h3>Test accounts</h3>\r\n    <p class="muted" style="margin-top:0">Accounts agents may log in with. Roles and usernames are shared with the team in <span class="mono">probe/hints/accounts.yaml</span>; passwords and login codes are encrypted on this machine only, and agents never see them \u2014 Probe types them on the device.</p>\r\n    ${accounts.length ? `<table><thead><tr><th>Role</th><th>Username</th><th>Shown as</th><th>Notes</th><th>Password</th><th>Login code</th><th></th></tr></thead><tbody>\r\n      ${accounts.map((a) => `<tr><td class="mono">${esc(a.role)}</td><td>${esc(a.username)}</td><td>${esc(a.shownAs)}</td><td class="muted">${esc(a.notes)}</td><td>${mark(a.hasPassword)}</td><td>${mark(a.hasCode)}</td>\r\n        <td style="white-space:nowrap"><button class="btn secondary" data-login="${esc(a.role)}" data-job="${esc(jobKey.login(a.role))}" data-busy="Logging in\u2026" ${a.hasPassword ? "" : "disabled"} title="An agent logs the app on the emulator in with this account">Log in on device</button> <button class="btn secondary" data-edit="${esc(a.role)}">Edit</button> <button class="btn secondary" data-del="${esc(a.role)}">Remove</button></td></tr>`).join("")}\r\n    </tbody></table>` : `<div class="empty">No test accounts yet. Without one, a card that needs login ends as blocked.</div>`}\r\n    <form class="acct" autocomplete="off">\r\n      <label>Role<input name="role" placeholder="user_a" required pattern="[\\\\w-]{1,40}"></label>\r\n      <label>Username<input name="username" placeholder="tester.a@example.com" required></label>\r\n      <label>Shown as<input name="shownAs" placeholder="@tester_a or Tester A" title="The name or handle the app shows when logged in, so agents recognise the account"></label>\r\n      <label>Notes<input name="notes" placeholder="main tester, has posts"></label>\r\n      <label>Password<input name="password" type="password" autocomplete="new-password" placeholder="unchanged if empty"></label>\r\n      <label>Login code<input name="code" type="password" autocomplete="off" placeholder="only if fixed"></label>\r\n      <button class="btn" type="submit">Save account</button>\r\n    </form></div>`;\r\n  const startLogin = async (role, b) => {\r\n    b.disabled = true;\r\n    const res = await post("/api/login", { role });\r\n    if (res.error) { alert(res.error); b.disabled = false; return; }\r\n    followRun(res.runId, el.querySelector("#runpanel"), () => renderAccounts(el));\r\n  };\r\n  el.querySelector("#logincheck").addEventListener("click", (e) => startLogin(undefined, e.target));\r\n  el.querySelectorAll("button[data-login]").forEach((b) => b.addEventListener("click", () => startLogin(b.dataset.login, b)));\r\n  const form = el.querySelector("form.acct");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const body = Object.fromEntries(new FormData(form));\r\n    const res = await api("/api/accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });\r\n    if (res.error) return alert(res.error);\r\n    renderAccounts(el);\r\n  });\r\n  el.querySelectorAll("button[data-edit]").forEach((b) => b.addEventListener("click", () => {\r\n    const a = accounts.find((x) => x.role === b.dataset.edit);\r\n    form.role.value = a.role; form.username.value = a.username; form.shownAs.value = a.shownAs || ""; form.notes.value = a.notes || "";\r\n    form.password.focus();\r\n  }));\r\n  el.querySelectorAll("button[data-del]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm(`Remove ${b.dataset.del} and its stored password?`)) return;\r\n    await api(`/api/accounts/${encodeURIComponent(b.dataset.del)}`, { method: "DELETE" });\r\n    renderAccounts(el);\r\n  }));\r\n}\r\n\r\nconst SOURCE_LABEL = { machine: "set on this machine", project: "from probe/probe.yaml (team default)", default: "Probe\'s default" };\r\n\r\n/** Why device features are off for this project, or "" when its app runs on a device. */\r\nfunction noDevices() {\r\n  return state.scan && state.scan.project.devices === false ? "Not available yet: this project builds no Android app. To run cards on a web app in a browser, set its address in Settings \u2192 Builds and web." : "";\r\n}\r\n\r\nconst APP_SOURCE = { "probe.yaml": "set here", "last build": "found in the last build", "build file": "found in the build file", detected: "found in the project" };\r\n\r\nfunction projectBox(p) {\r\n  const a = p.app;\r\n  const real = [...new Set([...p.devices.connected.filter((d) => !d.emulator).map((d) => d.serial), ...p.devices.allowReal])];\r\n  const model = (serial) => p.devices.connected.find((d) => d.serial === serial)?.model;\r\n  const branches = p.branches || [];\r\n  const opt = (v, label, sel) => `<option value="${esc(v)}" ${sel ? "selected" : ""}>${esc(label)}</option>`;\r\n  const dev = p.devices.supported !== false;\r\n  return `<div class="box"><h3>Project</h3>\r\n    <p class="muted" style="margin-top:0">Probe fills these in from the project; leave a field empty to keep what it found. Shared settings are saved to <span class="mono">probe/probe.yaml</span> for the team (commit it), the emulator and phones only for this machine.</p>\r\n    <form class="inline" id="pf">\r\n      ${dev ? `<label>App id <span class="src">${a.package ? esc(APP_SOURCE[a.packageSource]) : "not found yet"}</span><input name="package" value="${esc(p.appSet.package || "")}" placeholder="${esc(a.package || "read after the first install")}" style="width:260px"></label>\r\n      <label>Install task <span class="src">${a.installTask ? esc(APP_SOURCE[a.installSource]) : "not found"}</span><input name="installTask" value="${esc(p.appSet.installTask || "")}" placeholder="${esc(a.installTask || ":app:installDebug")}" style="width:220px"></label>\r\n      <label>Emulator <span class="src">this machine</span><select name="avd">${opt("", p.devices.avds.length ? `Automatic (${p.devices.avds[0]})` : "Automatic (none on this machine)", !p.devices.avd)}${p.devices.avds.map((v) => opt(v, v, v === p.devices.avd)).join("")}</select></label>\r\n      ${real.length ? `<div style="flex:1 1 100%"><div class="muted" style="font-size:12px;font-weight:600">Real phones agents may use <span class="src">this machine \xB7 a phone usually carries someone\'s own accounts</span></div>\r\n        ${real.map((r) => `<label class="check"><input type="checkbox" name="allowReal" value="${esc(r)}" ${p.devices.allowReal.includes(r) ? "checked" : ""}> ${esc(r)}${model(r) ? ` (${esc(model(r))})` : " (not connected)"}</label>`).join("")}</div>` : ""}` : `<p class="muted" style="flex:1 1 100%;margin:0">${esc(p.devices.unsupported)}</p>`}\r\n      <label>Verify against <span class="src">base branch</span><select name="base">${opt("", `Automatic (${p.verify.defaultBase || "none found"})`, !p.verify.base)}${branches.map((b) => opt(b, b, b === p.verify.base)).join("")}</select></label>\r\n      <label>Cards in verify<select name="cards">${opt("approved", "Approved only", p.verify.cards === "approved")}${opt("all", "Drafts too", p.verify.cards === "all")}</select></label>\r\n      <label>Max card runs<input name="maxCards" type="number" min="1" max="50" value="${p.verify.maxCards}" style="width:90px"></label>\r\n      ${dev ? `<label>Cold start limit (ms)<input name="maxStartupMs" type="number" min="1" value="${p.perf.maxStartupMs}" style="width:110px"></label>\r\n      <label>Janky frames limit (%)<input name="maxJankyPct" type="number" min="1" value="${p.perf.maxJankyPct}" style="width:110px"></label>\r\n      <label>90th pct frame (ms)<input name="maxP90Ms" type="number" min="1" value="${p.perf.maxP90Ms}" style="width:110px"></label>\r\n      <label>Memory limit (MB)<input name="maxMemoryMb" type="number" min="1" value="${p.perf.maxMemoryMb ?? ""}" placeholder="none" style="width:110px"></label>` : ""}\r\n      <label>Ticket id pattern<input name="pattern" value="${esc(p.tickets.pattern)}" style="width:180px" class="mono"></label>\r\n      <label>Ticket link (<span class="mono">{id}</span>)<input name="url" value="${esc(p.tickets.url || "")}" placeholder="https://jira.example.com/browse/{id}" style="width:300px"></label>\r\n      <label style="flex:1 1 100%">Command that files a ticket (<span class="mono">{title}</span>, <span class="mono">{file}</span>), only ever run when someone presses File<input name="fileCommand" value="${esc(p.tickets.fileCommand || "")}" placeholder="gh issue create --title {title} --body-file {file}" class="mono"></label>\r\n      <button class="btn" type="submit">Save project settings</button>\r\n    </form>\r\n    <p id="pout" style="margin-bottom:0"></p>\r\n  </div>`;\r\n}\r\n\r\nfunction bindProject() {\r\n  const f = document.getElementById("pf");\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const num = (v) => (v === "" ? null : Number(v));\r\n    const body = {\r\n      verify: { base: f.base.value || null, cards: f.cards.value, maxCards: Number(f.maxCards.value) },\r\n      tickets: { pattern: f.pattern.value.trim() || null, url: f.url.value.trim() || null, fileCommand: f.fileCommand.value.trim() || null },\r\n    };\r\n    // App, device and performance fields only exist on a project whose app runs on a device.\r\n    if (f.package) {\r\n      body.app = { package: f.package.value.trim() || null, installTask: f.installTask.value.trim() || null };\r\n      body.devices = { avd: f.avd.value || null, allowReal: [...f.querySelectorAll("input[name=allowReal]:checked")].map((i) => i.value) };\r\n      body.perf = { maxStartupMs: num(f.maxStartupMs.value), maxJankyPct: num(f.maxJankyPct.value), maxP90Ms: num(f.maxP90Ms.value), maxMemoryMb: num(f.maxMemoryMb.value) };\r\n      for (const k of ["maxStartupMs", "maxJankyPct", "maxP90Ms"]) if (body.perf[k] === null) delete body.perf[k];\r\n    }\r\n    const res = await post("/api/project", body);\r\n    document.getElementById("pout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\r\n    if (!res.error) setTimeout(renderSettings, 700);\r\n  });\r\n}\r\n\r\n// \u2500\u2500 Settings: everything here belongs to the project picked at the top. One section at a time. \u2500\u2500\r\n\r\nconst SETTINGS_TABS = [\r\n  ["general", "General"],\r\n  ["connections", "Connections"],\r\n  ["ai", "AI accounts and models"],\r\n  ["workbench", "Workbench"],\r\n  ["builds", "Builds and web"],\r\n  ["accounts", "Test accounts"],\r\n];\r\n\r\nasync function renderSettings() {\r\n  const tab = state.settingsTab || "general";\r\n  const proj = await api("/api/connections").catch(() => null);\r\n  const name = proj ? proj.project.name : "this project";\r\n  $view.innerHTML = `<div class="box" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><strong>Settings for ${esc(name)}</strong>\r\n      <span class="muted mono">${esc(proj ? proj.project.root : "")}</span><span style="flex:1"></span>\r\n      <span class="muted" style="font-size:12px">Switch project with the picker at the top. Nothing here is shared between projects.</span></div>\r\n    <div class="split"><div class="side"><ul>${SETTINGS_TABS.map(([id, label]) => `<li data-st="${id}" class="${id === tab ? "active" : ""}"><span class="name">${label}</span></li>`).join("")}</ul></div>\r\n    <div id="setpane"><div class="empty">Reading\u2026</div></div></div>`;\r\n  $view.querySelectorAll("[data-st]").forEach((li) => li.addEventListener("click", () => { state.settingsTab = li.dataset.st; renderSettings(); }));\r\n  const pane = document.getElementById("setpane");\r\n  if (tab === "general") return renderGeneral(pane);\r\n  if (tab === "connections") return renderConnections(pane, proj);\r\n  if (tab === "ai") return renderAi(pane, proj);\r\n  if (tab === "workbench") return renderWorkbenchSettings(pane);\r\n  if (tab === "builds") { pane.innerHTML = buildsBox(await api("/api/builds/settings")); bindBuilds(); return; }\r\n  if (tab === "accounts") return renderAccounts(pane);\r\n}\r\n\r\n// \u2500\u2500 Connections: trackers, Slack \u2500\u2500\r\n\r\nconst CONN_GROUPS = [["tickets", "Tickets", "Where this project\'s tickets live. Add more than one: Jira and Linear side by side."], ["conversations", "Conversations", "Slack channels the agent reads to find what the team said about a ticket."]];\r\n\r\nfunction connStatus(c) {\r\n  if (!c.missing) return `<span class="pill passed">Connected</span>`;\r\n  if (!c.hasToken) return `<span class="pill warn">No token on this machine</span>`;\r\n  return `<span class="pill warn">Needs setup</span>`;\r\n}\r\n\r\nfunction connDetail(c) {\r\n  if (c.kind === "jira") return `${esc(c.filter || "tickets that aren\'t done")}${c.email ? ` \xB7 ${esc(c.email)}` : ""}`;\r\n  if (c.kind === "linear") return `${c.team ? `team ${esc(c.team)} \xB7 ` : ""}${esc(c.filter || "started and to-do tickets")}`;\r\n  const ch = c.channels || [];\r\n  return ch.length ? ch.map((x) => `#${esc(x.name)}${x.post ? " (posts)" : ""}`).join(", ") + ` \xB7 last ${c.days} days` : "no channel yet";\r\n}\r\n\r\nfunction renderConnections(pane, data) {\r\n  const st = state.connEdit || (state.connEdit = { open: null, kind: null });\r\n  pane.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><div style="flex:1"><h3 style="margin:0">Connections for ${esc(data.project.name)}</h3>\r\n      <div class="muted">What each tool is and where it points is saved to <span class="mono">probe/probe.yaml</span> for the team. Your tokens are encrypted on this machine, for this project only.</div></div>\r\n      <select id="cnadd"><option value="">\uFF0B Add connection\u2026</option><option value="jira">Jira</option><option value="linear">Linear</option><option value="slack">Slack</option></select></div></div>\r\n    ${st.open === "new" ? `<div class="box" style="border-color:var(--accent)">${connForm({ kind: st.kind, channels: [], days: 30 }, true)}</div>` : ""}\r\n    ${CONN_GROUPS.map(([g, title, hint]) => {\r\n      const list = data.connections.filter((c) => c.group === g);\r\n      return `<div class="box"><h3>${title}</h3><p class="muted" style="margin-top:0">${hint}</p>\r\n        ${list.length ? list.map((c) => `<div style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px">\r\n          <div class="row" style="flex-wrap:wrap"><div style="flex:1;min-width:200px"><strong>${esc(c.label)}</strong>${c.legacy ? ` <span class="muted" style="font-size:12px">(from the older single-tracker setting)</span>` : ""}<div class="muted" style="font-size:12px">${connDetail(c)}</div></div>\r\n            ${connStatus(c)}\r\n            <button class="btn secondary" data-cn-test="${c.id}">Test</button>\r\n            <button class="btn secondary" data-cn-edit="${c.id}">${st.open === c.id ? "Close" : "Edit"}</button>\r\n            ${c.hasToken ? `<button class="btn secondary" data-cn-forget="${c.id}" title="Forget your token on this machine; the team setting stays">Forget token</button>` : ""}\r\n            <button class="btn secondary" data-cn-remove="${c.id}" title="Remove it from the project for everyone">Remove</button></div>\r\n          ${c.missing ? `<div class="muted" style="font-size:12px;margin-top:4px">${esc(c.missing)}</div>` : ""}\r\n          <div data-cn-out="${c.id}" style="font-size:13px;margin-top:4px"></div>\r\n          ${st.open === c.id ? `<div style="margin-top:10px">${connForm(c, false)}</div>` : ""}</div>`).join("")\r\n        : `<div class="muted">None yet.</div>`}</div>`;\r\n    }).join("")}`;\r\n\r\n  document.getElementById("cnadd").addEventListener("change", (e) => { if (!e.target.value) return; Object.assign(st, { open: "new", kind: e.target.value }); renderConnections(pane, data); });\r\n  pane.querySelectorAll("[data-cn-edit]").forEach((b) => b.addEventListener("click", () => { st.open = st.open === b.dataset.cnEdit ? null : b.dataset.cnEdit; renderConnections(pane, data); }));\r\n  pane.querySelectorAll("[data-cn-test]").forEach((b) => b.addEventListener("click", async () => {\r\n    const out = pane.querySelector(`[data-cn-out="${b.dataset.cnTest}"]`);\r\n    out.innerHTML = `<span class="muted">Asking\u2026</span>`;\r\n    const r = await post(`/api/connections/${b.dataset.cnTest}/test`);\r\n    out.innerHTML = r.ok ? `<span class="pill passed">works</span> as <strong>${esc(r.message)}</strong>` : `<span class="pill failed">not connected</span> ${esc(r.message)}`;\r\n  }));\r\n  pane.querySelectorAll("[data-cn-forget]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm("Forget your token for this connection on this machine?")) return;\r\n    const r = await post(`/api/connections/${b.dataset.cnForget}/disconnect`);\r\n    state.tickets = null; renderConnections(pane, r);\r\n  }));\r\n  pane.querySelectorAll("[data-cn-remove]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm("Remove this connection from the project? It is removed from probe/probe.yaml for the whole team, and your token is forgotten.")) return;\r\n    const r = await api(`/api/connections/${b.dataset.cnRemove}`, { method: "DELETE" });\r\n    state.tickets = null; st.open = null; renderConnections(pane, r);\r\n  }));\r\n  const form = pane.querySelector("form[data-conn]");\r\n  if (form) bindConnForm(form, pane, data);\r\n}\r\n\r\nfunction connForm(c, isNew) {\r\n  const k = c.kind;\r\n  const tokenLabel = k === "slack" ? "Slack token (xoxb- bot or xoxp- user)" : k === "jira" ? "API token" : "API key";\r\n  const help = k === "jira" ? "A Jira API token: id.atlassian.com \u2192 Security \u2192 API tokens." : k === "linear" ? "A Linear API key: Linear \u2192 Settings \u2192 Security & access \u2192 Personal API keys." : "A Slack app token with channels:history, groups:history, channels:read, groups:read and users:read (and chat:write to post). Invite the bot to each channel.";\r\n  return `<form class="inline" data-conn="${esc(c.id || "")}" data-kind="${k}" autocomplete="off">\r\n    <label>Name <span class="src">optional</span><input name="label" value="${esc(c.customLabel || "")}" placeholder="${k === "slack" ? "Acme Slack" : k === "jira" ? "Acme Jira" : "Linear"}" style="width:160px"></label>\r\n    ${k === "jira" ? `<label>Site<input name="site" value="${esc(c.site || "")}" placeholder="https://acme.atlassian.net" style="width:240px"></label>\r\n      <label>Account email <span class="src">this machine</span><input name="email" value="${esc(c.email || "")}" placeholder="you@example.com" style="width:200px"></label>\r\n      <label>Build field<input name="buildField" value="${esc(c.buildField || "")}" placeholder="Fix version" style="width:130px"></label>\r\n      <label style="flex:1 1 100%">Tickets to list (JQL)<input name="filter" class="mono" value="${esc(c.filter || "")}" placeholder=\'project = SHOP AND statusCategory != Done ORDER BY updated DESC\'></label>` : ""}\r\n    ${k === "linear" ? `<label>Team key<input name="team" value="${esc(c.team || "")}" placeholder="ENG" style="width:90px"></label>\r\n      <label style="flex:1 1 320px">Statuses to list (comma separated)<input name="filter" value="${esc(c.filter || "")}" placeholder="Todo, In Progress, Ready for dev"></label>` : ""}\r\n    ${k === "slack" ? `<label>Workspace<input name="workspace" value="${esc(c.workspace || "")}" placeholder="acme" style="width:140px"></label>\r\n      <label>Look back (days)<input name="days" type="number" min="1" max="365" value="${esc(c.days || 30)}" style="width:90px"></label>` : ""}\r\n    <label>${tokenLabel} <span class="src">${c.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${c.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>\r\n    ${k === "slack" ? `<div style="flex:1 1 100%">${isNew ? `<p class="muted" style="margin:0">Save the token first; then add the channels this project uses.</p>` : channelEditor(c)}</div>` : ""}\r\n    <button class="btn" type="submit">${isNew ? "Add and test" : "Save and test"}</button>\r\n    ${isNew ? `<button class="btn secondary" type="button" data-cancel>Cancel</button>` : ""}\r\n    <p class="muted" style="flex:1 1 100%;margin:0">${help}</p>\r\n    <p data-form-out style="flex:1 1 100%;margin:0"></p>\r\n  </form>`;\r\n}\r\n\r\nfunction channelEditor(c) {\r\n  const rows = (c.channels || []).map((ch, i) => `<tr data-ch="${i}"><td class="mono">#${esc(ch.name)}<br><span class="muted">${esc(ch.id)}</span></td>\r\n    <td><input type="checkbox" data-f="search" ${ch.search ? "checked" : ""}></td>\r\n    <td><input type="checkbox" data-f="post" ${ch.post ? "checked" : ""}></td>\r\n    <td><input data-f="labels" value="${esc((ch.labels || []).join(", "))}" placeholder="any ticket" style="width:160px"></td>\r\n    <td><button class="btn secondary" type="button" data-ch-del="${i}">Remove</button></td></tr>`).join("");\r\n  return `<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:4px">Channels</div>\r\n    <table><thead><tr><th>Channel</th><th title="Read it for talk about a ticket">Search</th><th title="Probe may post results here when you press Post">Post</th><th title="Only for tickets with one of these labels">Only for labels</th><th></th></tr></thead>\r\n    <tbody>${rows || `<tr><td colspan="5" class="muted">No channel yet.</td></tr>`}</tbody></table>\r\n    <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn secondary" type="button" data-ch-load>\uFF0B Add channels\u2026</button><span data-ch-pick></span></div>`;\r\n}\r\n\r\nfunction readChannels(form, c) {\r\n  return (c.channels || []).map((ch, i) => {\r\n    const row = form.querySelector(`tr[data-ch="${i}"]`);\r\n    if (!row) return null;\r\n    return { ...ch, search: row.querySelector(\'[data-f="search"]\').checked, post: row.querySelector(\'[data-f="post"]\').checked, labels: row.querySelector(\'[data-f="labels"]\').value.split(",").map((x) => x.trim()).filter(Boolean) };\r\n  }).filter(Boolean);\r\n}\r\n\r\nfunction bindConnForm(form, pane, data) {\r\n  const id = form.dataset.conn;\r\n  const c = data.connections.find((x) => x.id === id) || { kind: form.dataset.kind, channels: [] };\r\n  const out = form.querySelector("[data-form-out]");\r\n  form.querySelector("[data-cancel]")?.addEventListener("click", () => { state.connEdit.open = null; renderConnections(pane, data); });\r\n  form.querySelectorAll("[data-ch-del]").forEach((b) => b.addEventListener("click", () => { b.closest("tr").remove(); }));\r\n  form.querySelector("[data-ch-load]")?.addEventListener("click", async (e) => {\r\n    const spot = form.querySelector("[data-ch-pick]");\r\n    spot.innerHTML = `<span class="muted">Asking Slack for channels\u2026</span>`;\r\n    const r = await api(`/api/connections/${id}/channels`);\r\n    if (r.error) { spot.innerHTML = `<span class="pill failed">no list</span> ${esc(r.error)}`; return; }\r\n    const have = new Set((c.channels || []).map((x) => x.id));\r\n    const options = r.channels.filter((x) => !have.has(x.id));\r\n    spot.innerHTML = `<input type="search" placeholder="Filter channels\u2026" data-ch-q style="min-width:180px">\r\n      <div data-ch-list style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:6px;min-width:280px">${options.map((x) => `<label style="display:flex;gap:6px;align-items:center;font-weight:400;color:var(--text)"><input type="checkbox" value="${esc(x.id)}" data-name="${esc(x.name)}"> #${esc(x.name)} ${x.isPrivate ? `<span class="muted">private</span>` : ""} ${x.isMember ? "" : `<span class="muted" title="Invite the bot to read it">bot not in it</span>`}</label>`).join("") || `<span class="muted">Every channel the token sees is added.</span>`}</div>\r\n      <button class="btn secondary" type="button" data-ch-addsel style="margin-top:6px">Add selected</button>`;\r\n    spot.querySelector("[data-ch-q]").addEventListener("input", (ev) => { const v = ev.target.value.toLowerCase(); spot.querySelectorAll("[data-ch-list] label").forEach((l) => { l.style.display = l.textContent.toLowerCase().includes(v) ? "" : "none"; }); });\r\n    spot.querySelector("[data-ch-addsel]").addEventListener("click", async () => {\r\n      const add = [...spot.querySelectorAll("[data-ch-list] input:checked")].map((i) => ({ id: i.value, name: i.dataset.name, search: true, post: false, labels: [] }));\r\n      if (!add.length) return;\r\n      const res = await post("/api/connections", { id, channels: [...readChannels(form, c), ...add] });\r\n      if (res.error) { spot.innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }\r\n      renderConnections(pane, res);\r\n    });\r\n  });\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const v = (n) => (form[n] ? form[n].value : undefined);\r\n    const body = { id: id || undefined, kind: c.kind, label: v("label"), site: v("site"), email: v("email"), filter: v("filter"), team: v("team"), buildField: v("buildField"), workspace: v("workspace"), days: form.days ? Number(form.days.value) : undefined, token: v("token") };\r\n    if (c.kind === "slack" && id) body.channels = readChannels(form, c);\r\n    const res = await post("/api/connections", body);\r\n    if (res.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }\r\n    state.tickets = null;\r\n    state.connEdit.open = res.saved;\r\n    renderConnections(pane, res);\r\n    const t = await post(`/api/connections/${res.saved}/test`);\r\n    const o = pane.querySelector(`[data-cn-out="${res.saved}"]`);\r\n    if (o) o.innerHTML = t.ok ? `<span class="pill passed">works</span> as <strong>${esc(t.message)}</strong>` : `<span class="pill failed">saved, not connected</span> ${esc(t.message)}`;\r\n  });\r\n}\r\n\r\n// \u2500\u2500 AI accounts and which one (and which model) each kind of work uses \u2500\u2500\r\n\r\nconst AI_MODE = { default: "The CLI\'s own login", profile: "A separate login folder", apiKey: "An API key" };\r\n\r\nfunction renderAi(pane, data) {\r\n  const ai = data.ai;\r\n  const editing = state.aiEdit;\r\n  const acct = editing && editing !== "new" ? ai.accounts.find((a) => a.id === editing) : null;\r\n  const modelOpts = (cur) => `<option value="" ${cur ? "" : "selected"}>Agents default (${esc(ai.model || "CLI default")})</option>` +\r\n    ai.models.filter(([m]) => m).map(([m, label]) => `<option value="${esc(m)}" ${m === cur ? "selected" : ""}>${esc(label)}</option>`).join("") +\r\n    (cur && !ai.models.some(([m]) => m === cur) ? `<option value="${esc(cur)}" selected>${esc(cur)}</option>` : "") + `<option value="__other">Other model name\u2026</option>`;\r\n  pane.innerHTML = `<div class="box"><h3>AI accounts for ${esc(data.project.name)}</h3>\r\n      <p class="muted" style="margin-top:0">The ${esc(ai.runner)} accounts this project\'s agents may use on this machine. Each one is a separate login, so a client project can run on the client\'s account and never touch your own. Keys are encrypted on this machine.</p>\r\n      ${ai.accounts.length ? `<table><thead><tr><th>Account</th><th>Signs in with</th><th></th></tr></thead><tbody>${ai.accounts.map((a) => `<tr>\r\n        <td><strong>${esc(a.name)}</strong> <span class="muted mono">${esc(a.id)}</span></td>\r\n        <td>${AI_MODE[a.mode]}${a.mode === "profile" ? ` <span class="mono muted">${esc(a.profileDir)}</span>` : ""}${a.mode === "apiKey" ? (a.hasKey ? ` <span class="pill passed">key stored</span>` : ` <span class="pill warn">no key</span>`) : ""}</td>\r\n        <td style="white-space:nowrap"><button class="btn secondary" data-ai-test="${a.id}">Test</button> <button class="btn secondary" data-ai-edit="${a.id}">Edit</button> <button class="btn secondary" data-ai-del="${a.id}">Remove</button><div data-ai-out="${a.id}" style="font-size:12px"></div></td></tr>`).join("")}</tbody></table>`\r\n        : `<p class="muted">No account added: agents use ${esc(ai.runner)}\'s own login on this machine.</p>`}\r\n      <div style="margin-top:10px">${editing ? aiAccountForm(acct) : `<button class="btn secondary" id="aiadd">\uFF0B Add an account</button>`}</div></div>\r\n    <div class="box"><h3>Which account and model for each kind of work</h3>\r\n      <p class="muted" style="margin-top:0">For example: coding on Opus with your work account, reviews on Sonnet. A workbench run can still pick another for that run.</p>\r\n      <form class="inline" id="aiuse">${ai.roles.map((r) => { const u = ai.use[r.id] || {}; return `<div style="flex:1 1 100%;display:flex;gap:10px;flex-wrap:wrap;align-items:end;padding:6px 0;border-bottom:1px solid var(--line)">\r\n        <div style="flex:1 1 220px"><strong>${esc(r.label.split(":")[0])}</strong><div class="muted" style="font-size:12px">${esc(r.label.split(":")[1] || "")}</div></div>\r\n        <label>Account<select name="acct-${r.id}"><option value="">${ai.accounts.length ? `First account (${esc(ai.accounts[0].name)})` : "CLI\'s own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${u.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>\r\n        <label>Model<select name="model-${r.id}">${modelOpts(u.model)}</select></label></div>`; }).join("")}\r\n        <button class="btn" type="submit">Save</button><span id="aiuseout"></span></form>\r\n      <p class="muted" style="margin-bottom:0">Runner and the default model are under General \u2192 Agents.</p></div>`;\r\n  document.getElementById("aiadd")?.addEventListener("click", () => { state.aiEdit = "new"; renderAi(pane, data); });\r\n  pane.querySelectorAll("[data-ai-edit]").forEach((b) => b.addEventListener("click", () => { state.aiEdit = b.dataset.aiEdit; renderAi(pane, data); }));\r\n  pane.querySelectorAll("[data-ai-del]").forEach((b) => b.addEventListener("click", async () => {\r\n    if (!confirm("Remove this account from the project on this machine? Its key is forgotten.")) return;\r\n    renderAi(pane, await api(`/api/ai/accounts/${b.dataset.aiDel}`, { method: "DELETE" }));\r\n  }));\r\n  pane.querySelectorAll("[data-ai-test]").forEach((b) => b.addEventListener("click", async () => {\r\n    const out = pane.querySelector(`[data-ai-out="${b.dataset.aiTest}"]`);\r\n    out.innerHTML = `<span class="muted">Sending one tiny prompt\u2026</span>`;\r\n    const r = await post(`/api/ai/accounts/${b.dataset.aiTest}/test`, {});\r\n    out.innerHTML = r.ok ? `<span class="pill passed">works</span> ${esc(r.model)}` : `<span class="pill failed">not usable</span> ${esc(r.message)}`;\r\n  }));\r\n  pane.querySelectorAll("#aiuse select[name^=model-]").forEach((s) => s.addEventListener("change", () => {\r\n    if (s.value !== "__other") return;\r\n    const name = (prompt("Model name, e.g. claude-opus-5-5 or opus:") || "").trim();\r\n    if (!name) { s.value = ""; return; }\r\n    s.insertAdjacentHTML("beforeend", `<option value="${esc(name)}">${esc(name)}</option>`); s.value = name;\r\n  }));\r\n  document.getElementById("aiuse").addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const f = e.target;\r\n    const use = Object.fromEntries(ai.roles.map((r) => [r.id, { account: f[`acct-${r.id}`].value, model: f[`model-${r.id}`].value === "__other" ? "" : f[`model-${r.id}`].value }]));\r\n    const res = await post("/api/ai/use", use);\r\n    if (res.error) { document.getElementById("aiuseout").innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }\r\n    renderAi(pane, res);\r\n    document.getElementById("aiuseout").innerHTML = `<span class="pill passed">saved</span>`;\r\n  });\r\n  const form = document.getElementById("aif");\r\n  if (form) {\r\n    const sync = () => form.querySelectorAll("[data-mode]").forEach((el) => { el.style.display = el.dataset.mode === form.mode.value ? "" : "none"; });\r\n    form.mode.addEventListener("change", sync); sync();\r\n    form.querySelector("[data-cancel]").addEventListener("click", () => { state.aiEdit = null; renderAi(pane, data); });\r\n    form.addEventListener("submit", async (e) => {\r\n      e.preventDefault();\r\n      const res = await post("/api/ai/accounts", { id: acct ? acct.id : undefined, name: form.name.value, mode: form.mode.value, profileDir: form.profileDir.value, apiKey: form.apiKey.value });\r\n      if (res.error) { document.getElementById("aifout").innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }\r\n      state.aiEdit = null; renderAi(pane, res);\r\n    });\r\n  }\r\n}\r\n\r\nfunction aiAccountForm(a) {\r\n  a = a || { name: "", mode: "profile", profileDir: "" };\r\n  return `<form class="inline" id="aif" autocomplete="off">\r\n    <label>Name<input name="name" value="${esc(a.name)}" placeholder="Work Claude (Max)" style="width:200px"></label>\r\n    <label>Signs in with<select name="mode">${Object.entries(AI_MODE).map(([k, l]) => `<option value="${k}" ${a.mode === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>\r\n    <label data-mode="profile">Login folder<input name="profileDir" value="${esc(a.profileDir || "")}" placeholder="C:\\\\Users\\\\you\\\\.claude-work" style="width:260px"></label>\r\n    <label data-mode="apiKey">API key <span class="src">${a.hasKey ? "stored on this machine" : "not stored yet"}</span><input name="apiKey" type="password" autocomplete="new-password" placeholder="${a.hasKey ? "unchanged if empty" : "sk-ant-\u2026"}" style="width:220px"></label>\r\n    <button class="btn" type="submit">Save account</button><button class="btn secondary" type="button" data-cancel>Cancel</button>\r\n    <p class="muted" data-mode="profile" style="flex:1 1 100%;margin:0">To make a separate Claude login: in a terminal, set CLAUDE_CONFIG_DIR to a new folder, run <span class="mono">claude</span> and log in with that account. Then give the same folder here.</p>\r\n    <p class="muted" data-mode="default" style="flex:1 1 100%;margin:0">Uses whichever account the CLI is logged in with on this machine.</p>\r\n    <p id="aifout" style="flex:1 1 100%;margin:0"></p></form>`;\r\n}\r\n\r\n// \u2500\u2500 Workbench rules: which tickets are not yours, the commit name, default steps \u2500\u2500\r\n\r\nasync function renderWorkbenchSettings(pane) {\r\n  const w = await api("/api/workbench/settings");\r\n  pane.innerHTML = `<div class="box"><h3>Workbench</h3>\r\n    <p class="muted" style="margin-top:0">Shared with the team in <span class="mono">probe/probe.yaml</span>. Tickets you hide by hand stay on this machine.</p>\r\n    <form class="inline" id="wsf">\r\n      <label style="flex:1 1 100%">Commit message pattern <span class="src">{key} {title} {type} {area}</span><input name="pattern" class="mono" value="${esc(w.commitPattern)}"></label>\r\n      <p class="muted" style="flex:1 1 100%;margin:0">Example: <span class="mono" id="wsprev">${esc(w.preview)}</span></p>\r\n      <div style="flex:1 1 100%;margin-top:6px"><strong style="font-size:13px">Not for me</strong></div>\r\n      <label class="check"><input type="checkbox" name="other" ${w.notForMe.otherAssignee ? "checked" : ""}> Assigned to someone else</label>\r\n      <label>Labels <span class="src">comma separated</span><input name="labels" value="${esc(w.notForMe.labels.join(", "))}" placeholder="backend, design" style="width:220px"></label>\r\n      <label>Statuses <span class="src">comma separated</span><input name="statuses" value="${esc(w.notForMe.statuses.join(", "))}" placeholder="Blocked, Waiting for design" style="width:240px"></label>\r\n      <div style="flex:1 1 100%;margin-top:6px"><strong style="font-size:13px">Steps ticked by default</strong></div>\r\n      ${w.allSteps.map((s) => `<label class="check"><input type="checkbox" name="step" value="${s.id}" ${w.steps.includes(s.id) ? "checked" : ""}> ${esc(s.label)}</label>`).join("")}\r\n      <div style="flex:1 1 100%"></div>\r\n      <button class="btn" type="submit">Save</button><span id="wsout"></span>\r\n    </form>\r\n    ${w.hidden.length ? `<p class="muted" style="margin-bottom:0">${w.hidden.length} ticket(s) hidden by hand on this machine: find them under Tickets \u2192 Hidden.</p>` : ""}</div>`;\r\n  const f = document.getElementById("wsf");\r\n  f.pattern.addEventListener("input", () => { document.getElementById("wsprev").textContent = previewCommit(f.pattern.value, { id: "SHOP-412", title: "Checkout button does nothing on Android 14", labels: ["bug"] }, "checkout"); });\r\n  f.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/workbench/settings", { commitPattern: f.pattern.value, notForMe: { otherAssignee: f.other.checked, labels: f.labels.value, statuses: f.statuses.value }, steps: [...f.querySelectorAll("[name=step]:checked")].map((x) => x.value) });\r\n    document.getElementById("wsout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;\r\n    if (!res.error) state.tickets = null;\r\n  });\r\n}\r\n\r\nasync function renderGeneral(pane) {\r\n  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);\r\n  p.branches = br.branches;\r\n  const current = s.agents.model;\r\n  const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];\r\n  const models = runner.models;\r\n  const known = models.some(([m]) => m === current);\r\n  pane.innerHTML = projectBox(p) + `\r\n    <div class="box"><h3>Agents</h3>\r\n      <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer\'s tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>\r\n      <form class="inline" id="sf">\r\n        <label>Runs on<select name="runner">${s.agents.runners.map((r) => `<option value="${r.id}" ${r.id === runner.id ? "selected" : ""}>${esc(r.label)}</option>`).join("")}</select></label>\r\n        <label>Model<select name="pick">${models.map(([m, label]) => `<option value="${esc(m)}" ${m === current ? "selected" : ""}>${esc(label)}</option>`).join("")}<option value="custom" ${known ? "" : "selected"}>Other\u2026</option></select></label>\r\n        <label id="customwrap" style="${known ? "display:none" : ""}">Model name<input name="custom" value="${known ? "" : esc(current)}" placeholder="${runner.id === "claude" ? "claude-sonnet-5-5" : "a name codex --model accepts"}"></label>\r\n        <button class="btn" type="submit">Save</button>\r\n        <button class="btn secondary" type="button" id="stest" title="Sends one tiny prompt with this model to check your plan can run it">Test on my plan</button>\r\n        ${s.agents.source === "machine" || s.agents.runnerSource === "machine" ? `<button class="btn secondary" type="button" id="sreset">Use team default</button>` : ""}\r\n      </form>\r\n      <p style="margin-bottom:0">In use: <strong>${esc(runner.label)}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.runnerSource]}</span> \xB7 <strong class="mono">${esc(current || "its default model")}</strong> <span class="muted">\xB7 ${SOURCE_LABEL[s.agents.source]}</span></p>\r\n      <p id="sout" style="margin-bottom:0"></p>\r\n    </div>`;\r\n  bindProject();\r\n  const form = document.getElementById("sf");\r\n  const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);\r\n  form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });\r\n  // The model list belongs to the runner, so a new runner is saved at once and the box redrawn.\r\n  form.runner.addEventListener("change", async () => {\r\n    const res = await post("/api/settings", { runner: form.runner.value });\r\n    if (res.error) return alert(res.error);\r\n    renderSettings();\r\n  });\r\n  const out = document.getElementById("sout");\r\n  form.addEventListener("submit", async (e) => {\r\n    e.preventDefault();\r\n    const res = await post("/api/settings", { model: chosen() });\r\n    if (res.error) return alert(res.error);\r\n    renderSettings();\r\n  });\r\n  document.getElementById("stest").addEventListener("click", async (e) => {\r\n    e.target.disabled = true; out.innerHTML = `<span class="muted">Asking ${esc(chosen() || runner.label)}\u2026</span>`;\r\n    const r = await post("/api/settings/test", { model: chosen() });\r\n    e.target.disabled = false;\r\n    out.innerHTML = r.ok\r\n      ? `<span class="pill passed">works</span> <span class="mono">${esc(r.model)}</span> answered on your plan.`\r\n      : `<span class="pill failed">not usable</span> <span class="mono">${esc(r.model)}</span>: ${esc(r.message)}`;\r\n  });\r\n  const reset = document.getElementById("sreset");\r\n  if (reset) reset.addEventListener("click", async () => { await post("/api/settings", { runner: "", model: "" }); renderSettings(); });\r\n}\r\n\r\nasync function renderDoctor(el) {\r\n  el.innerHTML = `<div class="empty">Checking the machine\u2026</div>`;\r\n  const checks = await api("/api/doctor");\r\n  el.innerHTML = `<h2>System checks</h2><table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody>\r\n    ${checks.map((c) => `<tr><td><strong>${esc(c.label)}</strong></td><td><span class="pill ${c.status}">${c.status}</span></td><td>${esc(c.detail)}${c.fix ? `<br><span class="muted">\u2192 ${esc(c.fix)}</span>` : ""}</td></tr>`).join("")}\r\n  </tbody></table>`;\r\n}\r\n\r\nconst STATUS_ICON = { ok: "\u2713", warn: "!", fail: "\u2715" };\r\nconst INIT_PILL = { done: ["ok", "\u2713"], todo: ["none", "\xB7"], waiting: ["warn", "\u2026"], warn: ["warn", "!"] };\r\nconst INIT_RUNNABLE = new Set(["config", "kit", "scan", "manifests", "cards", "agentfile"]);\r\n\r\n/**\r\n * Which features and platform areas get a manifest, side by side. Before any choice everything is\r\n * ticked; after one, only what was chosen, and areas the scan found since are marked new. One with\r\n * a written manifest stays chosen.\r\n */\r\nfunction areaPicker(k) {\r\n  const first = !k.chosen;\r\n  const box = (a) => `<label style="font-size:13px" title="${a.modules} modules \xB7 ${a.testable} testable classes \xB7 ${a.testFiles} test files"><input type="checkbox" data-feat="${esc(a.id)}" data-kind="${a.kind}" ${a.manifest ? "checked disabled" : a.chosen || first ? "checked" : ""}> ${esc(a.id)}${a.undecided && !first ? ` <span class="pill warn" style="font-size:10px">new</span>` : ""}</label>`;\r\n  const group = (kind, label, hint) => {\r\n    const list = k.proposed.filter((a) => a.kind === kind);\r\n    return list.length ? `<div class="k" style="margin-top:10px">${label} (${list.length})${hint ? ` <span class="muted" style="font-weight:400">\xB7 ${hint}</span>` : ""}</div>\r\n      <div class="row" style="flex-wrap:wrap;gap:4px 14px;margin:6px 0">${list.map(box).join("")}</div>` : "";\r\n  };\r\n  return `${group("feature", "Features to give a manifest", "")}\r\n    ${group("platform", "Platform areas to give a manifest", "shared code (core, common, the app module); its rules are proven by unit tests, and an edit in it marks the areas using it stale")}\r\n    <div class="row"><button class="btn" id="initchoose">Use the ticked ones</button>${k.proposed.some((a) => a.kind === "platform") ? `<button class="btn secondary" id="initplatform">Tick all platform areas</button>` : ""}<button class="btn secondary" id="initnone">Untick all</button></div>`;\r\n}\r\n\r\n/** `probe init` as a checklist: each step, the features to choose, and the drafts to review. */\r\nasync function renderInit(el) {\r\n  const k = await api("/api/init");\r\n  const open = k.steps.filter((s) => s.status === "todo" || s.status === "waiting");\r\n  const features = k.steps.find((s) => s.id === "features");\r\n  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><h3 style="margin:0">${open.length ? `Feature knowledge: ${open.length} step${open.length === 1 ? "" : "s"} left` : "Feature knowledge: set up"}</h3><div style="flex:1"></div>\r\n      ${open.some((s) => s.status === "todo") ? `<button class="btn" id="initrun" ${k.running ? "disabled" : ""}>${k.running ? "Running\u2026" : "\u25B6 Run the next steps"}</button>` : ""}</div>\r\n    <p class="muted" style="margin:6px 0 0">The same steps as <code class="mono">probe init</code>. Each reads where the project stands, so running it again carries on and never redoes finished work. Manifests, card links and the agent file arrive below as drafts: nothing lands until you apply it, and nothing is committed.</p>\r\n    <ul class="setup">${k.steps.map((s) => `<li><span class="pill ${INIT_PILL[s.status][0]}">${INIT_PILL[s.status][1]}</span>\r\n      <div class="what"><strong>${esc(s.label)}</strong><div class="muted">${esc(s.detail)}</div></div>\r\n      ${s.status === "todo" && INIT_RUNNABLE.has(s.id) && !k.running ? `<button class="btn secondary" data-initstep="${s.id}">Run</button>` : ""}</li>`).join("")}</ul>\r\n    ${features.status === "waiting" && k.proposed.length ? areaPicker(k) : ""}\r\n  </div>\r\n  <div id="initpanel"></div>\r\n  ${k.drafts.map((d) => `<div class="box stale"><h3>${d.step === "agentfile" ? "Agent file" : d.step === "cards" ? `Cards for ${esc(d.feature)}` : `Manifest for ${esc(d.feature)}`} <span class="muted" style="font-weight:400">\xB7 drafted ${ago(d.createdAt)}</span></h3>\r\n      <p style="margin:4px 0 8px;white-space:pre-wrap">${esc(d.summary)}</p>\r\n      ${d.diffs.map((x) => `<div class="mono muted">${esc(x.path)}${x.conflict ? ` <span class="pill fail">changed since the draft was made</span>` : ""}</div>${diffHtml(x.diff)}`).join("")}\r\n      <div class="row"><button class="btn" data-iapprove="${esc(d.id)}" ${d.diffs.some((x) => x.conflict) ? "disabled" : ""}>Apply</button><button class="btn secondary" data-ireject="${esc(d.id)}">Reject</button></div></div>`).join("")}`;\r\n\r\n  const start = async (body) => {\r\n    const res = await post("/api/init/run", body);\r\n    if (res.error) return alert(res.error);\r\n    el.querySelectorAll("#initrun,[data-initstep]").forEach((b) => (b.disabled = true));\r\n    followRun(res.runId, document.getElementById("initpanel"), () => renderInit(el));\r\n  };\r\n  el.querySelector("#initrun")?.addEventListener("click", () => start({}));\r\n  el.querySelectorAll("[data-initstep]").forEach((b) => b.addEventListener("click", () => start({ step: b.dataset.initstep })));\r\n  el.querySelector("#initnone")?.addEventListener("click", () => el.querySelectorAll("[data-feat]:not(:disabled)").forEach((c) => (c.checked = false)));\r\n  el.querySelector("#initplatform")?.addEventListener("click", () => el.querySelectorAll(\'[data-feat][data-kind="platform"]\').forEach((c) => (c.checked = true)));\r\n  el.querySelector("#initchoose")?.addEventListener("click", async () => {\r\n    const chosen = [...el.querySelectorAll("[data-feat]")].filter((c) => c.checked).map((c) => c.dataset.feat);\r\n    if (!chosen.length) return alert("Tick at least one feature or platform area.");\r\n    const res = await post("/api/init/features", { features: chosen });\r\n    if (res.error) return alert(res.error);\r\n    renderInit(el);\r\n  });\r\n  el.querySelectorAll("[data-iapprove],[data-ireject]").forEach((b) => b.addEventListener("click", async () => {\r\n    const approve = !!b.dataset.iapprove;\r\n    const id = b.dataset.iapprove || b.dataset.ireject;\r\n    if (approve && !confirm("Write this draft into the project? Nothing is committed.")) return;\r\n    b.disabled = true;\r\n    const res = await post(`/api/drafts/${encodeURIComponent(id)}/${approve ? "approve" : "reject"}`, {});\r\n    if (!res.ok) alert(res.error);\r\n    renderInit(el);\r\n  }));\r\n  if (k.running) followRun(k.running, document.getElementById("initpanel"), () => renderInit(el));\r\n}\r\n\r\nasync function renderSetup() {\r\n  $view.innerHTML = `<div class="empty">Checking this project\u2026</div>`;\r\n  const items = await api("/api/setup");\r\n  const left = items.filter((i) => i.status !== "ok").length;\r\n  $view.innerHTML = `<div id="initwrap"></div><div class="box"><h3>${left ? `Device testing: ${left} thing${left === 1 ? "" : "s"} left to set up` : "Device testing: ready"}</h3>\r\n    <p class="muted" style="margin-top:0">Probe finds what it can on its own; anything it guessed is marked and can be changed in Settings. Nothing here needs a file edited by hand.</p>\r\n    <ul class="setup">${items.map((i) => `<li><span class="pill ${i.status}">${STATUS_ICON[i.status]}</span>\r\n      <div class="what"><strong>${esc(i.label)}</strong><div class="muted">${esc(i.detail)}</div></div>\r\n      ${i.action && i.status !== "ok" ? `<button class="btn secondary" data-go="${i.action.tab}">${esc(i.action.label)}</button>` : ""}</li>`).join("")}</ul></div>`;\r\n  $view.insertAdjacentHTML("beforeend", `<div id="docwrap"></div>`);\r\n  $view.querySelectorAll("button[data-go]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.go; render(); }));\r\n  renderDoctor(document.getElementById("docwrap"));\r\n  renderInit(document.getElementById("initwrap"));\r\n}\r\n\r\n// Links inside the page (#setup, #runs/<id>) go where they say; saveRoute\'s replaceState does not fire this.\r\nwindow.addEventListener("hashchange", () => { if (loadRoute()) render(); });\r\ndocument.addEventListener("keydown", (e) => {\r\n  if (e.key === "Escape" && state.tab === "runs" && runsState().selected && !e.target.closest?.("input, textarea, select")) closeRun();\r\n});\r\n\r\n(async () => {\r\n  await Promise.all([checkBranch(), refreshJobs()]);\r\n  // Back where the page was; else on work still going; else a project that cannot be tested\r\n  // yet opens on what is missing.\r\n  if (loadRoute()) return render();\r\n  const latest = state.jobs[state.jobs.length - 1];\r\n  if (latest) {\r\n    goTo(routeOf(latest));\r\n    state.followId = latest.runId;\r\n    return render();\r\n  }\r\n  const [items, init] = await Promise.all([api("/api/setup").catch(() => []), api("/api/init").catch(() => null)]);\r\n  const knowledgeOpen = init && init.steps.some((s) => ["features", "manifests"].includes(s.id) && s.status !== "done");\r\n  if (items.some((i) => i.status === "fail") || knowledgeOpen) state.tab = "setup";\r\n  render();\r\n})();\r\n</script>\r\n</body>\r\n</html>\r\n';
 
 // src/engine/watcher.ts
 var import_node_fs34 = require("node:fs");
@@ -51644,8 +51913,8 @@ function isFile(path) {
   }
 }
 function headOf(project) {
-  const git2 = gitState(project.root);
-  return git2 ? `${git2.branch}@${git2.commit}` : "";
+  const git3 = gitState(project.root);
+  return git3 ? `${git3.branch}@${git3.commit}` : "";
 }
 
 // src/studio/jobs.ts
@@ -51661,6 +51930,8 @@ var jobKeys = {
   security: (feature) => `security:${feature || "*"}`,
   init: () => "init",
   check: () => "check",
+  /** One workbench run at a time: its agents edit the same working tree. */
+  work: () => "work",
   verify(o) {
     if (o.outdated) return `verify:outdated${o.features?.length ? `:${[...o.features].sort().join(",")}` : ""}`;
     if (o.ticket) return `verify:ticket:${o.ticket}`;
@@ -51671,7 +51942,7 @@ var jobKeys = {
 var keys = /* @__PURE__ */ new Map();
 function derivedKey(run) {
   if (run.kind === "card") return jobKeys.card(run.feature, run.cardId);
-  if (run.kind === "init" || run.kind === "check") return run.kind;
+  if (run.kind === "init" || run.kind === "check" || run.kind === "work") return run.kind;
   return `${run.kind}:${run.feature}`;
 }
 function runningJobs() {
@@ -51797,12 +52068,12 @@ function setupChecklist(project) {
     detail: cards.length ? `${cards.length} cards, ${cards.filter((c) => c.status === "approved").length} approved${cards.some((c) => c.status === "approved") ? "" : ". Verify runs approved cards only: review drafts in Cards."}` : "None yet. Open a feature in Atlas and press Generate cards.",
     action: { label: cards.length ? "Review cards" : "Atlas", tab: cards.length ? "cards" : "atlas" }
   });
-  const git2 = gitState(project.root);
+  const git3 = gitState(project.root);
   items.push({
     id: "git",
     label: "Branch",
-    status: !git2 ? "warn" : git2.branch ? "ok" : "warn",
-    detail: !git2 ? "Not a git repository: verify and tickets need git." : git2.branch ? `${git2.branch} @ ${git2.commit}` : `detached HEAD @ ${git2.commit}`
+    status: !git3 ? "warn" : git3.branch ? "ok" : "warn",
+    detail: !git3 ? "Not a git repository: verify and tickets need git." : git3.branch ? `${git3.branch} @ ${git3.commit}` : `detached HEAD @ ${git3.commit}`
   });
   return items;
 }
@@ -51831,21 +52102,21 @@ function appAndDevice(project) {
 }
 function branchMismatch(project, expected) {
   if (expected === void 0) return null;
-  const git2 = gitState(project.root);
-  const now = git2 ? git2.branch ?? `detached@${git2.commit}` : "";
+  const git3 = gitState(project.root);
+  const now = git3 ? git3.branch ?? `detached@${git3.commit}` : "";
   return now === expected ? null : `The project is now on ${now || "no branch"}, not ${expected}. Check the branch, then press again.`;
 }
 function branchInfo(project, withBranches = false) {
-  const git2 = gitState(project.root);
-  if (!git2) return { git: null, branches: [], base: null, warnings: ["Not a git repository."] };
+  const git3 = gitState(project.root);
+  if (!git3) return { git: null, branches: [], base: null, warnings: ["Not a git repository."] };
   const base = defaultBase(project.root, project.config.verify.base);
   const warnings = [];
-  if (!git2.branch) warnings.push(`Detached HEAD at ${git2.commit}: runs test that commit, and results belong to no branch.`);
+  if (!git3.branch) warnings.push(`Detached HEAD at ${git3.commit}: runs test that commit, and results belong to no branch.`);
   const baseName = base?.replace(/^origin\//, "");
-  if (git2.branch && baseName && git2.branch === baseName) warnings.push(`You are on ${git2.branch}, the base branch itself: verify finds only uncommitted work. Check out your feature branch first.`);
-  if (git2.behind) warnings.push(`${git2.branch} is ${git2.behind} commit(s) behind ${git2.upstream}: you are testing older code than the team has.`);
-  if (git2.dirty) warnings.push(`${git2.dirty} uncommitted file(s) are part of what runs test.`);
-  return { git: git2, id: git2.branch ?? `detached@${git2.commit}`, branches: withBranches ? pickableBranches(project.root, [base, project.config.verify.base, git2.branch]) : [], base, warnings };
+  if (git3.branch && baseName && git3.branch === baseName) warnings.push(`You are on ${git3.branch}, the base branch itself: verify finds only uncommitted work. Check out your feature branch first.`);
+  if (git3.behind) warnings.push(`${git3.branch} is ${git3.behind} commit(s) behind ${git3.upstream}: you are testing older code than the team has.`);
+  if (git3.dirty) warnings.push(`${git3.dirty} uncommitted file(s) are part of what runs test.`);
+  return { git: git3, id: git3.branch ?? `detached@${git3.commit}`, branches: withBranches ? pickableBranches(project.root, [base, project.config.verify.base, git3.branch]) : [], base, warnings };
 }
 var branchCache = null;
 function pickableBranches(root, keep) {
@@ -51872,15 +52143,21 @@ function trackerMissing(config2, hasToken) {
   if (!hasToken) return `No ${TRACKER_LABEL[config2.tracker]} API token on this machine.`;
   return null;
 }
-function openTracker(project, fetcher = fetch) {
-  const config2 = project.config.tickets;
-  const token = config2.tracker ? new Secrets(project.store.dir).getKey(tokenKey(config2.tracker)) : null;
-  const missing = trackerMissing(config2, token !== null);
-  if (missing) throw new Error(`${missing} Connect it in Studio \u2192 Settings \u2192 Ticket tracker.`);
-  return config2.tracker === "jira" ? new Jira(config2, token, fetcher) : new Linear(config2, token, fetcher);
+function openTracker(project, fetcher = fetch, source) {
+  const all = trackerConnections(project);
+  const conn = source ? all.find((c) => c.id === source) : all[0];
+  if (!conn) throw new Error(source ? `This project has no tracker connection ${source}.` : "No ticket tracker chosen. Connect it in Studio \u2192 Settings \u2192 Connections.");
+  return openTrackerFor(project, conn, fetcher);
 }
-function buildInText(text2) {
-  return /\bbuild(?:\s+(?:number|no\.?|version))?\s*[:#=]?\s*v?(\d[\w.+-]{0,30})/i.exec(text2)?.[1]?.replace(/[.,;]+$/, "");
+function openTrackerFor(project, conn, fetcher = fetch) {
+  const token = connectionToken(project, conn);
+  const missing = connectionMissing(conn, token !== null);
+  if (missing) throw new Error(`${connectionLabel(conn)}: ${missing} Connect it in Studio \u2192 Settings \u2192 Connections.`);
+  const config2 = { pattern: project.config.tickets.pattern, tracker: conn.kind, site: conn.site, filter: conn.filter, team: conn.team, buildField: conn.buildField, email: conn.email };
+  return conn.kind === "jira" ? new Jira(config2, token, fetcher) : new Linear(config2, token, fetcher);
+}
+function buildInText(text3) {
+  return /\bbuild(?:\s+(?:number|no\.?|version))?\s*[:#=]?\s*v?(\d[\w.+-]{0,30})/i.exec(text3)?.[1]?.replace(/[.,;]+$/, "");
 }
 async function readJson(res, what) {
   const body = await res.text();
@@ -51932,7 +52209,7 @@ var Jira = class {
     if (/^customfield_\d+$/.test(wanted)) return this.buildFieldId = wanted;
     const fields = await readJson(await this.call("/rest/api/2/field"), "Jira");
     const found3 = fields.find((f) => f.name.toLowerCase() === wanted.toLowerCase() || f.id === wanted);
-    if (!found3) throw new Error(`Jira has no field named "${wanted}". Fix the build field in Studio \u2192 Settings \u2192 Ticket tracker.`);
+    if (!found3) throw new Error(`Jira has no field named "${wanted}". Fix the build field in Studio \u2192 Settings \u2192 Connections.`);
     return this.buildFieldId = found3.id;
   }
   async fields() {
@@ -51971,8 +52248,8 @@ var Jira = class {
   async comment(id, body) {
     await readJson(await this.call(`/rest/api/2/issue/${encodeURIComponent(id)}/comment`, { method: "POST", body: { body } }), "Jira");
   }
-  bold(text2) {
-    return `*${text2}*`;
+  bold(text3) {
+    return `*${text3}*`;
   }
 };
 function fieldText(value) {
@@ -52058,8 +52335,8 @@ var Linear = class {
     );
     if (!data.commentCreate.success) throw new Error(`Linear did not accept the comment on ${id}.`);
   }
-  bold(text2) {
-    return `**${text2}**`;
+  bold(text3) {
+    return `**${text3}**`;
   }
 };
 
@@ -52070,14 +52347,35 @@ async function inbox(project, options = {}) {
   const key = project.root.toLowerCase();
   const hit = cache.get(key);
   if (hit && !options.refresh && Date.now() - hit.at < CACHE_MS) return hit.tickets;
-  const tracker = openTracker(project, options.fetcher);
+  const conns = trackerConnections(project);
+  if (!conns.length) openTracker(project, options.fetcher);
   const runs = ticketRuns(project);
-  const tickets = (await tracker.list()).map((t) => enrich(project, t, runs));
+  const errors = [];
+  const lists = await Promise.all(
+    conns.map(async (conn) => {
+      try {
+        const tracker = openTrackerFor(project, conn, options.fetcher);
+        return (await tracker.list()).map((t) => ({ ...t, source: conn.id, sourceLabel: connectionLabel(conn) }));
+      } catch (e) {
+        errors.push(e.message);
+        return [];
+      }
+    })
+  );
+  if (errors.length && errors.length === conns.length) throw new Error(errors.join(" "));
+  const tickets = lists.flat().map((t) => enrich(project, t, runs));
   cache.set(key, { at: Date.now(), tickets });
+  inboxErrors.set(key, errors);
   return tickets;
 }
-async function inboxTicket(project, id, fetcher) {
-  return enrich(project, await openTracker(project, fetcher).get(id), ticketRuns(project));
+var inboxErrors = /* @__PURE__ */ new Map();
+function inboxWarnings(project) {
+  return inboxErrors.get(project.root.toLowerCase()) ?? [];
+}
+async function inboxTicket(project, id, fetcher, source) {
+  const conn = source ? trackerConnections(project).find((c) => c.id === source) : trackerConnections(project)[0];
+  const ticket = await openTracker(project, fetcher, source).get(id);
+  return enrich(project, { ...ticket, source: conn?.id, sourceLabel: conn ? connectionLabel(conn) : void 0 }, ticketRuns(project));
 }
 function clearInbox(project) {
   cache.delete(project.root.toLowerCase());
@@ -52100,10 +52398,10 @@ function buildTags(pattern, build2) {
   return [...new Set(names)];
 }
 function buildState(project, build2, commits) {
-  const git2 = (...args) => (0, import_node_child_process11.spawnSync)("git", args, { cwd: project.root, encoding: "utf8", windowsHide: true, timeout: 15e3 });
-  const tag = buildTags(project.config.builds.tag, build2).find((t) => /^[\w./+-]+$/.test(t) && git2("rev-parse", "--verify", "--quiet", `refs/tags/${t}`).status === 0);
+  const git3 = (...args) => (0, import_node_child_process11.spawnSync)("git", args, { cwd: project.root, encoding: "utf8", windowsHide: true, timeout: 15e3 });
+  const tag = buildTags(project.config.builds.tag, build2).find((t) => /^[\w./+-]+$/.test(t) && git3("rev-parse", "--verify", "--quiet", `refs/tags/${t}`).status === 0);
   if (!tag || commits.length === 0) return { state: "unknown", tag };
-  const all = commits.every((hash3) => git2("merge-base", "--is-ancestor", hash3, `refs/tags/${tag}`).status === 0);
+  const all = commits.every((hash3) => git3("merge-base", "--is-ancestor", hash3, `refs/tags/${tag}`).status === 0);
   return { state: all ? "included" : "missing", tag };
 }
 function testedLine(project, run) {
@@ -52134,8 +52432,8 @@ function resultComment(project, tracker, run) {
   lines.push("", `Probe run ${run.id}. Screenshots and video are on the tester's machine.`);
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
-async function postResult(project, ticketId, run, fetcher) {
-  const tracker = openTracker(project, fetcher);
+async function postResult(project, ticketId, run, fetcher, source) {
+  const tracker = openTracker(project, fetcher, source);
   const body = resultComment(project, tracker, run);
   await tracker.comment(ticketId, body);
   return body;
@@ -52266,6 +52564,565 @@ function testOptions(project) {
   return out;
 }
 
+// src/connections/slack.ts
+var TIMEOUT_MS2 = 2e4;
+var Slack = class {
+  constructor(token, fetcher = fetch) {
+    this.token = token;
+    this.fetcher = fetcher;
+  }
+  token;
+  fetcher;
+  teamUrl = null;
+  users = /* @__PURE__ */ new Map();
+  async call(method, params = {}, post2 = false) {
+    const query = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]));
+    const res = await this.fetcher(post2 ? `https://slack.com/api/${method}` : `https://slack.com/api/${method}?${query}`, {
+      method: post2 ? "POST" : "GET",
+      headers: { authorization: `Bearer ${this.token}`, ...post2 ? { "content-type": "application/json; charset=utf-8" } : {} },
+      body: post2 ? JSON.stringify(params) : void 0,
+      signal: AbortSignal.timeout(TIMEOUT_MS2)
+    });
+    if (!res.ok) throw new Error(`Slack answered ${res.status}.`);
+    const body = await res.json();
+    if (!body.ok) throw new Error(`Slack: ${slackError(body.error, body.needed)}`);
+    return body;
+  }
+  /** Who the token belongs to, and the workspace. */
+  async me() {
+    const who = await this.call("auth.test");
+    this.teamUrl = who.url ?? null;
+    return { user: who.user ?? "connected", team: who.team ?? "", url: who.url ?? "" };
+  }
+  /** Channels the token can see, to choose from. */
+  async channels() {
+    const out = [];
+    let cursor = "";
+    for (let page = 0; page < 10; page++) {
+      const body = await this.call(
+        "conversations.list",
+        { types: "public_channel,private_channel", exclude_archived: "true", limit: 200, ...cursor ? { cursor } : {} }
+      );
+      out.push(...body.channels.map((c) => ({ id: c.id, name: c.name, isPrivate: !!c.is_private, isMember: !!c.is_member })));
+      cursor = body.response_metadata?.next_cursor ?? "";
+      if (!cursor) break;
+    }
+    return out.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  /** Messages of a channel since `oldest` (seconds), newest first, at most `max`. */
+  async history(channel, oldest, max = 1e3) {
+    const out = [];
+    let cursor = "";
+    while (out.length < max) {
+      const body = await this.call(
+        "conversations.history",
+        { channel, oldest, limit: 200, ...cursor ? { cursor } : {} }
+      );
+      out.push(...body.messages);
+      cursor = body.response_metadata?.next_cursor ?? "";
+      if (!body.has_more || !cursor) break;
+    }
+    return out.slice(0, max);
+  }
+  async userName(id) {
+    if (!id) return "someone";
+    const known = this.users.get(id);
+    if (known) return known;
+    try {
+      const body = await this.call("users.info", { user: id });
+      const name = body.user.profile?.display_name || body.user.real_name || body.user.name || id;
+      this.users.set(id, name);
+      return name;
+    } catch {
+      return id;
+    }
+  }
+  link(channel, ts) {
+    const base = (this.teamUrl ?? "https://slack.com/").replace(/\/?$/, "/");
+    return `${base}archives/${channel}/p${ts.replace(".", "")}`;
+  }
+  async post(channel, text3) {
+    await this.call("chat.postMessage", { channel, text: text3 }, true);
+  }
+};
+function slackError(code, needed) {
+  switch (code) {
+    case "invalid_auth":
+    case "not_authed":
+    case "token_revoked":
+    case "token_expired":
+      return "the token is not accepted (expired or revoked). Paste a new one.";
+    case "not_in_channel":
+      return "the bot is not in that channel. In Slack, type /invite @your-bot in the channel.";
+    case "channel_not_found":
+      return "channel not found, or the token cannot see it.";
+    case "missing_scope":
+      return `the token is missing a permission${needed ? ` (${needed})` : ""}. Add it to the Slack app and reinstall it.`;
+    case "ratelimited":
+      return "too many requests; try again in a minute.";
+    default:
+      return code ?? "unknown error";
+  }
+}
+function mentionsTicket(text3, key, title) {
+  const k = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (new RegExp(`(^|[^A-Za-z0-9])${k}(?![0-9])`, "i").test(text3)) return true;
+  const t = title?.trim().toLowerCase();
+  return !!t && t.length >= 16 && text3.toLowerCase().includes(t);
+}
+function channelApplies(channel, labels) {
+  if (!channel.search) return false;
+  if (!channel.labels.length) return true;
+  const have = new Set(labels.map((l) => l.toLowerCase()));
+  return channel.labels.some((l) => have.has(l.toLowerCase()));
+}
+function openSlack(project, conn, fetcher) {
+  const token = connectionToken(project, conn);
+  if (!token) throw new Error(`${connectionLabel(conn)}: no token on this machine for this project.`);
+  return new Slack(token, fetcher);
+}
+var HISTORY_MS = 5 * 6e4;
+var historyCache = /* @__PURE__ */ new Map();
+async function ticketDiscussion(project, ticket, fetcher) {
+  const matches = [];
+  const errors = [];
+  const searched = [];
+  for (const conn of slackConnections(project)) {
+    const hasToken = connectionToken(project, conn) !== null;
+    const missing = connectionMissing(conn, hasToken);
+    if (missing) {
+      errors.push(`${connectionLabel(conn)}: ${missing}`);
+      continue;
+    }
+    const slack = openSlack(project, conn, fetcher);
+    try {
+      await slack.me();
+    } catch (e) {
+      errors.push(`${connectionLabel(conn)}: ${e.message}`);
+      continue;
+    }
+    const oldest = Math.floor(Date.now() / 1e3) - (conn.days ?? 30) * 86400;
+    for (const channel of (conn.channels ?? []).filter((c) => channelApplies(c, ticket.labels ?? []))) {
+      searched.push(`#${channel.name}`);
+      try {
+        const key = `${project.store.dir}|${conn.id}|${channel.id}|${oldest - oldest % 3600}`;
+        let hit = historyCache.get(key);
+        if (!hit || Date.now() - hit.at > HISTORY_MS) {
+          hit = { at: Date.now(), messages: await slack.history(channel.id, oldest) };
+          historyCache.set(key, hit);
+        }
+        for (const m of hit.messages) {
+          if (!m.text || !mentionsTicket(m.text, ticket.id, ticket.title)) continue;
+          matches.push({
+            connection: conn.id,
+            connectionLabel: connectionLabel(conn),
+            channel: channel.id,
+            channelName: channel.name,
+            ts: m.ts,
+            user: await slack.userName(m.user ?? ""),
+            text: m.text.slice(0, 1200),
+            at: new Date(Number(m.ts) * 1e3).toISOString(),
+            link: slack.link(channel.id, m.ts),
+            replies: m.reply_count ?? 0
+          });
+        }
+      } catch (e) {
+        errors.push(`#${channel.name}: ${e.message}`);
+      }
+    }
+  }
+  matches.sort((a, b) => b.ts.localeCompare(a.ts));
+  return { matches, errors, searched };
+}
+function discussionText(matches, max = 20) {
+  if (!matches.length) return "";
+  return matches.slice(0, max).map((m) => `[#${m.channelName} \xB7 ${m.user} \xB7 ${m.at.slice(0, 16).replace("T", " ")}${m.replies ? ` \xB7 ${m.replies} replies` : ""}]
+${m.text}`).join("\n\n");
+}
+
+// src/tickets/workbench.ts
+var import_node_child_process12 = require("node:child_process");
+var STEP_LABEL = {
+  context: "Read ticket and Slack",
+  fix: "Write the change",
+  unitwrite: "Write unit tests",
+  unit: "Run unit tests",
+  ui: "Test the UI",
+  validate: "Check against the ticket",
+  commit: "Commit",
+  comment: "Comment on the ticket"
+};
+function commitType(ticket) {
+  const words = `${(ticket.labels ?? []).join(" ")} ${ticket.title}`.toLowerCase();
+  if (/\b(bug|fix|crash|broken|error|regression|defect)\b/.test(words)) return "fix";
+  if (/\b(test|tests|coverage)\b/.test(words)) return "test";
+  if (/\b(docs?|documentation|readme)\b/.test(words)) return "docs";
+  if (/\b(chore|refactor|cleanup|upgrade|bump)\b/.test(words)) return "chore";
+  return "feat";
+}
+function commitMessage(pattern, ticket, area) {
+  const title = ticket.title.trim().replace(/\s+/g, " ").replace(/[.\s]+$/, "");
+  let out = pattern.replace(/\{key\}/g, ticket.key).replace(/\{title\}/g, title).replace(/\{type\}/g, commitType(ticket)).replace(/\{area\}/g, area ?? "");
+  out = out.replace(/\(\s*\)/g, "").replace(/\[\s*\]/g, "").replace(/ {2,}/g, " ").trim();
+  return out;
+}
+function ticketGroup(ticket, rules, me) {
+  if (rules.hidden.includes(`${ticket.source ?? ""}/${ticket.id}`)) return { group: "hidden", why: "you hid it" };
+  const labels = new Set(ticket.labels.map((l) => l.toLowerCase()));
+  const label = rules.notForMe.labels.find((l) => labels.has(l.toLowerCase()));
+  if (label) return { group: "notForMe", why: `label ${label}` };
+  const status = rules.notForMe.statuses.find((s) => s.toLowerCase() === ticket.status.toLowerCase());
+  if (status) return { group: "notForMe", why: `status ${status}` };
+  if (rules.notForMe.otherAssignee && ticket.assignee && me.length && !me.some((m) => m.toLowerCase() === ticket.assignee.toLowerCase()))
+    return { group: "notForMe", why: `assigned to ${ticket.assignee}` };
+  return { group: "mine" };
+}
+function orderSteps(steps) {
+  return WORK_STEPS.filter((s) => steps.includes(s));
+}
+function changedSince(before, after) {
+  const files = [];
+  const conflicts = [];
+  for (const [file2, st] of after) {
+    if (!before.has(file2)) files.push(file2);
+    else if (before.get(file2) !== st) conflicts.push(file2);
+  }
+  return { files: files.sort(), conflicts: conflicts.sort() };
+}
+function git2(root, args) {
+  return (0, import_node_child_process12.spawnSync)("git", args, { cwd: root, encoding: "utf8", windowsHide: true, timeout: 6e4 });
+}
+function ticketPrompt(t, discussion, task, files) {
+  const head = [
+    `You are working on ticket ${t.id}${t.sourceLabel ? ` from ${t.sourceLabel}` : ""}: ${t.title}`,
+    "",
+    "Ticket text:",
+    t.description.trim() || "(no description)",
+    t.labels.length ? `
+Labels: ${t.labels.join(", ")}` : "",
+    discussion ? `
+What the team said about it in Slack (newest first):
+${discussion}` : ""
+  ];
+  if (task === "fix")
+    return [
+      ...head,
+      "",
+      "Make the change this ticket asks for in this project's code. Read the code first (probe_feature helps find a feature's files).",
+      "Keep the change focused on this ticket. Do not commit, do not run commands. Edit files only.",
+      "When done, answer with a short summary of what you changed and anything still open."
+    ].join("\n");
+  return [
+    ...head,
+    "",
+    `The change for this ticket touched: ${files.join(", ") || "(no files yet)"}.`,
+    "Write or extend unit tests that prove the ticket's behaviour, next to the project's existing tests and in their style.",
+    "Only add or edit test files. Do not run commands. Answer with a short list of the tests you wrote."
+  ].join("\n");
+}
+function validatePrompt(t, diff) {
+  return [
+    `Ticket ${t.id}: ${t.title}`,
+    "",
+    t.description.trim() || "(no description)",
+    "",
+    "This is the change made for it (git diff):",
+    diff.slice(0, 6e4) || "(no change)",
+    "",
+    "Judge whether the change does what the ticket asks, criterion by criterion. Do not edit anything.",
+    'End your answer with one line: "VERDICT: PASS" or "VERDICT: FAIL", then one line saying why.'
+  ].join("\n");
+}
+function startWork(project, options) {
+  const steps = orderSteps(options.steps);
+  if (!options.tickets.length) throw new Error("Choose at least one ticket.");
+  if (!steps.length) throw new Error("Choose at least one step.");
+  const pattern = options.commitPattern?.trim() || project.config.workbench.commitPattern;
+  const run = {
+    id: newRunId(),
+    kind: "work",
+    feature: "*",
+    startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    status: "running",
+    steps,
+    commitPattern: pattern,
+    costUsd: 0,
+    tickets: options.tickets.map((t) => ({
+      key: t.key,
+      source: t.source,
+      title: t.key,
+      status: "queued",
+      files: [],
+      steps: steps.map((step) => ({ step, status: "queued" }))
+    }))
+  };
+  return launchRun(project, run, async (log) => {
+    for (const ticket of run.tickets) {
+      if (runSignal.getStore()?.aborted) break;
+      log(`\u2550\u2550 ${ticket.key}`);
+      ticket.status = "running";
+      try {
+        await workOn(project, run, ticket, steps, pattern, options.model, options.account, log);
+      } catch (e) {
+        ticket.status = "error";
+        ticket.summary = e.message;
+        log(`${ticket.key}: ${e.message}`);
+      }
+      for (const s of ticket.steps) if (s.status === "queued") s.status = "skipped";
+    }
+    const bad = run.tickets.filter((t) => t.status !== "passed");
+    run.status = bad.length === 0 ? "passed" : run.tickets.some((t) => t.status === "error") ? "failed" : "blocked";
+    if (bad.length) run.error = `${bad.length} of ${run.tickets.length} ticket(s) need you: ${bad.map((t) => t.key).join(", ")}.`;
+  });
+}
+async function workOn(project, run, ticket, steps, pattern, model, account, log) {
+  const state = (step) => ticket.steps.find((s) => s.step === step);
+  const fail = (s, note, status = "failed") => {
+    s.status = status;
+    s.note = note;
+    ticket.status = "needs-you";
+    log(`\u2717 ${STEP_LABEL[s.step]}: ${note}`);
+  };
+  const t = await inboxTicket(project, ticket.key, void 0, ticket.source);
+  ticket.title = t.title;
+  const before = dirtyFiles(project.root);
+  let discussion = "";
+  let features = t.features;
+  for (const step of steps) {
+    if (runSignal.getStore()?.aborted) return;
+    if (ticket.status === "needs-you") return;
+    const s = state(step);
+    s.status = "running";
+    log(`\u2500\u2500 ${STEP_LABEL[step]}`);
+    if (step === "context") {
+      const found3 = await ticketDiscussion(project, { id: t.id, title: t.title, labels: t.labels });
+      discussion = discussionText(found3.matches);
+      s.status = "passed";
+      s.note = `${found3.matches.length} Slack message(s)${found3.searched.length ? ` in ${found3.searched.join(", ")}` : ""}${found3.errors.length ? ` \xB7 ${found3.errors.join("; ")}` : ""}`;
+      continue;
+    }
+    if (step === "fix" || step === "unitwrite") {
+      const changed = changedSince(before, dirtyFiles(project.root)).files;
+      const result = await runAgent(
+        project,
+        { prompt: ticketPrompt(t, discussion, step, changed), probeTools: ["probe_feature", "probe_cards_list"], model: model ?? void 0, allowEdits: true, role: "coding", account },
+        log
+      );
+      run.costUsd += result.costUsd;
+      if (step === "fix") ticket.summary = result.summary.slice(0, 2e3);
+      const now = changedSince(before, dirtyFiles(project.root));
+      ticket.files = now.files;
+      if (!result.ok) {
+        fail(s, `agent stopped: ${result.summary.slice(0, 200)}`);
+        return;
+      }
+      if (step === "fix" && now.files.length === 0) {
+        fail(s, `no file changed. Agent: ${result.summary.slice(0, 200)}`, "blocked");
+        return;
+      }
+      s.status = "passed";
+      s.note = `${now.files.length} file(s) changed`;
+      continue;
+    }
+    if (step === "unit" || step === "ui") {
+      const scanned = latestScan(project);
+      const own2 = featuresOfFiles(project, scanned, ticket.files).byFeature;
+      features = [.../* @__PURE__ */ new Set([...own2.keys(), ...own2.size ? [] : features])];
+      if (!features.length) {
+        s.status = "skipped";
+        s.note = "no feature owns the changed files";
+        continue;
+      }
+      if (step === "unit") {
+        for (const feature of features) {
+          const { run: unit, done } = startUnitRun(project, feature);
+          s.runId = unit.id;
+          const finished = await done;
+          if (finished.status !== "passed") {
+            fail(s, `${feature}: unit tests ${finished.status}${finished.error ? ` (${finished.error})` : ""}`);
+            return;
+          }
+        }
+        s.status = "passed";
+        s.note = `${features.join(", ")} passed`;
+      } else {
+        const { run: verify, done } = startVerify(project, { features, noUnit: true, cards: "all", model });
+        s.runId = verify.id;
+        const finished = await done;
+        run.costUsd += finished.costUsd;
+        if (finished.status !== "passed") {
+          fail(s, `UI test ${finished.status}${finished.error ? ` (${finished.error})` : ""}`);
+          return;
+        }
+        s.status = "passed";
+      }
+      continue;
+    }
+    if (step === "validate") {
+      const diff = ticket.files.length ? git2(project.root, ["diff", "--", ...ticket.files]).stdout ?? "" : "";
+      const result = await runAgent(project, { prompt: validatePrompt(t, diff), probeTools: [], role: "review" }, log);
+      run.costUsd += result.costUsd;
+      const verdict = /VERDICT:\s*(PASS|FAIL)/i.exec(result.summary)?.[1]?.toUpperCase();
+      const why = result.summary.split(/VERDICT:\s*(?:PASS|FAIL)/i)[1]?.trim().split("\n")[0] ?? "";
+      if (verdict !== "PASS") {
+        fail(s, verdict === "FAIL" ? `does not meet the ticket: ${why || result.summary.slice(-200)}` : "the check gave no verdict");
+        return;
+      }
+      s.status = "passed";
+      s.note = why.slice(0, 200);
+      continue;
+    }
+    if (step === "commit") {
+      const now = changedSince(before, dirtyFiles(project.root));
+      ticket.files = now.files;
+      if (now.conflicts.length) {
+        fail(s, `not committed: ${now.conflicts.slice(0, 5).join(", ")} had uncommitted changes before this ticket. Review and commit by hand.`, "blocked");
+        return;
+      }
+      if (!now.files.length) {
+        s.status = "skipped";
+        s.note = "nothing to commit";
+        continue;
+      }
+      const area = features.length === 1 ? features[0] : void 0;
+      const message = commitMessage(pattern, { key: t.id, title: t.title, labels: t.labels }, area);
+      const add = git2(project.root, ["add", "--", ...now.files]);
+      if (add.status !== 0) {
+        fail(s, `git add failed: ${(add.stderr || add.stdout).trim().slice(0, 300)}`);
+        return;
+      }
+      const commit = git2(project.root, ["commit", "-m", message, "--", ...now.files]);
+      if (commit.status !== 0) {
+        fail(s, `git commit failed: ${(commit.stderr || commit.stdout).trim().slice(0, 300)}`);
+        return;
+      }
+      const hash3 = git2(project.root, ["rev-parse", "--short", "HEAD"]).stdout.trim();
+      ticket.commit = { hash: hash3, message };
+      s.status = "passed";
+      s.note = `${hash3} ${message}`;
+      log(`committed ${hash3}: ${message}`);
+      continue;
+    }
+    if (step === "comment") {
+      const tracker = openTracker(project, void 0, ticket.source);
+      const lines = [
+        tracker.bold(`Probe workbench: ${ticket.key}`),
+        ...ticket.steps.filter((x) => x.step !== "comment" && x.status !== "queued").map((x) => `- ${x.status === "passed" ? "\u2713" : x.status === "skipped" ? "\u2013" : "\u2717"} ${STEP_LABEL[x.step]}${x.note ? `: ${x.note}` : ""}`),
+        ticket.commit ? `
+Committed locally as ${ticket.commit.hash} (not pushed).` : ""
+      ];
+      await tracker.comment(ticket.key, lines.join("\n").trim());
+      s.status = "passed";
+      continue;
+    }
+  }
+  ticket.status = "passed";
+}
+
+// src/studio/connections.ts
+function view(project, c) {
+  const hasToken = hasConnectionToken(project, c);
+  return {
+    id: c.id,
+    kind: c.kind,
+    kindLabel: KIND_LABEL[c.kind],
+    group: groupOf(c.kind),
+    label: connectionLabel(c),
+    customLabel: c.label ?? null,
+    site: c.site ?? null,
+    email: c.email ?? null,
+    filter: c.filter ?? null,
+    team: c.team ?? null,
+    buildField: c.buildField ?? null,
+    workspace: c.workspace ?? null,
+    days: c.days ?? 30,
+    channels: c.channels ?? [],
+    legacy: !!c.legacy,
+    hasToken,
+    missing: connectionMissing(c, hasToken)
+  };
+}
+function connectionsView(project) {
+  const ai = aiSettings(project);
+  const runner = agentRunner(project.config.agents.runner);
+  return {
+    project: { name: project.name, root: project.root },
+    connections: connections(project).map((c) => view(project, c)),
+    ai: { ...ai, runner: runner.label, runnerId: runner.id, model: project.config.agents.model, models: runner.models }
+  };
+}
+async function testConnection(project, id) {
+  const conn = findConnection(project, id);
+  if (!conn) return { ok: false, message: "No such connection in this project." };
+  try {
+    if (conn.kind === "slack") {
+      const me = await openSlack(project, conn).me();
+      return { ok: true, message: `${me.user} in ${me.team}` };
+    }
+    const who = await openTrackerFor(project, conn).me();
+    meCache.set(`${project.root}|${conn.id}`, who);
+    return { ok: true, message: who };
+  } catch (e) {
+    return { ok: false, message: e.message };
+  }
+}
+var meCache = /* @__PURE__ */ new Map();
+async function myNames(project) {
+  const names = [];
+  for (const conn of trackerConnections(project)) {
+    const key = `${project.root}|${conn.id}`;
+    let name = meCache.get(key);
+    if (!name) {
+      try {
+        name = await openTrackerFor(project, conn).me();
+        meCache.set(key, name);
+      } catch {
+        continue;
+      }
+    }
+    names.push(name);
+  }
+  return names;
+}
+function afterConnectionChange(project) {
+  clearInbox(project);
+  for (const key of [...meCache.keys()]) if (key.startsWith(`${project.root}|`)) meCache.delete(key);
+}
+function workbenchView(project) {
+  const w = project.config.workbench;
+  return {
+    ...w,
+    allSteps: WORK_STEPS.map((id) => ({ id, label: STEP_LABEL[id] })),
+    preview: commitMessage(w.commitPattern, { key: "SHOP-412", title: "Checkout button does nothing on Android 14", labels: ["bug"] }, "checkout")
+  };
+}
+var list = (v) => (Array.isArray(v) ? v : (v ?? "").split(",")).map((x) => x.trim()).filter(Boolean);
+function saveWorkbench(project, body) {
+  const pattern = body.commitPattern?.trim();
+  if (pattern !== void 0 && pattern && !/\{key\}/.test(pattern)) return "Commit message: include {key}, so each commit names its ticket.";
+  if (pattern && pattern.length > 200) return "Commit message: keep the pattern under 200 characters.";
+  const steps = body.steps?.filter((s) => WORK_STEPS.includes(s));
+  saveProject(project.root, {
+    workbench: {
+      commitPattern: pattern === void 0 ? void 0 : pattern || null,
+      notForMe: body.notForMe ? { otherAssignee: body.notForMe.otherAssignee !== false, labels: list(body.notForMe.labels), statuses: list(body.notForMe.statuses) } : void 0,
+      steps: steps === void 0 ? void 0 : steps.length ? steps : null
+    }
+  });
+  reload(project);
+  return null;
+}
+function setHidden(project, key, source, hidden) {
+  const id = `${source ?? ""}/${key}`;
+  const current3 = readLocalSettings(project.store.dir).workbench?.hidden ?? [];
+  const next = hidden ? [.../* @__PURE__ */ new Set([...current3, id])] : current3.filter((h) => h !== id);
+  saveLocal(project.store.dir, { workbench: next.length ? { hidden: next } : void 0 });
+  reload(project);
+}
+function reload(project) {
+  project.config = loadConfig(project.root, project.store.dir);
+}
+
 // src/studio/server.ts
 var running = null;
 var watchLog = [];
@@ -52311,14 +53168,14 @@ async function handle(current3, req, res) {
     res.end(page_default);
     return;
   }
-  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
+  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|connections|ai|workbench\/(settings|hide)|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : void 0) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
   if (method === "GET" && path === "/api/projects") {
-    const list = knownProjects();
+    const list2 = knownProjects();
     const here = { root: project.root, name: project.name, adapter: project.adapter.id };
-    return send(res, 200, { current: here, projects: list.some((p) => p.root.toLowerCase() === project.root.toLowerCase()) ? list : [{ ...here, scannedAt: "" }, ...list] });
+    return send(res, 200, { current: here, projects: list2.some((p) => p.root.toLowerCase() === project.root.toLowerCase()) ? list2 : [{ ...here, scannedAt: "" }, ...list2] });
   }
   if (method === "POST" && path === "/api/projects/open") {
     const body = JSON.parse(await readBody(req) || "{}");
@@ -52344,7 +53201,7 @@ async function handle(current3, req, res) {
     if (info.git.dirty) return send(res, 409, { error: `${info.git.dirty} uncommitted file(s): commit or stash them before switching.` });
     if (runningJobs().length) return send(res, 409, { error: "Runs are still going: stop them or wait before switching." });
     const local = want.replace(/^origin\//, "");
-    const out = (0, import_node_child_process12.spawnSync)("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
+    const out = (0, import_node_child_process13.spawnSync)("git", ["switch", local], { cwd: project.root, encoding: "utf8" });
     if (out.status !== 0) return send(res, 400, { error: (out.stderr || out.stdout || "git switch failed").trim() });
     scan(project);
     return send(res, 200, branchInfo(project));
@@ -52529,29 +53386,111 @@ async function handle(current3, req, res) {
       return send(res, 400, { error: e.message });
     }
   }
-  if (method === "GET" && path === "/api/inbox") {
-    const settings = trackerSettings(project);
-    if (settings.missing) return send(res, 200, { connected: false, missing: settings.missing, tracker: settings.tracker, tickets: [] });
-    try {
-      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: await inbox(project, { refresh: url2.searchParams.has("refresh") }) });
-    } catch (e) {
-      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: [], error: e.message });
+  if (method === "GET" && path === "/api/connections") return send(res, 200, connectionsView(project));
+  if (method === "POST" && path === "/api/connections") {
+    const saved = saveConnection(project, JSON.parse(await readBody(req)));
+    afterConnectionChange(project);
+    return "error" in saved ? send(res, 400, saved) : send(res, 200, { ...connectionsView(project), saved: saved.id });
+  }
+  m = /^\/api\/connections\/([\w-]+)(?:\/(test|channels|disconnect))?$/.exec(path);
+  if (m) {
+    const id = m[1];
+    if (method === "POST" && m[2] === "test") return send(res, 200, await testConnection(project, id));
+    if (method === "POST" && m[2] === "disconnect") {
+      disconnect(project, id);
+      afterConnectionChange(project);
+      return send(res, 200, connectionsView(project));
+    }
+    if (method === "GET" && m[2] === "channels") {
+      const conn = findConnection(project, id);
+      if (!conn || conn.kind !== "slack") return send(res, 404, { error: "No Slack connection with that id." });
+      try {
+        return send(res, 200, { channels: await openSlack(project, conn).channels() });
+      } catch (e) {
+        return send(res, 400, { error: e.message });
+      }
+    }
+    if (method === "DELETE" && !m[2]) {
+      removeConnection(project, id);
+      afterConnectionChange(project);
+      return send(res, 200, connectionsView(project));
     }
   }
-  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment))?$/.exec(path);
+  if (method === "POST" && path === "/api/ai/accounts") {
+    const saved = saveAiAccount(project, JSON.parse(await readBody(req)));
+    return "error" in saved ? send(res, 400, saved) : send(res, 200, connectionsView(project));
+  }
+  m = /^\/api\/ai\/accounts\/([\w-]+)(\/test)?$/.exec(path);
+  if (m && method === "DELETE") {
+    removeAiAccount(project, m[1]);
+    return send(res, 200, connectionsView(project));
+  }
+  if (m && method === "POST" && m[2]) {
+    const body = JSON.parse(await readBody(req) || "{}");
+    return send(res, 200, await checkModel(project, body.model ?? project.config.agents.model, m[1]));
+  }
+  if (method === "POST" && path === "/api/ai/use") {
+    const error62 = saveAiUse(project, JSON.parse(await readBody(req)));
+    return error62 ? send(res, 400, { error: error62 }) : send(res, 200, connectionsView(project));
+  }
+  if (method === "GET" && path === "/api/workbench/settings") return send(res, 200, workbenchView(project));
+  if (method === "POST" && path === "/api/workbench/settings") {
+    const error62 = saveWorkbench(project, JSON.parse(await readBody(req)));
+    return error62 ? send(res, 400, { error: error62 }) : send(res, 200, workbenchView(project));
+  }
+  if (method === "POST" && path === "/api/workbench/hide") {
+    const body = JSON.parse(await readBody(req));
+    if (!body.key) return send(res, 400, { error: "key is required" });
+    setHidden(project, body.key, body.source, body.hidden !== false);
+    return send(res, 200, { ok: true });
+  }
+  if (method === "POST" && path === "/api/work") {
+    const body = JSON.parse(await readBody(req));
+    try {
+      const tickets = (body.tickets ?? []).filter((t) => t && typeof t.key === "string");
+      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || void 0, account: body.account || void 0 })));
+    } catch (e) {
+      return send(res, 400, { error: e.message });
+    }
+  }
+  m = /^\/api\/work\/([\w-]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const run = liveRun(m[1])?.run ?? project.store.read(`runs/${m[1]}.json`);
+    return run ? send(res, 200, run) : send(res, 404, { error: "unknown run" });
+  }
+  if (method === "GET" && path === "/api/inbox") {
+    const conns = trackerConnections(project);
+    const sources = conns.map((c) => ({ id: c.id, missing: connectionMissing(c, hasConnectionToken(project, c)) }));
+    if (!sources.some((x) => !x.missing))
+      return send(res, 200, { connected: false, missing: conns.length ? sources.map((x) => x.missing).filter(Boolean).join(" ") : "No ticket tracker connected to this project yet.", tickets: [], sources });
+    try {
+      const tickets = await inbox(project, { refresh: url2.searchParams.has("refresh") });
+      const me = await myNames(project);
+      const rules = project.config.workbench;
+      return send(res, 200, { connected: true, sources, me, warnings: inboxWarnings(project), tickets: tickets.map((t) => ({ ...t, ...ticketGroup(t, rules, me) })) });
+    } catch (e) {
+      return send(res, 200, { connected: true, sources, tickets: [], error: e.message });
+    }
+  }
+  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment|discussion))?$/.exec(path);
   if (m) {
     const id = decodeURIComponent(m[1]);
+    const source = url2.searchParams.get("source") || void 0;
     try {
-      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id));
+      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id, void 0, source));
+      if (method === "GET" && m[2] === "discussion") {
+        const ticket = await inboxTicket(project, id, void 0, source);
+        return send(res, 200, await ticketDiscussion(project, { id: ticket.id, title: ticket.title, labels: ticket.labels }));
+      }
       if (method === "POST" && m[2] === "cards") {
         const body = JSON.parse(await readBody(req));
-        const ticket = await inboxTicket(project, id);
+        const ticket = await inboxTicket(project, id, void 0, source);
         const features = body.features?.length ? body.features : ticket.features;
         if (!features.length) return send(res, 400, { error: `No commit names ${id} yet: choose the feature it belongs to.` });
-        const text2 = `${ticket.title}
+        const text3 = `${ticket.title}
 
 ${ticket.description}`.trim();
-        return send(res, 200, startJob(jobKeys.ticketCards(id), () => startBackfill(project, features, { ticket: { id, text: text2 } })));
+        return send(res, 200, startJob(jobKeys.ticketCards(id), () => startBackfill(project, features, { ticket: { id, text: text3 } })));
       }
       if (method === "POST" && m[2] === "test") {
         const body = JSON.parse(await readBody(req));
@@ -52562,8 +53501,8 @@ ${ticket.description}`.trim();
         const runId = method === "GET" ? url2.searchParams.get("run") : JSON.parse(await readBody(req)).run;
         const run = runId && /^[\w-]+$/.test(runId) ? project.store.read(`runs/${runId}.json`) : null;
         if (!run) return send(res, 404, { error: "unknown run" });
-        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project), run) });
-        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run) });
+        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project, void 0, source), run) });
+        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run, void 0, source) });
       }
     } catch (e) {
       return send(res, 400, { error: e.message });
@@ -52788,7 +53727,7 @@ function send(res, status, body) {
 var projectDir = external_exports.string().optional().describe("Project root. Defaults to the directory the session was opened in.");
 var target = external_exports.enum(["android", "web"]).optional().describe("Where the cards run: the Android app or the web app in a browser. Default: the project's first.");
 var build = external_exports.string().optional().describe('A finished Android build to test instead of the working tree: "firebase" or "play" (the newest), "firebase:<build number>", "play:<version code>", or "file:<path to .apk/.aab>".');
-var text = (t) => ({ content: [{ type: "text", text: t }] });
+var text2 = (t) => ({ content: [{ type: "text", text: t }] });
 async function runMcpServer(version2) {
   const server = new McpServer({ name: "probe", version: version2 });
   server.registerTool(
@@ -52807,9 +53746,9 @@ async function runMcpServer(version2) {
     },
     async ({ projectDir: dir, status, step, accept, features, limit }) => {
       const project = openProject(dir);
-      if (status) return text(formatInitStatus(initStatus(project)));
+      if (status) return text2(formatInitStatus(initStatus(project)));
       const { done } = startInit(project, { step, accept, features, limit });
-      return text(summarizeInit(await done));
+      return text2(summarizeInit(await done));
     }
   );
   server.registerTool(
@@ -52822,8 +53761,8 @@ async function runMcpServer(version2) {
     async ({ projectDir: dir, features, drafts }) => {
       const project = openProject(dir);
       const started = startCheck(project, { features, drafts, trigger: "manual" });
-      if (!started) return text(`A check is already running (run ${runningCheck(project)?.runId}).`);
-      return text(summarizeCheckRun(await started.done));
+      if (!started) return text2(`A check is already running (run ${runningCheck(project)?.runId}).`);
+      return text2(summarizeCheckRun(await started.done));
     }
   );
   server.registerTool(
@@ -52842,7 +53781,7 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
       if (drafts.length) lines.push(`Drafts to review: ${drafts.map((d) => `${d.id} (${d.feature})`).join(", ")}`);
       const running2 = runningCheck(project);
       if (running2) lines.push(`A check is running: ${running2.runId}`);
-      return text(lines.length ? lines.join("\n") : "Nothing stale: every feature was checked after its last edit.");
+      return text2(lines.length ? lines.join("\n") : "Nothing stale: every feature was checked after its last edit.");
     }
   );
   server.registerTool(
@@ -52852,7 +53791,7 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
       description: "Checks probe/features/<feature>.yaml against the code: every covered_by names a test that exists under that exact name, every card link names a card in probe/cards, paths exist, unproven rules say why.",
       inputSchema: { projectDir, feature: external_exports.string() }
     },
-    async ({ projectDir: dir, feature }) => text(summarizeCheck(checkManifest(openProject(dir).root, feature)))
+    async ({ projectDir: dir, feature }) => text2(summarizeCheck(checkManifest(openProject(dir).root, feature)))
   );
   server.registerTool(
     "probe_rule",
@@ -52869,12 +53808,12 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
       const project = openProject(dir);
       if (rule2) {
         const found3 = findRule(project, rule2);
-        if ("error" in found3) return text(found3.error);
-        return text(summarizeRule(ruleProofs(project, found3.manifest).find((p) => p.invariant.id === found3.invariant.id)));
+        if ("error" in found3) return text2(found3.error);
+        return text2(summarizeRule(ruleProofs(project, found3.manifest).find((p) => p.invariant.id === found3.invariant.id)));
       }
-      if (!feature) return text("Give a rule (feature/rule-id) or a feature.");
+      if (!feature) return text2("Give a rule (feature/rule-id) or a feature.");
       const manifest = loadManifest(project.root, feature);
-      return text(manifest ? summarizeRules(project, manifest) : `No manifest probe/features/${feature}.yaml.`);
+      return text2(manifest ? summarizeRules(project, manifest) : `No manifest probe/features/${feature}.yaml.`);
     }
   );
   server.registerTool(
@@ -52882,9 +53821,9 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     { title: "Check setup", description: "Checks Node, the project, build tooling, SDKs, devices and emulator images.", inputSchema: { projectDir } },
     async ({ projectDir: dir }) => {
       try {
-        return text(formatDoctor(doctor(openProject(dir))));
+        return text2(formatDoctor(doctor(openProject(dir))));
       } catch (e) {
-        return text(formatDoctor(doctor(null, e.message)));
+        return text2(formatDoctor(doctor(null, e.message)));
       }
     }
   );
@@ -52898,7 +53837,7 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     async ({ projectDir: dir, refresh }) => {
       const project = openProject(dir);
       const result = refresh ? scan(project) : latestScan(project);
-      return text(formatAtlas(result, featureHealth(project, result)));
+      return text2(formatAtlas(result, featureHealth(project, result)));
     }
   );
   server.registerTool(
@@ -52910,12 +53849,12 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     },
     async ({ projectDir: dir, feature: id }) => {
       const feature = findFeature(latestScan(openProject(dir)), id);
-      if (!feature) return text(`Unknown feature "${id}". Call probe_scan to list features.`);
+      if (!feature) return text2(`Unknown feature "${id}". Call probe_scan to list features.`);
       const lines = [`${feature.id} (${feature.group}) \xB7 ${feature.stats.testable} testable classes \xB7 ${feature.stats.direct} with a test class \xB7 ${feature.stats.untested} untested`, "", "Modules:"];
       for (const m of feature.modules) lines.push(`  ${m.id} [${m.platform}] ${m.mainFiles} source files, ${m.testFiles} unit test files${m.unitTestTask ? ` \xB7 ${m.unitTestTask}` : ""}`);
       lines.push("", "Riskiest untested classes:");
       for (const c of riskyGaps(feature)) lines.push(`  ${c.risk.toFixed(1).padStart(5)}  ${c.name} (${c.kind}, ~${c.lines} lines)  ${c.file}`);
-      return text(lines.join("\n"));
+      return text2(lines.join("\n"));
     }
   );
   server.registerTool(
@@ -52927,7 +53866,7 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     },
     async ({ projectDir: dir, feature }) => {
       const { done } = startUnitRun(openProject(dir), feature);
-      return text(summarizeRun(await done));
+      return text2(summarizeRun(await done));
     }
   );
   server.registerTool(
@@ -52940,8 +53879,8 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     async ({ projectDir: dir, feature: id }) => {
       const project = openProject(dir);
       const feature = findFeature(latestScan(project), id);
-      if (!feature) return text(`Unknown feature "${id}". Call probe_scan to list features.`);
-      return text(cardContext(project, feature));
+      if (!feature) return text2(`Unknown feature "${id}". Call probe_scan to list features.`);
+      return text2(cardContext(project, feature));
     }
   );
   server.registerTool(
@@ -52954,9 +53893,9 @@ ${e.files.slice(0, 10).map((f) => `    ${f}`).join("\n")}`);
     async ({ projectDir: dir, feature: id, cards }) => {
       const project = openProject(dir);
       const feature = findFeature(latestScan(project), id);
-      if (!feature) return text(`Unknown feature "${id}". Call probe_scan to list features.`);
+      if (!feature) return text2(`Unknown feature "${id}". Call probe_scan to list features.`);
       const r = saveCards(project.root, feature.id, cards, "backfill");
-      return text(
+      return text2(
         [
           `Saved ${r.written.length} cards for ${feature.id}: ${r.written.join(", ") || "none"}`,
           r.kept.length ? `Kept (already reviewed): ${r.kept.join(", ")}` : "",
@@ -52973,7 +53912,7 @@ ${r.errors.join("\n")}` : ""
       description: "Feature cards in the project, optionally for one feature: id, level, status, confidence, title, how to reach it and what to expect.",
       inputSchema: { projectDir, feature: external_exports.string().optional(), detail: external_exports.boolean().optional().describe("Include reach, steps and expectations.") }
     },
-    async ({ projectDir: dir, feature, detail }) => text(formatCards(listCards(openProject(dir).root, feature), detail ?? false))
+    async ({ projectDir: dir, feature, detail }) => text2(formatCards(listCards(openProject(dir).root, feature), detail ?? false))
   );
   server.registerTool(
     "probe_cards_backfill",
@@ -52989,7 +53928,7 @@ ${r.errors.join("\n")}` : ""
     },
     async ({ projectDir: dir, feature, ticket, ticketText }) => {
       const { done } = startBackfill(openProject(dir), feature, { ticket: ticket ? { id: ticket, text: ticketText } : void 0 });
-      return text(summarizeBackfill(await done));
+      return text2(summarizeBackfill(await done));
     }
   );
   const session = () => {
@@ -53042,23 +53981,23 @@ ${r.errors.join("\n")}` : ""
           detail = await d.tap({ element: a.element, x: a.x, y: a.y }) + (a.element ? ` (element ${a.element})` : "");
           break;
         case "long_press": {
-          if (a.x === void 0 || a.y === void 0) return text("long_press needs x and y (use an element's centre from observe).");
+          if (a.x === void 0 || a.y === void 0) return text2("long_press needs x and y (use an element's centre from observe).");
           await d.longPress(a.x, a.y);
           detail = `long-pressed ${a.x},${a.y}`;
           break;
         }
         case "type":
-          if (!a.text) return text("type needs text.");
+          if (!a.text) return text2("type needs text.");
           await d.type(a.text);
           detail = `typed "${a.text}"`;
           break;
         case "key":
-          if (!a.key) return text("key needs key.");
+          if (!a.key) return text2("key needs key.");
           await d.key(a.key);
           detail = `pressed ${a.key}`;
           break;
         case "swipe":
-          if (!a.direction) return text("swipe needs direction.");
+          if (!a.direction) return text2("swipe needs direction.");
           await d.swipe(a.direction);
           detail = `swiped ${a.direction}`;
           break;
@@ -53072,14 +54011,14 @@ ${r.errors.join("\n")}` : ""
           detail = "relaunched the app";
           break;
         case "open":
-          if (!d.open) return text("open only works in a web run; on a device, navigate through the app.");
-          if (!a.url) return text("open needs url, a path of the site under test.");
+          if (!d.open) return text2("open only works in a web run; on a device, navigate through the app.");
+          if (!a.url) return text2("open needs url, a path of the site under test.");
           detail = `opened ${await d.open(a.url)}`;
           break;
       }
       if (a.action !== "wait") await new Promise((r) => setTimeout(r, 700));
       s.record(a.action, detail);
-      return text(`${detail}. Observe to see the result.`);
+      return text2(`${detail}. Observe to see the result.`);
     }
   );
   server.registerTool(
@@ -53092,12 +54031,12 @@ ${r.errors.join("\n")}` : ""
     async ({ role, secret }) => {
       const s = session();
       const project = openProject();
-      if (!listAccounts(project.root).some((a) => a.role === role)) return text(`No test account with role "${role}".`);
+      if (!listAccounts(project.root).some((a) => a.role === role)) return text2(`No test account with role "${role}".`);
       const value = new Secrets(project.store.dir).get(role, secret);
-      if (value === null) return text(`No ${secret} stored for ${role}. Report blocked: it is added in Probe Studio -> Accounts.`);
+      if (value === null) return text2(`No ${secret} stored for ${role}. Report blocked: it is added in Probe Studio -> Accounts.`);
       await s.device.type(value);
       s.record("type_secret", `typed ${role}'s ${secret}`);
-      return text(`Typed ${role}'s ${secret}. Observe to see the result.`);
+      return text2(`Typed ${role}'s ${secret}. Observe to see the result.`);
     }
   );
   server.registerTool(
@@ -53116,7 +54055,7 @@ ${r.errors.join("\n")}` : ""
       const shot = await s.capture();
       s.record("verdict", `${verdict.result}${verdict.notes ? `: ${verdict.notes}` : ""}`, shot?.name);
       s.saveVerdict(verdict);
-      return text(`Verdict recorded: ${verdict.result}. You are done.`);
+      return text2(`Verdict recorded: ${verdict.result}. You are done.`);
     }
   );
   server.registerTool(
@@ -53136,7 +54075,7 @@ ${r.errors.join("\n")}` : ""
       const shot = await s.capture();
       s.record("report", `login: ${login.state}${login.role ? ` as ${login.role}` : ""}`, shot?.name);
       s.saveReport("login", login);
-      return text("Login state recorded. You are done.");
+      return text2("Login state recorded. You are done.");
     }
   );
   server.registerTool(
@@ -53153,7 +54092,7 @@ ${r.errors.join("\n")}` : ""
       const s = session();
       s.record("report", `${report.screens.length} screens, ${report.issues.length} issues`);
       s.saveReport("explore", report);
-      return text("Map recorded. You are done.");
+      return text2("Map recorded. You are done.");
     }
   );
   server.registerTool(
@@ -53173,10 +54112,10 @@ ${r.errors.join("\n")}` : ""
     },
     async ({ projectDir: dir, feature, card, rule: rule2, device, target: target2, build: build2 }) => {
       const project = openProject(dir);
-      if (rule2) return text(summarizeRuleRun(await runRuleCards(project, rule2, { device })));
-      if (!feature || !card) return text("Give feature and card, or a rule.");
+      if (rule2) return text2(summarizeRuleRun(await runRuleCards(project, rule2, { device })));
+      if (!feature || !card) return text2("Give feature and card, or a rule.");
       const { done } = startCardRun(project, feature, card, { device, target: target2, build: build2 ? parseBuildRef(build2) : void 0 });
-      return text(summarizeCardRun(await done));
+      return text2(summarizeCardRun(await done));
     }
   );
   server.registerTool(
@@ -53200,7 +54139,7 @@ ${r.errors.join("\n")}` : ""
     },
     async ({ projectDir: dir, build: build2, ...options }) => {
       const { done } = startVerify(openProject(dir), { ...options, build: build2 ? parseBuildRef(build2) : void 0 });
-      return text(summarizeVerify(await done));
+      return text2(summarizeVerify(await done));
     }
   );
   server.registerTool(
@@ -53215,13 +54154,13 @@ ${r.errors.join("\n")}` : ""
       const line = (t) => `${t.id} \xB7 ${t.status} \xB7 ${t.title}${t.author ? ` \xB7 by ${t.author}` : ""}${t.build ? ` \xB7 build ${t.build}${t.buildState ? ` (${t.buildState === "included" ? "contains the ticket's commits" : t.buildState === "missing" ? "does NOT contain the ticket's commits" : "no tag for it in this repository"})` : ""}` : ""} \xB7 ${t.commits} commits \xB7 cards: ${t.cards.join(", ") || "none"}${t.lastRun ? ` \xB7 last test ${t.lastRun.status}` : ""}`;
       if (ticket) {
         const t = await inboxTicket(project, ticket);
-        return text(`${line(t)}
+        return text2(`${line(t)}
 ${t.url}
 
 ${t.description || "(no description)"}`);
       }
       const tickets = await inbox(project, { refresh });
-      return text(tickets.length ? tickets.map(line).join("\n") : "No tickets match the inbox filter.");
+      return text2(tickets.length ? tickets.map(line).join("\n") : "No tickets match the inbox filter.");
     }
   );
   server.registerTool(
@@ -53233,7 +54172,7 @@ ${t.description || "(no description)"}`);
     },
     async ({ projectDir: dir, feature, limit }) => {
       const { done } = startUnitWrite(openProject(dir), feature, { limit });
-      return text(summarizeUnitWrite(await done));
+      return text2(summarizeUnitWrite(await done));
     }
   );
   server.registerTool(
@@ -53246,9 +54185,9 @@ ${t.description || "(no description)"}`);
     async ({ projectDir: dir, runId }) => {
       const project = openProject(dir);
       const run = project.store.read(`runs/${runId}.json`);
-      if (!run) return text(`No run ${runId}.`);
-      const list = issuesOf(project, run);
-      return text(list.length ? list.map((i) => `${i.id}  [${i.kind}] ${i.feature}: ${i.title}`).join("\n") : "No issues.");
+      if (!run) return text2(`No run ${runId}.`);
+      const list2 = issuesOf(project, run);
+      return text2(list2.length ? list2.map((i) => `${i.id}  [${i.kind}] ${i.feature}: ${i.title}`).join("\n") : "No issues.");
     }
   );
   server.registerTool(
@@ -53261,7 +54200,7 @@ ${t.description || "(no description)"}`);
     async ({ projectDir: dir, issueId }) => {
       const project = openProject(dir);
       const found3 = findIssue(project, issueId);
-      return text(found3 ? fixPrompt(project, found3.issue, found3.run, false) : `No issue ${issueId}.`);
+      return text2(found3 ? fixPrompt(project, found3.issue, found3.run, false) : `No issue ${issueId}.`);
     }
   );
   server.registerTool(
@@ -53273,7 +54212,7 @@ ${t.description || "(no description)"}`);
     },
     async ({ projectDir: dir, issueId }) => {
       const { done } = startFix(openProject(dir), issueId);
-      return text(summarizeFix(await done));
+      return text2(summarizeFix(await done));
     }
   );
   server.registerTool(
@@ -53291,7 +54230,7 @@ ${t.description || "(no description)"}`);
     },
     async ({ projectDir: dir, feature, agent, layers, url: url2 }) => {
       const { done } = startSecurityRun(openProject(dir), { feature, agent, layers, url: url2 });
-      return text(summarizeSecurity(await done));
+      return text2(summarizeSecurity(await done));
     }
   );
   server.registerTool(
@@ -53303,7 +54242,7 @@ ${t.description || "(no description)"}`);
     },
     async ({ projectDir: dir, issueId, reason }) => {
       const d = dismissIssue(openProject(dir), issueId, reason);
-      return text(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
+      return text2(`Dismissed ${d.check}${d.file ? ` in ${d.file}` : ""}: ${d.reason}`);
     }
   );
   server.registerTool(
@@ -53315,7 +54254,7 @@ ${t.description || "(no description)"}`);
     },
     async ({ projectDir: dir, feature, device }) => {
       const { done } = startExploreRun(openProject(dir), feature, { device });
-      return text(summarizeExplore(await done));
+      return text2(summarizeExplore(await done));
     }
   );
   server.registerTool(
@@ -53328,7 +54267,7 @@ ${t.description || "(no description)"}`);
     async ({ projectDir: dir, role, device }) => {
       const { done } = startLoginRun(openProject(dir), role, { device });
       const run = await done;
-      return text(`Login ${run.status}: ${run.login ? describeLogin(run.login) : run.error ?? "no report"}`);
+      return text2(`Login ${run.status}: ${run.login ? describeLogin(run.login) : run.error ?? "no report"}`);
     }
   );
   server.registerTool(
@@ -53342,15 +54281,15 @@ ${t.description || "(no description)"}`);
       const project = openProject(dir);
       if (runId) {
         const run = project.store.read(`runs/${runId}.json`);
-        if (!run) return text(`Unknown run ${runId}.`);
+        if (!run) return text2(`Unknown run ${runId}.`);
         const d = ticketDraft(project, run);
-        return text(`# ${d.title}
+        return text2(`# ${d.title}
 
 ${d.body}`);
       }
-      if (!ticket) return text("Pass ticket or runId.");
+      if (!ticket) return text2("Pass ticket or runId.");
       const info = ticketInfo(project, ticket);
-      return text(
+      return text2(
         [
           `${info.id}${info.url ? ` \xB7 ${info.url}` : ""}`,
           `Features: ${info.features.join(", ") || "none found"}`,
@@ -53367,7 +54306,7 @@ ${d.body}`);
     async ({ projectDir: dir }) => {
       const url2 = await startStudio(openProject(dir));
       openInBrowser(url2);
-      return text(`Probe Studio is running at ${url2} (opened in the browser). It stays up while this session runs.`);
+      return text2(`Probe Studio is running at ${url2} (opened in the browser). It stays up while this session runs.`);
     }
   );
   await server.connect(new StdioServerTransport());
@@ -53386,7 +54325,7 @@ async function runHook(event, options = {}) {
     if (!project || !project.config.watch.enabled) return 0;
     const source = event === "commit" ? "commit" : "agent";
     const session = hook.session_id ?? options.session ?? "agent";
-    const say = (text2) => process.stdout.write(`${text2}
+    const say = (text3) => process.stdout.write(`${text3}
 `);
     if (event === "edit") {
       const file2 = hook.tool_input?.file_path ?? hook.tool_input?.notebook_path;
@@ -53484,11 +54423,11 @@ function withPreCommitBlock(existing, block) {
 ${block}
 `;
 }
-function withoutPreCommitBlock(text2) {
-  const start = text2.indexOf(BEGIN);
-  const end = text2.indexOf(END);
-  if (start < 0 || end < start) return text2;
-  const kept = [text2.slice(0, start).trimEnd(), text2.slice(end + END.length).trim()].filter(Boolean);
+function withoutPreCommitBlock(text3) {
+  const start = text3.indexOf(BEGIN);
+  const end = text3.indexOf(END);
+  if (start < 0 || end < start) return text3;
+  const kept = [text3.slice(0, start).trimEnd(), text3.slice(end + END.length).trim()].filter(Boolean);
   return kept.length ? `${kept.join("\n\n")}
 ` : "";
 }
@@ -53512,7 +54451,7 @@ function gitHooks(project, action) {
 }
 
 // src/cli.ts
-var VERSION = "0.7.0";
+var VERSION = "0.8.0";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]
@@ -53725,8 +54664,8 @@ ${rows.join("\n")}` : "No results recorded yet.");
       const project = openProject(projectArg);
       const run = project.store.read(`runs/${arg}.json`);
       if (!run) return usage(`probe issues <run>  (no run ${arg})`);
-      const list = issuesOf(project, run);
-      console.log(list.length ? list.map((i) => `${i.id}  [${i.kind}] ${i.title}`).join("\n") : "No issues.");
+      const list2 = issuesOf(project, run);
+      console.log(list2.length ? list2.map((i) => `${i.id}  [${i.kind}] ${i.title}`).join("\n") : "No issues.");
       return 0;
     }
     case "fix-prompt": {
@@ -53974,8 +54913,8 @@ ${summarizeRuleRun(result)}`);
     }
     case "drafts": {
       const project = openProject(projectArg);
-      const list = listDrafts(project, arg);
-      console.log(list.length ? list.map((d) => `${d.id}  ${d.status.padEnd(8)} ${d.feature}: ${d.files.map((f) => f.path).join(", ")}`).join("\n") : "No drafts.");
+      const list2 = listDrafts(project, arg);
+      console.log(list2.length ? list2.map((d) => `${d.id}  ${d.status.padEnd(8)} ${d.feature}: ${d.files.map((f) => f.path).join(", ")}`).join("\n") : "No drafts.");
       return 0;
     }
     case "draft": {
