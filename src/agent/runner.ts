@@ -15,6 +15,10 @@ export interface AgentTask {
   mcpEnv?: Record<string, string>;
   /** Lets the agent create and edit files (writing unit tests). It still never runs commands. */
   allowEdits?: boolean;
+  /** Which kind of work this is: picks the project's account and model for it (Settings → AI). */
+  role?: import("../core/config.js").AiRole;
+  /** An AI account id of the project, over the role's choice. */
+  account?: string;
   /** Folder the agent works in; the project by default. */
   cwd?: string;
   /** More folders the agent may read, e.g. the project when it works in a scratch folder. */

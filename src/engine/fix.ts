@@ -37,7 +37,7 @@ export function startFix(project: Project, issueId: string, options: { model?: s
     const before = dirtyFiles(project.root);
     const result = await runAgent(
       project,
-      { prompt: fixPrompt(project, issue, source, true), probeTools: ["probe_feature", "probe_unit_run", "probe_cards_list"], model: options.model, allowEdits: true },
+      { prompt: fixPrompt(project, issue, source, true), probeTools: ["probe_feature", "probe_unit_run", "probe_cards_list"], model: options.model, allowEdits: true, role: "coding" },
       log,
     );
     run.costUsd += result.costUsd;

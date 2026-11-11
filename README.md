@@ -224,10 +224,41 @@ see passwords (Probe types them on the device); a run stops as `blocked` if the 
 with an account that is not a test account, or a login needs a code or captcha it lacks. Agents
 never file tickets; a person does, from Studio, with the team's own command.
 
+## Connections and the ticket workbench
+
+Everything in Studio → Settings belongs to the project picked at the top. **Connections** holds
+the project's trackers (Jira and Linear, as many as it uses) and Slack, with the channels it uses;
+which ones and where they point are shared in `probe/probe.yaml`, while each person's tokens are
+encrypted on their machine for that project only. **AI accounts and models** lists the Claude (or
+Codex) accounts a project may use (the CLI's own login, a separate login folder, or an API key)
+and which account and model do coding, review and testing.
+
+Studio → **Tickets** lists the tickets of every tracker of the project, sorted into For me, Not
+for me (rules in Settings → Workbench) and Hidden. Tick some, choose what the agent does for each
+(read the ticket and its Slack talk, write the change, write and run unit tests, test the UI,
+check the change against the ticket, commit, comment), and it works through them one by one. Each
+ticket gets its own local commit named by a pattern such as `{type}({area}): {title} [{key}]`.
+Probe never pushes.
+
+```yaml
+connections:
+  - id: jira
+    kind: jira
+    site: https://acme.atlassian.net
+    filter: project = SHOP AND statusCategory != Done
+  - id: slack
+    kind: slack
+    channels:
+      - { id: C0123456, name: shop-qa, search: true, post: false }
+workbench:
+  commitPattern: "{type}({area}): {title} [{key}]"
+  notForMe: { otherAssignee: true, labels: [backend], statuses: [Blocked] }
+```
+
 ## Tickets, builds and the web app
 
-Studio → **Tickets** is a tester's inbox. Connect Jira or Linear in Studio → Settings → Ticket
-tracker (the site and the filter are shared in `probe/probe.yaml`; your API token is encrypted
+Studio → **Tickets** is a tester's inbox. Connect Jira or Linear in Studio → Settings → Connections
+(the site and the filter are shared in `probe/probe.yaml`; your API token is encrypted
 on your machine and never shown again), and the tab lists the tickets waiting for a test: who
 wrote each one, its text, the build it names, and what this repository knows about it (the
 commits that name it, the features they touch, the cards drafted from it).

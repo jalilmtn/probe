@@ -1,5 +1,5 @@
-import { Secrets } from "../accounts/accounts.js";
-import type { ProbeConfig, TrackerId } from "../core/config.js";
+import { connectionLabel, connectionMissing, connectionToken, trackerConnections } from "../connections/connections.js";
+import type { Connection, ProbeConfig, TrackerId } from "../core/config.js";
 
 // The tracker is where tickets live (Jira, Linear). Probe reads tickets from it for the inbox
 // and writes exactly one thing back: a comment with a run's result, when a person presses Post.
@@ -18,6 +18,9 @@ export interface TrackerTicket {
   labels: string[];
   /** The build to test, from the ticket's build field or its text. */
   build?: string;
+  /** The connection it came from, when the project has more than one tracker. */
+  source?: string;
+  sourceLabel?: string;
 }
 
 export interface Tracker {
@@ -46,13 +49,23 @@ export function trackerMissing(config: ProbeConfig["tickets"], hasToken: boolean
   return null;
 }
 
-/** The project's tracker with this machine's token, or an error saying what is missing. */
-export function openTracker(project: { config: ProbeConfig; store: { dir: string } }, fetcher: Fetch = fetch): Tracker {
-  const config = project.config.tickets;
-  const token = config.tracker ? new Secrets(project.store.dir).getKey(tokenKey(config.tracker)) : null;
-  const missing = trackerMissing(config, token !== null);
-  if (missing) throw new Error(`${missing} Connect it in Studio → Settings → Ticket tracker.`);
-  return config.tracker === "jira" ? new Jira(config, token!, fetcher) : new Linear(config, token!, fetcher);
+/**
+ * A tracker of the project with this machine's token: the connection named, else the first one.
+ * Throws saying what is missing.
+ */
+export function openTracker(project: { config: ProbeConfig; store: { dir: string } }, fetcher: Fetch = fetch, source?: string): Tracker {
+  const all = trackerConnections(project);
+  const conn = source ? all.find((c) => c.id === source) : all[0];
+  if (!conn) throw new Error(source ? `This project has no tracker connection ${source}.` : "No ticket tracker chosen. Connect it in Studio → Settings → Connections.");
+  return openTrackerFor(project, conn, fetcher);
+}
+
+export function openTrackerFor(project: { config: ProbeConfig; store: { dir: string } }, conn: Connection, fetcher: Fetch = fetch): Tracker {
+  const token = connectionToken(project, conn);
+  const missing = connectionMissing(conn, token !== null);
+  if (missing) throw new Error(`${connectionLabel(conn)}: ${missing} Connect it in Studio → Settings → Connections.`);
+  const config: ProbeConfig["tickets"] = { pattern: project.config.tickets.pattern, tracker: conn.kind as TrackerId, site: conn.site, filter: conn.filter, team: conn.team, buildField: conn.buildField, email: conn.email };
+  return conn.kind === "jira" ? new Jira(config, token!, fetcher) : new Linear(config, token!, fetcher);
 }
 
 /** A build number written in a ticket's text: "Build: 142", "build #1.4.2", "build 142". */
@@ -137,7 +150,7 @@ export class Jira implements Tracker {
     if (/^customfield_\d+$/.test(wanted)) return (this.buildFieldId = wanted);
     const fields = (await readJson(await this.call("/rest/api/2/field"), "Jira")) as { id: string; name: string }[];
     const found = fields.find((f) => f.name.toLowerCase() === wanted.toLowerCase() || f.id === wanted);
-    if (!found) throw new Error(`Jira has no field named "${wanted}". Fix the build field in Studio → Settings → Ticket tracker.`);
+    if (!found) throw new Error(`Jira has no field named "${wanted}". Fix the build field in Studio → Settings → Connections.`);
     return (this.buildFieldId = found.id);
   }
 

@@ -154,6 +154,13 @@ export interface ProbeConfig {
     /** Path globs never scanned, on top of build output and vendored folders. */
     ignorePaths: string[];
   };
+  /**
+   * The project's connections: ticket trackers (more than one allowed) and Slack workspaces with
+   * their channels. Shared with the team; each person's token and email stay on their machine.
+   */
+  connections: Connection[];
+  /** How the ticket workbench decides which tickets are not yours, and how it commits. */
+  workbench: WorkbenchConfig;
   /** Per machine, from the local settings file — never from the shared probe.yaml. */
   devices: {
     /** Emulator to boot when none is running. */
@@ -162,6 +169,65 @@ export interface ProbeConfig {
     allowReal: string[];
   };
 }
+
+/** Kinds of connection a project can have. The AI account is per machine and never in probe.yaml. */
+export const CONNECTION_KINDS = ["jira", "linear", "slack"] as const;
+export type ConnectionKind = (typeof CONNECTION_KINDS)[number];
+
+/** A Slack channel the project uses: searched for talk about a ticket, and maybe posted to. */
+export interface SlackChannel {
+  id: string;
+  name: string;
+  /** Look here for messages about a ticket. */
+  search: boolean;
+  /** Probe may post a result here, only when a person presses Post. */
+  post: boolean;
+  /** Only search this channel for tickets with one of these labels. Empty: every ticket. */
+  labels: string[];
+}
+
+export interface Connection {
+  /** Stable id within the project, e.g. "jira", "slack-acme". */
+  id: string;
+  kind: ConnectionKind;
+  /** What Studio calls it, e.g. "Acme Jira". */
+  label?: string;
+  /** Jira: the site. */
+  site?: string;
+  /** Jira: JQL. Linear: status names, comma separated. */
+  filter?: string;
+  /** Linear: the team key. */
+  team?: string;
+  /** Jira: the build field. */
+  buildField?: string;
+  /** Per machine: the Jira account email. */
+  email?: string;
+  /** Slack: the workspace name, for the label. */
+  workspace?: string;
+  /** Slack: the channels this project uses. */
+  channels?: SlackChannel[];
+  /** Slack: how many days back to look (default 30). */
+  days?: number;
+  /** Read from the older single `tickets.tracker` settings. */
+  legacy?: boolean;
+}
+
+/** Steps the workbench agent can take for each ticket, in this order. */
+export const WORK_STEPS = ["context", "fix", "unitwrite", "unit", "ui", "validate", "commit", "comment"] as const;
+export type WorkStep = (typeof WORK_STEPS)[number];
+
+export interface WorkbenchConfig {
+  /** `{key}`, `{title}`, `{type}`, `{area}` are replaced. */
+  commitPattern: string;
+  /** Tickets that are not yours: assigned to someone else, or with one of these labels or statuses. */
+  notForMe: { otherAssignee: boolean; labels: string[]; statuses: string[] };
+  /** Steps ticked when the workbench opens. */
+  steps: WorkStep[];
+  /** Per machine: tickets you hid by hand, as `source/key`. */
+  hidden: string[];
+}
+
+export const DEFAULT_COMMIT_PATTERN = "{type}({area}): {title} [{key}]";
 
 /** Ticket trackers the inbox can read. */
 export const TRACKERS = ["jira", "linear"] as const;
@@ -197,6 +263,8 @@ const DEFAULTS: ProbeConfig = {
   watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
   security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
   devices: { allowReal: [] },
+  connections: [],
+  workbench: { commitPattern: DEFAULT_COMMIT_PATTERN, notForMe: { otherAssignee: true, labels: [], statuses: [] }, steps: ["context", "fix", "unitwrite", "unit", "commit"], hidden: [] },
 };
 
 export function configPath(root: string): string {
@@ -224,6 +292,52 @@ export function loadConfig(root: string, localDir: string): ProbeConfig {
     watch: { ...DEFAULTS.watch, ...raw.watch },
     security: { ...DEFAULTS.security, ...raw.security },
     devices: { avd: local.devices?.avd, allowReal: local.devices?.allowReal ?? [] },
+    connections: readConnections(raw.connections, local.connections),
+    workbench: readWorkbench(raw.workbench, local.workbench),
+  };
+}
+
+function strings(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((v) => String(v).trim()).filter(Boolean) : [];
+}
+
+/** The shared list, checked, with this machine's email added. Entries Probe cannot use are left out. */
+function readConnections(raw: unknown, local: LocalSettings["connections"]): Connection[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Connection[] = [];
+  for (const item of raw as Record<string, unknown>[]) {
+    if (!item || typeof item !== "object") continue;
+    const kind = item.kind as ConnectionKind;
+    const id = String(item.id ?? "").trim();
+    if (!CONNECTION_KINDS.includes(kind) || !/^[\w-]{1,40}$/.test(id) || out.some((c) => c.id === id)) continue;
+    const text = (k: string) => (typeof item[k] === "string" && (item[k] as string).trim() ? (item[k] as string).trim() : undefined);
+    const conn: Connection = { id, kind, label: text("label") };
+    if (kind === "jira") Object.assign(conn, { site: text("site"), filter: text("filter"), buildField: text("buildField"), email: local?.[id]?.email });
+    if (kind === "linear") Object.assign(conn, { filter: text("filter"), team: text("team") });
+    if (kind === "slack") {
+      conn.workspace = text("workspace");
+      conn.days = typeof item.days === "number" && item.days > 0 ? Math.min(item.days, 365) : undefined;
+      conn.channels = (Array.isArray(item.channels) ? (item.channels as Record<string, unknown>[]) : [])
+        .filter((c) => c && typeof c.id === "string")
+        .map((c) => ({ id: String(c.id), name: String(c.name ?? c.id), search: c.search !== false, post: c.post === true, labels: strings(c.labels) }));
+    }
+    out.push(conn);
+  }
+  return out;
+}
+
+function readWorkbench(raw: Partial<WorkbenchConfig> | undefined, local: LocalSettings["workbench"]): WorkbenchConfig {
+  const d = DEFAULTS.workbench;
+  const steps = strings(raw?.steps).filter((s): s is WorkStep => (WORK_STEPS as readonly string[]).includes(s));
+  return {
+    commitPattern: typeof raw?.commitPattern === "string" && raw.commitPattern.trim() ? raw.commitPattern : d.commitPattern,
+    notForMe: {
+      otherAssignee: typeof raw?.notForMe?.otherAssignee === "boolean" ? raw.notForMe.otherAssignee : d.notForMe.otherAssignee,
+      labels: strings(raw?.notForMe?.labels),
+      statuses: strings(raw?.notForMe?.statuses),
+    },
+    steps: steps.length ? steps : d.steps,
+    hidden: strings(local?.hidden),
   };
 }
 
@@ -244,7 +358,42 @@ export type LocalSettings = Partial<Pick<ProbeConfig, "devices">> & {
   agents?: Partial<ProbeConfig["agents"]>;
   builds?: Pick<ProbeConfig["builds"], "serviceAccount" | "bundletool">;
   tickets?: Pick<ProbeConfig["tickets"], "email">;
+  /** Per connection id: what only this machine knows. */
+  connections?: Record<string, { email?: string }>;
+  /** Which AI account this project's agents use on this machine. */
+  ai?: AiSettings;
+  workbench?: { hidden?: string[] };
 };
+
+/**
+ * The AI account a project's agents use on this machine. "default": the CLI's own login.
+ * "profile": a separate CLI login kept in its own folder (CLAUDE_CONFIG_DIR, or CODEX_HOME for
+ * Codex). "apiKey": an API key sealed in the project's secrets.
+ */
+export interface AiAccount {
+  /** Stable id, e.g. "work". */
+  id: string;
+  /** What Studio calls it, e.g. "Work Claude (Max)". */
+  name: string;
+  /** "default": the CLI's own login. "profile": a separate login folder. "apiKey": a key sealed in the project's secrets. */
+  mode: "default" | "profile" | "apiKey";
+  profileDir?: string;
+}
+
+/** Kinds of agent work, each with its own account and model. */
+export const AI_ROLES = ["coding", "review", "testing"] as const;
+export type AiRole = (typeof AI_ROLES)[number];
+
+export interface AiSettings {
+  /** The project's Claude (or Codex) accounts on this machine. Empty: the CLI's own login. */
+  accounts?: AiAccount[];
+  /** Per kind of work: which account and model. Unset: the first account and the Agents model. */
+  use?: Partial<Record<AiRole, { account?: string; model?: string }>>;
+}
+
+export function readLocalSettings(localDir: string): LocalSettings {
+  return readLocal(localDir);
+}
 
 function readLocal(localDir: string): LocalSettings {
   const file = join(localDir, LOCAL_CONFIG_FILE);
@@ -429,6 +578,23 @@ export interface ProjectPatch {
     buildField?: string | null;
   };
   agents?: { runner?: AgentRunnerId | null; model?: string | null };
+  workbench?: { commitPattern?: string | null; notForMe?: WorkbenchConfig["notForMe"] | null; steps?: WorkStep[] | null };
+}
+
+/** Replaces the shared connections list in probe/probe.yaml. Machine-only fields are never written. */
+export function saveConnections(root: string, list: Connection[]): void {
+  const file = configPath(root);
+  if (!existsSync(file)) {
+    mkdirSync(join(root, CONFIG_DIR), { recursive: true });
+    writeFileSync(file, CONFIG_TEMPLATE);
+  }
+  const doc = parseDocument(readFileSync(file, "utf8"));
+  const shared = list
+    .filter((c) => !c.legacy)
+    .map(({ email: _email, legacy: _legacy, ...c }) => Object.fromEntries(Object.entries(c).filter(([, v]) => v !== undefined && v !== "")));
+  if (shared.length) doc.set("connections", doc.createNode(shared));
+  else doc.delete("connections");
+  writeFileSync(file, doc.toString());
 }
 
 /**

@@ -41,6 +41,11 @@ import { agentSettings, branchInfo, branchMismatch, projectSettings, saveProject
 import { buildSettings, disconnectTracker, saveBuildSettings, saveTracker, testOptions, testTracker, trackerSettings, type BuildSettingsBody, type TrackerBody } from "./qa.js";
 import { inbox, inboxTicket, postResult, resultComment } from "../tickets/inbox.js";
 import { openTracker } from "../tickets/tracker.js";
+import { removeConnection, disconnect as disconnectConnection, saveAiAccount, removeAiAccount, saveAiUse, saveConnection, findConnection, trackerConnections, connectionMissing, hasConnectionToken, type ConnectionBody } from "../connections/connections.js";
+import { openSlack, ticketDiscussion } from "../connections/slack.js";
+import { inboxWarnings } from "../tickets/inbox.js";
+import { startWork, ticketGroup } from "../tickets/workbench.js";
+import { afterConnectionChange, connectionsView, myNames, saveWorkbench, setHidden, testConnection, workbenchView, type WorkbenchBody } from "./connections.js";
 import { listBuilds } from "../devices/builds.js";
 import { runTargets } from "../devices/driver.js";
 import type { BuildRef, BuildSource, RunTarget } from "../core/types.js";
@@ -111,7 +116,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     return;
   }
   // Starting work: only on the branch the person is looking at (Studio sends it with every action).
-  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
+  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|connections|ai|workbench\/(settings|hide)|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : undefined) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
@@ -354,24 +359,112 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   }
 
   // The ticket inbox: the tracker's tickets waiting for a test, with what this repository knows about each.
-  if (method === "GET" && path === "/api/inbox") {
-    const settings = trackerSettings(project);
-    if (settings.missing) return send(res, 200, { connected: false, missing: settings.missing, tracker: settings.tracker, tickets: [] });
-    try {
-      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: await inbox(project, { refresh: url.searchParams.has("refresh") }) });
-    } catch (e) {
-      return send(res, 200, { connected: true, tracker: settings.tracker, filter: settings.filter, tickets: [], error: (e as Error).message });
+  // Connections of the project Studio has open: trackers, Slack, the AI account. Tokens go in, never out.
+  if (method === "GET" && path === "/api/connections") return send(res, 200, connectionsView(project));
+  if (method === "POST" && path === "/api/connections") {
+    const saved = saveConnection(project, JSON.parse(await readBody(req)) as ConnectionBody);
+    afterConnectionChange(project);
+    return "error" in saved ? send(res, 400, saved) : send(res, 200, { ...connectionsView(project), saved: saved.id });
+  }
+  m = /^\/api\/connections\/([\w-]+)(?:\/(test|channels|disconnect))?$/.exec(path);
+  if (m) {
+    const id = m[1]!;
+    if (method === "POST" && m[2] === "test") return send(res, 200, await testConnection(project, id));
+    if (method === "POST" && m[2] === "disconnect") {
+      disconnectConnection(project, id);
+      afterConnectionChange(project);
+      return send(res, 200, connectionsView(project));
+    }
+    if (method === "GET" && m[2] === "channels") {
+      const conn = findConnection(project, id);
+      if (!conn || conn.kind !== "slack") return send(res, 404, { error: "No Slack connection with that id." });
+      try {
+        return send(res, 200, { channels: await openSlack(project, conn).channels() });
+      } catch (e) {
+        return send(res, 400, { error: (e as Error).message });
+      }
+    }
+    if (method === "DELETE" && !m[2]) {
+      removeConnection(project, id);
+      afterConnectionChange(project);
+      return send(res, 200, connectionsView(project));
     }
   }
-  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment))?$/.exec(path);
+  // The project's AI accounts on this machine, and which account and model each kind of work uses.
+  if (method === "POST" && path === "/api/ai/accounts") {
+    const saved = saveAiAccount(project, JSON.parse(await readBody(req)));
+    return "error" in saved ? send(res, 400, saved) : send(res, 200, connectionsView(project));
+  }
+  m = /^\/api\/ai\/accounts\/([\w-]+)(\/test)?$/.exec(path);
+  if (m && method === "DELETE") {
+    removeAiAccount(project, m[1]!);
+    return send(res, 200, connectionsView(project));
+  }
+  if (m && method === "POST" && m[2]) {
+    const body = JSON.parse((await readBody(req)) || "{}") as { model?: string };
+    return send(res, 200, await checkModel(project, body.model ?? project.config.agents.model, m[1]!));
+  }
+  if (method === "POST" && path === "/api/ai/use") {
+    const error = saveAiUse(project, JSON.parse(await readBody(req)));
+    return error ? send(res, 400, { error }) : send(res, 200, connectionsView(project));
+  }
+
+  // The workbench: how tickets are sorted and committed, and working through chosen tickets.
+  if (method === "GET" && path === "/api/workbench/settings") return send(res, 200, workbenchView(project));
+  if (method === "POST" && path === "/api/workbench/settings") {
+    const error = saveWorkbench(project, JSON.parse(await readBody(req)) as WorkbenchBody);
+    return error ? send(res, 400, { error }) : send(res, 200, workbenchView(project));
+  }
+  if (method === "POST" && path === "/api/workbench/hide") {
+    const body = JSON.parse(await readBody(req)) as { key?: string; source?: string; hidden?: boolean };
+    if (!body.key) return send(res, 400, { error: "key is required" });
+    setHidden(project, body.key, body.source, body.hidden !== false);
+    return send(res, 200, { ok: true });
+  }
+  if (method === "POST" && path === "/api/work") {
+    const body = JSON.parse(await readBody(req)) as { tickets?: { key: string; source?: string }[]; steps?: string[]; commitPattern?: string; model?: string; account?: string };
+    try {
+      const tickets = (body.tickets ?? []).filter((t) => t && typeof t.key === "string");
+      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || undefined, account: body.account || undefined })));
+    } catch (e) {
+      return send(res, 400, { error: (e as Error).message });
+    }
+  }
+  m = /^\/api\/work\/([\w-]+)$/.exec(path);
+  if (method === "GET" && m) {
+    const run = liveRun(m[1]!)?.run ?? project.store.read<Run>(`runs/${m[1]}.json`);
+    return run ? send(res, 200, run) : send(res, 404, { error: "unknown run" });
+  }
+
+  // The ticket inbox: every tracker of the project, with what this repository knows about each ticket.
+  if (method === "GET" && path === "/api/inbox") {
+    const conns = trackerConnections(project);
+    const sources = conns.map((c) => ({ id: c.id, missing: connectionMissing(c, hasConnectionToken(project, c)) }));
+    if (!sources.some((x) => !x.missing))
+      return send(res, 200, { connected: false, missing: conns.length ? sources.map((x) => x.missing).filter(Boolean).join(" ") : "No ticket tracker connected to this project yet.", tickets: [], sources });
+    try {
+      const tickets = await inbox(project, { refresh: url.searchParams.has("refresh") });
+      const me = await myNames(project);
+      const rules = project.config.workbench;
+      return send(res, 200, { connected: true, sources, me, warnings: inboxWarnings(project), tickets: tickets.map((t) => ({ ...t, ...ticketGroup(t, rules, me) })) });
+    } catch (e) {
+      return send(res, 200, { connected: true, sources, tickets: [], error: (e as Error).message });
+    }
+  }
+  m = /^\/api\/inbox\/([^/]+)(?:\/(cards|test|comment|discussion))?$/.exec(path);
   if (m) {
     const id = decodeURIComponent(m[1]!);
+    const source = url.searchParams.get("source") || undefined;
     try {
-      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id));
+      if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id, undefined, source));
+      if (method === "GET" && m[2] === "discussion") {
+        const ticket = await inboxTicket(project, id, undefined, source);
+        return send(res, 200, await ticketDiscussion(project, { id: ticket.id, title: ticket.title, labels: ticket.labels }));
+      }
       // Cards from the ticket's own text, read from the tracker rather than pasted.
       if (method === "POST" && m[2] === "cards") {
         const body = JSON.parse(await readBody(req)) as { features?: string[] };
-        const ticket = await inboxTicket(project, id);
+        const ticket = await inboxTicket(project, id, undefined, source);
         const features = body.features?.length ? body.features : ticket.features;
         if (!features.length) return send(res, 400, { error: `No commit names ${id} yet: choose the feature it belongs to.` });
         const text = `${ticket.title}\n\n${ticket.description}`.trim();
@@ -388,8 +481,8 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
         const runId = method === "GET" ? url.searchParams.get("run") : (JSON.parse(await readBody(req)) as { run?: string }).run;
         const run = runId && /^[\w-]+$/.test(runId) ? project.store.read<Run>(`runs/${runId}.json`) : null;
         if (!run) return send(res, 404, { error: "unknown run" });
-        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project), run) });
-        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run) });
+        if (method === "GET") return send(res, 200, { body: resultComment(project, openTracker(project, undefined, source), run) });
+        if (method === "POST") return send(res, 200, { posted: await postResult(project, id, run, undefined, source) });
       }
     } catch (e) {
       return send(res, 400, { error: (e as Error).message });

@@ -52,7 +52,7 @@ export function startUnitWrite(project: Project, featureId: string, options: { l
     const before = dirtyFiles(project.root);
     const result = await runAgent(
       project,
-      { prompt: prompt(feature, targets), probeTools: ["probe_feature", "probe_unit_run"], model: options.model, allowEdits: true },
+      { prompt: prompt(feature, targets), probeTools: ["probe_feature", "probe_unit_run"], model: options.model, allowEdits: true, role: "coding" },
       log,
     );
     run.costUsd = result.costUsd;

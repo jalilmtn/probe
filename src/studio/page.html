@@ -322,6 +322,7 @@ const jobKey = {
   verifyFeatures: (fs) => `verify:features:${[...fs].sort().join(",")}`,
   verifyOutdated: (fs) => `verify:outdated${fs && fs.length ? ":" + [...fs].sort().join(",") : ""}`,
   verifyBase: (base) => `verify:base:${base || ""}`,
+  work: () => "work",
 };
 
 /** Where a job's button lives, to open the page on it. */
@@ -329,6 +330,7 @@ function routeOf(j) {
   const [kind, ...rest] = j.key.split(":");
   const arg = rest.join(":");
   if (kind === "init") return { tab: "setup" };
+  if (kind === "work") return { tab: "tickets" };
   if (kind === "login") return { tab: "settings" };
   if (kind === "check") return { tab: "atlas" };
   if (kind === "security") return { tab: "security" };
@@ -1519,8 +1521,10 @@ const BUILD_STATE = {
 function ticketDetail(t, options, st) {
   const bs = t.build && t.buildState ? BUILD_STATE[t.buildState] : null;
   const canTest = t.cards.length > 0;
-  return `<h2 style="margin-top:0"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>
-    <p class="muted" style="margin-top:0">${esc(t.status)}${t.author ? ` · written by ${esc(t.author)}` : ""}${t.assignee ? ` · assigned to ${esc(t.assignee)}` : ""} · updated ${ago(t.updatedAt)}${t.labels.length ? ` · ${t.labels.map(esc).join(", ")}` : ""}</p>
+  return `<div class="row" style="align-items:start"><h2 style="margin-top:0;flex:1"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.id)}</a> ${esc(t.title)}</h2>
+      <button class="btn secondary" id="tkhide" title="${t.group === "hidden" ? "Show it in your list again" : "Hide it from your list on this machine"}">${t.group === "hidden" ? "Show again" : "Hide"}</button></div>
+    ${t.why ? `<p style="margin-top:0"><span class="pill warn">not for you</span> <span class="muted">${esc(t.why)}</span></p>` : ""}
+    <p class="muted" style="margin-top:0">${t.sourceLabel ? `${esc(t.sourceLabel)} · ` : ""}${esc(t.status)}${t.author ? ` · written by ${esc(t.author)}` : ""}${t.assignee ? ` · assigned to ${esc(t.assignee)}` : ""} · updated ${ago(t.updatedAt)}${t.labels.length ? ` · ${t.labels.map(esc).join(", ")}` : ""}</p>
     <p>${t.build ? `Build <strong class="mono">${esc(t.build)}</strong> ${bs ? `<span class="pill ${bs[0]}" title="${t.buildTag ? "git tag " + esc(t.buildTag) : ""}">${bs[1]}</span>` : ""}` : `<span class="muted">The ticket names no build.</span>`}</p>
     <div class="desc">${esc(t.description) || `<span class="muted">No description.</span>`}</div>
     <p>${t.commits} commit${t.commits === 1 ? "" : "s"} name it · features: ${t.features.map(esc).join(", ") || `<span class="muted">none yet</span>`} · cards: ${t.cards.map((c) => `<span class="mono">${esc(c)}</span>`).join(", ") || `<span class="muted">none yet</span>`}</p>
@@ -1534,47 +1538,186 @@ function ticketDetail(t, options, st) {
       <button class="btn secondary" type="button" id="tkshow">Show</button>
       <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}
     <div id="tkpostpanel"></div>
-    <div id="runpanel" style="margin-top:12px"></div>`;
+    <div id="runpanel" style="margin-top:12px"></div>
+    <h3 style="margin-top:16px">Talk about it in Slack</h3><div id="tktalk"><span class="muted">Searching this project's channels…</span></div>`;
+}
+
+// ── Tickets: the workbench. Your tickets from every tracker of this project; tick some, choose
+// what the agent does for each, and it works through them one by one, a commit per ticket.
+
+const tkKey = (t) => `${t.source || ""}/${t.id}`;
+const tkQuery = (t) => (t.source ? `?source=${encodeURIComponent(t.source)}` : "");
+const GROUPS = [["mine", "For me"], ["notForMe", "Not for me"], ["hidden", "Hidden"], ["all", "All"]];
+
+/** The same rules as the server's commitMessage (src/tickets/workbench.ts), for the live preview. */
+function previewCommit(pattern, t, area) {
+  const words = `${(t.labels || []).join(" ")} ${t.title}`.toLowerCase();
+  const type = /\b(bug|fix|crash|broken|error|regression|defect)\b/.test(words) ? "fix" : /\b(test|tests|coverage)\b/.test(words) ? "test" : /\b(docs?|documentation|readme)\b/.test(words) ? "docs" : /\b(chore|refactor|cleanup|upgrade|bump)\b/.test(words) ? "chore" : "feat";
+  const title = t.title.trim().replace(/\s+/g, " ").replace(/[.\s]+$/, "");
+  return pattern.replace(/\{key\}/g, t.id).replace(/\{title\}/g, title).replace(/\{type\}/g, type).replace(/\{area\}/g, area || "")
+    .replace(/\(\s*\)/g, "").replace(/\[\s*\]/g, "").replace(/ {2,}/g, " ").trim();
 }
 
 async function renderTickets() {
   const st = ticketsState();
+  st.picked = st.picked || new Set();
+  st.group = st.group || "mine";
+  st.statuses = st.statuses || new Set();
+  st.label = st.label || "";
   $view.innerHTML = `<div class="empty">Reading tickets…</div>`;
-  const [box, options] = await Promise.all([api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options")]);
+  const [box, options, wb, conns] = await Promise.all([
+    api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options"), api("/api/workbench/settings"), api("/api/connections"),
+  ]);
   st.refresh = false;
+  st.steps = st.steps || new Set(wb.steps);
+  st.pattern = st.pattern ?? wb.commitPattern;
+  const projectName = conns.project.name;
+  st.ai = conns.ai;
   if (!box.connected) {
-    $view.innerHTML = `<div class="box"><h3>Tickets to test</h3>
-      <p style="margin-top:0">Connect Jira or Linear, and the tickets waiting for a test show up here: who wrote each one, the build it names, and a button to test it.</p>
+    $view.innerHTML = `<div class="box"><h3>Tickets for ${esc(projectName)}</h3>
+      <p style="margin-top:0">Connect Jira or Linear to this project, and its tickets show up here. Tick the ones you want, choose what the agent does for each, and it works through them with a commit per ticket.</p>
       <p class="muted">${esc(box.missing)}</p>
-      <button class="btn" id="tkconnect">Connect a ticket tracker</button></div>`;
-    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.scrollTo = "trackerbox"; render(); });
+      <button class="btn" id="tkconnect">Open this project's connections</button></div>`;
+    document.getElementById("tkconnect").addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "connections"; render(); });
     return;
   }
-  const tickets = box.tickets;
-  if (!tickets.some((t) => t.id === st.selected)) st.selected = tickets[0] ? tickets[0].id : null;
-  const sel = tickets.find((t) => t.id === st.selected);
-  const name = box.tracker === "jira" ? "Jira" : "Linear";
-  $view.innerHTML = `
-    <div class="box"><div class="row" style="flex-wrap:wrap"><strong>Tickets to test</strong>
-      <span class="muted">${name} · ${box.filter ? esc(box.filter) : "default filter"} · ${tickets.length} ticket${tickets.length === 1 ? "" : "s"}</span><span style="flex:1"></span>
-      <button class="btn secondary" id="tkrefresh">Refresh</button></div>
-      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}</div>
-    ${tickets.length ? `<div class="split">
-      <div class="side"><div class="head"><input type="search" id="tkq" placeholder="Find a ticket…" value="${esc(st.q)}"></div>
-        <ul id="tklist">${tickets.map((t) => `<li data-t="${esc(t.id)}" class="${t.id === st.selected ? "active" : ""}" title="${esc(t.title)}"><span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>${t.lastRun ? `<span class="pill ${esc(t.lastRun.status)}">${esc(t.lastRun.status)}</span>` : t.cards.length ? `<span class="n">${t.cards.length} card${t.cards.length === 1 ? "" : "s"}</span>` : ""}</li>`).join("")}</ul></div>
-      <div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : ""}</div></div>`
-      : box.error ? "" : `<div class="empty">No ticket matches the filter. Change it in Settings → Ticket tracker.</div>`}`;
-  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; renderTickets(); });
-  if (!tickets.length) return;
-  const filterList = () => {
-    const v = st.q.toLowerCase();
-    document.querySelectorAll("#tklist li").forEach((li) => { li.style.display = !v || (li.dataset.t + " " + li.title).toLowerCase().includes(v) ? "" : "none"; });
-  };
-  document.getElementById("tkq").addEventListener("input", (e) => { st.q = e.target.value; filterList(); });
-  filterList();
-  document.querySelectorAll("#tklist li").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; render(); }));
-  if (!sel) return;
+  const all = box.tickets;
+  const sources = [...new Set(all.map((t) => t.sourceLabel).filter(Boolean))];
+  const inGroup = (t) => st.group === "all" ? t.group !== "hidden" : t.group === st.group;
+  const counts = Object.fromEntries(GROUPS.map(([g]) => [g, all.filter((t) => (g === "all" ? t.group !== "hidden" : t.group === g)).length]));
+  const grouped = all.filter(inGroup);
+  const statuses = [...new Set(grouped.map((t) => t.status))].sort();
+  const labels = [...new Set(grouped.flatMap((t) => t.labels))].sort();
+  for (const s of [...st.statuses]) if (!statuses.includes(s)) st.statuses.delete(s);
+  const visible = grouped.filter((t) => (!st.statuses.size || st.statuses.has(t.status)) && (!st.label || t.labels.includes(st.label)) &&
+    (!st.q || `${t.id} ${t.title}`.toLowerCase().includes(st.q.toLowerCase())));
+  for (const k of [...st.picked]) if (!all.some((t) => tkKey(t) === k)) st.picked.delete(k);
+  if (!all.some((t) => tkKey(t) === st.selected)) st.selected = visible[0] ? tkKey(visible[0]) : null;
+  const sel = all.find((t) => tkKey(t) === st.selected);
 
+  $view.innerHTML = `
+    <div class="box"><div class="row" style="flex-wrap:wrap;gap:8px">
+      <strong>Tickets · ${esc(projectName)}</strong>
+      <span class="muted">${esc(sources.join(" + ") || "")}${box.me && box.me.length ? ` · you are ${esc(box.me.join(", "))}` : ""}</span>
+      <span style="flex:1"></span>
+      <button class="btn secondary" id="tkrules" title="Which tickets are not for you, and how commits are named">Rules</button>
+      <button class="btn secondary" id="tkrefresh">Refresh</button></div>
+      <div class="chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${GROUPS.map(([g, label]) => `<button class="chip ${st.group === g ? "active" : ""}" data-g="${g}">${label} ${counts[g]}</button>`).join("")}</div>
+      ${statuses.length > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="muted" style="font-size:12px">Status</span>${statuses.map((s) => `<button class="chip ${st.statuses.has(s) ? "active" : ""}" data-s="${esc(s)}">${esc(s)} ${grouped.filter((t) => t.status === s).length}</button>`).join("")}</div>` : ""}
+      ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}
+      ${(box.warnings || []).map((w) => `<p style="color:var(--warn);margin-bottom:0">${esc(w)}</p>`).join("")}</div>
+    <div id="workpanel"></div>
+    <div class="split">
+      <div class="side"><div class="head">
+        <input type="search" id="tkq" placeholder="Find a ticket…" value="${esc(st.q)}">
+        ${labels.length ? `<select id="tklabel"><option value="">Any label</option>${labels.map((l) => `<option ${l === st.label ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>` : ""}
+        <label class="muted" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="tkall" ${visible.length && visible.every((t) => st.picked.has(tkKey(t))) ? "checked" : ""}> Select all ${visible.length}</label></div>
+        <ul id="tklist">${visible.map((t) => `<li data-t="${esc(tkKey(t))}" class="${tkKey(t) === st.selected ? "active" : ""}" title="${esc(t.title)}${t.why ? " · not for you: " + esc(t.why) : ""}">
+          <input type="checkbox" data-pick="${esc(tkKey(t))}" ${st.picked.has(tkKey(t)) ? "checked" : ""} aria-label="Select ${esc(t.id)}">
+          <span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>
+          <span class="n">${esc(t.status)}</span></li>`).join("") || `<li class="muted" style="cursor:default">No ticket here.</li>`}</ul></div>
+      <div><div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : `<div class="empty">Choose a ticket.</div>`}</div></div></div>
+    <div id="tkbar"></div>`;
+
+  const rerender = () => renderTickets();
+  document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; rerender(); });
+  document.getElementById("tkrules").addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "workbench"; render(); });
+  $view.querySelectorAll("[data-g]").forEach((b) => b.addEventListener("click", () => { st.group = b.dataset.g; st.statuses.clear(); rerender(); }));
+  $view.querySelectorAll("[data-s]").forEach((b) => b.addEventListener("click", () => { st.statuses.has(b.dataset.s) ? st.statuses.delete(b.dataset.s) : st.statuses.add(b.dataset.s); rerender(); }));
+  document.getElementById("tkq").addEventListener("change", (e) => { st.q = e.target.value; rerender(); });
+  document.getElementById("tklabel")?.addEventListener("change", (e) => { st.label = e.target.value; rerender(); });
+  document.getElementById("tkall").addEventListener("change", (e) => { visible.forEach((t) => (e.target.checked ? st.picked.add(tkKey(t)) : st.picked.delete(tkKey(t)))); rerender(); });
+  $view.querySelectorAll("[data-pick]").forEach((cb) => {
+    cb.addEventListener("click", (e) => e.stopPropagation());
+    cb.addEventListener("change", () => { cb.checked ? st.picked.add(cb.dataset.pick) : st.picked.delete(cb.dataset.pick); renderWorkBar(all, wb, st); });
+  });
+  $view.querySelectorAll("#tklist li[data-t]").forEach((li) => li.addEventListener("click", () => { st.selected = li.dataset.t; rerender(); }));
+  renderWorkBar(all, wb, st);
+  const running = state.jobs.find((j) => j.key === "work");
+  if (running || st.workRun) showWork(running ? running.runId : st.workRun, st);
+  if (sel) bindTicketDetail(sel, options, st, rerender);
+}
+
+/** The bar under the list: what the agent does for the ticked tickets, the commit name, and Start. */
+function renderWorkBar(all, wb, st) {
+  const bar = document.getElementById("tkbar");
+  const picked = all.filter((t) => st.picked.has(tkKey(t)));
+  if (!picked.length) { bar.innerHTML = ""; return; }
+  const first = picked[0];
+  bar.innerHTML = `<div class="box" style="position:sticky;bottom:0;margin-top:14px;border-color:var(--accent)">
+    <div class="row" style="flex-wrap:wrap"><strong>${picked.length} ticket${picked.length === 1 ? "" : "s"} selected</strong>
+      <span class="muted">${picked.map((t) => esc(t.id)).join(", ")}</span><span style="flex:1"></span>
+      <button class="btn secondary" id="wbclear">Clear</button></div>
+    <p class="muted" style="margin:8px 0 6px">What should the agent do for each ticket? It works through them one at a time.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">${wb.allSteps.map((s) => `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-step="${s.id}" ${st.steps.has(s.id) ? "checked" : ""}> ${esc(s.label)}</label>`).join("")}</div>
+    <form class="inline" id="wbf" style="margin-top:10px">
+      <label style="flex:1 1 320px">Commit message <span class="src">{key} {title} {type} {area}</span><input name="pattern" class="mono" value="${esc(st.pattern)}"></label>
+      ${(() => { const ai = st.ai; const coding = ai.use.coding || {}; st.account = st.account ?? (coding.account || ""); st.model = st.model ?? (coding.model || "");
+        return `<label>Coding account<select name="account"><option value="">${ai.accounts.length ? "As in Settings (" + esc((ai.accounts.find((a) => a.id === coding.account) || ai.accounts[0]).name) + ")" : "CLI's own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${st.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>
+        <label>Coding model<select name="model"><option value="">As in Settings (${esc(coding.model || ai.model || "default")})</option>${ai.models.filter(([m]) => m).map(([m, l]) => `<option value="${esc(m)}" ${st.model === m ? "selected" : ""}>${esc(l.split(" — ")[0])}</option>`).join("")}${st.model && !ai.models.some(([m]) => m === st.model) ? `<option selected>${esc(st.model)}</option>` : ""}</select></label>`; })()}
+      <button class="btn" type="submit" data-job="work" data-busy="Working…">▶ Start ${picked.length} ticket${picked.length === 1 ? "" : "s"}</button>
+    </form>
+    <p class="muted" style="margin:6px 0 0" id="wbprev"></p>
+    <p class="muted" style="margin:6px 0 0">Commits stay on this machine on branch <strong>${esc(state.branchSeen || "the current branch")}</strong>. Nothing is pushed. A ticket's tracker is only changed if you tick “Comment on the ticket”.</p>
+  </div>`;
+  const prev = () => {
+    const commit = st.steps.has("commit");
+    document.getElementById("wbprev").innerHTML = commit ? `First commit: <span class="mono">${esc(previewCommit(st.pattern, first, first.features.length === 1 ? first.features[0] : ""))}</span>` : "No commit: the changes stay in your working tree for you to review.";
+  };
+  prev();
+  bar.querySelectorAll("[data-step]").forEach((cb) => cb.addEventListener("change", () => { cb.checked ? st.steps.add(cb.dataset.step) : st.steps.delete(cb.dataset.step); prev(); }));
+  const f = document.getElementById("wbf");
+  f.pattern.addEventListener("input", () => { st.pattern = f.pattern.value; prev(); });
+  f.account.addEventListener("change", () => { st.account = f.account.value; });
+  f.model.addEventListener("change", () => { st.model = f.model.value; });
+  document.getElementById("wbclear").addEventListener("click", () => { st.picked.clear(); renderTickets(); });
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!st.steps.size) return alert("Tick at least one step.");
+    if (st.steps.has("commit") && !/\{key\}/.test(st.pattern)) return alert("The commit message needs {key}, so each commit names its ticket.");
+    const steps = wb.allSteps.map((s) => s.id).filter((s) => st.steps.has(s));
+    if (!confirm(`The agent will work on ${picked.length} ticket(s) in ${state.branchSeen || "this branch"}: ${steps.join(", ")}.${steps.includes("commit") ? " Each ticket gets its own local commit." : ""} Start?`)) return;
+    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined });
+    if (res.error) return alert(res.error);
+    st.workRun = res.runId;
+    st.picked.clear();
+    await refreshJobs();
+    renderTickets();
+  });
+}
+
+const STEP_ICON = { passed: "✓", failed: "✗", error: "✗", blocked: "!", running: "…", queued: "·", skipped: "–", stopped: "■" };
+const STEP_CLASS = { passed: "passed", failed: "failed", error: "failed", blocked: "warn", running: "running", queued: "none", skipped: "skipped", stopped: "stopped" };
+
+/** A workbench run as a grid: a row per ticket, a cell per step. Follows it while it runs. */
+async function showWork(runId, st) {
+  const el = document.getElementById("workpanel");
+  if (!el) return;
+  const run = await api(`/api/work/${encodeURIComponent(runId)}`).catch(() => null);
+  if (!run || run.error || run.kind !== "work") return;
+  const done = run.status !== "running";
+  el.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><strong>Workbench run</strong>
+      <span class="pill ${esc(run.status)}">${esc(run.status)}</span><span class="muted">started ${ago(run.startedAt)}${run.costUsd ? ` · $${run.costUsd.toFixed(2)}` : ""}</span><span style="flex:1"></span>
+      ${done ? `<button class="btn secondary" id="wkclose">Close</button>` : `<button class="btn stop" id="wkstop">■ Stop</button>`}
+      <a href="#runs/${encodeURIComponent(run.id)}">Full log</a></div>
+    ${run.error ? `<p style="color:var(--warn)">${esc(run.error)}</p>` : ""}
+    <table style="margin-top:8px"><thead><tr><th>Ticket</th>${run.steps.map((s) => `<th>${esc(STEP_NAMES[s] || s)}</th>`).join("")}<th>Result</th></tr></thead><tbody>
+    ${run.tickets.map((t) => `<tr><td><span class="mono">${esc(t.key)}</span><br><span class="muted">${esc(t.title === t.key ? "" : t.title)}</span></td>
+      ${run.steps.map((s) => { const x = t.steps.find((y) => y.step === s) || { status: "queued" }; return `<td title="${esc(x.note || x.status)}"><span class="pill ${STEP_CLASS[x.status] || "none"}">${STEP_ICON[x.status] || "·"}</span>${x.runId ? ` <a href="#runs/${encodeURIComponent(x.runId)}" class="muted" style="font-size:11px">run</a>` : ""}</td>`; }).join("")}
+      <td>${t.commit ? `<span class="mono">${esc(t.commit.hash)}</span> ${esc(t.commit.message)}` : t.status === "needs-you" ? `<span class="pill warn">needs you</span> ${esc((t.steps.find((x) => ["failed", "blocked", "error"].includes(x.status)) || {}).note || "")}` : `<span class="pill ${esc(t.status)}">${esc(t.status)}</span>`}
+      ${t.files.length ? `<details><summary class="muted">${t.files.length} file(s)</summary><div class="mono">${t.files.map(esc).join("<br>")}</div></details>` : ""}</td></tr>`).join("")}
+    </tbody></table></div>`;
+  document.getElementById("wkclose")?.addEventListener("click", () => { st.workRun = null; el.innerHTML = ""; });
+  document.getElementById("wkstop")?.addEventListener("click", async () => { if (confirm("Stop the workbench run? The ticket in progress stops where it is.")) await stopRunReq(run.id); });
+  if (!done && state.tab === "tickets") setTimeout(() => { if (state.tab === "tickets" && document.getElementById("workpanel") === el) showWork(runId, st); }, 2500);
+  else if (done) refreshJobs();
+}
+
+const STEP_NAMES = { context: "Context", fix: "Change", unitwrite: "Write tests", unit: "Unit tests", ui: "UI test", validate: "Validate", commit: "Commit", comment: "Comment" };
+
+/** The ticket on the right: its text, what Slack said about it, and testing it. */
+function bindTicketDetail(sel, options, st, rerender) {
+  const q = tkQuery(sel);
   const form = document.getElementById("tkf");
   const panel = document.getElementById("runpanel");
   const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };
@@ -1583,87 +1726,51 @@ async function renderTickets() {
     e.preventDefault();
     const against = readTarget(form, options);
     if (against.error) return alert(against.error);
-    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test`, against);
+    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/test${q}`, against);
     if (res.error) return alert(res.error);
     followRun(res.runId, panel, done);
   });
   document.getElementById("tkcards").addEventListener("click", async () => {
     const features = form.features ? form.features.value.split(",").map((x) => x.trim()).filter(Boolean) : [];
-    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards`, { features });
+    const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/cards${q}`, { features });
     if (res.error) return alert(res.error);
     followRun(res.runId, panel, done);
+  });
+  document.getElementById("tkhide").addEventListener("click", async () => {
+    await post("/api/workbench/hide", { key: sel.id, source: sel.source, hidden: sel.group !== "hidden" });
+    st.selected = null;
+    rerender();
   });
   const show = document.getElementById("tkshow");
   if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));
   const postBtn = document.getElementById("tkpost");
   if (postBtn) postBtn.addEventListener("click", async () => {
     const out = document.getElementById("tkpostpanel");
-    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment?run=${encodeURIComponent(sel.lastRun.id)}`);
+    const sep = q ? "&" : "?";
+    const preview = await api(`/api/inbox/${encodeURIComponent(sel.id)}/comment${q}${sep}run=${encodeURIComponent(sel.lastRun.id)}`);
     if (preview.error) { out.innerHTML = `<p style="color:var(--fail)">${esc(preview.error)}</p>`; return; }
-    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${name}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>
+    out.innerHTML = `<div class="box" style="margin-top:10px"><h3>This comment goes on ${esc(sel.id)} in ${esc(sel.sourceLabel || "the tracker")}, under your name</h3><pre class="log" style="max-height:260px">${esc(preview.body)}</pre>
       <div class="row" style="margin-top:8px"><button class="btn" id="tkpostgo">Post comment</button><button class="btn secondary" id="tkpostno">Cancel</button><span id="tkpostout"></span></div></div>`;
     document.getElementById("tkpostno").addEventListener("click", () => { out.innerHTML = ""; });
     document.getElementById("tkpostgo").addEventListener("click", async (ev) => {
       ev.target.disabled = true;
-      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment`, { run: sel.lastRun.id });
+      const res = await post(`/api/inbox/${encodeURIComponent(sel.id)}/comment${q}`, { run: sel.lastRun.id });
       document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;
       if (res.error) ev.target.disabled = false;
     });
   });
-}
-
-// ── Settings: the tracker connection, and finished builds and the web app ──
-
-function trackerBox(t) {
-  const opt = (v, label) => `<option value="${v}" ${(t.tracker || "") === v ? "selected" : ""}>${label}</option>`;
-  return `<div class="box" id="trackerbox"><h3>Ticket tracker</h3>
-    <p class="muted" style="margin-top:0">Connect Jira or Linear, and the Tickets tab lists what is waiting for a test. Which tracker, the site and the filter are saved to <span class="mono">probe/probe.yaml</span> for the team. Your API token is encrypted on this machine only and is never shown again; Probe uses it to read tickets, and to post a result as a comment when you press Post.</p>
-    <form class="inline" id="trf" autocomplete="off">
-      <label>Tracker<select name="tracker">${opt("", "None")}${t.trackers.map((x) => opt(x.id, x.label)).join("")}</select></label>
-      <label data-for="jira">Site<input name="site" value="${esc(t.site || "")}" placeholder="https://acme.atlassian.net" style="width:260px"></label>
-      <label data-for="jira">Account email <span class="src">this machine</span><input name="email" value="${esc(t.email || "")}" placeholder="you@example.com" style="width:220px" title="The Jira account the API token belongs to. Leave empty for a Jira Data Center personal access token."></label>
-      <label data-for="jira linear">API token <span class="src">${t.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${t.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>
-      <label data-for="linear">Team key<input name="team" value="${esc(t.team || "")}" placeholder="ENG" style="width:90px" title="Only this team's tickets: the prefix of its ticket ids"></label>
-      <label data-for="jira">Build field<input name="buildField" value="${esc(t.buildField || "")}" placeholder="Fix version" style="width:150px" title="The Jira field that holds the build to test. Empty: a build written in the description, else the fix version."></label>
-      <label data-for="jira" style="flex:1 1 100%">Tickets to list (JQL)<input name="filterJira" value="${t.tracker === "jira" ? esc(t.filter || "") : ""}" placeholder='status = "Ready for QA" ORDER BY updated DESC   (empty: ${esc(t.defaultFilter)})' class="mono"></label>
-      <label data-for="linear" style="flex:1 1 100%">Tickets to list (status names, comma separated)<input name="filterLinear" value="${t.tracker === "linear" ? esc(t.filter || "") : ""}" placeholder="Ready for QA, In Review   (empty: everything started or to do)"></label>
-      <button class="btn" type="submit">Save and test the connection</button>
-      ${t.hasToken ? `<button class="btn secondary" type="button" id="trdisc" title="Forgets the token on this machine">Disconnect</button>` : ""}
-    </form>
-    <p id="trout" style="margin-bottom:0"></p>
-    <p class="muted" style="margin-bottom:0" data-for="jira">A Jira API token: id.atlassian.com → Security → API tokens.</p>
-    <p class="muted" style="margin-bottom:0" data-for="linear">A Linear API key: Linear → Settings → Security &amp; access → Personal API keys. Linear has no build field: write "Build: 142" in the ticket, or give it a label like <span class="mono">build:142</span>.</p>
-  </div>`;
-}
-
-function bindTracker() {
-  const f = document.getElementById("trf");
-  const box = document.getElementById("trackerbox");
-  const out = document.getElementById("trout");
-  const sync = () => box.querySelectorAll("[data-for]").forEach((el) => { el.style.display = el.dataset.for.split(" ").includes(f.tracker.value) ? "" : "none"; });
-  f.tracker.addEventListener("change", sync);
-  sync();
-  f.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const tracker = f.tracker.value || null;
-    const saved = await post("/api/tracker", { tracker, site: f.site.value, email: f.email.value, token: f.token.value, team: f.team.value, buildField: f.buildField.value, filter: tracker === "linear" ? f.filterLinear.value : f.filterJira.value });
-    if (saved.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(saved.error)}`; return; }
-    if (!tracker) return renderSettings();
-    if (saved.missing) { out.innerHTML = `<span class="pill warn">saved</span> ${esc(saved.missing)}`; return; }
-    out.innerHTML = `<span class="muted">Saved. Asking ${tracker === "jira" ? "Jira" : "Linear"}…</span>`;
-    const test = await post("/api/tracker/test");
-    out.innerHTML = test.ok ? `<span class="pill passed">connected</span> as <strong>${esc(test.message)}</strong>. The Tickets tab now lists your tickets.` : `<span class="pill failed">saved, but not connected</span> ${esc(test.message)}`;
-    f.token.value = "";
-    state.tickets = null;
-  });
-  const disc = document.getElementById("trdisc");
-  if (disc) disc.addEventListener("click", async () => {
-    if (!confirm("Forget the API token on this machine?")) return;
-    await api("/api/tracker", { method: "DELETE" });
-    state.tickets = null;
-    renderSettings();
+  // What people said about it in this project's Slack channels.
+  const talk = document.getElementById("tktalk");
+  api(`/api/inbox/${encodeURIComponent(sel.id)}/discussion${q}`).then((d) => {
+    if (!talk || d.error) { if (talk) talk.innerHTML = `<span class="muted">${esc(d.error)}</span>`; return; }
+    if (!d.searched.length && !d.errors.length) { talk.innerHTML = `<span class="muted">No Slack channel connected to this project. Add one in Settings → Connections.</span>`; return; }
+    talk.innerHTML = `${d.matches.length ? d.matches.map((m) => `<div style="border-left:3px solid var(--line);padding:4px 10px;margin:6px 0">
+        <div class="muted" style="font-size:12px">#${esc(m.channelName)} · ${esc(m.user)} · ${ago(m.at)}${m.replies ? ` · ${m.replies} replies` : ""} · <a href="${esc(m.link)}" target="_blank" rel="noopener">open in Slack</a></div>
+        <div style="white-space:pre-wrap">${esc(m.text)}</div></div>`).join("") : `<span class="muted">Nothing about ${esc(sel.id)} in ${esc(d.searched.join(", "))}.</span>`}
+      ${d.errors.map((e) => `<p style="color:var(--warn);margin:4px 0">${esc(e)}</p>`).join("")}`;
   });
 }
+
 
 function buildsBox(b) {
   const pw = b.playwright;
@@ -1812,15 +1919,299 @@ function bindProject() {
   });
 }
 
+// ── Settings: everything here belongs to the project picked at the top. One section at a time. ──
+
+const SETTINGS_TABS = [
+  ["general", "General"],
+  ["connections", "Connections"],
+  ["ai", "AI accounts and models"],
+  ["workbench", "Workbench"],
+  ["builds", "Builds and web"],
+  ["accounts", "Test accounts"],
+];
+
 async function renderSettings() {
-  $view.innerHTML = `<div class="empty">Reading settings…</div>`;
-  const [s, p, br, tracker, builds] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches"), api("/api/tracker"), api("/api/builds/settings")]);
+  const tab = state.settingsTab || "general";
+  const proj = await api("/api/connections").catch(() => null);
+  const name = proj ? proj.project.name : "this project";
+  $view.innerHTML = `<div class="box" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><strong>Settings for ${esc(name)}</strong>
+      <span class="muted mono">${esc(proj ? proj.project.root : "")}</span><span style="flex:1"></span>
+      <span class="muted" style="font-size:12px">Switch project with the picker at the top. Nothing here is shared between projects.</span></div>
+    <div class="split"><div class="side"><ul>${SETTINGS_TABS.map(([id, label]) => `<li data-st="${id}" class="${id === tab ? "active" : ""}"><span class="name">${label}</span></li>`).join("")}</ul></div>
+    <div id="setpane"><div class="empty">Reading…</div></div></div>`;
+  $view.querySelectorAll("[data-st]").forEach((li) => li.addEventListener("click", () => { state.settingsTab = li.dataset.st; renderSettings(); }));
+  const pane = document.getElementById("setpane");
+  if (tab === "general") return renderGeneral(pane);
+  if (tab === "connections") return renderConnections(pane, proj);
+  if (tab === "ai") return renderAi(pane, proj);
+  if (tab === "workbench") return renderWorkbenchSettings(pane);
+  if (tab === "builds") { pane.innerHTML = buildsBox(await api("/api/builds/settings")); bindBuilds(); return; }
+  if (tab === "accounts") return renderAccounts(pane);
+}
+
+// ── Connections: trackers, Slack ──
+
+const CONN_GROUPS = [["tickets", "Tickets", "Where this project's tickets live. Add more than one: Jira and Linear side by side."], ["conversations", "Conversations", "Slack channels the agent reads to find what the team said about a ticket."]];
+
+function connStatus(c) {
+  if (!c.missing) return `<span class="pill passed">Connected</span>`;
+  if (!c.hasToken) return `<span class="pill warn">No token on this machine</span>`;
+  return `<span class="pill warn">Needs setup</span>`;
+}
+
+function connDetail(c) {
+  if (c.kind === "jira") return `${esc(c.filter || "tickets that aren't done")}${c.email ? ` · ${esc(c.email)}` : ""}`;
+  if (c.kind === "linear") return `${c.team ? `team ${esc(c.team)} · ` : ""}${esc(c.filter || "started and to-do tickets")}`;
+  const ch = c.channels || [];
+  return ch.length ? ch.map((x) => `#${esc(x.name)}${x.post ? " (posts)" : ""}`).join(", ") + ` · last ${c.days} days` : "no channel yet";
+}
+
+function renderConnections(pane, data) {
+  const st = state.connEdit || (state.connEdit = { open: null, kind: null });
+  pane.innerHTML = `<div class="box"><div class="row" style="flex-wrap:wrap"><div style="flex:1"><h3 style="margin:0">Connections for ${esc(data.project.name)}</h3>
+      <div class="muted">What each tool is and where it points is saved to <span class="mono">probe/probe.yaml</span> for the team. Your tokens are encrypted on this machine, for this project only.</div></div>
+      <select id="cnadd"><option value="">＋ Add connection…</option><option value="jira">Jira</option><option value="linear">Linear</option><option value="slack">Slack</option></select></div></div>
+    ${st.open === "new" ? `<div class="box" style="border-color:var(--accent)">${connForm({ kind: st.kind, channels: [], days: 30 }, true)}</div>` : ""}
+    ${CONN_GROUPS.map(([g, title, hint]) => {
+      const list = data.connections.filter((c) => c.group === g);
+      return `<div class="box"><h3>${title}</h3><p class="muted" style="margin-top:0">${hint}</p>
+        ${list.length ? list.map((c) => `<div style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px">
+          <div class="row" style="flex-wrap:wrap"><div style="flex:1;min-width:200px"><strong>${esc(c.label)}</strong>${c.legacy ? ` <span class="muted" style="font-size:12px">(from the older single-tracker setting)</span>` : ""}<div class="muted" style="font-size:12px">${connDetail(c)}</div></div>
+            ${connStatus(c)}
+            <button class="btn secondary" data-cn-test="${c.id}">Test</button>
+            <button class="btn secondary" data-cn-edit="${c.id}">${st.open === c.id ? "Close" : "Edit"}</button>
+            ${c.hasToken ? `<button class="btn secondary" data-cn-forget="${c.id}" title="Forget your token on this machine; the team setting stays">Forget token</button>` : ""}
+            <button class="btn secondary" data-cn-remove="${c.id}" title="Remove it from the project for everyone">Remove</button></div>
+          ${c.missing ? `<div class="muted" style="font-size:12px;margin-top:4px">${esc(c.missing)}</div>` : ""}
+          <div data-cn-out="${c.id}" style="font-size:13px;margin-top:4px"></div>
+          ${st.open === c.id ? `<div style="margin-top:10px">${connForm(c, false)}</div>` : ""}</div>`).join("")
+        : `<div class="muted">None yet.</div>`}</div>`;
+    }).join("")}`;
+
+  document.getElementById("cnadd").addEventListener("change", (e) => { if (!e.target.value) return; Object.assign(st, { open: "new", kind: e.target.value }); renderConnections(pane, data); });
+  pane.querySelectorAll("[data-cn-edit]").forEach((b) => b.addEventListener("click", () => { st.open = st.open === b.dataset.cnEdit ? null : b.dataset.cnEdit; renderConnections(pane, data); }));
+  pane.querySelectorAll("[data-cn-test]").forEach((b) => b.addEventListener("click", async () => {
+    const out = pane.querySelector(`[data-cn-out="${b.dataset.cnTest}"]`);
+    out.innerHTML = `<span class="muted">Asking…</span>`;
+    const r = await post(`/api/connections/${b.dataset.cnTest}/test`);
+    out.innerHTML = r.ok ? `<span class="pill passed">works</span> as <strong>${esc(r.message)}</strong>` : `<span class="pill failed">not connected</span> ${esc(r.message)}`;
+  }));
+  pane.querySelectorAll("[data-cn-forget]").forEach((b) => b.addEventListener("click", async () => {
+    if (!confirm("Forget your token for this connection on this machine?")) return;
+    const r = await post(`/api/connections/${b.dataset.cnForget}/disconnect`);
+    state.tickets = null; renderConnections(pane, r);
+  }));
+  pane.querySelectorAll("[data-cn-remove]").forEach((b) => b.addEventListener("click", async () => {
+    if (!confirm("Remove this connection from the project? It is removed from probe/probe.yaml for the whole team, and your token is forgotten.")) return;
+    const r = await api(`/api/connections/${b.dataset.cnRemove}`, { method: "DELETE" });
+    state.tickets = null; st.open = null; renderConnections(pane, r);
+  }));
+  const form = pane.querySelector("form[data-conn]");
+  if (form) bindConnForm(form, pane, data);
+}
+
+function connForm(c, isNew) {
+  const k = c.kind;
+  const tokenLabel = k === "slack" ? "Slack token (xoxb- bot or xoxp- user)" : k === "jira" ? "API token" : "API key";
+  const help = k === "jira" ? "A Jira API token: id.atlassian.com → Security → API tokens." : k === "linear" ? "A Linear API key: Linear → Settings → Security & access → Personal API keys." : "A Slack app token with channels:history, groups:history, channels:read, groups:read and users:read (and chat:write to post). Invite the bot to each channel.";
+  return `<form class="inline" data-conn="${esc(c.id || "")}" data-kind="${k}" autocomplete="off">
+    <label>Name <span class="src">optional</span><input name="label" value="${esc(c.customLabel || "")}" placeholder="${k === "slack" ? "Acme Slack" : k === "jira" ? "Acme Jira" : "Linear"}" style="width:160px"></label>
+    ${k === "jira" ? `<label>Site<input name="site" value="${esc(c.site || "")}" placeholder="https://acme.atlassian.net" style="width:240px"></label>
+      <label>Account email <span class="src">this machine</span><input name="email" value="${esc(c.email || "")}" placeholder="you@example.com" style="width:200px"></label>
+      <label>Build field<input name="buildField" value="${esc(c.buildField || "")}" placeholder="Fix version" style="width:130px"></label>
+      <label style="flex:1 1 100%">Tickets to list (JQL)<input name="filter" class="mono" value="${esc(c.filter || "")}" placeholder='project = SHOP AND statusCategory != Done ORDER BY updated DESC'></label>` : ""}
+    ${k === "linear" ? `<label>Team key<input name="team" value="${esc(c.team || "")}" placeholder="ENG" style="width:90px"></label>
+      <label style="flex:1 1 320px">Statuses to list (comma separated)<input name="filter" value="${esc(c.filter || "")}" placeholder="Todo, In Progress, Ready for dev"></label>` : ""}
+    ${k === "slack" ? `<label>Workspace<input name="workspace" value="${esc(c.workspace || "")}" placeholder="acme" style="width:140px"></label>
+      <label>Look back (days)<input name="days" type="number" min="1" max="365" value="${esc(c.days || 30)}" style="width:90px"></label>` : ""}
+    <label>${tokenLabel} <span class="src">${c.hasToken ? "stored on this machine" : "not stored yet"}</span><input name="token" type="password" autocomplete="new-password" placeholder="${c.hasToken ? "unchanged if empty" : "paste it here"}" style="width:220px"></label>
+    ${k === "slack" ? `<div style="flex:1 1 100%">${isNew ? `<p class="muted" style="margin:0">Save the token first; then add the channels this project uses.</p>` : channelEditor(c)}</div>` : ""}
+    <button class="btn" type="submit">${isNew ? "Add and test" : "Save and test"}</button>
+    ${isNew ? `<button class="btn secondary" type="button" data-cancel>Cancel</button>` : ""}
+    <p class="muted" style="flex:1 1 100%;margin:0">${help}</p>
+    <p data-form-out style="flex:1 1 100%;margin:0"></p>
+  </form>`;
+}
+
+function channelEditor(c) {
+  const rows = (c.channels || []).map((ch, i) => `<tr data-ch="${i}"><td class="mono">#${esc(ch.name)}<br><span class="muted">${esc(ch.id)}</span></td>
+    <td><input type="checkbox" data-f="search" ${ch.search ? "checked" : ""}></td>
+    <td><input type="checkbox" data-f="post" ${ch.post ? "checked" : ""}></td>
+    <td><input data-f="labels" value="${esc((ch.labels || []).join(", "))}" placeholder="any ticket" style="width:160px"></td>
+    <td><button class="btn secondary" type="button" data-ch-del="${i}">Remove</button></td></tr>`).join("");
+  return `<div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:4px">Channels</div>
+    <table><thead><tr><th>Channel</th><th title="Read it for talk about a ticket">Search</th><th title="Probe may post results here when you press Post">Post</th><th title="Only for tickets with one of these labels">Only for labels</th><th></th></tr></thead>
+    <tbody>${rows || `<tr><td colspan="5" class="muted">No channel yet.</td></tr>`}</tbody></table>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn secondary" type="button" data-ch-load>＋ Add channels…</button><span data-ch-pick></span></div>`;
+}
+
+function readChannels(form, c) {
+  return (c.channels || []).map((ch, i) => {
+    const row = form.querySelector(`tr[data-ch="${i}"]`);
+    if (!row) return null;
+    return { ...ch, search: row.querySelector('[data-f="search"]').checked, post: row.querySelector('[data-f="post"]').checked, labels: row.querySelector('[data-f="labels"]').value.split(",").map((x) => x.trim()).filter(Boolean) };
+  }).filter(Boolean);
+}
+
+function bindConnForm(form, pane, data) {
+  const id = form.dataset.conn;
+  const c = data.connections.find((x) => x.id === id) || { kind: form.dataset.kind, channels: [] };
+  const out = form.querySelector("[data-form-out]");
+  form.querySelector("[data-cancel]")?.addEventListener("click", () => { state.connEdit.open = null; renderConnections(pane, data); });
+  form.querySelectorAll("[data-ch-del]").forEach((b) => b.addEventListener("click", () => { b.closest("tr").remove(); }));
+  form.querySelector("[data-ch-load]")?.addEventListener("click", async (e) => {
+    const spot = form.querySelector("[data-ch-pick]");
+    spot.innerHTML = `<span class="muted">Asking Slack for channels…</span>`;
+    const r = await api(`/api/connections/${id}/channels`);
+    if (r.error) { spot.innerHTML = `<span class="pill failed">no list</span> ${esc(r.error)}`; return; }
+    const have = new Set((c.channels || []).map((x) => x.id));
+    const options = r.channels.filter((x) => !have.has(x.id));
+    spot.innerHTML = `<input type="search" placeholder="Filter channels…" data-ch-q style="min-width:180px">
+      <div data-ch-list style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:6px;min-width:280px">${options.map((x) => `<label style="display:flex;gap:6px;align-items:center;font-weight:400;color:var(--text)"><input type="checkbox" value="${esc(x.id)}" data-name="${esc(x.name)}"> #${esc(x.name)} ${x.isPrivate ? `<span class="muted">private</span>` : ""} ${x.isMember ? "" : `<span class="muted" title="Invite the bot to read it">bot not in it</span>`}</label>`).join("") || `<span class="muted">Every channel the token sees is added.</span>`}</div>
+      <button class="btn secondary" type="button" data-ch-addsel style="margin-top:6px">Add selected</button>`;
+    spot.querySelector("[data-ch-q]").addEventListener("input", (ev) => { const v = ev.target.value.toLowerCase(); spot.querySelectorAll("[data-ch-list] label").forEach((l) => { l.style.display = l.textContent.toLowerCase().includes(v) ? "" : "none"; }); });
+    spot.querySelector("[data-ch-addsel]").addEventListener("click", async () => {
+      const add = [...spot.querySelectorAll("[data-ch-list] input:checked")].map((i) => ({ id: i.value, name: i.dataset.name, search: true, post: false, labels: [] }));
+      if (!add.length) return;
+      const res = await post("/api/connections", { id, channels: [...readChannels(form, c), ...add] });
+      if (res.error) { spot.innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }
+      renderConnections(pane, res);
+    });
+  });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const v = (n) => (form[n] ? form[n].value : undefined);
+    const body = { id: id || undefined, kind: c.kind, label: v("label"), site: v("site"), email: v("email"), filter: v("filter"), team: v("team"), buildField: v("buildField"), workspace: v("workspace"), days: form.days ? Number(form.days.value) : undefined, token: v("token") };
+    if (c.kind === "slack" && id) body.channels = readChannels(form, c);
+    const res = await post("/api/connections", body);
+    if (res.error) { out.innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }
+    state.tickets = null;
+    state.connEdit.open = res.saved;
+    renderConnections(pane, res);
+    const t = await post(`/api/connections/${res.saved}/test`);
+    const o = pane.querySelector(`[data-cn-out="${res.saved}"]`);
+    if (o) o.innerHTML = t.ok ? `<span class="pill passed">works</span> as <strong>${esc(t.message)}</strong>` : `<span class="pill failed">saved, not connected</span> ${esc(t.message)}`;
+  });
+}
+
+// ── AI accounts and which one (and which model) each kind of work uses ──
+
+const AI_MODE = { default: "The CLI's own login", profile: "A separate login folder", apiKey: "An API key" };
+
+function renderAi(pane, data) {
+  const ai = data.ai;
+  const editing = state.aiEdit;
+  const acct = editing && editing !== "new" ? ai.accounts.find((a) => a.id === editing) : null;
+  const modelOpts = (cur) => `<option value="" ${cur ? "" : "selected"}>Agents default (${esc(ai.model || "CLI default")})</option>` +
+    ai.models.filter(([m]) => m).map(([m, label]) => `<option value="${esc(m)}" ${m === cur ? "selected" : ""}>${esc(label)}</option>`).join("") +
+    (cur && !ai.models.some(([m]) => m === cur) ? `<option value="${esc(cur)}" selected>${esc(cur)}</option>` : "") + `<option value="__other">Other model name…</option>`;
+  pane.innerHTML = `<div class="box"><h3>AI accounts for ${esc(data.project.name)}</h3>
+      <p class="muted" style="margin-top:0">The ${esc(ai.runner)} accounts this project's agents may use on this machine. Each one is a separate login, so a client project can run on the client's account and never touch your own. Keys are encrypted on this machine.</p>
+      ${ai.accounts.length ? `<table><thead><tr><th>Account</th><th>Signs in with</th><th></th></tr></thead><tbody>${ai.accounts.map((a) => `<tr>
+        <td><strong>${esc(a.name)}</strong> <span class="muted mono">${esc(a.id)}</span></td>
+        <td>${AI_MODE[a.mode]}${a.mode === "profile" ? ` <span class="mono muted">${esc(a.profileDir)}</span>` : ""}${a.mode === "apiKey" ? (a.hasKey ? ` <span class="pill passed">key stored</span>` : ` <span class="pill warn">no key</span>`) : ""}</td>
+        <td style="white-space:nowrap"><button class="btn secondary" data-ai-test="${a.id}">Test</button> <button class="btn secondary" data-ai-edit="${a.id}">Edit</button> <button class="btn secondary" data-ai-del="${a.id}">Remove</button><div data-ai-out="${a.id}" style="font-size:12px"></div></td></tr>`).join("")}</tbody></table>`
+        : `<p class="muted">No account added: agents use ${esc(ai.runner)}'s own login on this machine.</p>`}
+      <div style="margin-top:10px">${editing ? aiAccountForm(acct) : `<button class="btn secondary" id="aiadd">＋ Add an account</button>`}</div></div>
+    <div class="box"><h3>Which account and model for each kind of work</h3>
+      <p class="muted" style="margin-top:0">For example: coding on Opus with your work account, reviews on Sonnet. A workbench run can still pick another for that run.</p>
+      <form class="inline" id="aiuse">${ai.roles.map((r) => { const u = ai.use[r.id] || {}; return `<div style="flex:1 1 100%;display:flex;gap:10px;flex-wrap:wrap;align-items:end;padding:6px 0;border-bottom:1px solid var(--line)">
+        <div style="flex:1 1 220px"><strong>${esc(r.label.split(":")[0])}</strong><div class="muted" style="font-size:12px">${esc(r.label.split(":")[1] || "")}</div></div>
+        <label>Account<select name="acct-${r.id}"><option value="">${ai.accounts.length ? `First account (${esc(ai.accounts[0].name)})` : "CLI's own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${u.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>
+        <label>Model<select name="model-${r.id}">${modelOpts(u.model)}</select></label></div>`; }).join("")}
+        <button class="btn" type="submit">Save</button><span id="aiuseout"></span></form>
+      <p class="muted" style="margin-bottom:0">Runner and the default model are under General → Agents.</p></div>`;
+  document.getElementById("aiadd")?.addEventListener("click", () => { state.aiEdit = "new"; renderAi(pane, data); });
+  pane.querySelectorAll("[data-ai-edit]").forEach((b) => b.addEventListener("click", () => { state.aiEdit = b.dataset.aiEdit; renderAi(pane, data); }));
+  pane.querySelectorAll("[data-ai-del]").forEach((b) => b.addEventListener("click", async () => {
+    if (!confirm("Remove this account from the project on this machine? Its key is forgotten.")) return;
+    renderAi(pane, await api(`/api/ai/accounts/${b.dataset.aiDel}`, { method: "DELETE" }));
+  }));
+  pane.querySelectorAll("[data-ai-test]").forEach((b) => b.addEventListener("click", async () => {
+    const out = pane.querySelector(`[data-ai-out="${b.dataset.aiTest}"]`);
+    out.innerHTML = `<span class="muted">Sending one tiny prompt…</span>`;
+    const r = await post(`/api/ai/accounts/${b.dataset.aiTest}/test`, {});
+    out.innerHTML = r.ok ? `<span class="pill passed">works</span> ${esc(r.model)}` : `<span class="pill failed">not usable</span> ${esc(r.message)}`;
+  }));
+  pane.querySelectorAll("#aiuse select[name^=model-]").forEach((s) => s.addEventListener("change", () => {
+    if (s.value !== "__other") return;
+    const name = (prompt("Model name, e.g. claude-opus-5-5 or opus:") || "").trim();
+    if (!name) { s.value = ""; return; }
+    s.insertAdjacentHTML("beforeend", `<option value="${esc(name)}">${esc(name)}</option>`); s.value = name;
+  }));
+  document.getElementById("aiuse").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const use = Object.fromEntries(ai.roles.map((r) => [r.id, { account: f[`acct-${r.id}`].value, model: f[`model-${r.id}`].value === "__other" ? "" : f[`model-${r.id}`].value }]));
+    const res = await post("/api/ai/use", use);
+    if (res.error) { document.getElementById("aiuseout").innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }
+    renderAi(pane, res);
+    document.getElementById("aiuseout").innerHTML = `<span class="pill passed">saved</span>`;
+  });
+  const form = document.getElementById("aif");
+  if (form) {
+    const sync = () => form.querySelectorAll("[data-mode]").forEach((el) => { el.style.display = el.dataset.mode === form.mode.value ? "" : "none"; });
+    form.mode.addEventListener("change", sync); sync();
+    form.querySelector("[data-cancel]").addEventListener("click", () => { state.aiEdit = null; renderAi(pane, data); });
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await post("/api/ai/accounts", { id: acct ? acct.id : undefined, name: form.name.value, mode: form.mode.value, profileDir: form.profileDir.value, apiKey: form.apiKey.value });
+      if (res.error) { document.getElementById("aifout").innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }
+      state.aiEdit = null; renderAi(pane, res);
+    });
+  }
+}
+
+function aiAccountForm(a) {
+  a = a || { name: "", mode: "profile", profileDir: "" };
+  return `<form class="inline" id="aif" autocomplete="off">
+    <label>Name<input name="name" value="${esc(a.name)}" placeholder="Work Claude (Max)" style="width:200px"></label>
+    <label>Signs in with<select name="mode">${Object.entries(AI_MODE).map(([k, l]) => `<option value="${k}" ${a.mode === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label data-mode="profile">Login folder<input name="profileDir" value="${esc(a.profileDir || "")}" placeholder="C:\\Users\\you\\.claude-work" style="width:260px"></label>
+    <label data-mode="apiKey">API key <span class="src">${a.hasKey ? "stored on this machine" : "not stored yet"}</span><input name="apiKey" type="password" autocomplete="new-password" placeholder="${a.hasKey ? "unchanged if empty" : "sk-ant-…"}" style="width:220px"></label>
+    <button class="btn" type="submit">Save account</button><button class="btn secondary" type="button" data-cancel>Cancel</button>
+    <p class="muted" data-mode="profile" style="flex:1 1 100%;margin:0">To make a separate Claude login: in a terminal, set CLAUDE_CONFIG_DIR to a new folder, run <span class="mono">claude</span> and log in with that account. Then give the same folder here.</p>
+    <p class="muted" data-mode="default" style="flex:1 1 100%;margin:0">Uses whichever account the CLI is logged in with on this machine.</p>
+    <p id="aifout" style="flex:1 1 100%;margin:0"></p></form>`;
+}
+
+// ── Workbench rules: which tickets are not yours, the commit name, default steps ──
+
+async function renderWorkbenchSettings(pane) {
+  const w = await api("/api/workbench/settings");
+  pane.innerHTML = `<div class="box"><h3>Workbench</h3>
+    <p class="muted" style="margin-top:0">Shared with the team in <span class="mono">probe/probe.yaml</span>. Tickets you hide by hand stay on this machine.</p>
+    <form class="inline" id="wsf">
+      <label style="flex:1 1 100%">Commit message pattern <span class="src">{key} {title} {type} {area}</span><input name="pattern" class="mono" value="${esc(w.commitPattern)}"></label>
+      <p class="muted" style="flex:1 1 100%;margin:0">Example: <span class="mono" id="wsprev">${esc(w.preview)}</span></p>
+      <div style="flex:1 1 100%;margin-top:6px"><strong style="font-size:13px">Not for me</strong></div>
+      <label class="check"><input type="checkbox" name="other" ${w.notForMe.otherAssignee ? "checked" : ""}> Assigned to someone else</label>
+      <label>Labels <span class="src">comma separated</span><input name="labels" value="${esc(w.notForMe.labels.join(", "))}" placeholder="backend, design" style="width:220px"></label>
+      <label>Statuses <span class="src">comma separated</span><input name="statuses" value="${esc(w.notForMe.statuses.join(", "))}" placeholder="Blocked, Waiting for design" style="width:240px"></label>
+      <div style="flex:1 1 100%;margin-top:6px"><strong style="font-size:13px">Steps ticked by default</strong></div>
+      ${w.allSteps.map((s) => `<label class="check"><input type="checkbox" name="step" value="${s.id}" ${w.steps.includes(s.id) ? "checked" : ""}> ${esc(s.label)}</label>`).join("")}
+      <div style="flex:1 1 100%"></div>
+      <button class="btn" type="submit">Save</button><span id="wsout"></span>
+    </form>
+    ${w.hidden.length ? `<p class="muted" style="margin-bottom:0">${w.hidden.length} ticket(s) hidden by hand on this machine: find them under Tickets → Hidden.</p>` : ""}</div>`;
+  const f = document.getElementById("wsf");
+  f.pattern.addEventListener("input", () => { document.getElementById("wsprev").textContent = previewCommit(f.pattern.value, { id: "SHOP-412", title: "Checkout button does nothing on Android 14", labels: ["bug"] }, "checkout"); });
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const res = await post("/api/workbench/settings", { commitPattern: f.pattern.value, notForMe: { otherAssignee: f.other.checked, labels: f.labels.value, statuses: f.statuses.value }, steps: [...f.querySelectorAll("[name=step]:checked")].map((x) => x.value) });
+    document.getElementById("wsout").innerHTML = res.error ? `<span class="pill failed">not saved</span> ${esc(res.error)}` : `<span class="pill passed">saved</span>`;
+    if (!res.error) state.tickets = null;
+  });
+}
+
+async function renderGeneral(pane) {
+  const [s, p, br] = await Promise.all([api("/api/settings"), api("/api/project"), api("/api/branch?branches")]);
   p.branches = br.branches;
   const current = s.agents.model;
   const runner = s.agents.runners.find((r) => r.id === s.agents.runner) ?? s.agents.runners[0];
   const models = runner.models;
   const known = models.some(([m]) => m === current);
-  $view.innerHTML = projectBox(p) + trackerBox(tracker) + buildsBox(builds) + `<div id="acctwrap"></div>` + `
+  pane.innerHTML = projectBox(p) + `
     <div class="box"><h3>Agents</h3>
       <p class="muted" style="margin-top:0">Every Probe agent (drafting cards, device runs, verify, writing tests) runs headless on a coding-agent CLI with your own login and plan, with Probe attached as its MCP server. Both are saved for this machine only, since each developer's tools and plan differ; the team default lives in <span class="mono">agents</span> in probe/probe.yaml, and a run started from the CLI can still pass <span class="mono">--model</span>.</p>
       <form class="inline" id="sf">
@@ -1835,10 +2226,6 @@ async function renderSettings() {
       <p id="sout" style="margin-bottom:0"></p>
     </div>`;
   bindProject();
-  bindTracker();
-  bindBuilds();
-  if (state.scrollTo) { document.getElementById(state.scrollTo)?.scrollIntoView({ block: "start" }); state.scrollTo = null; }
-  renderAccounts(document.getElementById("acctwrap"));
   const form = document.getElementById("sf");
   const chosen = () => (form.pick.value === "custom" ? form.custom.value.trim() : form.pick.value);
   form.pick.addEventListener("change", () => { document.getElementById("customwrap").style.display = form.pick.value === "custom" ? "" : "none"; });

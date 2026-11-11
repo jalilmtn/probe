@@ -3,7 +3,8 @@ import { listCards } from "../cards/store.js";
 import type { CardRun, Run, VerifyRun } from "../core/types.js";
 import type { Project } from "../engine/project.js";
 import { ticketInfo } from "./tickets.js";
-import { openTracker, type Fetch, type Tracker, type TrackerTicket } from "./tracker.js";
+import { connectionLabel, trackerConnections } from "../connections/connections.js";
+import { openTracker, openTrackerFor, type Fetch, type Tracker, type TrackerTicket } from "./tracker.js";
 
 /**
  * Whether a build holds a ticket's work: `included` when every commit naming the ticket is in
@@ -32,16 +33,41 @@ export async function inbox(project: Project, options: { refresh?: boolean; fetc
   const key = project.root.toLowerCase();
   const hit = cache.get(key);
   if (hit && !options.refresh && Date.now() - hit.at < CACHE_MS) return hit.tickets;
-  const tracker = openTracker(project, options.fetcher);
+  const conns = trackerConnections(project);
+  if (!conns.length) openTracker(project, options.fetcher); // throws what is missing
   const runs = ticketRuns(project);
-  const tickets = (await tracker.list()).map((t) => enrich(project, t, runs));
+  const errors: string[] = [];
+  // Every tracker of the project, side by side; one that fails does not hide the others.
+  const lists = await Promise.all(
+    conns.map(async (conn) => {
+      try {
+        const tracker = openTrackerFor(project, conn, options.fetcher);
+        return (await tracker.list()).map((t) => ({ ...t, source: conn.id, sourceLabel: connectionLabel(conn) }));
+      } catch (e) {
+        errors.push((e as Error).message);
+        return [];
+      }
+    }),
+  );
+  if (errors.length && errors.length === conns.length) throw new Error(errors.join(" "));
+  const tickets = lists.flat().map((t) => enrich(project, t, runs));
   cache.set(key, { at: Date.now(), tickets });
+  inboxErrors.set(key, errors);
   return tickets;
 }
 
-/** One ticket, read fresh from the tracker. */
-export async function inboxTicket(project: Project, id: string, fetcher?: Fetch): Promise<InboxTicket> {
-  return enrich(project, await openTracker(project, fetcher).get(id), ticketRuns(project));
+const inboxErrors = new Map<string, string[]>();
+
+/** Trackers that could not be read on the last load, while others could. */
+export function inboxWarnings(project: Project): string[] {
+  return inboxErrors.get(project.root.toLowerCase()) ?? [];
+}
+
+/** One ticket, read fresh from the tracker it came from. */
+export async function inboxTicket(project: Project, id: string, fetcher?: Fetch, source?: string): Promise<InboxTicket> {
+  const conn = source ? trackerConnections(project).find((c) => c.id === source) : trackerConnections(project)[0];
+  const ticket = await openTracker(project, fetcher, source).get(id);
+  return enrich(project, { ...ticket, source: conn?.id, sourceLabel: conn ? connectionLabel(conn) : undefined }, ticketRuns(project));
 }
 
 /** Forgets the cached list, after the connection or filter changed. */
@@ -115,8 +141,8 @@ export function resultComment(project: Project, tracker: Pick<Tracker, "bold">, 
 }
 
 /** Posts a run's result to its ticket as a comment. Only ever called when a person presses Post. */
-export async function postResult(project: Project, ticketId: string, run: Run, fetcher?: Fetch): Promise<string> {
-  const tracker = openTracker(project, fetcher);
+export async function postResult(project: Project, ticketId: string, run: Run, fetcher?: Fetch, source?: string): Promise<string> {
+  const tracker = openTracker(project, fetcher, source);
   const body = resultComment(project, tracker, run);
   await tracker.comment(ticketId, body);
   return body;

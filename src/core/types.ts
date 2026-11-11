@@ -426,7 +426,40 @@ export interface InitRun extends BaseRun {
   costUsd: number;
 }
 
-export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun | CheckRun | InitRun | SecurityRun;
+/** One step of the workbench for one ticket. */
+export interface WorkStepState {
+  step: import("./config.js").WorkStep;
+  status: RunStatus | "queued" | "skipped";
+  note?: string;
+  /** The run this step started (unit tests, verify). */
+  runId?: string;
+}
+
+/** One ticket inside a workbench run. */
+export interface WorkTicket {
+  key: string;
+  source?: string;
+  title: string;
+  status: RunStatus | "queued" | "needs-you";
+  steps: WorkStepState[];
+  /** Files changed for this ticket. */
+  files: string[];
+  /** The commit made for it, when the commit step ran. */
+  commit?: { hash: string; message: string };
+  /** What the agent said it did. */
+  summary?: string;
+}
+
+/** The workbench: an agent works through chosen tickets one by one, each with the chosen steps. */
+export interface WorkRun extends BaseRun {
+  kind: "work";
+  tickets: WorkTicket[];
+  steps: import("./config.js").WorkStep[];
+  commitPattern: string;
+  costUsd: number;
+}
+
+export type Run = UnitRun | BackfillRun | CardRun | LoginRun | ExploreRun | UnitWriteRun | VerifyRun | FixRun | CheckRun | InitRun | SecurityRun | WorkRun;
 export type DeviceRun = CardRun | LoginRun | ExploreRun;
 
 // ── Feature cards ─────────────────────────────────────────────────────────────

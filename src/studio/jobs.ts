@@ -20,6 +20,8 @@ export const jobKeys = {
   security: (feature?: string) => `security:${feature || "*"}`,
   init: () => "init",
   check: () => "check",
+  /** One workbench run at a time: its agents edit the same working tree. */
+  work: () => "work",
   verify(o: VerifyOptions): string {
     if (o.outdated) return `verify:outdated${o.features?.length ? `:${[...o.features].sort().join(",")}` : ""}`;
     // One test of a ticket at a time, whatever it runs against.
@@ -46,7 +48,7 @@ const keys = new Map<string, string>();
 /** A key for a run this registry did not start (from the MCP server or a parent run). */
 function derivedKey(run: Run): string {
   if (run.kind === "card") return jobKeys.card(run.feature, (run as CardRun).cardId);
-  if (run.kind === "init" || run.kind === "check") return run.kind;
+  if (run.kind === "init" || run.kind === "check" || run.kind === "work") return run.kind;
   return `${run.kind}:${run.feature}`;
 }
 
