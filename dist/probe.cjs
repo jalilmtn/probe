@@ -14972,6 +14972,15 @@ function saveAccount(root, account) {
     { role: account.role, username: account.username, ...account.shownAs ? { shownAs: account.shownAs } : {}, ...account.notes ? { notes: account.notes } : {} }
   ]);
 }
+function learnShownAs(root, role, seenAs, timeline, log) {
+  const name = seenAs.trim().slice(0, 80);
+  const account = listAccounts(root).find((a) => a.role === role);
+  const signedIn = timeline.some((e) => e.action === "type_secret" && e.detail === `typed ${role}'s password`);
+  if (!account || !name || !signedIn || account.shownAs === name) return false;
+  saveAccount(root, { ...account, shownAs: name });
+  log(`test account ${role} is shown in the app as ${name}${account.shownAs ? ` (was ${account.shownAs})` : ""}: saved`);
+  return true;
+}
 function removeAccount(root, role) {
   writeAccounts(root, listAccounts(root).filter((a) => a.role !== role));
 }
@@ -37014,7 +37023,7 @@ function listAvds(projectRoot) {
 // src/devices/harness.ts
 var DEVICE_TOOLS = ["probe_device_observe", "probe_device_act", "probe_device_type_secret"];
 var SAFETY = (outside) => `## Safety \u2014 stop and report "blocked" instead of guessing
-- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
+- The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything. Every account listed under Test accounts is a test account: it is one when the app shows its username, its email or its "shown in the app as" name. A name shown in the app can be out of date, so when the profile shows a handle that matches none of them, open the account or settings screen and look for the email or username before you decide; only an account that matches no test account by any of these is not one.
 - A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
 - A sign-in is refused (an error on the fields, "wrong password", the same screen back): do not try again or try test accounts the task does not name. Stop at once and report blocked, saying what the app showed.
 - Before you tap sign in, look at the fields: autofill or a saved-account picker can replace what you typed with another account. If a field does not show exactly the test account, clear it and type it again; never sign in with an account the task does not name.
@@ -37407,10 +37416,10 @@ ${accountsForPrompt(project)}
 ${howTo(target2)}
 
 Follow the card's reach, preconditions and steps, then check every expectation ${target2 === "web" ? "in the browser" : "on the device"}.
-If the app is logged in with an account that is not a test account, the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
+If the app is logged in with an account that matches no test account (by username, email or shown name, checked as the safety rules say), the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
 
 ## Finish
-Call probe_card_verdict exactly once: result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
+Call probe_card_verdict exactly once (with signedInAs when you saw which test account the app uses): result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
 }
 function startCardRun(project, feature, cardId, options = {}) {
   const card = listCards(project.root, feature).find((c) => c.id === cardId);
@@ -37438,6 +37447,8 @@ function startCardRun(project, feature, cardId, options = {}) {
       log
     );
     run.verdict = session.verdict() ?? void 0;
+    const seen = run.verdict?.signedInAs;
+    if (seen) learnShownAs(project.root, seen.role, seen.seenAs, run.timeline, log);
     const crashed = crashError(run);
     if (crashed) {
       run.status = "failed";
@@ -51021,6 +51032,7 @@ function startLoginRun(project, wanted, options = {}) {
       run.status = "passed";
     }
     if (run.login) log(`login: ${describeLogin(run.login)}`);
+    if (run.login?.state === "logged_in" && run.login.role && run.login.seenAs) learnShownAs(project.root, run.login.role, run.login.seenAs, run.timeline, log);
   });
 }
 function describeLogin(l) {
@@ -51475,8 +51487,8 @@ function todoFor(reason, project) {
       };
     case "wrong-account":
       return {
-        todo: accounts ? "Sign out on the device and sign in as a test account, or press Sign in as a test account to let Probe do it, then run again." : "Sign out on the device and add a test account in Settings \u2192 Test accounts, then run again.",
-        settings: accounts ? void 0 : "accounts"
+        todo: accounts ? 'If the account on the device is one of your test accounts, its "Shown as" name in Settings \u2192 Test accounts is out of date: set it to what the app shows. Otherwise sign in as a test account, or press Sign in as a test account to let Probe do it. Then run again.' : "Sign out on the device and add a test account in Settings \u2192 Test accounts, then run again.",
+        settings: "accounts"
       };
     case "needs-code":
       return { todo: "Store the code with the test account in Settings \u2192 Test accounts, or sign in by hand on the device once, then run again.", settings: "accounts" };
@@ -54553,6 +54565,7 @@ ${r.errors.join("\n")}` : ""
         result: external_exports.enum(["passed", "failed", "blocked"]),
         expectations: external_exports.array(external_exports.object({ text: external_exports.string(), met: external_exports.boolean().nullable(), evidence: external_exports.string() })),
         notes: external_exports.string().default(""),
+        signedInAs: external_exports.object({ role: external_exports.string(), seenAs: external_exports.string() }).optional().describe("The test account the app was signed in with (its role) and the name or handle the app shows for it, e.g. its profile handle."),
         blockedBy: external_exports.enum(["sign-in", "wrong-account", "needs-code", "missing-data", "other"]).optional().describe(
           "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), other."
         )
@@ -54959,7 +54972,7 @@ function gitHooks(project, action) {
 }
 
 // src/cli.ts
-var VERSION = "0.8.3";
+var VERSION = "0.8.4";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]

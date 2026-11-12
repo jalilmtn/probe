@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.4 — 2026-11-12
+
+- Every account in Test accounts counts as a test account: the agent matches it by username, email or "shown in the app as" name, and looks at the account screen before calling an account foreign.
+- After Probe signs in with a test account, the name the app shows for it is saved as its "shown in the app as" name, so an old one no longer blocks runs.
+- The Unblock panel for a wrong account says first that the test account's shown name may be out of date.
+
 ## 0.8.3 — 2026-11-12
 
 - A card's preconditions are set up before its steps: when the signed-in test account can create what is missing (a story, a post, an item), the agent does so with plain test content instead of stopping. A card is blocked with `missing-data` only when that is not possible.
