@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5 — 2026-11-12
+
+- Workbench: a Device test option when starting. By default "Test on the device" runs only the ticket's own cards (drafted from the ticket when it has none); "Ticket's cards + its features' cards" also runs the other cards of the features it touched, as before.
+
 ## 0.8.4 — 2026-11-12
 
 - Every account in Test accounts counts as a test account: the agent matches it by username, email or "shown in the app as" name, and looks at the account screen before calling an account foreign.

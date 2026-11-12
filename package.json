@@ -1,6 +1,6 @@
 {
   "name": "probe",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "Agent-driven test platform: app map, unit tests, coverage gaps and agent tests on devices. Project-agnostic.",
   "private": true,
   "license": "MIT",
