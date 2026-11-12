@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.6 — 2026-11-12
+
+- A new block reason, `no-connection`: when the app cannot reach its server (an offline or reconnecting banner, posting that never finishes), the agent stops at once instead of retrying, the Unblock panel says to check the device's network, VPN and server, and a verify does not run its later cards.
+
 ## 0.8.5 — 2026-11-12
 
 - Workbench: a Device test option when starting. By default "Test on the device" runs only the ticket's own cards (drafted from the ticket when it has none); "Ticket's cards + its features' cards" also runs the other cards of the features it touched, as before.

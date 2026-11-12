@@ -37416,7 +37416,7 @@ ${accountsForPrompt(project)}
 ${howTo(target2)}
 
 Follow the card's reach, preconditions and steps, then check every expectation ${target2 === "web" ? "in the browser" : "on the device"}.
-If the app is logged in with an account that matches no test account (by username, email or shown name, checked as the safety rules say), the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
+If the app is logged in with an account that matches no test account (by username, email or shown name, checked as the safety rules say), the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing. If the app cannot reach its server (an offline or "trying to reconnect" banner, posting or loading that never finishes), stop: the result is blocked with blockedBy "no-connection".
 
 ## Finish
 Call probe_card_verdict exactly once (with signedInAs when you saw which test account the app uses): result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
@@ -51190,7 +51190,7 @@ function summarizeUnitWrite(run) {
 var import_node_path41 = require("node:path");
 
 // src/core/types.ts
-var SIGN_IN_BLOCKS = ["sign-in", "wrong-account", "needs-code"];
+var SIGN_IN_BLOCKS = ["sign-in", "wrong-account", "needs-code", "no-connection"];
 
 // src/engine/verify.ts
 function testsOtherCode(project, options) {
@@ -51466,12 +51466,14 @@ var TITLE = {
   "wrong-account": "The app is signed in with an account that is not a test account",
   "needs-code": "Signing in needs a code the agent does not have",
   "missing-data": "The app did not have what the card needs",
+  "no-connection": "The app could not reach its server",
   other: "The agent could not finish the card"
 };
 function blockReason(said, notes) {
   if (said) return said;
   const n = notes.toLowerCase();
   if (/not (one of )?the test accounts?|non-test account|not a test account|wrong account|real account/.test(n)) return "wrong-account";
+  if (/no (internet )?connection|trying to reconnect|offline|failed to (post|upload|load|send)|network error|could not connect|can't connect|never finish/.test(n)) return "no-connection";
   if (/\b(sms|email|verification|one[- ]time|2fa|two[- ]factor|otp|login) code\b|captcha/.test(n)) return "needs-code";
   if (/(sign[- ]?in|log[- ]?in|password)[^.]{0,60}(refused|rejected|failed|wrong|incorrect|invalid|did not work|error)|(wrong|incorrect|invalid) (password|credentials)|could not (sign|log) ?in/.test(n)) return "sign-in";
   if (/\bno (active |existing )?\w+ (to|yet)\b|there (is|are|was|were) no\b|nothing to (open|test|show)|first (post|create|add)|needs? (an?|some|existing) /.test(n)) return "missing-data";
@@ -51492,6 +51494,8 @@ function todoFor(reason, project) {
       };
     case "needs-code":
       return { todo: "Store the code with the test account in Settings \u2192 Test accounts, or sign in by hand on the device once, then run again.", settings: "accounts" };
+    case "no-connection":
+      return { todo: "Check that the device reaches the app's server: its Wi-Fi or mobile data, a VPN, the server address of this build, and that the server is up. Open the app by hand to see it load, then run again." };
     case "missing-data":
       return { todo: "Prepare what the agent says is missing on the device (or with the test account), then run again." };
     default:
@@ -54576,8 +54580,8 @@ ${r.errors.join("\n")}` : ""
         expectations: external_exports.array(external_exports.object({ text: external_exports.string(), met: external_exports.boolean().nullable(), evidence: external_exports.string() })),
         notes: external_exports.string().default(""),
         signedInAs: external_exports.object({ role: external_exports.string(), seenAs: external_exports.string() }).optional().describe("The test account the app was signed in with (its role) and the name or handle the app shows for it, e.g. its profile handle."),
-        blockedBy: external_exports.enum(["sign-in", "wrong-account", "needs-code", "missing-data", "other"]).optional().describe(
-          "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), other."
+        blockedBy: external_exports.enum(["sign-in", "wrong-account", "needs-code", "missing-data", "no-connection", "other"]).optional().describe(
+          "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), no-connection (the app cannot reach its server: an offline or reconnecting banner, uploads or loading that never finish), other."
         )
       }
     },
@@ -54982,7 +54986,7 @@ function gitHooks(project, action) {
 }
 
 // src/cli.ts
-var VERSION = "0.8.5";
+var VERSION = "0.8.6";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]
