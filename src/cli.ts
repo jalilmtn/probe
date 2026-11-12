@@ -40,7 +40,7 @@ import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./
 import { ALL_LAYERS, dismissIssue, startSecurityRun, summarizeSecurity } from "./security/run.js";
 import type { SecurityLayer } from "./core/types.js";
 
-const VERSION = "0.8.1";
+const VERSION = "0.8.2";
 
 const HELP = `probe ${VERSION} — agent-driven test platform
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.2 — 2026-11-12
+
+A way past blocked runs.
+
+- A blocked card, verify or workbench run shows an Unblock panel: why it stopped, what the agent said, and what to do about it, with Open Test accounts or Sign in as a test account where that is the fix.
+- Run again reruns only the blocked cards, and the ones a failed sign-in left out, on the same ticket and build.
+- When a card is blocked, the agent says why: `sign-in`, `wrong-account`, `needs-code`, `missing-data` or `other`. Older runs get their reason from the agent's notes.
+- A verify also stops its later cards when the app is signed in with an account that is not a test account, or asks for a code the agent does not have.
+
 ## 0.8.1 — 2026-11-12
 
 Studio stays responsive, and device tests stop at a failed sign-in.
