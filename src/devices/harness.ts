@@ -17,6 +17,8 @@ export const DEVICE_TOOLS = ["probe_device_observe", "probe_device_act", "probe_
 const SAFETY = (outside: string) => `## Safety — stop and report "blocked" instead of guessing
 - The app is logged in with an account that is not one of the test accounts: do not post, send, edit, delete, like or follow anything.
 - A login needs something you do not have (an SMS or email code that is not stored, a captcha, 2FA).
+- A sign-in is refused (an error on the fields, "wrong password", the same screen back): do not try again or try test accounts the task does not name. Stop at once and report blocked, saying what the app showed.
+- Before you tap sign in, look at the fields: autofill or a saved-account picker can replace what you typed with another account. If a field does not show exactly the test account, clear it and type it again; never sign in with an account the task does not name.
 - Never buy, pay, change account or privacy settings, or touch anything outside this ${outside}.
 - Only create or delete content with a test account, and only what the task needs.`;
 

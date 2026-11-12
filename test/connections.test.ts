@@ -9,8 +9,11 @@ import { aiEnv, aiFor, connections, removeAiAccount, saveAiAccount, saveAiUse, s
 import { channelApplies, mentionsTicket, ticketDiscussion, type Fetch } from "../src/connections/slack.js";
 import type { WorkbenchConfig } from "../src/core/config.js";
 import { openProject, type Project } from "../src/engine/project.js";
-import { inbox } from "../src/tickets/inbox.js";
-import { changedSince, commitMessage, commitType, orderSteps, ticketGroup } from "../src/tickets/workbench.js";
+import { clearInbox, inbox } from "../src/tickets/inbox.js";
+import { cached, invalidate, watchForChanges } from "../src/studio/cache.js";
+import { openTracker } from "../src/tickets/tracker.js";
+import { changedSince, commitMessage, commitType, notesText, orderSteps, parseFeatures, ticketGroup } from "../src/tickets/workbench.js";
+import { claudeRunner } from "../src/agent/claude.js";
 
 const home = mkdtempSync(join(tmpdir(), "probe-home-"));
 process.env.HOME = home;
@@ -70,6 +73,14 @@ describe("connections per project", () => {
     assert.doesNotMatch(readFileSync(join(p.root, "probe/probe.yaml"), "utf8"), /tracker: linear/);
   });
 
+  test("Jira Cloud without the account email says so before calling Jira", () => {
+    const p = fixture();
+    saveConnection(p, { kind: "jira", site: "acme.atlassian.net", token: "t" });
+    assert.throws(() => openTracker(p), /Jira Cloud needs the email/);
+    saveConnection(p, { id: "jira", email: "you@example.com", token: "" });
+    assert.doesNotThrow(() => openTracker(p));
+  });
+
   test("Jira refuses a site address that carries more than the address", () => {
     const p = fixture();
     assert.deepEqual(saveConnection(p, { kind: "jira", site: "https://user:pw@acme.atlassian.net" }), { error: "Site: only the address, e.g. https://acme.atlassian.net" });
@@ -77,7 +88,7 @@ describe("connections per project", () => {
 
   test("the inbox lists every tracker's tickets, each marked with where it came from", async () => {
     const p = fixture();
-    saveConnection(p, { kind: "jira", site: "https://acme.atlassian.net", token: "t1" });
+    saveConnection(p, { kind: "jira", site: "https://jira.example.com", token: "t1" });
     saveConnection(p, { kind: "linear", token: "t2" });
     const { fetcher } = fake([
       ["/search/jql", () => ({ issues: [{ key: "SHOP-1", fields: { summary: "Cart", status: { name: "Ready for dev" }, labels: [] } }] })],
@@ -85,6 +96,51 @@ describe("connections per project", () => {
     ]);
     const tickets = await inbox(p, { fetcher, refresh: true });
     assert.deepEqual(tickets.map((t) => [t.id, t.source]), [["SHOP-1", "jira"], ["ENG-9", "linear"]]);
+  });
+
+  test("the tracker is asked once: the list is kept on this machine until Refresh or a connection change", async () => {
+    const p = fixture();
+    saveConnection(p, { kind: "linear", token: "t2" });
+    let summary = "Login";
+    const { fetcher, urls } = fake([["api.linear.app", () => ({ data: { issues: { nodes: [{ id: "x", identifier: "ENG-9", title: summary, url: "u", updatedAt: "", state: { name: "Todo" } }] } } })]]);
+    assert.equal((await inbox(p, { fetcher, refresh: true }))[0]?.title, "Login");
+    const asked = urls.length;
+    summary = "Login, renamed";
+    assert.equal((await inbox(p, { fetcher }))[0]?.title, "Login", "kept list, no new request");
+    assert.equal((await inbox(openProject(p.root), { fetcher }))[0]?.title, "Login", "kept on disk for a restarted Studio");
+    assert.equal(urls.length, asked);
+    assert.equal((await inbox(p, { fetcher, refresh: true }))[0]?.title, "Login, renamed");
+    saveConnection(p, { id: "linear", team: "OPS" });
+    clearInbox(p);
+    await inbox(p, { fetcher });
+    assert.ok(urls.length > asked + 1, "a connection change reads the tracker again");
+  });
+});
+
+describe("Studio cache", () => {
+  test("a kept value is reused until something is written to the project's store, or on Refresh", async () => {
+    const p = fixture();
+    const stop = watchForChanges(p);
+    try {
+      let computed = 0;
+      const read = () => cached("k", () => ++computed);
+      assert.equal(read(), 1);
+      assert.equal(read(), 1);
+      p.store.write("note.json", { a: 1 });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      assert.equal(read(), 2);
+      invalidate();
+      assert.equal(read(), 3);
+    } finally {
+      stop();
+    }
+  });
+});
+
+describe("watch", () => {
+  test("edits mark features stale but start no check unless the project turns it on", () => {
+    assert.equal(fixture().config.watch.autoCheck, false);
+    assert.equal(fixture("name: shop\nwatch:\n  autoCheck: true\n").config.watch.autoCheck, true);
   });
 });
 
@@ -129,11 +185,13 @@ describe("AI accounts", () => {
     const work = saveAiAccount(a, { name: "Work Claude (Max)", mode: "profile", profileDir: "/tmp/claude-work" });
     const client = saveAiAccount(a, { name: "Client API", mode: "apiKey", apiKey: "sk-ant-test" });
     assert.deepEqual([work, client], [{ id: "work-claude-max" }, { id: "client-api" }]);
-    assert.equal(saveAiUse(a, { coding: { account: "client-api", model: "opus" }, review: { model: "sonnet" } }), null);
+    assert.equal(saveAiUse(a, { coding: { account: "client-api", model: "opus", effort: "high" }, review: { model: "sonnet" } }), null);
+    assert.match(String(saveAiUse(a, { coding: { effort: "turbo" } })), /effort is one of/);
 
     const coding = aiFor(a, "coding");
     assert.equal(coding.account?.name, "Client API");
     assert.equal(coding.model, "opus");
+    assert.equal(coding.effort, "high");
     assert.deepEqual(aiEnv(a, coding.account), { ANTHROPIC_API_KEY: "sk-ant-test" });
     assert.equal(aiFor(a, "review").account?.id, "work-claude-max", "no choice: the first account");
     assert.deepEqual(aiEnv(a, aiFor(a, "review").account), { CLAUDE_CONFIG_DIR: "/tmp/claude-work" });
@@ -165,6 +223,23 @@ describe("workbench", () => {
     assert.equal(ticketGroup({ ...base, labels: ["Backend"] }, rules, []).group, "notForMe");
     assert.equal(ticketGroup({ ...base, status: "blocked" }, rules, []).group, "notForMe");
     assert.equal(ticketGroup({ ...base, id: "SHOP-9" }, rules, []).group, "hidden");
+  });
+
+  test("the developer's instructions lead the prompt: the run's first, then the ticket's own", () => {
+    assert.equal(notesText(" ", undefined), "");
+    const text = notesText("Keep it small.", "Don't touch the SDK.");
+    assert.ok(text.startsWith("Instructions from the developer"));
+    assert.ok(text.endsWith("\nKeep it small.\n\nDon't touch the SDK.\n\n"));
+  });
+
+  test("the feature picker keeps only features the project has, at most two", () => {
+    assert.deepEqual(parseFeatures("Looked at the code.\nFEATURES: `Chat`, live-room, nope, story", ["chat", "live-room", "story"]), ["chat", "live-room"]);
+    assert.deepEqual(parseFeatures("no idea", ["chat"]), []);
+  });
+
+  test("effort reaches Claude Code as --effort", () => {
+    const launch = claudeRunner.launch({ task: { prompt: "x", probeTools: [] }, model: "claude-opus-5-5", effort: "high", mcp: { command: "node", args: [], env: {} }, scratchDir: tmpdir(), id: "t" });
+    assert.deepEqual(launch.args.slice(launch.args.indexOf("--model"), launch.args.indexOf("--model") + 4), ["--model", "claude-opus-5-5", "--effort", "high"]);
   });
 
   test("steps keep their fixed order, and a ticket's files are only those it changed", () => {

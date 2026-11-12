@@ -58,7 +58,8 @@ export async function runHook(event: string, options: HookOptions = {}): Promise
           return 0;
         }
       }
-      if (Object.keys(loadWatch(project).stale).length) {
+      // Checks start on their own only when the project asks for it; otherwise Check now in Studio.
+      if (project.config.watch.autoCheck && Object.keys(loadWatch(project).stale).length) {
         const started = await kickCheck(project, source);
         if (!claude) say(`Probe: checking stale features (${started === "busy" ? "a check is already running" : `in ${started}`})`);
       }
@@ -80,7 +81,7 @@ export async function runHook(event: string, options: HookOptions = {}): Promise
     if (event === "commit") {
       const staged = capture("git", ["diff", "--cached", "--name-only", "--diff-filter=ACMR"], project.root);
       const files = (staged ?? "").split(/\r?\n/).filter(Boolean).map((f) => join(project.root, f));
-      if (files.length && markStale(project, files, "commit", session).length) await kickCheck(project, "commit");
+      if (files.length && markStale(project, files, "commit", session).length && project.config.watch.autoCheck) await kickCheck(project, "commit");
       return 0;
     }
   } catch (e) {

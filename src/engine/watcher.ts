@@ -48,7 +48,7 @@ export function startWatcher(project: Project, log: (line: string) => void = () 
     const stale = Object.values(loadWatch(project).stale);
     // Include "claude" for watch state written by versions before agent sources were normalized.
     const agentActive = stale.some((e) => (e.sources.includes("agent") || e.sources.includes("claude")) && Date.now() - Date.parse(e.last) < AGENT_ACTIVE_MS);
-    if (!stale.length || agentActive || runningCheck(project)) return;
+    if (!project.config.watch.autoCheck || !stale.length || agentActive || runningCheck(project)) return;
     const started = startCheck(project, { trigger: "editor" });
     if (started) log(`watch: checking ${stale.length} stale feature(s) (run ${started.run.id})`);
   };

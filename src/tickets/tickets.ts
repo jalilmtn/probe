@@ -7,7 +7,7 @@ import { isWindows } from "../core/proc.js";
 import type { Run } from "../core/types.js";
 import { commitsForTicket, filesOfCommit } from "../engine/history.js";
 import type { Project } from "../engine/project.js";
-import { scan } from "../engine/scan.js";
+import { latestScan } from "../engine/scan.js";
 import { featuresOfFiles } from "../engine/verify.js";
 
 // Tickets are a boundary, not a system Probe owns. In: a ticket id (and optionally its text)
@@ -26,7 +26,7 @@ export function ticketUrl(project: Project, id: string): string | undefined {
 export function ticketInfo(project: Project, id: string) {
   const commits = commitsForTicket(project.root, id);
   const files = [...new Set(commits.flatMap((c) => filesOfCommit(project.root, c.hash)))];
-  const { byFeature } = featuresOfFiles(project, scan(project), files);
+  const { byFeature } = featuresOfFiles(project, latestScan(project), files);
   const cards = listCards(project.root).filter((c) => c.tickets.includes(id));
   return { id, url: ticketUrl(project, id), commits, features: [...byFeature.keys()], cards: cards.map((c) => `${c.feature}/${c.id}`) };
 }

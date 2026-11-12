@@ -142,6 +142,8 @@ export interface CardVerdict {
   result: "passed" | "failed" | "blocked";
   expectations: ExpectationResult[];
   notes: string;
+  /** Blocked because a test account could not sign in: the next cards would fail the same way. */
+  blockedBy?: "sign-in";
 }
 
 export interface TimelineEntry {
@@ -439,6 +441,8 @@ export interface WorkStepState {
 export interface WorkTicket {
   key: string;
   source?: string;
+  /** The developer's own instructions for this ticket. */
+  notes?: string;
   title: string;
   status: RunStatus | "queued" | "needs-you";
   steps: WorkStepState[];
@@ -456,6 +460,8 @@ export interface WorkRun extends BaseRun {
   tickets: WorkTicket[];
   steps: import("./config.js").WorkStep[];
   commitPattern: string;
+  /** The developer's instructions for every ticket of the run. */
+  notes?: string;
   costUsd: number;
 }
 

@@ -122,6 +122,8 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
       log(`${targets.size} features have outdated or missing results`);
     } else if (options.features?.length) {
       targets = new Map(options.features.map((f) => [f, []]));
+      // With a ticket, its own cards run too, whatever feature they belong to.
+      if (options.ticket) for (const c of listCards(project.root)) if (c.tickets.includes(options.ticket) && !targets.has(c.feature)) targets.set(c.feature, []);
     } else {
       run.changed = options.ticket
         ? [...new Set(commitsForTicket(project.root, options.ticket).flatMap((c) => filesOfCommit(project.root, c.hash)))]
@@ -167,6 +169,8 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
     if (!noDevice) {
       let budget = options.maxCards ?? project.config.verify.maxCards;
       let first = true;
+      /** The card whose sign-in failed: the rest would fail at the same sign-in, so they are not run. */
+      let signInFailed: string | null = null;
       for (const f of run.features) {
         const cards = pickCards(listCards(project.root, f.feature), which, options.ticket);
         if (cards.length === 0) {
@@ -181,6 +185,10 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
             const e = known.entry!;
             f.cards.push({ cardId: card.id, runId: e.run, status: e.result === "passed" ? "skipped" : e.result, note: `${e.result} on this same code (${e.by ?? "run"} ${e.at.slice(0, 10)}); not re-run` });
             log(`${f.feature}/${card.id}: ${e.result}, up to date — skipped`);
+            continue;
+          }
+          if (signInFailed) {
+            f.cards.push({ cardId: card.id, status: "skipped", note: `not run: sign-in failed on ${signInFailed}; fix the test accounts in Studio → Settings → Test accounts` });
             continue;
           }
           if (budget <= 0) {
@@ -200,6 +208,10 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
           log(`${f.feature}/${card.id}: ${finished.status}`);
           // A build that does not install will not install for the next card either.
           if (finished.status === "error" && /Installing|did not open/.test(finished.error ?? "")) budget = 0;
+          if (finished.status === "blocked" && finished.verdict?.blockedBy === "sign-in") {
+            signInFailed = `${f.feature}/${card.id}`;
+            log(`sign-in failed: the remaining cards are not run`);
+          }
         }
       }
     }

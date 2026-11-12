@@ -21,6 +21,7 @@ export async function runAgent(project: Project, task: AgentTask, log: (line: st
   const launch = runner.launch({
     task,
     model: task.model ?? chosen.model ?? project.config.agents.model,
+    effort: task.effort ?? chosen.effort,
     mcp: probeMcpServer(project, task.mcpEnv),
     scratchDir: project.store.dir,
     // Two agents running at once must not share a config file.

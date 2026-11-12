@@ -14,7 +14,7 @@ import { CardInput } from "../cards/schema.js";
 import { listCards, saveCards } from "../cards/store.js";
 import { listAccounts, Secrets } from "../accounts/accounts.js";
 import { startCardRun, summarizeCardRun } from "../cards/run.js";
-import { DeviceSession } from "../devices/session.js";
+import { DeviceSession, MAX_SECRET_TRIES } from "../devices/session.js";
 import { WebDevice } from "../devices/web.js";
 import { formatUiTree } from "../devices/uitree.js";
 import { describeLogin, startLoginRun } from "../accounts/login.js";
@@ -387,7 +387,10 @@ export async function runMcpServer(version: string): Promise<void> {
       const project = openProject();
       if (!listAccounts(project.root).some((a) => a.role === role)) return text(`No test account with role "${role}".`);
       const value = new Secrets(project.store.dir).get(role, secret);
-      if (value === null) return text(`No ${secret} stored for ${role}. Report blocked: it is added in Probe Studio -> Accounts.`);
+      if (value === null) return text(`No ${secret} stored for ${role}. Report blocked (blockedBy sign-in): it is added in Probe Studio -> Accounts.`);
+      // A refused sign-in does not start working on the third try: each try costs a run's worth of screenshots.
+      if (s.secretTries(role, secret) >= MAX_SECRET_TRIES)
+        return text(`Not typed: ${role}'s ${secret} was already typed ${MAX_SECRET_TRIES} times in this run, so the sign-in is not working. Stop now and report blocked with blockedBy "sign-in", saying what the app showed.`);
       await s.device.type(value);
       s.record("type_secret", `typed ${role}'s ${secret}`);
       return text(`Typed ${role}'s ${secret}. Observe to see the result.`);
@@ -403,6 +406,7 @@ export async function runMcpServer(version: string): Promise<void> {
         result: z.enum(["passed", "failed", "blocked"]),
         expectations: z.array(z.object({ text: z.string(), met: z.boolean().nullable(), evidence: z.string() })),
         notes: z.string().default(""),
+        blockedBy: z.enum(["sign-in"]).optional().describe("With blocked: \"sign-in\" when a test account's sign-in was refused or needs a code you do not have."),
       },
     },
     async (verdict) => {

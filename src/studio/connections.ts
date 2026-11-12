@@ -70,21 +70,25 @@ export async function testConnection(project: Project, id: string): Promise<{ ok
 }
 
 const meCache = new Map<string, string>();
+/** Your name per tracker connection, kept on this machine: asking the tracker takes seconds. */
+const ME_FILE = "tracker-me.json";
 
 /** Your name in each of the project's trackers, for telling your tickets from others'. */
 export async function myNames(project: Project): Promise<string[]> {
   const names: string[] = [];
+  const saved = project.store.read<Record<string, string>>(ME_FILE) ?? {};
   for (const conn of trackerConnections(project)) {
     const key = `${project.root}|${conn.id}`;
-    let name = meCache.get(key);
+    let name = meCache.get(key) ?? saved[conn.id];
     if (!name) {
       try {
         name = await openTrackerFor(project, conn).me();
-        meCache.set(key, name);
+        project.store.write(ME_FILE, { ...(project.store.read<Record<string, string>>(ME_FILE) ?? {}), [conn.id]: name });
       } catch {
         continue;
       }
     }
+    meCache.set(key, name);
     names.push(name);
   }
   return names;
@@ -93,6 +97,7 @@ export async function myNames(project: Project): Promise<string[]> {
 export function afterConnectionChange(project: Project): void {
   clearInbox(project);
   for (const key of [...meCache.keys()]) if (key.startsWith(`${project.root}|`)) meCache.delete(key);
+  if (project.store.read(ME_FILE) !== null) project.store.write(ME_FILE, null);
 }
 
 // ── Workbench settings ──────────────────────────────────────────────────────

@@ -29,6 +29,7 @@ import { startUnitWrite, summarizeUnitWrite } from "./engine/unitwrite.js";
 import { startVerify, summarizeVerify } from "./engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "./tickets/tickets.js";
 import { startStudio } from "./studio/server.js";
+import { isViewWorker, runViewWorker, useViewWorker } from "./studio/viewWorker.js";
 import { parseBuildRef } from "./devices/builds.js";
 import type { RunTarget } from "./core/types.js";
 import { gitHooks, runHook } from "./cli/hook.js";
@@ -39,7 +40,7 @@ import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "./
 import { ALL_LAYERS, dismissIssue, startSecurityRun, summarizeSecurity } from "./security/run.js";
 import type { SecurityLayer } from "./core/types.js";
 
-const VERSION = "0.8.0";
+const VERSION = "0.8.1";
 
 const HELP = `probe ${VERSION} — agent-driven test platform
 
@@ -577,15 +578,20 @@ function usage(line: string): number {
   return 1;
 }
 
-main(process.argv.slice(2)).then(
-  (code) => {
-    if (code >= 0) process.exit(code);
-  },
-  (e) => {
-    console.error(`probe: ${(e as Error).message}`);
-    process.exit(1);
-  },
-);
+// Studio starts this same script again as the worker thread its slower pages are worked out on.
+if (isViewWorker()) runViewWorker();
+else {
+  useViewWorker(process.argv[1]);
+  main(process.argv.slice(2)).then(
+    (code) => {
+      if (code >= 0) process.exit(code);
+    },
+    (e) => {
+      console.error(`probe: ${(e as Error).message}`);
+      process.exit(1);
+    },
+  );
+}
 
 /** `--target` as a run target, or undefined for the project's own. */
 function runTarget(value: string | undefined): RunTarget | undefined {

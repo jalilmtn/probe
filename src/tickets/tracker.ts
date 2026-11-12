@@ -83,7 +83,11 @@ async function readJson(res: Response, what: string): Promise<unknown> {
     } catch {
       // Not JSON (a login page, a proxy error): the first characters are all there is.
     }
-    const hint = res.status === 401 || res.status === 403 ? " Check the token (and, for Jira, the email it belongs to)." : "";
+    const hint = /Connect Session Auth Token/i.test(body)
+      ? " Jira Cloud wants the account email with an API token: add the email in Studio → Settings → Connections."
+      : res.status === 401 || res.status === 403
+        ? " Check the token (and, for Jira, the email it belongs to)."
+        : "";
     throw new Error(`${what} answered ${res.status}: ${detail || res.statusText}.${hint}`);
   }
   return body ? JSON.parse(body) : {};

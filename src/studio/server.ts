@@ -9,13 +9,11 @@ import { startBackfill } from "../cards/backfill.js";
 import { lastLogin, startLoginRun } from "../accounts/login.js";
 import { navMap, startExploreRun } from "../cards/explore.js";
 import { startCardRun } from "../cards/run.js";
-import { cardResults, featureHealth } from "../engine/health.js";
-import { changedFiles, defaultBase } from "../engine/history.js";
 import { startUnitWrite } from "../engine/unitwrite.js";
-import { featuresOfFiles, startVerify, type VerifyOptions } from "../engine/verify.js";
+import { startVerify, type VerifyOptions } from "../engine/verify.js";
 import { fileTicket, ticketDraft, ticketInfo } from "../tickets/tickets.js";
-import { listCards, setCardStatus } from "../cards/store.js";
-import type { CardStatus, Run, ScanResult, SecurityRun } from "../core/types.js";
+import { setCardStatus } from "../cards/store.js";
+import type { CardStatus, Run, SecurityRun } from "../core/types.js";
 import { doctor } from "../engine/doctor.js";
 import type { Project } from "../engine/project.js";
 import { liveRun, stopRun, type RunEvent } from "../engine/runs.js";
@@ -32,14 +30,14 @@ import page from "./page.html";
 import { startWatcher } from "../engine/watcher.js";
 import { clearStudio, loadWatch, recordStudio, runningCheck, startCheck, type ChangeSource } from "../engine/watch.js";
 import { approveDraft, draftDiffs, findDraft, listDrafts, rejectDraft } from "../knowledge/draft.js";
-import { briefGlance, checkManifest, loadManifest, loadManifests, manifestFile } from "../knowledge/manifest.js";
-import { describeCardProof, ruleProofs } from "../knowledge/proof.js";
-import { chooseFeatures, chosenFeatures, initPendingDrafts, initStatus, isInitStep, proposedAreas, runningInit, startInit, undecidedAreas, type InitStepId } from "../engine/init.js";
-import { areaGraph, usedBy, uses } from "../engine/impact.js";
+import { chooseFeatures, isInitStep, runningInit, startInit, type InitStepId } from "../engine/init.js";
 import { jobKeys, runningJobs, startJob } from "./jobs.js";
-import { agentSettings, branchInfo, branchMismatch, projectSettings, saveProjectSettings, setupChecklist, type ProjectSettingsBody } from "./project.js";
+import { cacheVersion, cachedAsync, gitStamp, invalidate, watchForChanges } from "./cache.js";
+import { summary, type ViewName, type ViewValue } from "./views.js";
+import { view } from "./viewWorker.js";
+import { agentSettings, branchInfo, branchMismatch, projectSettings, saveProjectSettings, type ProjectSettingsBody } from "./project.js";
 import { buildSettings, disconnectTracker, saveBuildSettings, saveTracker, testOptions, testTracker, trackerSettings, type BuildSettingsBody, type TrackerBody } from "./qa.js";
-import { inbox, inboxTicket, postResult, resultComment } from "../tickets/inbox.js";
+import { clearInbox, inboxList, inboxFetchedAt, inboxTicket, postResult, resultComment } from "../tickets/inbox.js";
 import { openTracker } from "../tickets/tracker.js";
 import { removeConnection, disconnect as disconnectConnection, saveAiAccount, removeAiAccount, saveAiUse, saveConnection, findConnection, trackerConnections, connectionMissing, hasConnectionToken, type ConnectionBody } from "../connections/connections.js";
 import { openSlack, ticketDiscussion } from "../connections/slack.js";
@@ -47,7 +45,6 @@ import { inboxWarnings } from "../tickets/inbox.js";
 import { startWork, ticketGroup } from "../tickets/workbench.js";
 import { afterConnectionChange, connectionsView, myNames, saveWorkbench, setHidden, testConnection, workbenchView, type WorkbenchBody } from "./connections.js";
 import { listBuilds } from "../devices/builds.js";
-import { runTargets } from "../devices/driver.js";
 import type { BuildRef, BuildSource, RunTarget } from "../core/types.js";
 
 let running: { server: Server; url: string } | null = null;
@@ -61,11 +58,14 @@ const watchLog: string[] = [];
 interface Current {
   project: Project;
   stopWatcher?: () => void;
+  stopCache?: () => void;
 }
 
 /** Starts Studio once per process and returns its URL; later calls reuse it. */
 export async function startStudio(project: Project, preferredPort = 7777): Promise<string> {
   if (running) return running.url;
+  // Studio's own git reads (status, diff) must not rewrite the index: that would look like a change.
+  process.env.GIT_OPTIONAL_LOCKS ??= "0";
   for (let port = preferredPort; port < preferredPort + 20; port++) {
     const current: Current = { project };
     const server = createStudioServer(current);
@@ -86,6 +86,8 @@ export async function startStudio(project: Project, preferredPort = 7777): Promi
 function attach(current: Current, project: Project): void {
   current.stopWatcher?.();
   current.stopWatcher = undefined;
+  current.stopCache?.();
+  current.stopCache = watchForChanges(project);
   // The project left behind runs its edit checks in the background again, not in a Studio showing another project.
   if (current.project !== project) clearStudio(current.project);
   current.project = project;
@@ -97,7 +99,14 @@ function attach(current: Current, project: Project): void {
 /** Studio's HTTP server, not yet listening. A bare project (tests) is shown without switching. */
 export function createStudioServer(target: Project | Current): Server {
   const current: Current = "store" in target ? { project: target } : target;
-  return createServer((req, res) => handle(current, req, res).catch((e) => send(res, 500, { error: String(e) })));
+  return createServer((req, res) => {
+    // Anything but a read may change what pages show: drop what was kept, before and after.
+    const changes = req.method !== "GET" && req.method !== "HEAD";
+    if (changes) invalidate();
+    handle(current, req, res)
+      .catch((e) => send(res, 500, { error: String(e) }))
+      .finally(() => changes && invalidate());
+  });
 }
 
 async function handle(current: Current, req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -116,7 +125,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     return;
   }
   // Starting work: only on the branch the person is looking at (Studio sends it with every action).
-  const isAction = method !== "GET" && !/^\/api\/(project|settings|accounts|tracker|connections|ai|workbench\/(settings|hide)|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
+  const isAction = method !== "GET" && !/^\/api\/(refresh|project|settings|accounts|tracker|connections|ai|workbench\/(settings|hide)|builds|cards\/[^/]+\/[^/]+\/status|runs\/[^/]+\/stop)/.test(path);
   const header = req.headers["x-probe-branch"];
   const mismatch = isAction ? branchMismatch(project, typeof header === "string" ? decodeURIComponent(header) : undefined) : null;
   if (mismatch) return send(res, 409, { error: mismatch, branchChanged: true });
@@ -159,18 +168,19 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     scan(project);
     return send(res, 200, branchInfo(project));
   }
-  if (method === "GET" && path === "/api/branch") return send(res, 200, branchInfo(project, url.searchParams.has("branches")));
-  if (method === "GET" && path === "/api/setup") return send(res, 200, setupChecklist(project));
+  // Refresh: everything is read again, tickets included.
+  if (method === "POST" && path === "/api/refresh") {
+    clearInbox(project);
+    return send(res, 200, { ok: true });
+  }
+  if (method === "GET" && path === "/api/branch") {
+    const withBranches = url.searchParams.has("branches");
+    return send(res, 200, await shown(project, `branch:${withBranches}:${gitStamp(project.root)}`, "branch", withBranches));
+  }
+  if (method === "GET" && path === "/api/setup") return send(res, 200, await shown(project, "setup", "setup"));
   if (method === "GET" && path === "/api/init") {
-    const scanned = project.store.read("scan.json") !== null;
-    return send(res, 200, {
-      steps: initStatus(project),
-      // Each proposed feature or platform area, with whether it is chosen or not decided yet.
-      proposed: scanned ? proposedAreaRows(project) : [],
-      chosen: chosenFeatures(project),
-      drafts: initPendingDrafts(project).map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
-      running: runningInit(),
-    });
+    const kept = await shown(project, "init", "init");
+    return send(res, 200, { ...kept, running: runningInit() });
   }
   if (method === "POST" && path === "/api/init/run") {
     const body = JSON.parse((await readBody(req)) || "{}") as { step?: string; features?: string[]; accept?: boolean };
@@ -196,7 +206,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     const error = saveProjectSettings(project, JSON.parse(await readBody(req)) as ProjectSettingsBody);
     return error ? send(res, 400, { error }) : send(res, 200, projectSettings(project));
   }
-  if (method === "GET" && path === "/api/scan") return send(res, 200, summary(latestScan(project), project));
+  if (method === "GET" && path === "/api/scan") return send(res, 200, await shown(project, "scan", "scan"));
   if (method === "POST" && path === "/api/scan") return send(res, 200, summary(scan(project), project));
   if (method === "GET" && path === "/api/doctor") return send(res, 200, doctor(project));
 
@@ -214,8 +224,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   }
 
   if (method === "GET" && path === "/api/cards") {
-    const last = cardResults(project, latestScan(project));
-    return send(res, 200, listCards(project.root).map((c) => ({ ...c, lastRun: last.get(`${c.feature}/${c.id}`) ?? null })));
+    return send(res, 200, await shown(project, "cards", "cards"));
   }
   if (method === "GET" && path === "/api/navmap") return send(res, 200, navMap(project));
 
@@ -241,32 +250,7 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   m = /^\/api\/knowledge\/([^/]+)$/.exec(path);
   if (method === "GET" && m) {
     const id = decodeURIComponent(m[1]!);
-    let manifest = null;
-    try {
-      manifest = loadManifest(project.root, id);
-    } catch {
-      // checkManifest below reports why it does not parse.
-    }
-    const exists = existsSync(join(project.root, manifestFile(id)));
-    return send(res, 200, {
-      file: manifestFile(id),
-      manifest,
-      check: exists ? checkManifest(project.root, id) : null,
-      glance: manifest ? briefGlance(project.root, manifest) : null,
-      // Each rule's cards with their last result, keyed by rule id.
-      cards: manifest
-        ? Object.fromEntries(
-            ruleProofs(project, manifest).map((p) => [
-              p.invariant.id,
-              p.cards.map((c) => ({ ref: c.ref, feature: c.feature, id: c.id, title: c.card?.title, status: c.card?.status, result: c.result, freshness: c.freshness, text: describeCardProof(c) })),
-            ]),
-          )
-        : {},
-      stale: loadWatch(project).stale[id] ?? null,
-      kind: manifest?.kind ?? findFeature(latestScan(project), id)?.group ?? "feature",
-      ...areaLinks(project, id),
-      drafts: listDrafts(project, id).filter((d) => d.status === "pending").map((d) => ({ ...d, diffs: draftDiffs(project, d) })),
-    });
+    return send(res, 200, await shown(project, `knowledge:${id}`, "knowledge", id));
   }
   m = /^\/api\/drafts\/([\w-]+)\/(approve|reject)$/.exec(path);
   if (method === "POST" && m) {
@@ -281,11 +265,8 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
 
   // What a verify would check right now, before anything runs.
   if (method === "GET" && path === "/api/changes") {
-    const base = url.searchParams.get("base") || defaultBase(project.root, project.config.verify.base);
-    if (!base) return send(res, 200, { base: null, files: [], features: [], unowned: [] });
-    const files = changedFiles(project.root, base);
-    const { byFeature, unowned } = featuresOfFiles(project, latestScan(project), files);
-    return send(res, 200, { base, files, features: [...byFeature.entries()].map(([feature, fs]) => ({ feature, files: fs })), unowned });
+    const asked = url.searchParams.get("base");
+    return send(res, 200, await shown(project, `changes:${asked ?? ""}:${gitStamp(project.root)}`, "changes", asked));
   }
   if (method === "POST" && path === "/api/verify") {
     const options = JSON.parse(await readBody(req)) as VerifyOptions;
@@ -422,10 +403,10 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     return send(res, 200, { ok: true });
   }
   if (method === "POST" && path === "/api/work") {
-    const body = JSON.parse(await readBody(req)) as { tickets?: { key: string; source?: string }[]; steps?: string[]; commitPattern?: string; model?: string; account?: string };
+    const body = JSON.parse(await readBody(req)) as { tickets?: { key: string; source?: string; notes?: string }[]; steps?: string[]; commitPattern?: string; model?: string; account?: string; effort?: string; notes?: string };
     try {
       const tickets = (body.tickets ?? []).filter((t) => t && typeof t.key === "string");
-      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || undefined, account: body.account || undefined })));
+      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || undefined, account: body.account || undefined, effort: body.effort || undefined, notes: body.notes?.slice(0, 8000) })));
     } catch (e) {
       return send(res, 400, { error: (e as Error).message });
     }
@@ -443,10 +424,15 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     if (!sources.some((x) => !x.missing))
       return send(res, 200, { connected: false, missing: conns.length ? sources.map((x) => x.missing).filter(Boolean).join(" ") : "No ticket tracker connected to this project yet.", tickets: [], sources });
     try {
-      const tickets = await inbox(project, { refresh: url.searchParams.has("refresh") });
+      // Matching each ticket to commits, runs and cards is kept too, until something changes.
+      const refresh = url.searchParams.has("refresh");
+      const list = await inboxList(project, { refresh });
+      // A list read again from the trackers makes what was kept from the old one out of date.
+      if (refresh) invalidate();
+      const tickets = await shown(project, "", "inbox", list);
       const me = await myNames(project);
       const rules = project.config.workbench;
-      return send(res, 200, { connected: true, sources, me, warnings: inboxWarnings(project), tickets: tickets.map((t) => ({ ...t, ...ticketGroup(t, rules, me) })) });
+      return send(res, 200, { connected: true, sources, me, fetchedAt: inboxFetchedAt(project), warnings: inboxWarnings(project), tickets: tickets.map((t) => ({ ...t, ...ticketGroup(t, rules, me) })) });
     } catch (e) {
       return send(res, 200, { connected: true, sources, tickets: [], error: (e as Error).message });
     }
@@ -458,7 +444,8 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     try {
       if (method === "GET" && !m[2]) return send(res, 200, await inboxTicket(project, id, undefined, source));
       if (method === "GET" && m[2] === "discussion") {
-        const ticket = await inboxTicket(project, id, undefined, source);
+        // The ticket as the list has it: no second trip to the tracker for its title and labels.
+        const ticket = (await inboxList(project)).find((t) => t.id === id && (!source || t.source === source)) ?? (await inboxTicket(project, id, undefined, source));
         return send(res, 200, await ticketDiscussion(project, { id: ticket.id, title: ticket.title, labels: ticket.labels }));
       }
       // Cards from the ticket's own text, read from the tracker rather than pasted.
@@ -574,8 +561,8 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     // A run is saved when it ends, so the ones still going come from memory.
     const going = runningJobs().flatMap((j) => liveRun(j.runId)?.run ?? []).reverse();
     const ids = new Set(going.map((r) => r.id));
-    const saved = project.store.listRuns<Run & { log?: string[] }>().filter((r) => !ids.has(r.id)).map(({ log: _log, ...r }) => r);
-    return send(res, 200, [...going, ...saved]);
+    const saved = project.store.listRuns<Run>().filter((r) => !ids.has(r.id));
+    return send(res, 200, [...going, ...saved].map(runRow));
   }
 
   m = /^\/api\/runs\/([^/]+)$/.exec(path);
@@ -673,53 +660,28 @@ function streamRun(project: Project, id: string, res: ServerResponse): void {
 }
 
 /** The Atlas list: features, stats and health, without per-class detail (that stays behind /api/feature). */
-function summary(result: ScanResult, project: Project) {
-  const health = featureHealth(project, result);
-  const manifests = new Map(loadManifests(project.root).map((m) => [m.id, m]));
-  const graph = safeGraph(project, result);
-  return {
-    // Whether cards can run follows the settings (a web address set since the scan), not the scan.
-    project: { ...result.project, devices: runTargets(project).length > 0 },
-    scannedAt: result.scannedAt,
-    excluded: result.excluded,
-    features: result.features.map((f) => {
-      const h = health.get(f.id)!;
-      const m = manifests.get(f.id);
-      return {
-        id: f.id,
-        group: f.group,
-        stats: f.stats,
-        ...h,
-        lastUnitRun: h.unit ? { ...h.unit, id: h.unit.runId, finishedAt: h.unit.at } : null,
-        // Its written knowledge at a glance: rules, and how many nothing proves yet.
-        manifest: m ? { kind: m.kind, rules: m.invariants.length, unproven: m.invariants.filter((i) => !i.coveredBy.length && !i.cards.length).length } : null,
-        usedBy: graph ? usedBy(graph, f.id).length : 0,
-      };
-    }),
+/** A run as the Runs list shows it: its row and filters, without its findings, steps and logs. */
+function runRow(run: Run): Record<string, unknown> {
+  const { log: _log, timeline, features, results, written, command: _command, skipped: _skipped, ...rest } = run as Run & Record<string, unknown> & {
+    log?: unknown;
+    timeline?: unknown[];
+    features?: { feature: string; unitStatus?: string; draftId?: string; cards?: { runId?: string }[] }[];
+    results?: { tests: number; failed: number }[];
+    written?: unknown[];
   };
+  const row: Record<string, unknown> = { ...rest };
+  if (Array.isArray(row.findings)) row.findings = (row.findings as { severity?: string }[]).map((f) => ({ severity: f.severity }));
+  for (const big of ["screens", "issues", "files", "drafts", "tickets"]) if (Array.isArray(row[big])) row[big] = new Array((row[big] as unknown[]).length).fill(0);
+  if (timeline) row.timeline = new Array(timeline.length).fill(0);
+  if (written) row.written = new Array(written.length).fill(0);
+  if (results) row.results = results.map((x) => ({ tests: x.tests, failed: x.failed }));
+  if (features) row.features = features.map((f) => ({ feature: f.feature, unitStatus: f.unitStatus, draftId: f.draftId, cards: (f.cards ?? []).filter((c) => c.runId).map(() => ({ runId: "1" })) }));
+  return row;
 }
 
-/** The module graph, or none when the build files cannot be read: Studio still shows the rest. */
-function safeGraph(project: Project, result: ScanResult) {
-  try {
-    return areaGraph(project, result);
-  } catch {
-    return null;
-  }
-}
-
-/** Which areas an area uses and which use it, from the build files. */
-function areaLinks(project: Project, id: string): { usedBy: string[]; uses: string[] } {
-  const graph = safeGraph(project, latestScan(project));
-  return graph ? { usedBy: usedBy(graph, id), uses: uses(graph, id) } : { usedBy: [], uses: [] };
-}
-
-/** Proposed areas for Setup's picker: chosen ones ticked, undecided ones marked new. */
-function proposedAreaRows(project: Project) {
-  const chosen = new Set(chosenFeatures(project) ?? []);
-  const undecided = new Set(undecidedAreas(project).map((a) => a.id));
-  const written = new Set(loadManifests(project.root).map((m) => m.id));
-  return proposedAreas(project).map((a) => ({ ...a, chosen: chosen.has(a.id), undecided: undecided.has(a.id), manifest: written.has(a.id) }));
+/** A slow page's data: kept until something changes, worked out off Studio's thread. */
+function shown<N extends ViewName>(project: Project, key: string, name: N, arg?: unknown): Promise<ViewValue<N>> {
+  return cachedAsync(`${name}:${project.root}:${key}`, () => view(project, name, arg, cacheVersion()));
 }
 
 function readBody(req: IncomingMessage): Promise<string> {

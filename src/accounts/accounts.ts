@@ -137,6 +137,14 @@ function seal(value: string): string {
 }
 
 function unseal(sealed: string): string {
-  if (sealed.startsWith("dpapi:")) return powershell(PS_UNPROTECT, sealed.slice(6));
+  if (sealed.startsWith("dpapi:")) {
+    // Each unseal starts PowerShell (about a second, holding up Studio): once per value is enough.
+    let plain = unsealed.get(sealed);
+    if (plain === undefined) unsealed.set(sealed, (plain = powershell(PS_UNPROTECT, sealed.slice(6))));
+    return plain;
+  }
   return sealed.replace(/^plain:/, "");
 }
+
+/** Values unsealed by this process, by their sealed form; only in memory. */
+const unsealed = new Map<string, string>();

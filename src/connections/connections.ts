@@ -6,6 +6,7 @@ import {
   saveLocal,
   saveProject,
   AI_ROLES,
+  EFFORTS,
   type AiAccount,
   type AiRole,
   type AiSettings,
@@ -70,6 +71,8 @@ export function hasConnectionToken(project: { store: { dir: string } }, conn: Co
 /** What a connection still needs before Probe can use it, or null when it is ready. */
 export function connectionMissing(conn: Connection, hasToken: boolean): string | null {
   if (conn.kind === "jira" && !conn.site) return "Jira needs the site address, e.g. https://acme.atlassian.net.";
+  if (conn.kind === "jira" && !conn.email && /^(https?:\/\/)?[^/]+\.atlassian\.net(\/|$)/i.test(conn.site ?? ""))
+    return "Jira Cloud needs the email of the account the API token belongs to.";
   if (!hasToken) return `No ${KIND_LABEL[conn.kind]} ${conn.kind === "slack" ? "token" : "API token"} on this machine for this project.`;
   if (conn.kind === "slack" && !(conn.channels ?? []).length) return "No channel added yet.";
   return null;
@@ -214,7 +217,7 @@ export function aiSettings(project: Project) {
   const ai = readLocalSettings(project.store.dir).ai ?? {};
   const secrets = new Secrets(project.store.dir);
   const accounts = (ai.accounts ?? []).map((a) => ({ ...a, hasKey: a.mode === "apiKey" ? secrets.hasKey(apiKeyName(a.id)) : undefined }));
-  return { accounts, use: ai.use ?? {}, roles: AI_ROLES.map((id) => ({ id, label: ROLE_LABEL[id] })) };
+  return { accounts, use: ai.use ?? {}, roles: AI_ROLES.map((id) => ({ id, label: ROLE_LABEL[id] })), efforts: [...EFFORTS] };
 }
 
 export interface AiAccountBody {
@@ -261,7 +264,7 @@ export function removeAiAccount(project: Project, id: string): void {
 }
 
 /** Which account and model each kind of work uses. */
-export function saveAiUse(project: Project, use: Partial<Record<string, { account?: string; model?: string }>>): string | null {
+export function saveAiUse(project: Project, use: Partial<Record<string, { account?: string; model?: string; effort?: string }>>): string | null {
   const ai = readLocalSettings(project.store.dir).ai ?? {};
   const ids = new Set((ai.accounts ?? []).map((a) => a.id));
   const next: AiSettings["use"] = {};
@@ -270,20 +273,22 @@ export function saveAiUse(project: Project, use: Partial<Record<string, { accoun
     if (!u) continue;
     const account = u.account?.trim() || undefined;
     const model = u.model?.trim() || undefined;
+    const effort = u.effort?.trim() || undefined;
+    if (effort && !(EFFORTS as readonly string[]).includes(effort)) return `${ROLE_LABEL[role]}: effort is one of ${EFFORTS.join(", ")}`;
     if (account && !ids.has(account)) return `${ROLE_LABEL[role]}: unknown account ${account}`;
     if (model && !/^[\w.[\]:/-]{2,80}$/.test(model)) return `${ROLE_LABEL[role]}: a model name such as opus or claude-opus-5-5`;
-    if (account || model) next[role] = { account, model };
+    if (account || model || effort) next[role] = { account, model, effort };
   }
   saveLocal(project.store.dir, { ai: { ...ai, use: next } });
   return null;
 }
 
 /** The account and model a kind of work uses: its own choice, else the project's first account and the Agents model. */
-export function aiFor(project: { config: ProbeConfig; store: { dir: string } }, role: AiRole = "testing"): { account?: AiAccount; model?: string } {
+export function aiFor(project: { config: ProbeConfig; store: { dir: string } }, role: AiRole = "testing"): { account?: AiAccount; model?: string; effort?: string } {
   const ai = readLocalSettings(project.store.dir).ai ?? {};
   const use = ai.use?.[role] ?? {};
   const account = (ai.accounts ?? []).find((a) => a.id === use.account) ?? (ai.accounts ?? [])[0];
-  return { account, model: use.model };
+  return { account, model: use.model, effort: use.effort };
 }
 
 /** Environment that points the agent CLI at an account. Empty for the CLI's own login. */

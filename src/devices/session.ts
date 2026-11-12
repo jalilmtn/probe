@@ -80,6 +80,11 @@ export class DeviceSession {
     appendFileSync(join(this.info.evidenceDir, "timeline.jsonl"), `${JSON.stringify(entry)}\n`);
   }
 
+  /** How often this run has typed `role`'s stored `secret` so far. */
+  secretTries(role: string, secret: string): number {
+    return secretTries(this.timeline(), role, secret);
+  }
+
   timeline(): TimelineEntry[] {
     const file = join(this.info.evidenceDir, "timeline.jsonl");
     if (!existsSync(file)) return [];
@@ -106,4 +111,12 @@ export class DeviceSession {
   verdict(): CardVerdict | null {
     return this.report<CardVerdict>("verdict");
   }
+}
+
+/** A sign-in tried more often than this in one run is not going to work: the run reports blocked. */
+export const MAX_SECRET_TRIES = 2;
+
+/** How often a timeline typed `role`'s stored `secret`. */
+export function secretTries(timeline: TimelineEntry[], role: string, secret: string): number {
+  return timeline.filter((e) => e.action === "type_secret" && e.detail === `typed ${role}'s ${secret}`).length;
 }

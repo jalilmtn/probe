@@ -192,7 +192,7 @@ function git(root: string, ...args: string[]): string {
 
 /** A repository with one commit for SHOP-7 inside tag v142 and one for SHOP-8 after it. */
 function repoWithBuilds(): Project {
-  const project = fixture({ "probe/probe.yaml": "tickets:\n  tracker: jira\n  site: https://acme.atlassian.net\n", "src/checkout/pay.ts": "export const a = 1;\n" });
+  const project = fixture({ "probe/probe.yaml": "tickets:\n  tracker: jira\n  site: https://jira.example.com\n", "src/checkout/pay.ts": "export const a = 1;\n" });
   git(project.root, "init", "-q");
   git(project.root, "config", "user.email", "t@example.com");
   git(project.root, "config", "user.name", "Tester");
@@ -277,7 +277,7 @@ describe("posting a result", () => {
   });
 
   test("posting sends that comment to the ticket", async () => {
-    const project = fixture({ "probe/probe.yaml": "tickets:\n  tracker: jira\n  site: https://acme.atlassian.net\n" });
+    const project = fixture({ "probe/probe.yaml": "tickets:\n  tracker: jira\n  site: https://jira.example.com\n" });
     new Secrets(project.store.dir).setKey(tokenKey("jira"), "tok");
     const { fetcher, calls } = fakeFetch([["POST /rest/api/2/issue/SHOP-7/comment", () => ({ status: 201, json: {} })]]);
     const posted = await postResult(project, "SHOP-7", verify(project), fetcher);
@@ -414,5 +414,21 @@ describe("what a test runs against", () => {
     assert.equal(webUrl(" http://localhost:3000 "), "http://localhost:3000/");
     assert.throws(() => webUrl(undefined), /No web app address/);
     assert.throws(() => webUrl("javascript:alert(1)"), /not an http/);
+  });
+});
+
+describe("sign-in tries", () => {
+  test("a stored secret is counted per account and secret", async () => {
+    const { MAX_SECRET_TRIES, secretTries } = await import("../src/devices/session.js");
+    const at = "2026-01-01T00:00:00.000Z";
+    const timeline = [
+      { at, action: "type_secret", detail: "typed user_a's password" },
+      { at, action: "type_secret", detail: "typed user_a's password" },
+      { at, action: "type_secret", detail: "typed user_b's password" },
+      { at, action: "act", detail: "tap 12" },
+    ];
+    assert.equal(secretTries(timeline, "user_a", "password"), 2);
+    assert.equal(secretTries(timeline, "user_b", "password"), 1);
+    assert.ok(secretTries(timeline, "user_a", "password") >= MAX_SECRET_TRIES);
   });
 });

@@ -194,6 +194,7 @@
   <div class="bwrap"><button class="branch" id="branch" title="Branch this project is on">…</button>
     <div class="bpop" id="bpop" hidden><input id="bq" placeholder="Search branches…" autocomplete="off"><div class="blist" id="blist"></div></div></div>
   <button class="jobs" id="jobs" hidden></button>
+  <button class="btn secondary" id="refreshall" title="Read the project, its branch and the tickets again. Studio also updates on its own when files change.">↻ Refresh</button>
   <div class="spacer"></div>
   <nav>
     <button data-tab="atlas" class="active">Atlas</button>
@@ -412,7 +413,7 @@ document.getElementById("jobs").addEventListener("click", () => {
   state.followId = j.runId;
   render();
 });
-setInterval(refreshJobs, 3000);
+setInterval(() => { if (!document.hidden) refreshJobs(); }, 3000);
 
 function coverageBar(s) {
   const t = Math.max(1, s.testable);
@@ -812,7 +813,22 @@ async function checkBranch() {
     banner.innerHTML = `<div class="banner warn">${b.warnings.map(esc).join(" · ")}</div>`;
   } else banner.innerHTML = "";
 }
-setInterval(checkBranch, 5000);
+// The branch changes when someone checks out elsewhere: look again when the window comes back.
+window.addEventListener("focus", () => checkBranch());
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { checkBranch(); refreshJobs(); } });
+document.getElementById("refreshall").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  b.disabled = true;
+  try {
+    await post("/api/refresh", {});
+    state.scan = null;
+    if (state.tickets) { state.tickets.data = null; state.tickets.refresh = true; }
+    await checkBranch();
+    render();
+  } finally {
+    b.disabled = false;
+  }
+});
 
 // Branch picker: the list loads when it opens (slow on big repos) and filters as you type.
 const $bpop = document.getElementById("bpop"), $bq = document.getElementById("bq"), $blist = document.getElementById("blist");
@@ -1539,6 +1555,9 @@ function ticketDetail(t, options, st) {
       <button class="btn secondary" type="button" id="tkpost" ${t.lastRun.status === "running" ? "disabled" : ""}>Post result to the ticket</button></div>` : ""}
     <div id="tkpostpanel"></div>
     <div id="runpanel" style="margin-top:12px"></div>
+    <h3 style="margin-top:16px">Your instructions for this ticket</h3>
+    <textarea id="tknotes" rows="3" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font:inherit" placeholder="Anything the agent must know or be careful about, e.g. “Don't touch the payment SDK; the fix belongs in CheckoutViewModel.”">${esc((ticketsState().notes || {})[tkKey(t)] || "")}</textarea>
+    <p class="muted" style="margin:4px 0 0;font-size:12px">Kept on this machine. Sent to the agent ahead of the ticket's text when this ticket is in a workbench run.</p>
     <h3 style="margin-top:16px">Talk about it in Slack</h3><div id="tktalk"><span class="muted">Searching this project's channels…</span></div>`;
 }
 
@@ -1546,6 +1565,9 @@ function ticketDetail(t, options, st) {
 // what the agent does for each, and it works through them one by one, a commit per ticket.
 
 const tkKey = (t) => `${t.source || ""}/${t.id}`;
+const notesKey = () => "probe.notes." + (document.getElementById("proj").dataset.current || "");
+function loadNotes() { try { return JSON.parse(localStorage.getItem(notesKey()) || "{}"); } catch { return {}; } }
+function saveNotes(n) { try { localStorage.setItem(notesKey(), JSON.stringify(n)); } catch { /* private window: kept for this visit */ } }
 const tkQuery = (t) => (t.source ? `?source=${encodeURIComponent(t.source)}` : "");
 const GROUPS = [["mine", "For me"], ["notForMe", "Not for me"], ["hidden", "Hidden"], ["all", "All"]];
 
@@ -1558,17 +1580,24 @@ function previewCommit(pattern, t, area) {
     .replace(/\(\s*\)/g, "").replace(/\[\s*\]/g, "").replace(/ {2,}/g, " ").trim();
 }
 
-async function renderTickets() {
+/** Loads the tickets and settings once; filters, ticks and choosing a ticket redraw from that copy. */
+async function renderTickets(local) {
   const st = ticketsState();
   st.picked = st.picked || new Set();
   st.group = st.group || "mine";
   st.statuses = st.statuses || new Set();
   st.label = st.label || "";
-  $view.innerHTML = `<div class="empty">Reading tickets…</div>`;
-  const [box, options, wb, conns] = await Promise.all([
-    api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options"), api("/api/workbench/settings"), api("/api/connections"),
-  ]);
+  st.notes = st.notes || loadNotes();
+  if (!local || !st.data || st.refresh) {
+    if (!st.data) $view.innerHTML = `<div class="empty">Reading tickets…</div>`;
+    const [box, options, wb, conns] = await Promise.all([
+      api("/api/inbox" + (st.refresh ? "?refresh" : "")), api("/api/test-options"), api("/api/workbench/settings"), api("/api/connections"),
+    ]);
+    st.data = { box, options, wb, conns };
+  }
   st.refresh = false;
+  const { box, options, wb, conns } = st.data;
+  const listScroll = document.getElementById("tklist")?.scrollTop || 0;
   st.steps = st.steps || new Set(wb.steps);
   st.pattern = st.pattern ?? wb.commitPattern;
   const projectName = conns.project.name;
@@ -1601,7 +1630,8 @@ async function renderTickets() {
       <span class="muted">${esc(sources.join(" + ") || "")}${box.me && box.me.length ? ` · you are ${esc(box.me.join(", "))}` : ""}</span>
       <span style="flex:1"></span>
       <button class="btn secondary" id="tkrules" title="Which tickets are not for you, and how commits are named">Rules</button>
-      <button class="btn secondary" id="tkrefresh">Refresh</button></div>
+      ${box.fetchedAt ? `<span class="muted" style="font-size:12px" title="${esc(box.fetchedAt)}">from the tracker ${ago(box.fetchedAt)}</span>` : ""}
+      <button class="btn secondary" id="tkrefresh" title="Read the tickets from the tracker again">Refresh</button></div>
       <div class="chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${GROUPS.map(([g, label]) => `<button class="chip ${st.group === g ? "active" : ""}" data-g="${g}">${label} ${counts[g]}</button>`).join("")}</div>
       ${statuses.length > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="muted" style="font-size:12px">Status</span>${statuses.map((s) => `<button class="chip ${st.statuses.has(s) ? "active" : ""}" data-s="${esc(s)}">${esc(s)} ${grouped.filter((t) => t.status === s).length}</button>`).join("")}</div>` : ""}
       ${box.error ? `<p style="color:var(--fail);margin-bottom:0">${esc(box.error)}</p>` : ""}
@@ -1614,12 +1644,14 @@ async function renderTickets() {
         <label class="muted" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="tkall" ${visible.length && visible.every((t) => st.picked.has(tkKey(t))) ? "checked" : ""}> Select all ${visible.length}</label></div>
         <ul id="tklist">${visible.map((t) => `<li data-t="${esc(tkKey(t))}" class="${tkKey(t) === st.selected ? "active" : ""}" title="${esc(t.title)}${t.why ? " · not for you: " + esc(t.why) : ""}">
           <input type="checkbox" data-pick="${esc(tkKey(t))}" ${st.picked.has(tkKey(t)) ? "checked" : ""} aria-label="Select ${esc(t.id)}">
-          <span class="name"><span class="mono">${esc(t.id)}</span> ${esc(t.title)}</span>
+          <span class="name"><span class="mono">${esc(t.id)}</span> ${st.notes[tkKey(t)] ? `<span title="Has your instructions">✎</span> ` : ""}${esc(t.title)}</span>
           <span class="n">${esc(t.status)}</span></li>`).join("") || `<li class="muted" style="cursor:default">No ticket here.</li>`}</ul></div>
       <div><div class="box" id="tkdetail">${sel ? ticketDetail(sel, options, st) : `<div class="empty">Choose a ticket.</div>`}</div></div></div>
     <div id="tkbar"></div>`;
 
-  const rerender = () => renderTickets();
+  const rerender = () => renderTickets(true);
+  const list = document.getElementById("tklist");
+  if (list) list.scrollTop = listScroll;
   document.getElementById("tkrefresh").addEventListener("click", () => { st.refresh = true; rerender(); });
   document.getElementById("tkrules").addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "workbench"; render(); });
   $view.querySelectorAll("[data-g]").forEach((b) => b.addEventListener("click", () => { st.group = b.dataset.g; st.statuses.clear(); rerender(); }));
@@ -1644,6 +1676,7 @@ function renderWorkBar(all, wb, st) {
   const picked = all.filter((t) => st.picked.has(tkKey(t)));
   if (!picked.length) { bar.innerHTML = ""; return; }
   const first = picked[0];
+  const coding = (st.ai && st.ai.use && st.ai.use.coding) || {};
   bar.innerHTML = `<div class="box" style="position:sticky;bottom:0;margin-top:14px;border-color:var(--accent)">
     <div class="row" style="flex-wrap:wrap"><strong>${picked.length} ticket${picked.length === 1 ? "" : "s"} selected</strong>
       <span class="muted">${picked.map((t) => esc(t.id)).join(", ")}</span><span style="flex:1"></span>
@@ -1655,6 +1688,10 @@ function renderWorkBar(all, wb, st) {
       ${(() => { const ai = st.ai; const coding = ai.use.coding || {}; st.account = st.account ?? (coding.account || ""); st.model = st.model ?? (coding.model || "");
         return `<label>Coding account<select name="account"><option value="">${ai.accounts.length ? "As in Settings (" + esc((ai.accounts.find((a) => a.id === coding.account) || ai.accounts[0]).name) + ")" : "CLI's own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${st.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>
         <label>Coding model<select name="model"><option value="">As in Settings (${esc(coding.model || ai.model || "default")})</option>${ai.models.filter(([m]) => m).map(([m, l]) => `<option value="${esc(m)}" ${st.model === m ? "selected" : ""}>${esc(l.split(" — ")[0])}</option>`).join("")}${st.model && !ai.models.some(([m]) => m === st.model) ? `<option selected>${esc(st.model)}</option>` : ""}</select></label>`; })()}
+      <label>Effort<select name="effort"><option value="">${esc(coding.effort ? "As in Settings (" + coding.effort + ")" : "CLI default")}</option>${(st.ai.efforts || []).map((e) => `<option ${st.effort === e ? "selected" : ""}>${e}</option>`).join("")}</select></label>
+      <label style="flex:1 1 100%">Instructions for every ticket in this run <span class="src">optional · each ticket can also have its own, on its page</span>
+        <textarea name="notes" rows="2" style="padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font:inherit" placeholder="e.g. Keep changes small. Don't change public APIs. Follow the existing MVI pattern.">${esc(st.batchNotes || "")}</textarea></label>
+      ${picked.some((t) => st.notes[tkKey(t)]) ? `<p class="muted" style="flex:1 1 100%;margin:0">✎ Your own instructions go with ${picked.filter((t) => st.notes[tkKey(t)]).map((t) => esc(t.id)).join(", ")}.</p>` : ""}
       <button class="btn" type="submit" data-job="work" data-busy="Working…">▶ Start ${picked.length} ticket${picked.length === 1 ? "" : "s"}</button>
     </form>
     <p class="muted" style="margin:6px 0 0" id="wbprev"></p>
@@ -1670,19 +1707,21 @@ function renderWorkBar(all, wb, st) {
   f.pattern.addEventListener("input", () => { st.pattern = f.pattern.value; prev(); });
   f.account.addEventListener("change", () => { st.account = f.account.value; });
   f.model.addEventListener("change", () => { st.model = f.model.value; });
-  document.getElementById("wbclear").addEventListener("click", () => { st.picked.clear(); renderTickets(); });
+  f.effort.addEventListener("change", () => { st.effort = f.effort.value; });
+  f.notes.addEventListener("input", () => { st.batchNotes = f.notes.value; });
+  document.getElementById("wbclear").addEventListener("click", () => { st.picked.clear(); renderTickets(true); });
   f.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!st.steps.size) return alert("Tick at least one step.");
     if (st.steps.has("commit") && !/\{key\}/.test(st.pattern)) return alert("The commit message needs {key}, so each commit names its ticket.");
     const steps = wb.allSteps.map((s) => s.id).filter((s) => st.steps.has(s));
     if (!confirm(`The agent will work on ${picked.length} ticket(s) in ${state.branchSeen || "this branch"}: ${steps.join(", ")}.${steps.includes("commit") ? " Each ticket gets its own local commit." : ""} Start?`)) return;
-    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined });
+    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source, notes: st.notes[tkKey(t)] || undefined })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined, effort: st.effort || undefined, notes: st.batchNotes || undefined });
     if (res.error) return alert(res.error);
     st.workRun = res.runId;
     st.picked.clear();
     await refreshJobs();
-    renderTickets();
+    renderTickets(true);
   });
 }
 
@@ -1720,7 +1759,7 @@ function bindTicketDetail(sel, options, st, rerender) {
   const q = tkQuery(sel);
   const form = document.getElementById("tkf");
   const panel = document.getElementById("runpanel");
-  const done = (run) => { st.refresh = true; state.showRun = run.id; render(); };
+  const done = (run) => { state.showRun = run.id; render(); };
   bindTargetPicker(form, options, (v) => { st.against = v; });
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1739,7 +1778,7 @@ function bindTicketDetail(sel, options, st, rerender) {
   document.getElementById("tkhide").addEventListener("click", async () => {
     await post("/api/workbench/hide", { key: sel.id, source: sel.source, hidden: sel.group !== "hidden" });
     st.selected = null;
-    rerender();
+    renderTickets();
   });
   const show = document.getElementById("tkshow");
   if (show) show.addEventListener("click", () => followRun(sel.lastRun.id, panel));
@@ -1758,6 +1797,12 @@ function bindTicketDetail(sel, options, st, rerender) {
       document.getElementById("tkpostout").innerHTML = res.error ? `<span class="pill failed">not posted</span> ${esc(res.error)}` : `<span class="pill passed">posted</span>`;
       if (res.error) ev.target.disabled = false;
     });
+  });
+  const notes = document.getElementById("tknotes");
+  notes.addEventListener("input", () => {
+    const v = notes.value;
+    if (v.trim()) st.notes[tkKey(sel)] = v; else delete st.notes[tkKey(sel)];
+    saveNotes(st.notes);
   });
   // What people said about it in this project's Slack channels.
   const talk = document.getElementById("tktalk");
@@ -2114,11 +2159,12 @@ function renderAi(pane, data) {
         : `<p class="muted">No account added: agents use ${esc(ai.runner)}'s own login on this machine.</p>`}
       <div style="margin-top:10px">${editing ? aiAccountForm(acct) : `<button class="btn secondary" id="aiadd">＋ Add an account</button>`}</div></div>
     <div class="box"><h3>Which account and model for each kind of work</h3>
-      <p class="muted" style="margin-top:0">For example: coding on Opus with your work account, reviews on Sonnet. A workbench run can still pick another for that run.</p>
+      <p class="muted" style="margin-top:0">For example: coding on Opus 5.5 at high effort with your work account, reviews on Sonnet at medium. Effort is how long the model thinks: low is fastest and cheapest, max is the most thorough. A workbench run can still pick another for that run.</p>
       <form class="inline" id="aiuse">${ai.roles.map((r) => { const u = ai.use[r.id] || {}; return `<div style="flex:1 1 100%;display:flex;gap:10px;flex-wrap:wrap;align-items:end;padding:6px 0;border-bottom:1px solid var(--line)">
         <div style="flex:1 1 220px"><strong>${esc(r.label.split(":")[0])}</strong><div class="muted" style="font-size:12px">${esc(r.label.split(":")[1] || "")}</div></div>
         <label>Account<select name="acct-${r.id}"><option value="">${ai.accounts.length ? `First account (${esc(ai.accounts[0].name)})` : "CLI's own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${u.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>
-        <label>Model<select name="model-${r.id}">${modelOpts(u.model)}</select></label></div>`; }).join("")}
+        <label>Model<select name="model-${r.id}">${modelOpts(u.model)}</select></label>
+        <label>Effort<select name="effort-${r.id}"><option value="">CLI default</option>${ai.efforts.map((e) => `<option ${u.effort === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>`; }).join("")}
         <button class="btn" type="submit">Save</button><span id="aiuseout"></span></form>
       <p class="muted" style="margin-bottom:0">Runner and the default model are under General → Agents.</p></div>`;
   document.getElementById("aiadd")?.addEventListener("click", () => { state.aiEdit = "new"; renderAi(pane, data); });
@@ -2142,7 +2188,7 @@ function renderAi(pane, data) {
   document.getElementById("aiuse").addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = e.target;
-    const use = Object.fromEntries(ai.roles.map((r) => [r.id, { account: f[`acct-${r.id}`].value, model: f[`model-${r.id}`].value === "__other" ? "" : f[`model-${r.id}`].value }]));
+    const use = Object.fromEntries(ai.roles.map((r) => [r.id, { account: f[`acct-${r.id}`].value, model: f[`model-${r.id}`].value === "__other" ? "" : f[`model-${r.id}`].value, effort: f[`effort-${r.id}`].value }]));
     const res = await post("/api/ai/use", use);
     if (res.error) { document.getElementById("aiuseout").innerHTML = `<span class="pill failed">not saved</span> ${esc(res.error)}`; return; }
     renderAi(pane, res);

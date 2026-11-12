@@ -12,13 +12,17 @@ export const claudeRunner: AgentRunner = {
   versionArgs: ["--version"],
   installHint: "Install Claude Code (https://claude.com/claude-code) and log in",
   models: [
-    ["sonnet", "Sonnet — balanced, included in most plans (recommended)"],
+    ["sonnet", "Sonnet — latest, balanced, included in most plans (recommended)"],
     ["haiku", "Haiku — fastest and cheapest, fine for simple cards"],
     ["opus", "Opus — strongest, uses your plan faster"],
     ["fable", "Fable — may bill usage credits on your plan"],
+    ["claude-opus-5-5", "Opus 5.5 — this exact version"],
+    ["claude-sonnet-5-5", "Sonnet 5.5 — this exact version"],
+    ["claude-haiku-5-5", "Haiku 5.5 — this exact version"],
+    ["claude-fable-5-2", "Fable 5.2 — this exact version"],
   ],
 
-  launch({ task, model, mcp, scratchDir, id }: AgentLaunchInput): AgentLaunch {
+  launch({ task, model, effort, mcp, scratchDir, id }: AgentLaunchInput): AgentLaunch {
     const mcpConfig = join(scratchDir, `agent-mcp-${id}.json`);
     const builtins = task.builtinTools ?? ["Read", "Grep", "Glob"];
     const scoped = (task.editOnly ?? []).flatMap((p) => [`Edit(${p})`, `Write(${p})`]);
@@ -41,6 +45,7 @@ export const claudeRunner: AgentRunner = {
     ];
     // Always explicit: without it the agent inherits the user's Claude Code default model.
     if (model) args.push("--model", model);
+    if (effort) args.push("--effort", effort);
     return {
       command: "claude",
       args,

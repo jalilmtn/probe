@@ -48,13 +48,15 @@ export function codexRunner(readSettings: () => CodexUserSettings = readCodexUse
     installHint: "Install Codex CLI (npm install -g @openai/codex) and run codex login",
     models: [["", "Codex default (your ~/.codex/config.toml)"]],
 
-    launch({ task, model, mcp }: AgentLaunchInput): AgentLaunch {
+    launch({ task, model, mcp, effort }: AgentLaunchInput): AgentLaunch {
       const edits = Boolean(task.allowEdits || task.editOnly?.length);
       const noShell = !edits && task.builtinTools !== undefined && task.builtinTools.length === 0;
       const args = [
         ...base(readSettings(), model, edits ? "workspace-write" : "read-only"),
         ...(noShell ? ["--disable", "shell_tool", "--disable", "unified_exec"] : []),
         ...mcpOverrides(mcp, task.probeTools),
+        // Codex has no "max": its highest is xhigh.
+        ...(effort ? ["-c", `model_reasoning_effort="${effort === "max" ? "xhigh" : effort}"`] : []),
         // The prompt comes on stdin.
         "-",
       ];

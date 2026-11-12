@@ -15,6 +15,8 @@ export interface AgentTask {
   mcpEnv?: Record<string, string>;
   /** Lets the agent create and edit files (writing unit tests). It still never runs commands. */
   allowEdits?: boolean;
+  /** How hard the model thinks: low, medium, high, xhigh, max. Unset: the CLI's default. */
+  effort?: string;
   /** Which kind of work this is: picks the project's account and model for it (Settings → AI). */
   role?: import("../core/config.js").AiRole;
   /** An AI account id of the project, over the role's choice. */
@@ -50,6 +52,8 @@ export interface AgentLaunchInput {
   task: AgentTask;
   /** "" = the runner's own default. */
   model: string;
+  /** "" = the runner's own default. */
+  effort?: string;
   mcp: McpServerSpec;
   /** A folder the runner may write its own config files to (removed after the run). */
   scratchDir: string;

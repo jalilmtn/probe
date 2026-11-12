@@ -10,6 +10,7 @@ import type { Project } from "../engine/project.js";
 import { launchRun } from "../engine/runs.js";
 import { latestScan } from "../engine/scan.js";
 import { startUnitRun } from "../engine/unit.js";
+import { startBackfill } from "../cards/backfill.js";
 import { featuresOfFiles, startVerify } from "../engine/verify.js";
 import { inboxTicket, type InboxTicket } from "./inbox.js";
 import { openTracker } from "./tracker.js";
@@ -23,7 +24,7 @@ export const STEP_LABEL: Record<WorkStep, string> = {
   fix: "Write the change",
   unitwrite: "Write unit tests",
   unit: "Run unit tests",
-  ui: "Test the UI",
+  ui: "Test on the device (drafts cards if none)",
   validate: "Check against the ticket",
   commit: "Commit",
   comment: "Comment on the ticket",
@@ -89,10 +90,44 @@ export function changedSince(before: Map<string, string>, after: Map<string, str
   return { files: files.sort(), conflicts: conflicts.sort() };
 }
 
+/** The feature ids an answer names, from `FEATURES: a, b`, kept only when the project has them. */
+export function parseFeatures(answer: string, known: string[]): string[] {
+  const line = /FEATURES:\s*(.+)/i.exec(answer)?.[1] ?? "";
+  const lower = new Map(known.map((k) => [k.toLowerCase(), k]));
+  return [...new Set(line.split(/[,\s]+/).map((x) => lower.get(x.trim().replace(/[`"'.]/g, "").toLowerCase())).filter((x): x is string => !!x))].slice(0, 2);
+}
+
+/** A short agent run that reads the ticket and the project's features and names the one or two it is about. */
+async function pickFeatures(project: Project, t: InboxTicket, notes: string, log: (l: string) => void, cost: (usd: number) => void): Promise<string[]> {
+  const scan = latestScan(project);
+  const list = scan.features.map((f) => `- ${f.id}: ${f.modules.slice(0, 3).map((m) => m.id).join(", ")}`).join("\n");
+  const prompt = [
+    notes,
+    `Ticket ${t.id}: ${t.title}`,
+    "",
+    t.description.slice(0, 6000) || "(no description)",
+    "",
+    "These are the app's features (id: modules):",
+    list,
+    "",
+    "Which one or two features is this ticket about? You may read the code to decide. Do not edit anything.",
+    "End your answer with one line: FEATURES: id[, id]",
+  ].join("\n");
+  const result = await runAgent(project, { prompt, probeTools: ["probe_feature"], role: "review" }, log);
+  cost(result.costUsd);
+  const picked = parseFeatures(result.summary, scan.features.map((f) => f.id));
+  log(picked.length ? `about: ${picked.join(", ")}` : "the agent named no known feature");
+  return picked;
+}
+
 // ── The run ─────────────────────────────────────────────────────────────────
 
 export interface WorkOptions {
-  tickets: { key: string; source?: string }[];
+  /** `notes`: the developer's own instructions for this ticket only. */
+  tickets: { key: string; source?: string; notes?: string }[];
+  /** The developer's instructions for every ticket of the run. */
+  notes?: string;
+  effort?: string;
   steps: string[];
   commitPattern?: string;
   /** Coding model and account for this run, over Settings → AI. */
@@ -104,8 +139,15 @@ function git(root: string, args: string[]) {
   return spawnSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true, timeout: 60_000 });
 }
 
-function ticketPrompt(t: InboxTicket, discussion: string, task: "fix" | "unitwrite", files: string[]): string {
+/** The developer's own words, for the whole run and for this ticket, ahead of everything else the agent reads. */
+export function notesText(batch?: string, own?: string): string {
+  const parts = [batch?.trim(), own?.trim()].filter(Boolean);
+  return parts.length ? `Instructions from the developer (follow them; they win over anything below):\n${parts.join("\n\n")}\n\n` : "";
+}
+
+function ticketPrompt(t: InboxTicket, discussion: string, task: "fix" | "unitwrite", files: string[], notes = ""): string {
   const head = [
+    notes,
     `You are working on ticket ${t.id}${t.sourceLabel ? ` from ${t.sourceLabel}` : ""}: ${t.title}`,
     "",
     "Ticket text:",
@@ -130,8 +172,9 @@ function ticketPrompt(t: InboxTicket, discussion: string, task: "fix" | "unitwri
   ].join("\n");
 }
 
-function validatePrompt(t: InboxTicket, diff: string): string {
+function validatePrompt(t: InboxTicket, diff: string, notes = ""): string {
   return [
+    notes,
     `Ticket ${t.id}: ${t.title}`,
     "",
     t.description.trim() || "(no description)",
@@ -158,10 +201,12 @@ export function startWork(project: Project, options: WorkOptions): { run: WorkRu
     status: "running",
     steps,
     commitPattern: pattern,
+    notes: options.notes?.trim() || undefined,
     costUsd: 0,
     tickets: options.tickets.map((t) => ({
       key: t.key,
       source: t.source,
+      notes: t.notes?.trim() || undefined,
       title: t.key,
       status: "queued",
       files: [],
@@ -175,7 +220,7 @@ export function startWork(project: Project, options: WorkOptions): { run: WorkRu
       log(`══ ${ticket.key}`);
       ticket.status = "running";
       try {
-        await workOn(project, run, ticket, steps, pattern, options.model, options.account, log);
+        await workOn(project, run, ticket, steps, pattern, { model: options.model, account: options.account, effort: options.effort, notes: notesText(options.notes, ticket.notes) }, log);
       } catch (e) {
         ticket.status = "error";
         ticket.summary = (e as Error).message;
@@ -189,7 +234,8 @@ export function startWork(project: Project, options: WorkOptions): { run: WorkRu
   });
 }
 
-async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps: WorkStep[], pattern: string, model: string | undefined, account: string | undefined, log: (l: string) => void): Promise<void> {
+async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps: WorkStep[], pattern: string, ai: { model?: string; account?: string; effort?: string; notes: string }, log: (l: string) => void): Promise<void> {
+  const { model, account, effort, notes } = ai;
   const state = (step: WorkStep) => ticket.steps.find((s) => s.step === step)!;
   const fail = (s: WorkStepState, note: string, status: WorkStepState["status"] = "failed") => {
     s.status = status;
@@ -222,7 +268,7 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
       const changed = changedSince(before, dirtyFiles(project.root)).files;
       const result = await runAgent(
         project,
-        { prompt: ticketPrompt(t, discussion, step, changed), probeTools: ["probe_feature", "probe_cards_list"], model: model ?? undefined, allowEdits: true, role: "coding", account },
+        { prompt: ticketPrompt(t, discussion, step, changed, notes), probeTools: ["probe_feature", "probe_cards_list"], model: model ?? undefined, allowEdits: true, role: "coding", account, effort },
         log,
       );
       run.costUsd += result.costUsd;
@@ -246,7 +292,29 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
       const scanned = latestScan(project);
       const own = featuresOfFiles(project, scanned, ticket.files).byFeature;
       features = [...new Set([...own.keys(), ...(own.size ? [] : features)])];
-      if (!features.length) {
+      // No card checks this ticket yet: draft them from its text first, then test them.
+      if (step === "ui" && !t.cards.length) {
+        if (!features.length) {
+          log("which part of the app is this ticket about?");
+          features = await pickFeatures(project, t, notes, log, (c) => (run.costUsd += c));
+        }
+        if (!features.length) {
+          fail(s, "could not tell which part of the app this ticket is about, so no card was drafted. Open it in Tickets and use “Draft cards from the ticket” with its feature.", "blocked");
+          return;
+        }
+        log(`drafting cards from ${t.id} for ${features.join(", ")}`);
+        const text = `${notes}${t.title}\n\n${t.description}`.trim();
+        const { run: drafting, done: drafted } = startBackfill(project, features, { ticket: { id: t.id, text } });
+        const made = await drafted;
+        run.costUsd += made.costUsd ?? 0;
+        if (made.status !== "passed" || !made.written.length) {
+          fail(s, `no card was drafted (${made.status}${made.error ? `: ${made.error}` : ""}). See run ${drafting.id}.`, "blocked");
+          return;
+        }
+        s.note = `drafted ${made.written.length} card(s): ${made.written.join(", ")}`;
+        log(s.note);
+      }
+      if (step === "unit" && !features.length) {
         s.status = "skipped";
         s.note = "no feature owns the changed files";
         continue;
@@ -264,22 +332,34 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
         s.status = "passed";
         s.note = `${features.join(", ")} passed`;
       } else {
-        const { run: verify, done } = startVerify(project, { features, noUnit: true, cards: "all", model });
+        // The ticket's cards first, then the cards of the features it touched; drafts count too.
+        log(`on the device: ${t.cards.length ? `${t.cards.length} card(s) of ${t.id}` : ""}${t.cards.length && features.length ? " and " : ""}${features.length ? `cards of ${features.join(", ")}` : ""}`);
+        const { run: verify, done } = startVerify(project, { ticket: t.id, features: features.length ? features : undefined, noUnit: true, cards: "all" });
         s.runId = verify.id;
         const finished = await done;
         run.costUsd += finished.costUsd;
+        const ran = finished.features.flatMap((f) => f.cards).filter((c) => c.cardId !== "—" && c.status !== "skipped");
+        if (!ran.length && finished.status !== "error" && finished.status !== "stopped") {
+          fail(s, `no card ran on the device${finished.error ? ` (${finished.error})` : ""}. Draft cards from the ticket on its page, then run again.`, "blocked");
+          return;
+        }
         if (finished.status !== "passed") {
-          fail(s, `UI test ${finished.status}${finished.error ? ` (${finished.error})` : ""}`);
+          const bad = ran.filter((c) => c.status !== "passed").map((c) => `${c.cardId}: ${c.status}${c.note ? ` (${c.note.split("\n")[0]!.slice(0, 120)})` : ""}`);
+          // A refused sign-in stops the cards after it: say what to fix rather than list them.
+          const signIn = finished.features.flatMap((f) => f.cards).some((c) => c.note?.startsWith("not run: sign-in failed"));
+          const hint = signIn ? " · Sign-in failed, so the other cards were not run: fix the test accounts in Settings → Test accounts." : "";
+          fail(s, `UI test ${finished.status}${bad.length ? ` · ${bad.slice(0, 3).join("; ")}` : finished.error ? ` (${finished.error})` : ""}${hint}`);
           return;
         }
         s.status = "passed";
+        s.note = `${s.note ? `${s.note} · ` : ""}${ran.length} card(s) passed on the device`;
       }
       continue;
     }
 
     if (step === "validate") {
       const diff = ticket.files.length ? (git(project.root, ["diff", "--", ...ticket.files]).stdout ?? "") : "";
-      const result = await runAgent(project, { prompt: validatePrompt(t, diff), probeTools: [], role: "review" }, log);
+      const result = await runAgent(project, { prompt: validatePrompt(t, diff, notes), probeTools: [], role: "review" }, log);
       run.costUsd += result.costUsd;
       const verdict = /VERDICT:\s*(PASS|FAIL)/i.exec(result.summary)?.[1]?.toUpperCase();
       const why = result.summary.split(/VERDICT:\s*(?:PASS|FAIL)/i)[1]?.trim().split("\n")[0] ?? "";
@@ -336,6 +416,11 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
       s.status = "passed";
       continue;
     }
+  }
+  if (ticket.steps.every((x) => x.status === "skipped" || x.status === "queued")) {
+    ticket.status = "needs-you";
+    ticket.summary = "No step ran for this ticket.";
+    return;
   }
   ticket.status = "passed";
 }

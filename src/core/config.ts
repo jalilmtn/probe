@@ -129,6 +129,11 @@ export interface ProbeConfig {
    */
   watch: {
     enabled: boolean;
+    /**
+     * Start a check on its own after edits (Studio's file watcher, the end of an agent's turn, a
+     * commit). Off by default: edits only mark features stale, and Check now runs it.
+     */
+    autoCheck: boolean;
     /** Let an agent draft manifest and brief corrections after a change. Costs one agent run per feature. */
     drafts: boolean;
     /** At most this many features per check; a wider change leaves the rest stale for a manual check. */
@@ -260,7 +265,7 @@ const DEFAULTS: ProbeConfig = {
   perf: { maxStartupMs: 4000, maxJankyPct: 15, maxP90Ms: 32 },
   tickets: { pattern: "[A-Z][A-Z0-9]+-\\d+" },
   agents: { runner: "claude", model: RUNNER_DEFAULT_MODEL.claude },
-  watch: { enabled: true, drafts: true, maxFeatures: 3, impactDepth: 1 },
+  watch: { enabled: true, autoCheck: false, drafts: true, maxFeatures: 3, impactDepth: 1 },
   security: { osv: true, historyCommits: 300, failOn: "high", skip: [], ignorePaths: [] },
   devices: { allowReal: [] },
   connections: [],
@@ -380,6 +385,9 @@ export interface AiAccount {
   profileDir?: string;
 }
 
+/** How hard a model thinks. Claude Code takes all five; Codex low, medium, high and xhigh. */
+export const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
+
 /** Kinds of agent work, each with its own account and model. */
 export const AI_ROLES = ["coding", "review", "testing"] as const;
 export type AiRole = (typeof AI_ROLES)[number];
@@ -388,7 +396,7 @@ export interface AiSettings {
   /** The project's Claude (or Codex) accounts on this machine. Empty: the CLI's own login. */
   accounts?: AiAccount[];
   /** Per kind of work: which account and model. Unset: the first account and the Agents model. */
-  use?: Partial<Record<AiRole, { account?: string; model?: string }>>;
+  use?: Partial<Record<AiRole, { account?: string; model?: string; effort?: string }>>;
 }
 
 export function readLocalSettings(localDir: string): LocalSettings {
@@ -540,6 +548,7 @@ perf:
 # Keeping features current while you code (edit hooks, Studio's file watcher).
 watch:
   enabled: true
+  autoCheck: false     # true: a check starts on its own after edits; false: edits only mark features stale
   drafts: true         # an agent drafts manifest and brief corrections for review
   maxFeatures: 3
   impactDepth: 1       # a platform edit marks the areas depending on it stale; 2 reaches theirs, 0 is off
