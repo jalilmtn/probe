@@ -30,6 +30,7 @@ const TITLE: Record<BlockReason, string> = {
   "wrong-account": "The app is signed in with an account that is not a test account",
   "needs-code": "Signing in needs a code the agent does not have",
   "missing-data": "The app did not have what the card needs",
+  "no-connection": "The app could not reach its server",
   other: "The agent could not finish the card",
 };
 
@@ -38,6 +39,7 @@ export function blockReason(said: BlockReason | undefined, notes: string): Block
   if (said) return said;
   const n = notes.toLowerCase();
   if (/not (one of )?the test accounts?|non-test account|not a test account|wrong account|real account/.test(n)) return "wrong-account";
+  if (/no (internet )?connection|trying to reconnect|offline|failed to (post|upload|load|send)|network error|could not connect|can't connect|never finish/.test(n)) return "no-connection";
   if (/\b(sms|email|verification|one[- ]time|2fa|two[- ]factor|otp|login) code\b|captcha/.test(n)) return "needs-code";
   if (/(sign[- ]?in|log[- ]?in|password)[^.]{0,60}(refused|rejected|failed|wrong|incorrect|invalid|did not work|error)|(wrong|incorrect|invalid) (password|credentials)|could not (sign|log) ?in/.test(n)) return "sign-in";
   if (/\bno (active |existing )?\w+ (to|yet)\b|there (is|are|was|were) no\b|nothing to (open|test|show)|first (post|create|add)|needs? (an?|some|existing) /.test(n)) return "missing-data";
@@ -63,6 +65,8 @@ function todoFor(reason: BlockReason, project: Project): Pick<Unblock, "todo" | 
       };
     case "needs-code":
       return { todo: "Store the code with the test account in Settings → Test accounts, or sign in by hand on the device once, then run again.", settings: "accounts" };
+    case "no-connection":
+      return { todo: "Check that the device reaches the app's server: its Wi-Fi or mobile data, a VPN, the server address of this build, and that the server is up. Open the app by hand to see it load, then run again." };
     case "missing-data":
       return { todo: "Prepare what the agent says is missing on the device (or with the test account), then run again." };
     default:

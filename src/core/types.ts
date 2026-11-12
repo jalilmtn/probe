@@ -150,12 +150,13 @@ export interface CardVerdict {
 
 /**
  * Why a card run was blocked: a refused sign-in, the app signed in with an account that is not
- * a test account, a login code the agent does not have, data the card needs, or anything else.
+ * a test account, a login code the agent does not have, data the card needs, the app cannot
+ * reach its server, or anything else.
  */
-export type BlockReason = "sign-in" | "wrong-account" | "needs-code" | "missing-data" | "other";
+export type BlockReason = "sign-in" | "wrong-account" | "needs-code" | "missing-data" | "no-connection" | "other";
 
 /** Block reasons that would stop every later card in the same way. */
-export const SIGN_IN_BLOCKS: readonly BlockReason[] = ["sign-in", "wrong-account", "needs-code"];
+export const SIGN_IN_BLOCKS: readonly BlockReason[] = ["sign-in", "wrong-account", "needs-code", "no-connection"];
 
 export interface TimelineEntry {
   at: string;

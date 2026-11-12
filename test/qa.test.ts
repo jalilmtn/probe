@@ -441,6 +441,7 @@ describe("unblocking a blocked run", () => {
     assert.equal(blockReason(undefined, "The sign-in was refused: wrong password shown under the field."), "sign-in");
     assert.equal(blockReason(undefined, "It asks for the SMS code sent to the phone."), "needs-code");
     assert.equal(blockReason(undefined, "There is no active story to open."), "missing-data");
+    assert.equal(blockReason(undefined, "A 'No connection – Trying to reconnect' banner stayed on."), "no-connection");
     assert.equal(blockReason(undefined, "The screen stayed white."), "other");
   });
 

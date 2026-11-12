@@ -411,10 +411,10 @@ export async function runMcpServer(version: string): Promise<void> {
           .optional()
           .describe("The test account the app was signed in with (its role) and the name or handle the app shows for it, e.g. its profile handle."),
         blockedBy: z
-          .enum(["sign-in", "wrong-account", "needs-code", "missing-data", "other"])
+          .enum(["sign-in", "wrong-account", "needs-code", "missing-data", "no-connection", "other"])
           .optional()
           .describe(
-            "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), other.",
+            "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), no-connection (the app cannot reach its server: an offline or reconnecting banner, uploads or loading that never finish), other.",
           ),
       },
     },
