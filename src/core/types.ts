@@ -142,9 +142,18 @@ export interface CardVerdict {
   result: "passed" | "failed" | "blocked";
   expectations: ExpectationResult[];
   notes: string;
-  /** Blocked because a test account could not sign in: the next cards would fail the same way. */
-  blockedBy?: "sign-in";
+  /** With blocked: what stopped it. The sign-in reasons stop a verify's next cards too. */
+  blockedBy?: BlockReason;
 }
+
+/**
+ * Why a card run was blocked: a refused sign-in, the app signed in with an account that is not
+ * a test account, a login code the agent does not have, data the card needs, or anything else.
+ */
+export type BlockReason = "sign-in" | "wrong-account" | "needs-code" | "missing-data" | "other";
+
+/** Block reasons that would stop every later card in the same way. */
+export const SIGN_IN_BLOCKS: readonly BlockReason[] = ["sign-in", "wrong-account", "needs-code"];
 
 export interface TimelineEntry {
   at: string;

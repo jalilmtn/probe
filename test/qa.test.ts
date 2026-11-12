@@ -432,3 +432,39 @@ describe("sign-in tries", () => {
     assert.ok(secretTries(timeline, "user_a", "password") >= MAX_SECRET_TRIES);
   });
 });
+
+describe("unblocking a blocked run", () => {
+  test("the reason comes from the agent, or from its notes on older runs", async () => {
+    const { blockReason } = await import("../src/engine/unblock.js");
+    assert.equal(blockReason("missing-data", "anything"), "missing-data");
+    assert.equal(blockReason(undefined, "Logged in as @someone, which is not a test account."), "wrong-account");
+    assert.equal(blockReason(undefined, "The sign-in was refused: wrong password shown under the field."), "sign-in");
+    assert.equal(blockReason(undefined, "It asks for the SMS code sent to the phone."), "needs-code");
+    assert.equal(blockReason(undefined, "There is no active story to open."), "missing-data");
+    assert.equal(blockReason(undefined, "The screen stayed white."), "other");
+  });
+
+  test("a verify reruns its blocked cards and the ones a failed sign-in skipped", async () => {
+    const { unblockOf } = await import("../src/engine/unblock.js");
+    const project = fixture();
+    const at = new Date().toISOString();
+    const card: CardRun = {
+      id: "20260101-000001", kind: "card", feature: "story", cardId: "close", status: "blocked", startedAt: at, device: "emulator", timeline: [], crashes: [], costUsd: 0,
+      verdict: { result: "blocked", expectations: [], notes: "Sign-in refused.", blockedBy: "sign-in" },
+    } as unknown as CardRun;
+    project.store.writeRun(card.id, card);
+    const verify = {
+      id: "20260101-000000", kind: "verify", feature: "*", status: "blocked", startedAt: at, base: "main", changed: [], unowned: [], device: true, costUsd: 0,
+      features: [{ feature: "story", files: [], cards: [
+        { cardId: "close", runId: card.id, status: "blocked", note: "Sign-in refused." },
+        { cardId: "sheet", status: "skipped", note: "not run: sign-in failed on story/close; fix the test accounts" },
+        { cardId: "open", status: "passed", runId: "x" },
+      ] }],
+    } as unknown as VerifyRun;
+    const u = unblockOf(project, verify)!;
+    assert.equal(u.reason, "sign-in");
+    assert.equal(u.settings, "accounts");
+    assert.deepEqual(u.cards, ["story/close", "story/sheet"]);
+    assert.equal(unblockOf(project, { ...verify, features: [{ feature: "story", files: [], cards: [{ cardId: "open", status: "passed" }] }] } as VerifyRun), null);
+  });
+});

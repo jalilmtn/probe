@@ -4,6 +4,7 @@ import { listCards } from "../cards/store.js";
 import { throwIfStopped } from "../core/proc.js";
 import { newRunId } from "../core/store.js";
 import type { BuildRef, Card, RunStatus, RunTarget, ScanResult, VerifyFeature, VerifyRun } from "../core/types.js";
+import { SIGN_IN_BLOCKS } from "../core/types.js";
 import { runTargets } from "../devices/driver.js";
 import { changedFiles, commitsForTicket, defaultBase, filesOfCommit } from "./history.js";
 import { resultsOverview } from "./ledger.js";
@@ -40,6 +41,8 @@ export interface VerifyOptions {
    * skipped: they test the working tree, which is not what the build holds.
    */
   build?: BuildRef;
+  /** Run only these cards ("feature/card"), whatever their last result: a blocked run, again. */
+  only?: string[];
 }
 
 /** Whether a verify's cards test something other than the working tree: a finished build or the deployed site. */
@@ -81,7 +84,7 @@ function pickCards(cards: Card[], which: "approved" | "all", ticket?: string): C
  */
 export function startVerify(project: Project, options: VerifyOptions = {}): { run: VerifyRun; done: Promise<VerifyRun> } {
   const base = options.base ?? defaultBase(project.root, project.config.verify.base);
-  if (!base && !options.features?.length && !options.ticket && !options.outdated) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
+  if (!base && !options.features?.length && !options.ticket && !options.outdated && !options.only?.length) throw new Error("No base branch found to compare with. Pass --base or set verify.base in probe/probe.yaml.");
 
   // A project whose app cannot run on a device or in a browser is verified by its unit tests alone.
   const noDevice = options.noDevice || runTargets(project).length === 0;
@@ -120,6 +123,9 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
       });
       targets = new Map(wanted.map((f) => [f.id, []]));
       log(`${targets.size} features have outdated or missing results`);
+    } else if (options.only?.length) {
+      targets = new Map(options.only.map((c) => [c.split("/")[0]!, [] as string[]]));
+      log(`again: ${options.only.join(", ")}`);
     } else if (options.features?.length) {
       targets = new Map(options.features.map((f) => [f, []]));
       // With a ticket, its own cards run too, whatever feature they belong to.
@@ -172,7 +178,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
       /** The card whose sign-in failed: the rest would fail at the same sign-in, so they are not run. */
       let signInFailed: string | null = null;
       for (const f of run.features) {
-        const cards = pickCards(listCards(project.root, f.feature), which, options.ticket);
+        const cards = pickCards(listCards(project.root, f.feature), options.only ? "all" : which, options.ticket).filter((c) => !options.only || options.only.includes(`${f.feature}/${c.id}`));
         if (cards.length === 0) {
           f.cards.push({ cardId: "—", status: "skipped", note: which === "approved" ? "no approved cards" : "no cards" });
           continue;
@@ -181,7 +187,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
           throwIfStopped();
           // A result on exactly this code and card would only repeat itself.
           const known = overview.cards.get(`${f.feature}/${card.id}`);
-          if (known?.state === "fresh" && !options.rerunFresh && !otherCode) {
+          if (known?.state === "fresh" && !options.rerunFresh && !options.only && !otherCode) {
             const e = known.entry!;
             f.cards.push({ cardId: card.id, runId: e.run, status: e.result === "passed" ? "skipped" : e.result, note: `${e.result} on this same code (${e.by ?? "run"} ${e.at.slice(0, 10)}); not re-run` });
             log(`${f.feature}/${card.id}: ${e.result}, up to date — skipped`);
@@ -208,7 +214,7 @@ export function startVerify(project: Project, options: VerifyOptions = {}): { ru
           log(`${f.feature}/${card.id}: ${finished.status}`);
           // A build that does not install will not install for the next card either.
           if (finished.status === "error" && /Installing|did not open/.test(finished.error ?? "")) budget = 0;
-          if (finished.status === "blocked" && finished.verdict?.blockedBy === "sign-in") {
+          if (finished.status === "blocked" && finished.verdict?.blockedBy && SIGN_IN_BLOCKS.includes(finished.verdict.blockedBy)) {
             signInFailed = `${f.feature}/${card.id}`;
             log(`sign-in failed: the remaining cards are not run`);
           }

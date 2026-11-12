@@ -901,8 +901,9 @@ function followRun(runId, el, onDone) {
       const rs = el.querySelector("#rs"); rs.className = "pill " + e.run.status; rs.textContent = e.run.status;
       el.querySelector("#rstop")?.remove();
       const rr = el.querySelector("#rr");
-      rr.innerHTML = resultsTable(e.run) + `<div id="ri"></div>`;
+      rr.innerHTML = `<div id="ru"></div>` + resultsTable(e.run) + `<div id="ri"></div>`;
       bindTicket(rr);
+      renderUnblock(e.run, rr.querySelector("#ru"), el);
       renderIssues(e.run, rr.querySelector("#ri"), el);
       rr.querySelectorAll("a[data-open]").forEach((a) => a.addEventListener("click", (ev) => { ev.preventDefault(); state.tab === "runs" ? selectRun(a.dataset.open) : followRun(a.dataset.open, el); }));
       // Over at once here, not at the next poll, so a re-render does not mark its button busy again.
@@ -955,6 +956,41 @@ async function renderIssues(run, el, panel) {
       if (res.error) return alert(res.error);
       followRun(res.runId, panel);
     });
+  });
+}
+
+/** A blocked run: why it stopped, what to do, and its blocked cards run again. */
+async function renderUnblock(run, el, panel) {
+  if (run.status === "running" || !["card", "verify", "work"].includes(run.kind)) return;
+  const u = await api(`/api/runs/${encodeURIComponent(run.id)}/unblock`).catch(() => null);
+  if (!u || !u.cards) return;
+  const n = u.cards.length;
+  el.innerHTML = `<div class="box unblock" style="border-color:var(--warn)">
+    <h3 style="margin-top:0"><span class="pill blocked">blocked</span> ${esc(u.title)}</h3>
+    ${u.seen ? `<p class="muted" style="margin:6px 0">The agent: “${esc(u.seen.length > 400 ? u.seen.slice(0, 400) + "…" : u.seen)}”</p>` : ""}
+    <p style="margin:6px 0"><strong>To do:</strong> ${esc(u.todo)}</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+      ${u.settings === "accounts" ? `<button class="btn secondary" data-ub-accounts>Open Test accounts</button>` : ""}
+      ${u.canSignIn ? `<select data-ub-role>${u.roles.map((r) => `<option>${esc(r)}</option>`).join("")}</select><button class="btn secondary" data-ub-signin title="Probe opens the app, signs out of the other account and signs in as this test account">Sign in as a test account</button>` : ""}
+      <button class="btn" data-ub-again title="${esc(u.cards.join("\n"))}">↻ Run again: ${n} card${n === 1 ? "" : "s"}</button>
+      <span class="muted" data-ub-out></span>
+    </div>
+    <div class="ub-run"></div></div>`;
+  const out = el.querySelector("[data-ub-out]");
+  el.querySelector("[data-ub-accounts]")?.addEventListener("click", () => { state.tab = "settings"; state.settingsTab = "accounts"; render(); });
+  el.querySelector("[data-ub-signin]")?.addEventListener("click", async (ev) => {
+    const role = el.querySelector("[data-ub-role]").value;
+    ev.target.disabled = true;
+    const res = await post("/api/login", { role });
+    if (res.error) { ev.target.disabled = false; return (out.textContent = res.error); }
+    out.textContent = `Signing in as ${role}… Run again once it is done.`;
+    followRun(res.runId, el.querySelector(".ub-run"), () => { ev.target.disabled = false; });
+  });
+  el.querySelector("[data-ub-again]").addEventListener("click", async (ev) => {
+    ev.target.disabled = true;
+    const res = await post(`/api/runs/${encodeURIComponent(run.id)}/again`);
+    if (res.error) { ev.target.disabled = false; return (out.textContent = res.error); }
+    followRun(res.runId, panel);
   });
 }
 

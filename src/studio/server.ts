@@ -24,6 +24,7 @@ import { dismissIssue, startSecurityRun } from "../security/run.js";
 import { loadDismissals, undismiss } from "../security/findings.js";
 import { RULES } from "../security/catalog/index.js";
 import { findIssue, fixPrompt, issuesOf } from "../engine/issues.js";
+import { unblockOf } from "../engine/unblock.js";
 import { findFeature, latestScan, riskyGaps, scan } from "../engine/scan.js";
 import { startUnitRun } from "../engine/unit.js";
 import page from "./page.html";
@@ -575,6 +576,31 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
   }
 
   // Problems of a run, and the two ways to fix one: a prompt to paste, or a fix agent.
+  // A blocked run: why, what to do, and its blocked cards run again.
+  m = /^\/api\/runs\/([\w-]+)\/unblock$/.exec(path);
+  if (method === "GET" && m) {
+    const run = project.store.read<Run>(`runs/${m[1]}.json`);
+    if (!run) return send(res, 404, { error: "no such run" });
+    const found = unblockOf(project, run);
+    return send(res, 200, found ? { ...found, roles: listAccounts(project.root).map((a) => a.role) } : null);
+  }
+  m = /^\/api\/runs\/([\w-]+)\/again$/.exec(path);
+  if (method === "POST" && m) {
+    const run = project.store.read<Run>(`runs/${m[1]}.json`);
+    const found = run && unblockOf(project, run);
+    if (!run || !found) return send(res, 409, { error: "Nothing in this run was blocked." });
+    const from = project.store.read<Run>(`runs/${found.runId}.json`);
+    try {
+      if (from?.kind === "card") {
+        return send(res, 200, startJob(jobKeys.card(from.feature, from.cardId), () => startCardRun(project, from.feature, from.cardId, { target: from.target, build: from.build })));
+      }
+      const v = from?.kind === "verify" ? from : null;
+      const options: VerifyOptions = { only: found.cards, noUnit: true, cards: "all", ticket: v?.ticket, target: v?.target, build: v?.build };
+      return send(res, 200, startJob(jobKeys.verify(options), () => startVerify(project, options)));
+    } catch (e) {
+      return send(res, 409, { error: (e as Error).message });
+    }
+  }
   m = /^\/api\/runs\/([^/]+)\/issues$/.exec(path);
   if (method === "GET" && m) {
     const run = project.store.read<Run>(`runs/${m[1]}.json`);

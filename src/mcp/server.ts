@@ -406,7 +406,12 @@ export async function runMcpServer(version: string): Promise<void> {
         result: z.enum(["passed", "failed", "blocked"]),
         expectations: z.array(z.object({ text: z.string(), met: z.boolean().nullable(), evidence: z.string() })),
         notes: z.string().default(""),
-        blockedBy: z.enum(["sign-in"]).optional().describe("With blocked: \"sign-in\" when a test account's sign-in was refused or needs a code you do not have."),
+        blockedBy: z
+          .enum(["sign-in", "wrong-account", "needs-code", "missing-data", "other"])
+          .optional()
+          .describe(
+            "With blocked, what stopped you: sign-in (a test account's sign-in was refused), wrong-account (the app is signed in with an account that is not a test account), needs-code (an SMS, email or 2FA code you do not have), missing-data (the app lacks what the card needs, say what in notes), other.",
+          ),
       },
     },
     async (verdict) => {
