@@ -406,6 +406,10 @@ export async function runMcpServer(version: string): Promise<void> {
         result: z.enum(["passed", "failed", "blocked"]),
         expectations: z.array(z.object({ text: z.string(), met: z.boolean().nullable(), evidence: z.string() })),
         notes: z.string().default(""),
+        signedInAs: z
+          .object({ role: z.string(), seenAs: z.string() })
+          .optional()
+          .describe("The test account the app was signed in with (its role) and the name or handle the app shows for it, e.g. its profile handle."),
         blockedBy: z
           .enum(["sign-in", "wrong-account", "needs-code", "missing-data", "other"])
           .optional()

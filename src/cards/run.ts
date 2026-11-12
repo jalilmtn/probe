@@ -1,5 +1,5 @@
 import { stringify } from "yaml";
-import { accountsForPrompt } from "../accounts/accounts.js";
+import { accountsForPrompt, learnShownAs } from "../accounts/accounts.js";
 import { newRunId } from "../core/store.js";
 import type { BuildRef, Card, CardRun, RunTarget } from "../core/types.js";
 import { appOn, crashError, howTo, runOnDevice } from "../devices/harness.js";
@@ -22,10 +22,10 @@ ${accountsForPrompt(project)}
 ${howTo(target)}
 
 Follow the card's reach, preconditions and steps, then check every expectation ${target === "web" ? "in the browser" : "on the device"}.
-If the app is logged in with an account that is not a test account, the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
+If the app is logged in with an account that matches no test account (by username, email or shown name, checked as the safety rules say), the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
 
 ## Finish
-Call probe_card_verdict exactly once: result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
+Call probe_card_verdict exactly once (with signedInAs when you saw which test account the app uses): result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
 }
 
 export interface CardRunOptions {
@@ -74,6 +74,8 @@ export function startCardRun(project: Project, feature: string, cardId: string, 
       log,
     );
     run.verdict = session.verdict() ?? undefined;
+    const seen = run.verdict?.signedInAs;
+    if (seen) learnShownAs(project.root, seen.role, seen.seenAs, run.timeline, log);
 
     const crashed = crashError(run);
     if (crashed) {

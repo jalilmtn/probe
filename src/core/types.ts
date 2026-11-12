@@ -142,6 +142,8 @@ export interface CardVerdict {
   result: "passed" | "failed" | "blocked";
   expectations: ExpectationResult[];
   notes: string;
+  /** The test account the app was signed in with, and the name or handle it shows for it. */
+  signedInAs?: { role: string; seenAs: string };
   /** With blocked: what stopped it. The sign-in reasons stop a verify's next cards too. */
   blockedBy?: BlockReason;
 }

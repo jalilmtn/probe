@@ -57,9 +57,9 @@ function todoFor(reason: BlockReason, project: Project): Pick<Unblock, "todo" | 
     case "wrong-account":
       return {
         todo: accounts
-          ? "Sign out on the device and sign in as a test account, or press Sign in as a test account to let Probe do it, then run again."
+          ? "If the account on the device is one of your test accounts, its \"Shown as\" name in Settings → Test accounts is out of date: set it to what the app shows. Otherwise sign in as a test account, or press Sign in as a test account to let Probe do it. Then run again."
           : "Sign out on the device and add a test account in Settings → Test accounts, then run again.",
-        settings: accounts ? undefined : "accounts",
+        settings: "accounts",
       };
     case "needs-code":
       return { todo: "Store the code with the test account in Settings → Test accounts, or sign in by hand on the device once, then run again.", settings: "accounts" };

@@ -3,7 +3,7 @@ import type { LoginRun, LoginState, RunTarget } from "../core/types.js";
 import { appOn, crashError, howTo, runOnDevice } from "../devices/harness.js";
 import type { Project } from "../engine/project.js";
 import { launchRun } from "../engine/runs.js";
-import { accountsForPrompt, listAccounts } from "./accounts.js";
+import { accountsForPrompt, learnShownAs, listAccounts } from "./accounts.js";
 
 function prompt(project: Project, wanted: string | undefined, device: string, app: string, target: RunTarget): string {
   const task = wanted
@@ -54,6 +54,7 @@ export function startLoginRun(project: Project, wanted?: string, options: { devi
       run.status = "passed";
     }
     if (run.login) log(`login: ${describeLogin(run.login)}`);
+    if (run.login?.state === "logged_in" && run.login.role && run.login.seenAs) learnShownAs(project.root, run.login.role, run.login.seenAs, run.timeline, log);
   });
 }
 

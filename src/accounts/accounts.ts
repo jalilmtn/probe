@@ -46,6 +46,21 @@ export function saveAccount(root: string, account: Account): void {
   ]);
 }
 
+/**
+ * Keeps a test account's "shown in the app as" name current. Only after Probe itself signed in
+ * with that account in this run (its password was typed): then the account the app shows is
+ * certainly that one, whatever name was saved before.
+ */
+export function learnShownAs(root: string, role: string, seenAs: string, timeline: { action: string; detail: string }[], log: (l: string) => void): boolean {
+  const name = seenAs.trim().slice(0, 80);
+  const account = listAccounts(root).find((a) => a.role === role);
+  const signedIn = timeline.some((e) => e.action === "type_secret" && e.detail === `typed ${role}'s password`);
+  if (!account || !name || !signedIn || account.shownAs === name) return false;
+  saveAccount(root, { ...account, shownAs: name });
+  log(`test account ${role} is shown in the app as ${name}${account.shownAs ? ` (was ${account.shownAs})` : ""}: saved`);
+  return true;
+}
+
 export function removeAccount(root: string, role: string): void {
   writeAccounts(root, listAccounts(root).filter((a) => a.role !== role));
 }

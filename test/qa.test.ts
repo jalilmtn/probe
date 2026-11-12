@@ -468,3 +468,18 @@ describe("unblocking a blocked run", () => {
     assert.equal(unblockOf(project, { ...verify, features: [{ feature: "story", files: [], cards: [{ cardId: "open", status: "passed" }] }] } as VerifyRun), null);
   });
 });
+
+describe("test accounts", () => {
+  test("the name an account shows is learned only after Probe signed in with it", async () => {
+    const { learnShownAs, listAccounts, saveAccount } = await import("../src/accounts/accounts.js");
+    const project = fixture();
+    saveAccount(project.root, { role: "user_a", username: "a@example.com", shownAs: "@old" });
+    const log: string[] = [];
+    const at = "2026-01-01T00:00:00.000Z";
+    assert.equal(learnShownAs(project.root, "user_a", "@new", [{ action: "act", detail: "tap 3" }], (l) => log.push(l)), false);
+    assert.equal(listAccounts(project.root)[0]!.shownAs, "@old");
+    assert.equal(learnShownAs(project.root, "user_a", "@new", [{ at, action: "type_secret", detail: "typed user_a's password" } as never], (l) => log.push(l)), true);
+    assert.equal(listAccounts(project.root)[0]!.shownAs, "@new");
+    assert.match(log[0]!, /was @old/);
+  });
+});
