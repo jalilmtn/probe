@@ -404,10 +404,10 @@ async function handle(current: Current, req: IncomingMessage, res: ServerRespons
     return send(res, 200, { ok: true });
   }
   if (method === "POST" && path === "/api/work") {
-    const body = JSON.parse(await readBody(req)) as { tickets?: { key: string; source?: string; notes?: string }[]; steps?: string[]; commitPattern?: string; model?: string; account?: string; effort?: string; notes?: string };
+    const body = JSON.parse(await readBody(req)) as { tickets?: { key: string; source?: string; notes?: string }[]; steps?: string[]; commitPattern?: string; model?: string; account?: string; effort?: string; notes?: string; uiScope?: string };
     try {
       const tickets = (body.tickets ?? []).filter((t) => t && typeof t.key === "string");
-      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || undefined, account: body.account || undefined, effort: body.effort || undefined, notes: body.notes?.slice(0, 8000) })));
+      return send(res, 200, startJob(jobKeys.work(), () => startWork(project, { tickets, steps: body.steps ?? [], commitPattern: body.commitPattern, model: body.model?.trim() || undefined, account: body.account || undefined, effort: body.effort || undefined, notes: body.notes?.slice(0, 8000), uiScope: body.uiScope === "feature" ? "feature" : "ticket" })));
     } catch (e) {
       return send(res, 400, { error: (e as Error).message });
     }

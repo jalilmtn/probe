@@ -133,7 +133,14 @@ export interface WorkOptions {
   /** Coding model and account for this run, over Settings → AI. */
   model?: string;
   account?: string;
+  /**
+   * What the device step runs: only the cards of the ticket (default), or also every other card
+   * of the features it touched, to see nothing else broke.
+   */
+  uiScope?: UiScope;
 }
+
+export type UiScope = "ticket" | "feature";
 
 function git(root: string, args: string[]) {
   return spawnSync("git", args, { cwd: root, encoding: "utf8", windowsHide: true, timeout: 60_000 });
@@ -220,7 +227,7 @@ export function startWork(project: Project, options: WorkOptions): { run: WorkRu
       log(`══ ${ticket.key}`);
       ticket.status = "running";
       try {
-        await workOn(project, run, ticket, steps, pattern, { model: options.model, account: options.account, effort: options.effort, notes: notesText(options.notes, ticket.notes) }, log);
+        await workOn(project, run, ticket, steps, pattern, { model: options.model, account: options.account, effort: options.effort, notes: notesText(options.notes, ticket.notes), uiScope: options.uiScope }, log);
       } catch (e) {
         ticket.status = "error";
         ticket.summary = (e as Error).message;
@@ -234,8 +241,8 @@ export function startWork(project: Project, options: WorkOptions): { run: WorkRu
   });
 }
 
-async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps: WorkStep[], pattern: string, ai: { model?: string; account?: string; effort?: string; notes: string }, log: (l: string) => void): Promise<void> {
-  const { model, account, effort, notes } = ai;
+async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps: WorkStep[], pattern: string, ai: { model?: string; account?: string; effort?: string; notes: string; uiScope?: UiScope }, log: (l: string) => void): Promise<void> {
+  const { model, account, effort, notes, uiScope = "ticket" } = ai;
   const state = (step: WorkStep) => ticket.steps.find((s) => s.step === step)!;
   const fail = (s: WorkStepState, note: string, status: WorkStepState["status"] = "failed") => {
     s.status = status;
@@ -248,6 +255,8 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
   const before = dirtyFiles(project.root);
   let discussion = "";
   let features: string[] = t.features;
+  /** The ticket's own cards, as feature/card: those linked to it, or the ones drafted from it here. */
+  let ticketCards = [...t.cards];
 
   for (const step of steps) {
     if (runSignal.getStore()?.aborted) return;
@@ -311,6 +320,7 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
           fail(s, `no card was drafted (${made.status}${made.error ? `: ${made.error}` : ""}). See run ${drafting.id}.`, "blocked");
           return;
         }
+        ticketCards = [...made.written];
         s.note = `drafted ${made.written.length} card(s): ${made.written.join(", ")}`;
         log(s.note);
       }
@@ -332,9 +342,17 @@ async function workOn(project: Project, run: WorkRun, ticket: WorkTicket, steps:
         s.status = "passed";
         s.note = `${features.join(", ")} passed`;
       } else {
-        // The ticket's cards first, then the cards of the features it touched; drafts count too.
-        log(`on the device: ${t.cards.length ? `${t.cards.length} card(s) of ${t.id}` : ""}${t.cards.length && features.length ? " and " : ""}${features.length ? `cards of ${features.join(", ")}` : ""}`);
-        const { run: verify, done } = startVerify(project, { ticket: t.id, features: features.length ? features : undefined, noUnit: true, cards: "all" });
+        // Only the ticket's cards by default; with "feature", then the other cards of the features it touched too.
+        const wide = uiScope === "feature";
+        if (!wide && !ticketCards.length) {
+          fail(s, `${t.id} has no cards of its own. Draft cards from the ticket on its page, or start again with the device test set to include its features' cards.`, "blocked");
+          return;
+        }
+        log(wide ? `on the device: ${ticketCards.length ? `${ticketCards.length} card(s) of ${t.id}` : ""}${ticketCards.length && features.length ? " and " : ""}${features.length ? `cards of ${features.join(", ")}` : ""}` : `on the device: only ${t.id}'s card(s): ${ticketCards.join(", ")}`);
+        const { run: verify, done } = startVerify(
+          project,
+          wide ? { ticket: t.id, features: features.length ? features : undefined, noUnit: true, cards: "all" } : { ticket: t.id, only: ticketCards, noUnit: true, cards: "all" },
+        );
         s.runId = verify.id;
         const finished = await done;
         run.costUsd += finished.costUsd;

@@ -1724,6 +1724,7 @@ function renderWorkBar(all, wb, st) {
       ${(() => { const ai = st.ai; const coding = ai.use.coding || {}; st.account = st.account ?? (coding.account || ""); st.model = st.model ?? (coding.model || "");
         return `<label>Coding account<select name="account"><option value="">${ai.accounts.length ? "As in Settings (" + esc((ai.accounts.find((a) => a.id === coding.account) || ai.accounts[0]).name) + ")" : "CLI's own login"}</option>${ai.accounts.map((a) => `<option value="${a.id}" ${st.account === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>
         <label>Coding model<select name="model"><option value="">As in Settings (${esc(coding.model || ai.model || "default")})</option>${ai.models.filter(([m]) => m).map(([m, l]) => `<option value="${esc(m)}" ${st.model === m ? "selected" : ""}>${esc(l.split(" — ")[0])}</option>`).join("")}${st.model && !ai.models.some(([m]) => m === st.model) ? `<option selected>${esc(st.model)}</option>` : ""}</select></label>`; })()}
+      <label title="What “Test on the device” runs for each ticket">Device test<select name="uiScope"><option value="ticket" ${st.uiScope !== "feature" ? "selected" : ""}>Only the ticket's cards</option><option value="feature" ${st.uiScope === "feature" ? "selected" : ""}>Ticket's cards + its features' cards</option></select></label>
       <label>Effort<select name="effort"><option value="">${esc(coding.effort ? "As in Settings (" + coding.effort + ")" : "CLI default")}</option>${(st.ai.efforts || []).map((e) => `<option ${st.effort === e ? "selected" : ""}>${e}</option>`).join("")}</select></label>
       <label style="flex:1 1 100%">Instructions for every ticket in this run <span class="src">optional · each ticket can also have its own, on its page</span>
         <textarea name="notes" rows="2" style="padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font:inherit" placeholder="e.g. Keep changes small. Don't change public APIs. Follow the existing MVI pattern.">${esc(st.batchNotes || "")}</textarea></label>
@@ -1744,6 +1745,7 @@ function renderWorkBar(all, wb, st) {
   f.account.addEventListener("change", () => { st.account = f.account.value; });
   f.model.addEventListener("change", () => { st.model = f.model.value; });
   f.effort.addEventListener("change", () => { st.effort = f.effort.value; });
+  f.uiScope.addEventListener("change", () => { st.uiScope = f.uiScope.value; });
   f.notes.addEventListener("input", () => { st.batchNotes = f.notes.value; });
   document.getElementById("wbclear").addEventListener("click", () => { st.picked.clear(); renderTickets(true); });
   f.addEventListener("submit", async (e) => {
@@ -1752,7 +1754,7 @@ function renderWorkBar(all, wb, st) {
     if (st.steps.has("commit") && !/\{key\}/.test(st.pattern)) return alert("The commit message needs {key}, so each commit names its ticket.");
     const steps = wb.allSteps.map((s) => s.id).filter((s) => st.steps.has(s));
     if (!confirm(`The agent will work on ${picked.length} ticket(s) in ${state.branchSeen || "this branch"}: ${steps.join(", ")}.${steps.includes("commit") ? " Each ticket gets its own local commit." : ""} Start?`)) return;
-    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source, notes: st.notes[tkKey(t)] || undefined })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined, effort: st.effort || undefined, notes: st.batchNotes || undefined });
+    const res = await post("/api/work", { tickets: picked.map((t) => ({ key: t.id, source: t.source, notes: st.notes[tkKey(t)] || undefined })), steps, commitPattern: st.pattern, account: st.account || undefined, model: st.model || undefined, effort: st.effort || undefined, notes: st.batchNotes || undefined, uiScope: st.uiScope || "ticket" });
     if (res.error) return alert(res.error);
     st.workRun = res.runId;
     st.picked.clear();
