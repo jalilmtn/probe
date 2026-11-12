@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.1 — 2026-11-12
+
+Studio stays responsive, and device tests stop at a failed sign-in.
+
+- Studio no longer freezes while a page loads. Its slower pages (Setup, Atlas, Cards, Changes, feature pages) and matching tickets to commits and builds are worked out on a background thread, and kept until a file, a run or a setting changes. Each page answers at once the second time.
+- A Refresh button in the header reads everything again, tickets included. The ticket list is kept on your machine and the tracker is asked only on Refresh or after a connection changes. Studio no longer polls in the background while its tab is hidden.
+- The Runs list sends a slim summary of each run instead of the whole record (about 25 times less data on a large project).
+- `watch.autoCheck` (default `false`): edits only mark features stale, and a check runs when you press Check now. Set it to `true` to start checks after edits, as before.
+- A device test stops at the first refused sign-in and reports it as blocked by sign-in. A stored password is typed at most twice per card. In a verify, the cards after a failed sign-in are not run, and the result says to fix the test accounts.
+- Before signing in, the agent checks the fields, so autofill cannot swap the test account for another one.
+- Workbench: instructions for the whole run and for each ticket, a thinking effort per AI role, and the device step drafts cards from the ticket when it has none.
+- Jira Cloud: a clearer message when the account email is missing for an API token.
+
 ## 0.8.0 — 2026-11-11
 
 Connections per project, and a ticket workbench for developers.
