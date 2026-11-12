@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.3 — 2026-11-12
+
+- A card's preconditions are set up before its steps: when the signed-in test account can create what is missing (a story, a post, an item), the agent does so with plain test content instead of stopping. A card is blocked with `missing-data` only when that is not possible.
+
 ## 0.8.2 — 2026-11-12
 
 A way past blocked runs.

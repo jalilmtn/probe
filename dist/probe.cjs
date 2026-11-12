@@ -37407,7 +37407,7 @@ ${accountsForPrompt(project)}
 ${howTo(target2)}
 
 Follow the card's reach, preconditions and steps, then check every expectation ${target2 === "web" ? "in the browser" : "on the device"}.
-If the app is logged in with an account that is not a test account, the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. If the app lacks what the card needs (no post, no story, an empty list), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
+If the app is logged in with an account that is not a test account, the result is blocked with blockedBy "wrong-account". If you cannot log in, the result is blocked with blockedBy "sign-in" (stop at the first refused sign-in), or "needs-code" when it asks for a code you do not have. Make every precondition true before the steps. When one is not met and the signed-in test account can make it so (post a story, create a post, add an item), do it first, with plain test content (a photo already in the gallery, the text "Probe test"): that is part of this task. Only when a precondition cannot be made true that way (it needs another person, a payment, or data you cannot create), the result is blocked with blockedBy "missing-data" and the notes say exactly what is missing.
 
 ## Finish
 Call probe_card_verdict exactly once: result passed (every expectation met), failed (an expectation was not met: say what you saw), or blocked (could not get far enough). For each expectation give met true/false/null and the evidence you saw. Then stop.`;
@@ -54959,7 +54959,7 @@ function gitHooks(project, action) {
 }
 
 // src/cli.ts
-var VERSION = "0.8.2";
+var VERSION = "0.8.3";
 var HELP = `probe ${VERSION} \u2014 agent-driven test platform
 
 Usage: probe <command> [options]
